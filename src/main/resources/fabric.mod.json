@@ -1,38 +1,37 @@
 {
-  "schemaVersion": 1,
-  "id": "modid",
-  "version": "${version}",
+	"schemaVersion": 1,
+	"id": "dm",
+	"version": "${version}",
 
-  "name": "Defensive Measures",
-  "description": "Allows you to craft defensive turrets that will shoot any hostile mobs it detects, and defend villages that are within proximity.",
-  "authors": [
-    "Virus5600"
-  ],
-  "contact": {
-    "homepage": "http://dma-guide.test/",
-    "sources": "https://github.com/FabricMC/fabric-example-mod"
-  },
+	"name": "Defensive Measures",
+	"description": "Allows you to craft defensive turrets that will shoot any hostile mobs it detects, and defend villages that are within proximity.",
+	"authors": [
+		"Virus5600"
+	],
+	"contact": {
+		"homepage": "http://dma-guide.test/",
+		"sources": "https://github.com/Virus5600/Defensive-Measures-Mod"
+	},
 
-  "license": "CC0-1.0",
-  "icon": "assets/modid/icon.png",
+	"license": "CC0-1.0",
+	"icon": "assets/dm/icon.png",
 
-  "environment": "*",
-  "entrypoints": {
-    "main": [
-      "com.virus5600.DefensiveMeasures"
-    ]
-  },
-  "mixins": [
-    "modid.mixins.json"
-  ],
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"com.virus5600.DefensiveMeasures.DefensiveMeasures"
+		]
+	},
+	"mixins": [
+	],
 
-  "depends": {
-    "fabricloader": ">=0.14.6",
-    "fabric": "*",
-    "minecraft": "~1.19",
-    "java": ">=17"
-  },
-  "suggests": {
-    "another-mod": "*"
-  }
+	"depends": {
+		"fabricloader": ">=0.14.6",
+		"fabric": "*",
+		"minecraft": "~1.19",
+		"java": ">=17"
+	},
+	"suggests": {
+		"another-mod": "*"
+	}
 }
