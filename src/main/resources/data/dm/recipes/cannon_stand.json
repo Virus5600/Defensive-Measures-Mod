@@ -1,0 +1,17 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern": [
+		"s  ",
+		"ss ",
+		"sss"
+	],
+	"key": {
+		"s": {
+			"tag": "minecraft:wooden_slabs"
+		}
+	},
+	"result": {
+		"item": "dm:cannon_stand",
+		"count": 2
+	}
+}

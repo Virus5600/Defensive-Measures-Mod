@@ -1,0 +1,19 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern": [
+		"f",
+		"s"
+	],
+	"key": {
+		"f": {
+			"tag": "minecraft:wooden_fences"
+		},
+		"s": {
+			"item": "dm:ballista_base"
+		}
+	},
+	"result": {
+		"item": "dm:ballista_base_with_stand",
+		"count": 1
+	}
+}

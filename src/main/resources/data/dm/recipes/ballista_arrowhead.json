@@ -1,0 +1,16 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern": [
+		" f ",
+		"fff"
+	],
+	"key": {
+		"f": {
+			"item": "minecraft:flint"
+		}
+	},
+	"result": {
+		"item": "dm:arrowhead",
+		"count": 1
+	}
+}

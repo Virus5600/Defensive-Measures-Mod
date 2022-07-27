@@ -1,0 +1,20 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern": [
+		"igi",
+		"igi",
+		"iii"
+	],
+	"key": {
+		"g": {
+			"item": "minecraft:green_dye"
+		},
+		"i": {
+			"item": "minecraft:iron_ingot"
+		}
+	},
+	"result": {
+		"item": "dm:machine_gun_stand",
+		"count": 1
+	}
+}

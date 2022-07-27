@@ -1,0 +1,17 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern": [
+		" s ",
+		"sss",
+		" s "
+	],
+	"key": {
+		"s": {
+			"tag": "minecraft:wooden_slab"
+		}
+	},
+	"result": {
+		"item": "dm:ballista_base",
+		"count": 1
+	}
+}

@@ -9,7 +9,7 @@
 		"Virus5600"
 	],
 	"contact": {
-		"homepage": "http://dma-guide.test/",
+		"homepage": "http://dma-guide.herokuapp.com/",
 		"sources": "https://github.com/Virus5600/Defensive-Measures-Mod"
 	},
 
@@ -20,9 +20,13 @@
 	"entrypoints": {
 		"main": [
 			"com.virus5600.DefensiveMeasures.DefensiveMeasures"
+		],
+		"client": [
+			"com.virus5600.DefensiveMeasures.DefensiveMeasuresClient"
 		]
 	},
 	"mixins": [
+		"dm.mixins.json"
 	],
 
 	"depends": {

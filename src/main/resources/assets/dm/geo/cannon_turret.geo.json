@@ -1,0 +1,80 @@
+{
+	"format_version": "1.12.0",
+	"minecraft:geometry": [
+		{
+			"description": {
+				"identifier": "geometry.cannon_turret",
+				"texture_width": 64,
+				"texture_height": 64,
+				"visible_bounds_width": 3,
+				"visible_bounds_height": 2.5,
+				"visible_bounds_offset": [0, 0.75, 0]
+			},
+			"bones": [
+				{
+					"name": "base",
+					"pivot": [0, 0, 0],
+					"cubes": [
+						{"origin": [-8, 0, -8], "size": [16, 1, 16], "uv": [0, 47]}
+					]
+				},
+				{
+					"name": "stand",
+					"pivot": [0, 0.5, 0],
+					"cubes": [
+						{"origin": [-6, 1, -6], "size": [12, 1, 12], "uv": [8, 33]}
+					]
+				},
+				{
+					"name": "rightstand",
+					"parent": "stand",
+					"pivot": [-6, 2, 1],
+					"cubes": [
+						{"origin": [-6, 2, -5], "size": [1, 1, 10], "uv": [42, 33]},
+						{"origin": [-6, 3, -4], "size": [1, 1, 8], "uv": [44, 34]},
+						{"origin": [-6, 4, -3], "size": [1, 1, 7], "uv": [48, 35]},
+						{"origin": [-6, 5, -2], "size": [1, 1, 5], "uv": [50, 33]},
+						{"origin": [-6, 6, -1], "size": [1, 1, 4], "uv": [54, 33]},
+						{"origin": [-6, 7, 0], "size": [1, 1, 2], "uv": [58, 39]}
+					]
+				},
+				{
+					"name": "leftstand",
+					"parent": "stand",
+					"pivot": [6, 2, 1],
+					"cubes": [
+						{"origin": [5, 2, -5], "size": [1, 1, 10], "uv": [42, 33], "mirror": true},
+						{"origin": [5, 3, -4], "size": [1, 1, 8], "uv": [44, 34]},
+						{"origin": [5, 4, -3], "size": [1, 1, 7], "uv": [48, 35], "mirror": true},
+						{"origin": [5, 5, -2], "size": [1, 1, 5], "uv": [50, 33], "mirror": true},
+						{"origin": [5, 6, -1], "size": [1, 1, 4], "uv": [54, 33], "mirror": true},
+						{"origin": [5, 7, 0], "size": [1, 1, 2], "uv": [58, 39]}
+					]
+				},
+				{
+					"name": "head",
+					"parent": "stand",
+					"pivot": [0, 6.5, -1],
+					"rotation": [-15, 0, 0],
+					"cubes": [
+						{"origin": [-5, 5, -4], "size": [10, 6, 8], "uv": [12, 0]},
+						{"origin": [-4, 4, -9], "size": [8, 8, 14], "uv": [20, 0]},
+						{"origin": [-3, 3, -4], "size": [6, 10, 8], "uv": [0, 0], "mirror": true},
+						{"origin": [-3, 5, -12], "size": [6, 6, 18], "uv": [16, 0]},
+						{"origin": [-2, 6, 6], "size": [4, 4, 1], "uv": [54, 0]},
+						{"origin": [-1, 9, -14], "size": [2, 1, 2], "uv": [56, 5]},
+						{"origin": [-1, 6, -14], "size": [2, 1, 2], "uv": [56, 10]},
+						{"origin": [1, 6, -14], "size": [1, 4, 2], "uv": [48, 9]},
+						{"origin": [-2, 6, -14], "size": [1, 4, 2], "uv": [2, 2], "mirror": true},
+						{"origin": [0, 8.5, 7], "size": [0, 1, 1], "uv": [24, 38]},
+						{"origin": [0, 9.5, 8], "size": [0, 2, 1], "uv": [28, 37]}
+					],
+					"locators": {
+						"barrel": [0, 8, -13.5],
+						"fuse": [0, 11.25, 8.75]
+					}
+				}
+			]
+		}
+	]
+}

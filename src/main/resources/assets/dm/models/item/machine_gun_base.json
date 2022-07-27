@@ -1,0 +1,6 @@
+{
+	"parent": "item/generated",
+	"textures": {
+		"layer0": "dm:item/machine_gun/machine_gun_base"
+	}
+}

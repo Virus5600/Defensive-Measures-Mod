@@ -1,0 +1,20 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern": [
+		"bbb",
+		"bpb",
+		"bbb"
+	],
+	"key": {
+		"b": {
+			"item": "minecraft:nether_bricks"
+		},
+		"p": {
+			"item": "minecraft:heavy_weighted_pressure_plate"
+		}
+	},
+	"result": {
+		"item": "dm:machine_gun_base",
+		"count": 1
+	}
+}

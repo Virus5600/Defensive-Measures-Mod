@@ -1,9 +1,10 @@
 {
 	"itemGroup.dm.defensive_measures.items" : "Defensive Measures Items",
-	"itemGroup.dm.defensive_measures.tools" : "Defensive Measures Tools",
+	"itemGroup.dm.defensive_measures.equipments" : "Defensive Measures Equipments",
+	"itemGroup.dm.defensive_measures.traps" : "Defensive Measures Traps",
 	"itemGroup.dm.defensive_measures.turrets" : "Defensive Measures Turrets",
 	
-	"tile.dm.arrowhead" : "Arrowhead",
+	"block.dm.arrowhead" : "Arrowhead",
 
 	"item.dm.turret_remover": "Turret Remover",
 	
@@ -33,5 +34,8 @@
 	"entity.dm.ballista_arrow" : "Ballista Arrow",
 	
 	"entity.dm.mg_turret" : "MG Turret",
-	"entity.dm.mg_bullet" : "MG Bullet"
+	"entity.dm.mg_bullet" : "MG Bullet",
+	
+	"death.attack.arrowhead" : "%1$s stepepd on an Arrowhead",
+	"death.attack.arrowhead.player" : "%1$s stepped on a random Arrowhead whilst fighting with %2$s"
 }

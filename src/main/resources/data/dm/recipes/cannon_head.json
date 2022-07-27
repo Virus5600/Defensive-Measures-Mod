@@ -1,0 +1,17 @@
+{
+	"type": "minecraft:crafting_shapeless",
+	"ingredients": [
+		{
+			"item": "dm:unfinished_cannon_head",
+			"count": 1
+		},
+		{
+			"item": "minecraft:string",
+			"count": 1
+		}
+	],
+	"result": {
+		"item": "dm:cannon_head",
+		"count": 1
+	}
+}

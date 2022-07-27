@@ -1,0 +1,27 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"group": "dm:cannon_turret",
+	"pattern": [
+		"shs",
+		"ppp",
+		"SSS"
+	],
+	"key": {
+		"s": {
+			"item": "dm:cannon_stand"
+		},
+		"h": {
+			"item": "dm:cannon_head"
+		},
+		"p": {
+			"tag": "minecraft:wooden_slabs"
+		},
+		"S": {
+			"item": "minecraft:smooth_stone_slab"
+		}
+	},
+	"result": {
+		"item": "dm:cannon_turret",
+		"count": 1
+	}
+}
