@@ -32,15 +32,24 @@ public class CannonTurretModel extends AnimatedGeoModel<CannonTurretEntity> {
 	@Override
 	public void setLivingAnimations(CannonTurretEntity entity, Integer uniqueID, AnimationEvent customPredicate) {
 		super.setLivingAnimations(entity, uniqueID, customPredicate);
+		IBone base = this.getAnimationProcessor().getBone("base");
 		IBone neck = this.getAnimationProcessor().getBone("stand");
 		IBone head = this.getAnimationProcessor().getBone("head");
 		
 		EntityModelData extraData = (EntityModelData) customPredicate.getExtraDataOfType(EntityModelData.class).get(0);
 		if (neck != null) {
-			neck.setRotationY(extraData.netHeadYaw * ((float) Math.PI / 360f));
+			float targetYRot = (extraData.netHeadYaw * ((float) Math.PI / 180f));
+			float neckRotY =  targetYRot;
+			neck.setRotationY(neckRotY);
+			
 			if (head != null) {
-				head.setRotationX(extraData.headPitch * ((float) Math.PI / 90f));
+				float targetXRot = (extraData.headPitch * ((float) Math.PI / 180f));
+				float headRotX = (targetXRot > 22.5f ? 30f : targetXRot < -22.5f ? -30f : targetXRot) + 0.125f;
+				head.setRotationX(headRotX);
 			}
 		}
+		
+		base.setRotationZ(0);
+		base.setRotationY(0);
 	}
 }

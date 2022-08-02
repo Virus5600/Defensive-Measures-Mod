@@ -9,11 +9,12 @@ import com.virus5600.DefensiveMeasures.entity.custom.TurretEntity;
 
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.goal.Goal;
+import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.entity.mob.ShulkerEntity;
 import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.sound.SoundEvents;
-import net.minecraft.world.Difficulty;
 
+@Deprecated
 public class ShootProjectileGoal extends Goal {
 	private int counter;
 	/**
@@ -45,16 +46,28 @@ public class ShootProjectileGoal extends Goal {
 	public boolean canStart() {
 		LivingEntity livingEntity = turret.getTarget();
 		if (livingEntity != null && livingEntity.isAlive()) {
-			return turret.world.getDifficulty() != Difficulty.PEACEFUL;
+			return true;
 		} else {
 			return false;
 		}
 	}
+	
+	@Override
+    public boolean shouldContinue() {
+        return (this.canStart() || !((MobEntity)this.turret).getNavigation().isIdle());
+    }
 
 	public void start() {
+		super.start();
+		((MobEntity)this.turret).setAttacking(true);
 	}
 
 	public void stop() {
+		super.stop();
+        ((MobEntity)this.turret).setAttacking(false);
+//        this.targetSeeingTicker = 0;
+//        this.cooldown = -1;
+        ((LivingEntity)this.turret).clearActiveItem();
 	}
 
 	public boolean shouldRunEveryTick() {

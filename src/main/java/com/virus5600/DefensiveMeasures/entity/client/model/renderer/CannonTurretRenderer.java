@@ -21,4 +21,10 @@ public class CannonTurretRenderer extends GeoEntityRenderer<CannonTurretEntity> 
 	public Identifier getTexture(CannonTurretEntity instance) {
 		return new Identifier(DefensiveMeasures.MOD_ID, "textures/entity/cannon_turret/cannon_turret.png");
 	}
+	
+	// PROTECTED
+	@Override
+	protected float getDeathMaxRotation(CannonTurretEntity entityLivingBaseIn) {
+		return 0.0F;
+	}
 }

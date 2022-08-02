@@ -1,8 +1,11 @@
 package com.virus5600.DefensiveMeasures.entity.custom;
 
 import java.util.Optional;
+import java.util.Random;
 
 import com.virus5600.DefensiveMeasures.advancement.criterion.ModCriterion;
+import com.virus5600.DefensiveMeasures.entity.TurretMaterial;
+import com.virus5600.DefensiveMeasures.sound.ModSoundEvents;
 
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.LivingEntity;
@@ -14,7 +17,6 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundEvent;
-import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.MathHelper;
@@ -87,7 +89,16 @@ public interface Itemable {
     	ItemStack itemStack = player.getStackInHand(hand);
     	if (itemStack.getItem() == tool && entity.isAlive()) {
         	World world = entity.world;
-            entity.playSound(SoundEvents.BLOCK_ANVIL_HIT, 1.0f, 1.0f);
+        	
+        	if (!world.isClient) {
+	        	if (((TurretEntity) entity).getTurretMaterial() == TurretMaterial.METAL) {
+	        		entity.playSound(ModSoundEvents.TURRET_REMOVED_METAL, 1.0f, new Random().nextFloat(0.75f, 1.25f));
+	        	}
+	        	else if (((TurretEntity) entity).getTurretMaterial() == TurretMaterial.WOOD) {
+	        		entity.playSound(ModSoundEvents.TURRET_REMOVED_WOOD, 1.0f, new Random().nextFloat(0.75f, 1.25f));
+	        	}
+        	}
+        		
 
             ItemStack stack = new ItemStack(modItem);
             ((Itemable) entity).copyDataToStack(stack);

@@ -3,8 +3,6 @@ package com.virus5600.DefensiveMeasures;
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.text.Text;
-import software.bernie.example.GeckoLibMod;
-import software.bernie.geckolib3.GeckoLib;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,6 +11,7 @@ import com.virus5600.DefensiveMeasures.advancement.criterion.ModCriterion;
 import com.virus5600.DefensiveMeasures.block.ModBlocks;
 import com.virus5600.DefensiveMeasures.entity.ModEntities;
 import com.virus5600.DefensiveMeasures.item.ModItems;
+import com.virus5600.DefensiveMeasures.sound.ModSoundEvents;
 
 public class DefensiveMeasures implements ModInitializer {
 	public static final String MOD_ID = "dm";
@@ -21,10 +20,8 @@ public class DefensiveMeasures implements ModInitializer {
 	
 	@Override
 	public void onInitialize() {
-		GeckoLibMod.DISABLE_IN_DEV = true;
-		GeckoLib.initialize();
-		
 		ModItems.registerModItems();
+		ModSoundEvents.registerSoundEvents();
 		ModBlocks.registerModBlocks();
 		ModEntities.registerModEntities();
 		ModCriterion.registerModItems();

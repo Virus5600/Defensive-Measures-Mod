@@ -1,0 +1,53 @@
+{
+	"turret.remove.metal": {
+		"sounds": [
+			{
+				"name": "mob/irongolem/damage1",
+				"volume": 0.8
+			},
+			{
+				"name": "mob/irongolem/damage1",
+				"pitch": 0.8,
+				"volume": 0.8
+			},
+  			{
+				"name": "mob/irongolem/damage2",
+				"volume": 0.8
+			},
+			{
+				"name": "mob/irongolem/damage2",
+				"pitch": 0.8,
+				"volume": 0.8
+			}
+		],
+		"subtitle": "subtitles.turret.remove.metal"
+	},
+	"turret.remove.wood": {
+		"sounds": [
+			"mob/zombie/woodbreak"
+		],
+		"subtitle": "subtitles.turret.remove.wood"
+	},
+	"turret.cannon.hurt": {
+		"sounds": [
+			"dm:cannon_turret/hurt1",
+			"dm:cannon_turret/hurt2"
+		],
+		"subtitle": "subtitles.turret.cannon.hurt"
+	},
+	"turret.cannon.destroyed": {
+		"sounds": [
+			"dm:cannon_turret/crumbling_cannon1",
+			"dm:cannon_turret/crumbling_cannon2"
+		],
+		"subtitle": "subtitles.turret.cannon.destroyed"
+	},
+	"turret.cannon.shoot": {
+		"sounds": [
+			"dm:cannon_turret/shot1",
+			"dm:cannon_turret/shot2",
+			"dm:cannon_turret/shot3"
+		],
+		"subtitle": "subtitles.turret.cannon.shoot"
+	}
+}
