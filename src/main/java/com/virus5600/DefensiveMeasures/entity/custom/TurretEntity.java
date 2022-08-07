@@ -32,7 +32,6 @@ import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.entity.mob.ShulkerEntity;
-import net.minecraft.entity.passive.AxolotlEntity;
 import net.minecraft.entity.passive.PassiveEntity.PassiveData;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.ArrowEntity;
@@ -51,6 +50,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3f;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.util.math.random.Random;
@@ -82,7 +82,8 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
 	private static final TrackedData<Integer> LEVEL;
 	private static final TrackedData<Byte> FROM_ITEM;
 	private static final TrackedData<Boolean> SHOOTING;
-	private static final TrackedData<Boolean> HAS_TARGET;
+	private static final TrackedData<Boolean> SHOOTING_FX_DONE;
+	private static final TrackedData<Boolean> HAS_TARGET; 
 	/**
 	 * Contains all the items that can heal this entity.
 	 */
@@ -101,6 +102,14 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
     private BlockPos prevAttachedBlock;
 	private TurretMaterial material;
 
+	protected static final TrackedData<Float> X;
+	protected static final TrackedData<Float> Y;
+	protected static final TrackedData<Float> Z;
+	protected static final TrackedData<Float> YAW;
+	protected static final TrackedData<Float> PITCH;
+	protected static final TrackedData<Float> TARGET_POS_X;
+	protected static final TrackedData<Float> TARGET_POS_Y;
+	protected static final TrackedData<Float> TARGET_POS_Z;
 	@Nullable
 	protected static final TrackedData<Direction> ATTACHED_FACE;
 	protected SoundEvent shootSound = SoundEvents.ENTITY_ARROW_SHOOT;
@@ -225,7 +234,17 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
         this.dataTracker.startTracking(LEVEL, this.level);
         this.dataTracker.startTracking(FROM_ITEM, (byte) 1);
         this.dataTracker.startTracking(SHOOTING, false);
+        this.dataTracker.startTracking(SHOOTING_FX_DONE, true);
         this.dataTracker.startTracking(HAS_TARGET, false);
+        
+        this.dataTracker.startTracking(X, 0f);
+        this.dataTracker.startTracking(Y, 0f);
+        this.dataTracker.startTracking(Z, 0f);
+        this.dataTracker.startTracking(YAW, 0f);
+        this.dataTracker.startTracking(PITCH, 0f);
+        this.dataTracker.startTracking(TARGET_POS_X, 0f);
+        this.dataTracker.startTracking(TARGET_POS_Y, 0f);
+        this.dataTracker.startTracking(TARGET_POS_Z, 0f);
     }
 
 	@Override
@@ -234,6 +253,33 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
     }
 
 	// PUBLIC
+	public Vec3d getPos(double offset) {
+		return this.getPos(offset, offset, offset);
+	}
+	
+	public Vec3d getPos(double yawOffset, double pitchOffset) {
+		return this.getPos(yawOffset, pitchOffset, yawOffset);
+	}
+	
+	public Vec3d getPos(double xOffset, double yOffset, double zOffset) {
+		/*
+		 * {
+		 * x = origin.x + radius * math.cos(math.rad(rotation.y)) * math.cos(math.rad(rotation.x));
+		 * y = origin.y + radius * math.sin(math.rad(rotation.x));
+		 * z = origin.z + radius * math.sin(math.rad(rotation.y)) * math.cos(math.rad(rotation.x));
+		 * }
+		 */
+		
+		double yaw = ((this.getTrackedYaw() + 90 + xOffset) * Math.PI) / 180;
+		double pitch = ((this.getTrackedPitch() + yOffset) * Math.PI) / 180;
+		
+		double x = zOffset * Math.cos(yaw) * Math.cos(pitch);
+		double y = zOffset * Math.sin(pitch);
+		double z = zOffset * Math.sin(yaw) * Math.cos(pitch);
+		
+		return new Vec3d(x, -y, z);
+	}
+	
 	@Override
 	public int getMaxLookPitchChange() {
 		return 30;
@@ -768,6 +814,14 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
         this.dataTracker.set(SHOOTING, shooting);
     }
     
+    public boolean getShootingFXDone() {
+        return this.dataTracker.get(SHOOTING_FX_DONE);
+    }
+
+    public void setShootingFXDone(boolean status) {
+        this.dataTracker.set(SHOOTING_FX_DONE, status);
+    }
+    
     public boolean hasTarget() {
         return this.dataTracker.get(HAS_TARGET);
     }
@@ -776,12 +830,47 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
         this.dataTracker.set(HAS_TARGET, hasTarget);
     }
 
+    public void setPos(TrackedData<Float> axis, double value) {
+    	this.dataTracker.set(axis, (float) value);
+    }
+    
+    public double getPos(TrackedData<Float> axis) {
+    	return this.dataTracker.get(axis);
+    }
+    
+    public void setTrackedYaw(double value) {
+    	this.dataTracker.set(YAW, (float) value);
+    }
+    
+    public double getTrackedYaw() {
+    	return (double) this.dataTracker.get(YAW);
+    }
+    
+    public void setTrackedPitch(double value) {
+    	this.dataTracker.set(PITCH, (float) value);
+    }
+    
+    public double getTrackedPitch() {
+    	return (double) this.dataTracker.get(PITCH);
+    }
+    
 	static {
 		ATTACHED_FACE = DataTracker.registerData(TurretEntity.class, TrackedDataHandlerRegistry.FACING);
-		LEVEL = DataTracker.registerData(AxolotlEntity.class, TrackedDataHandlerRegistry.INTEGER);
+		LEVEL = DataTracker.registerData(TurretEntity.class, TrackedDataHandlerRegistry.INTEGER);
 		FROM_ITEM = DataTracker.registerData(TurretEntity.class, TrackedDataHandlerRegistry.BYTE);
 		SHOOTING = DataTracker.registerData(TurretEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
+		SHOOTING_FX_DONE = DataTracker.registerData(TurretEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
 		HAS_TARGET = DataTracker.registerData(TurretEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
+		TARGET_POS_X = DataTracker.registerData(TurretEntity.class, TrackedDataHandlerRegistry.FLOAT);
+		TARGET_POS_Y = DataTracker.registerData(TurretEntity.class, TrackedDataHandlerRegistry.FLOAT);
+		TARGET_POS_Z = DataTracker.registerData(TurretEntity.class, TrackedDataHandlerRegistry.FLOAT);
+		
+		X = DataTracker.registerData(TurretEntity.class, TrackedDataHandlerRegistry.FLOAT);
+		Y = DataTracker.registerData(TurretEntity.class, TrackedDataHandlerRegistry.FLOAT);
+		Z = DataTracker.registerData(TurretEntity.class, TrackedDataHandlerRegistry.FLOAT);
+		YAW = DataTracker.registerData(TurretEntity.class, TrackedDataHandlerRegistry.FLOAT);
+		PITCH = DataTracker.registerData(TurretEntity.class, TrackedDataHandlerRegistry.FLOAT);
+		
 		SOUTH_VECTOR = Util.make(() -> {
 			Vec3i vec3i = Direction.SOUTH.getVector();
 			return new Vec3f(vec3i.getX(), vec3i.getY(), vec3i.getZ());
@@ -789,12 +878,15 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
 	}
 
 	static class TurretBodyControl extends BodyControl {
+		private MobEntity entity;
         public TurretBodyControl(MobEntity mobEntity) {
             super(mobEntity);
+            this.entity = mobEntity;
         }
 
         @Override
         public void tick() {
+        	entity.setVelocityClient(0, 0, 0);
         }
     }
 }

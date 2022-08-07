@@ -11,6 +11,7 @@ import com.virus5600.DefensiveMeasures.advancement.criterion.ModCriterion;
 import com.virus5600.DefensiveMeasures.block.ModBlocks;
 import com.virus5600.DefensiveMeasures.entity.ModEntities;
 import com.virus5600.DefensiveMeasures.item.ModItems;
+import com.virus5600.DefensiveMeasures.particle.ModParticles;
 import com.virus5600.DefensiveMeasures.sound.ModSoundEvents;
 
 public class DefensiveMeasures implements ModInitializer {
@@ -25,6 +26,7 @@ public class DefensiveMeasures implements ModInitializer {
 		ModBlocks.registerModBlocks();
 		ModEntities.registerModEntities();
 		ModCriterion.registerModItems();
+		ModParticles.registerParticles();
 	}
 	
 	public static void sendChat(String text, ChatType type) {
