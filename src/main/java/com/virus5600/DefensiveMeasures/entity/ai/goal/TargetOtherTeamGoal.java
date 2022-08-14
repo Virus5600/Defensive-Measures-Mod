@@ -20,7 +20,7 @@ public class TargetOtherTeamGoal extends ActiveTargetGoal<LivingEntity> {
 	}
 
 	protected Box getSearchBox(double distance) {
-		Direction direction = ((TurretEntity) this.mob).getAttachedFace();
+		Direction direction = Direction.DOWN;
 		if (direction.getAxis() == Direction.Axis.X) {
 			return this.mob.getBoundingBox().expand(4.0, distance, distance);
 		} else {

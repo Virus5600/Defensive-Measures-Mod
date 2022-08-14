@@ -1,6 +1,5 @@
 package com.virus5600.DefensiveMeasures.entity.custom;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -8,8 +7,10 @@ import java.util.Map;
 
 import org.jetbrains.annotations.Nullable;
 
+import com.virus5600.DefensiveMeasures.entity.ModEntities;
 import com.virus5600.DefensiveMeasures.entity.TurretMaterial;
 import com.virus5600.DefensiveMeasures.entity.ai.goal.TargetOtherTeamGoal;
+import com.virus5600.DefensiveMeasures.entity.projectile.CannonballEntity;
 import com.virus5600.DefensiveMeasures.item.ModItems;
 import com.virus5600.DefensiveMeasures.particle.ModParticles;
 import com.virus5600.DefensiveMeasures.sound.ModSoundEvents;
@@ -67,7 +68,7 @@ public class CannonTurretEntity extends TurretEntity implements IAnimatable, Ran
 
 	// CONSTRUCTORS //
 	public CannonTurretEntity(EntityType<? extends MobEntity> entityType, World world) {
-		super(entityType, world, TurretMaterial.METAL);
+		super(entityType, world, TurretMaterial.METAL, CannonballEntity.class);
 		this.setShootSound(ModSoundEvents.TURRET_CANNON_SHOOT);
 		this.addHealables(healables);
 		this.addEffectSource(effectSource);
@@ -96,11 +97,11 @@ public class CannonTurretEntity extends TurretEntity implements IAnimatable, Ran
 	}
 	
 	private <E extends IAnimatable> PlayState firingSequencePredicate(AnimationEvent<E> event) {
-		Vec3d fusePos = getPos(0, 17.5, -0.6);
-		Vec3d barrelPos = getPos(
+		Vec3d fusePos = getRelativePos(0, 17.5, -0.6);
+		Vec3d barrelPos = getRelativePos(
 			MathHelper.nextDouble(this.random, 0.25, 0.75),
-			MathHelper.nextDouble(this.random, -0.18, -0.20),
-			0.55
+			MathHelper.nextDouble(this.random, -7.625, -7.375),
+			0.9
 		);
 		
 		if (this.hasTarget() && this.isShooting()) {
@@ -111,12 +112,12 @@ public class CannonTurretEntity extends TurretEntity implements IAnimatable, Ran
 				double vx = (this.getPos(TARGET_POS_X) - this.getPos(X))/10;
 				double vy = (this.getPos(TARGET_POS_Y) - this.getPos(Y));
 				double vz = (this.getPos(TARGET_POS_Z) - this.getPos(Z))/10;
-				double variance = Math.sqrt(vx * vx + vz * vz) * 0.2;
+				double variance = Math.sqrt(vx * vx + vz * vz) * 0.5;
 				
 				for (int i = 0; i < count; i++) {
-					vx = vx == 0 ? MathHelper.nextDouble(this.random, -0.25, 0.25) : MathHelper.nextDouble(this.random, vx - 0.25, vx + 0.25);
-					vy = MathHelper.nextDouble(this.random, vy - 0.25, vy + 0.25);
-					vz = vz == 0 ? MathHelper.nextDouble(this.random, -0.25, 0.25) : MathHelper.nextDouble(this.random, vz - 0.25, vz + 0.25);
+					vx = vx == 0 ? MathHelper.nextDouble(this.random, -0.25, 0.25) : MathHelper.nextDouble(this.random, vx - 0.125, vx + 0.125);
+					vy = MathHelper.nextDouble(this.random, vy, vy + 0.5);
+					vz = vz == 0 ? MathHelper.nextDouble(this.random, -0.25, 0.25) : MathHelper.nextDouble(this.random, vz - 0.125, vz + 0.125);
 					
 					this.world.addParticle(
 						ModParticles.CANNON_FLASH,
@@ -124,9 +125,9 @@ public class CannonTurretEntity extends TurretEntity implements IAnimatable, Ran
 						barrelPos.x + this.getPos(X),
 						barrelPos.y + this.getPos(Y),
 						barrelPos.z + this.getPos(Z),
-						vx * MathHelper.nextDouble(this.random, 1.25, 1.5),
-						vy + variance * MathHelper.nextDouble(this.random, 0.5, 1.5),
-						vz * MathHelper.nextDouble(this.random, 1.25, 1.5)
+						vx * MathHelper.nextDouble(this.random, 1.5, 1.75),
+						vy * variance * MathHelper.nextDouble(this.random, -0.5, 0.5),
+						vz * MathHelper.nextDouble(this.random, 1.5, 1.75)
 					);
 				}
 			}
@@ -164,7 +165,6 @@ public class CannonTurretEntity extends TurretEntity implements IAnimatable, Ran
 		}));
 		this.targetSelector.add(3, new TargetOtherTeamGoal(this));
 	}
-	
 
 	@Override
 	protected void initDataTracker() {
@@ -172,13 +172,11 @@ public class CannonTurretEntity extends TurretEntity implements IAnimatable, Ran
 		this.dataTracker.startTracking(FUSE_LIT, false);
 	}
 
-	
 	@Nullable
 	@Override
 	protected SoundEvent getHurtSound(DamageSource source) {
 		return ModSoundEvents.TURRET_CANNON_HURT;
 	}
-	
 	
 	@Nullable
 	@Override
@@ -186,18 +184,15 @@ public class CannonTurretEntity extends TurretEntity implements IAnimatable, Ran
 		return ModSoundEvents.TURRET_CANNON_DESTROYED;
 	}
 	
-	
 	protected void setFuseLit(boolean lit) {
 		this.dataTracker.set(FUSE_LIT, lit);
 	}
-	
 	
 	protected boolean getFuseLit() {
 		return this.dataTracker.get(FUSE_LIT);
 	}
 	
 	// PUBLIC
-	
 	public static DefaultAttributeContainer.Builder setAttributes() {
 		return MobEntity.createMobAttributes()
 			.add(EntityAttributes.GENERIC_MAX_HEALTH, 50)
@@ -205,23 +200,18 @@ public class CannonTurretEntity extends TurretEntity implements IAnimatable, Ran
 			.add(EntityAttributes.GENERIC_KNOCKBACK_RESISTANCE, 999999f);
 	}
 	
-	
 	@Override
 	public void registerControllers(AnimationData data) {
-		AnimationController<IAnimatable> firingSequenceController = new AnimationController<IAnimatable>(this, "firing_sequence", 0, this::firingSequencePredicate);
-		
-		data.addAnimationController(new AnimationController<IAnimatable>(this, "idle", 0, this::idlePredicate));
-		data.addAnimationController(new AnimationController<IAnimatable>(this, "look_at_target", 0, this::lookAtTargetPredicate));
+		data.addAnimationController(new AnimationController<IAnimatable>(this, "idle", 20, this::idlePredicate));
+		data.addAnimationController(new AnimationController<IAnimatable>(this, "look_at_target", 20, this::lookAtTargetPredicate));
 		data.addAnimationController(new AnimationController<IAnimatable>(this, "death", 0, this::deathPredicate));
-		data.addAnimationController(firingSequenceController);
+		data.addAnimationController(new AnimationController<IAnimatable>(this, "firing_sequence", 0, this::firingSequencePredicate));
 	}
-	
 	
 	@Override
 	public AnimationFactory getFactory() {
 		return factory;
 	}
-	
 	
 	@Override
 	public ItemStack getEntityItem() {
@@ -229,7 +219,6 @@ public class CannonTurretEntity extends TurretEntity implements IAnimatable, Ran
 		return stack;
 	}
 
-	
 	@Override
 	public void attack(LivingEntity target, float pullProgress) {
 		this.setShooting(true);
@@ -240,25 +229,27 @@ public class CannonTurretEntity extends TurretEntity implements IAnimatable, Ran
 		}
 		
 		try {
-			ProjectileEntity projectile = (ProjectileEntity) this.projectile.getConstructors()[0].newInstance(world, this);
-			double vx = target.getX() - this.getX();
-			double vy = target.getBodyY(1/2) - projectile.getY();
-			double vz = target.getZ() - this.getZ();
+			double vx = (target.getX() - this.getX()) * 1.0625;
+			double vy = target.getBodyY(2/3) - this.getY() + 0.25;
+			double vz = (target.getZ() - this.getZ()) * 1.0625;
 			double variance = Math.sqrt(vx * vx + vz * vz);
 			float divergence = 0 + this.world.getDifficulty().getId() * 2;
+			ProjectileEntity projectile = (ProjectileEntity) new CannonballEntity(ModEntities.CANNONBALL, this, vx, vy, vz, world);
 			
-			projectile.setVelocity(vx, vy + variance * 0.2f, vz, 2.5f, divergence);
-			projectile.setPos(projectile.getX(), this.getY() + 0.5, projectile.getZ());
+			projectile.setVelocity(vx, vy + variance * 0.1f, vz, 1.5f, divergence);
+			projectile.setPos(this.getX(), this.getY() + 0.5, this.getZ());
 			
 			this.playSound(this.getShootSound(), 1.0f, 1.0f / (this.getRandom().nextFloat() * 0.4f + 0.8f));
 			this.world.spawnEntity(projectile);
-		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | SecurityException e) {
+		} catch ( IllegalArgumentException | SecurityException e) {
 			e.printStackTrace();
 		}
 	}
 	
 	@Override
 	public void tick() {
+		super.tick();
+		
 		this.setYaw(0);
 		this.setBodyYaw(0);
 		
@@ -293,16 +284,15 @@ public class CannonTurretEntity extends TurretEntity implements IAnimatable, Ran
 				else if (this.attCooldown <= 95)
 					this.setShooting(false);
 			}
+			else
+				this.setFuseLit(false);
 		}
-		
-		super.tick();
 	}
 	
 	@Override
-    public ActionResult interactMob(PlayerEntity player, Hand hand) {
+	public ActionResult interactMob(PlayerEntity player, Hand hand) {
 		return Itemable.tryItem(player, hand, this, ModItems.TURRET_REMOVER, ModItems.CANNON_TURRET).orElse(super.interactMob(player, hand));
-    }
-	
+	}
 	
 	static {
 		FUSE_LIT = DataTracker.registerData(CannonTurretEntity.class, TrackedDataHandlerRegistry.BOOLEAN);

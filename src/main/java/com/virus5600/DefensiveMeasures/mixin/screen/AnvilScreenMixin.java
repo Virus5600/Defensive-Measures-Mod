@@ -1,4 +1,4 @@
-package com.virus5600.DefensiveMeasures.mixin;
+package com.virus5600.DefensiveMeasures.mixin.screen;
 
 import java.util.Iterator;
 import java.util.Map;
@@ -10,7 +10,7 @@ import org.spongepowered.asm.mixin.Intrinsic;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 
-import com.virus5600.DefensiveMeasures.interfaces.AnvilScreenInterface;
+import com.virus5600.DefensiveMeasures.interfaces.IAnvilScreen;
 import com.virus5600.DefensiveMeasures.item.ModToolMaterials;
 import com.virus5600.DefensiveMeasures.util.ItemUtil;
 
@@ -29,7 +29,7 @@ import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.text.Text;
 
 @Mixin(AnvilScreenHandler.class)
-@Implements(@Interface(iface = AnvilScreenInterface.class, prefix = "asi$"))
+@Implements(@Interface(iface = IAnvilScreen.class, prefix = "asi$"))
 public abstract class AnvilScreenMixin extends ForgingScreenHandler {
 	@Shadow
 	private int repairItemUsage;

@@ -19,6 +19,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityData;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.MovementType;
 import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.ai.RangedAttackMob;
 import net.minecraft.entity.ai.brain.Brain;
@@ -30,6 +31,7 @@ import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectInstance;
+import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.entity.mob.ShulkerEntity;
 import net.minecraft.entity.passive.PassiveEntity.PassiveData;
@@ -57,6 +59,7 @@ import net.minecraft.util.math.random.Random;
 import net.minecraft.world.LocalDifficulty;
 import net.minecraft.world.ServerWorldAccess;
 import net.minecraft.world.World;
+import net.minecraft.world.event.GameEvent;
 
 /**
  * The mob base for all the <b>Turrets</b> that will be added into this mod. The
@@ -64,8 +67,8 @@ import net.minecraft.world.World;
  * superclass used by various mobs that has the same trait as this. The custom
  * interface {@code Itemable} and {@code RangedAttackMob} interfaces are also
  * implemented to define this entity as something that can do range attacks
- * and can be converted to an item.
- *
+ * and can be converted to an item.<br>
+ * <br>
  * New custom {@code NBT}s are also added such as {@code LEVEL}
  * and {@code FROM_ITEM} to identify their level variation and whether
  * this entity is spawned from an instance of already spawned turret entity.
@@ -78,6 +81,7 @@ import net.minecraft.world.World;
  * @see RangedAttackMob
  *
  */
+@SuppressWarnings("unused")
 public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob {
 	private static final TrackedData<Integer> LEVEL;
 	private static final TrackedData<Byte> FROM_ITEM;
@@ -110,8 +114,6 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
 	protected static final TrackedData<Float> TARGET_POS_X;
 	protected static final TrackedData<Float> TARGET_POS_Y;
 	protected static final TrackedData<Float> TARGET_POS_Z;
-	@Nullable
-	protected static final TrackedData<Direction> ATTACHED_FACE;
 	protected SoundEvent shootSound = SoundEvents.ENTITY_ARROW_SHOOT;
 	protected Class<?> projectile = null;
 	protected int level;
@@ -147,90 +149,14 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
 	}
 
 	// METHODS //
-	// PRIVATE
-	private boolean isInvalidPosition(BlockPos pos) {
-        BlockState blockState = this.world.getBlockState(pos);
-        if (blockState.isAir()) {
-            return false;
-        }
-        boolean bl = blockState.isOf(Blocks.MOVING_PISTON) && pos.equals(this.getBlockPos());
-        return !bl;
-    }
-
-	private void tryAttachOrFall() {
-        Direction direction = this.findAttachSide(this.getBlockPos());
-        if (direction != null) {
-            this.setAttachedFace(direction);
-        } else {
-            this.tryFalling();
-        }
-    }
-
-	private void setAttachedFace(Direction face) {
-        this.dataTracker.set(ATTACHED_FACE, face);
-    }
-
 	// PROTECTED
 	protected void setLevel(int level) {
 		this.dataTracker.set(LEVEL, level);
 	}
 
-	protected boolean canStay(BlockPos pos, Direction direction) {
-        if (this.isInvalidPosition(pos)) {
-            return false;
-        }
-
-        Direction direction2 = direction.getOpposite();
-        if (!this.world.isDirectionSolid(pos.offset(direction), this, direction2)) {
-            return false;
-        }
-
-        Box box = ShulkerEntity.calculateBoundingBox(direction2, 1.0f).offset(pos).contract(1.0E-6);
-        return this.world.isSpaceEmpty(this, box);
-    }
-
-	@Nullable
-    protected Direction findAttachSide(BlockPos pos) {
-        for (Direction direction : Direction.values()) {
-            if (!this.canStay(pos, direction)) continue;
-            return direction;
-        }
-        return null;
-    }
-
-	protected boolean tryFalling() {
-		if (this.hasNoGravity())
-			return false;
-		return true;
-
-//		BlockPos blockPos = this.getBlockPos();
-//        for (int i = 0; i < 5; ++i) {
-//            Direction direction;
-//            BlockPos blockPos2 = blockPos.add(MathHelper.nextBetween(this.random, -8, 8), MathHelper.nextBetween(this.random, -8, 8), MathHelper.nextBetween(this.random, -8, 8));
-//
-//            if (blockPos2.getY() <= this.world.getBottomY() ||
-//            	!this.world.isAir(blockPos2) ||
-//            	!this.world.getWorldBorder().contains(blockPos2) ||
-//            	!this.world.isSpaceEmpty(this, new Box(blockPos2).contract(1.0E-6)) ||
-//            	(direction = this.findAttachSide(blockPos2)) == null) {
-//            		continue;
-//            }
-//
-//            this.detach();
-//            this.setAttachedFace(direction);
-//            this.playSound(SoundEvents.BLOCK_ANVIL_FALL, 1.0f, 1.0f);
-//            this.setPosition((double)blockPos2.getX() + 0.5, blockPos2.getY(), (double)blockPos2.getZ() + 0.5);
-//            this.world.emitGameEvent(GameEvent.HIT_GROUND, blockPos, GameEvent.Emitter.of(this));
-//            this.setTarget(null);
-//            return true;
-//        }
-//		return true;
-	}
-
 	@Override
     protected void initDataTracker() {
         super.initDataTracker();
-        this.dataTracker.startTracking(ATTACHED_FACE, Direction.DOWN);
         this.dataTracker.startTracking(LEVEL, this.level);
         this.dataTracker.startTracking(FROM_ITEM, (byte) 1);
         this.dataTracker.startTracking(SHOOTING, false);
@@ -253,15 +179,15 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
     }
 
 	// PUBLIC
-	public Vec3d getPos(double offset) {
-		return this.getPos(offset, offset, offset);
+	public Vec3d getRelativePos(double offset) {
+		return this.getRelativePos(offset, offset, offset);
 	}
 	
-	public Vec3d getPos(double yawOffset, double pitchOffset) {
-		return this.getPos(yawOffset, pitchOffset, yawOffset);
+	public Vec3d getRelativePos(double yawOffset, double pitchOffset) {
+		return this.getRelativePos(yawOffset, pitchOffset, yawOffset);
 	}
 	
-	public Vec3d getPos(double xOffset, double yOffset, double zOffset) {
+	public Vec3d getRelativePos(double xOffset, double yOffset, double zOffset) {
 		/*
 		 * {
 		 * x = origin.x + radius * math.cos(math.rad(rotation.y)) * math.cos(math.rad(rotation.x));
@@ -288,10 +214,6 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
 	@Override
 	public int getMaxHeadRotation() {
 		return 360;
-	}
-
-	public Direction getAttachedFace() {
-		return this.dataTracker.get(ATTACHED_FACE);
 	}
 
 	@Override
@@ -581,7 +503,6 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
 		super.writeCustomDataToNbt(nbt);
 		nbt.putInt("Level", this.getLevel());
 		nbt.putByte("FromItem", this.isFromItem());
-		nbt.putByte("AttachFace", (byte)this.getAttachedFace().getId());
 	}
 
 	@Override
@@ -589,7 +510,6 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
         super.readCustomDataFromNbt(nbt);
         this.setLevel(nbt.getInt("Level"));
         this.setFromItem(nbt.getByte("FromItem"));
-        this.setAttachedFace(Direction.byId(nbt.getByte("AttachFace")));
     }
 
 	@Override
@@ -599,17 +519,13 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
 
 	@Override
     public boolean startRiding(Entity entity, boolean force) {
-        if (this.world.isClient()) {
-            this.prevAttachedBlock = null;
-        }
-
-        this.setAttachedFace(Direction.DOWN);
         return super.startRiding(entity, force);
     }
 
 	@Override
     public void stopRiding() {
         super.stopRiding();
+        
         if (this.world.isClient) {
             this.prevAttachedBlock = this.getBlockPos();
         }
@@ -635,39 +551,6 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
 		}
 
         return super.initialize(world, difficulty, spawnReason, entityData, entityNbt);
-    }
-
-	@Override
-    public void setPosition(double x, double y, double z) {
-        BlockPos blockPos = this.getBlockPos();
-        if (this.hasVehicle()) {
-            super.setPosition(x, y, z);
-        } else {
-        	if (this.tryFalling())
-        		super.setPosition(MathHelper.floor(x) + 0.5, y, MathHelper.floor(z) + 0.5);
-        	else
-        		super.setPosition(MathHelper.floor(x) + 0.5, MathHelper.floor(y + 0.5), MathHelper.floor(z) + 0.5);
-        }
-        if (this.age == 0) {
-            return;
-        }
-        BlockPos blockPos2 = this.getBlockPos();
-        if (!blockPos2.equals(blockPos)) {
-            this.velocityDirty = true;
-            if (this.world.isClient && !this.hasVehicle() && !blockPos2.equals(this.prevAttachedBlock)) {
-                this.prevAttachedBlock = blockPos;
-                this.lastRenderX = this.getX();
-                this.lastRenderY = this.getY();
-                this.lastRenderZ = this.getZ();
-            }
-        }
-    }
-
-	@Override
-    public void updateTrackedPositionAndAngles(double x, double y, double z, float yaw, float pitch, int interpolationSteps, boolean interpolate) {
-        this.bodyTrackingIncrements = 0;
-        this.setPosition(x, y, z);
-        this.setRotation(yaw, pitch);
     }
 
 	@Override
@@ -734,15 +617,9 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
 	@Override
 	public void tick() {
 		super.tick();
+		
 		if (!world.isClient())
 			this.setHasTarget(this.getTarget() != null);
-		
-		if (!(this.world.isClient || this.hasVehicle() || this.canStay(this.getBlockPos(), this.getAttachedFace()))) {
-			this.tryAttachOrFall();
-        }
-        if (this.world.isClient) {
-        	this.prevAttachedBlock = null;
-        }
 	}
 
 	@Override
@@ -754,7 +631,7 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
 		try {
 			this.setHasTarget(target != null);
 
-			ProjectileEntity projectile = (ProjectileEntity) this.projectile.getConstructors()[0].newInstance(world, this);
+			ProjectileEntity projectile = (ProjectileEntity) this.projectile.getConstructor(World.class, LivingEntity.class).newInstance(world, this);
 			double vx = target.getX() - this.getX();
 			double vy = target.getBodyY(1/2) - projectile.getY();
 			double vz = target.getZ() - this.getZ();
@@ -764,8 +641,18 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
 			projectile.setVelocity(vx, vy + variance * 0.125f, vz, 2.5f, divergence);
 			this.playSound(this.getShootSound(), 1.0f, 1.0f / (this.getRandom().nextFloat() * 0.4f + 0.8f));
 			this.world.spawnEntity(projectile);
-		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | SecurityException e) {
+		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | SecurityException | NoSuchMethodException e) {
 			e.printStackTrace();
+			DefensiveMeasures.LOGGER.debug("");
+			DefensiveMeasures.LOGGER.debug("     DM ERROR OCCURED     ");
+			DefensiveMeasures.LOGGER.debug("===== ERROR MSG START =====");
+			DefensiveMeasures.LOGGER.debug("LOCALIZED ERROR MESSAGE:");
+			DefensiveMeasures.LOGGER.debug(e.getLocalizedMessage());
+			DefensiveMeasures.LOGGER.debug("");
+			DefensiveMeasures.LOGGER.debug("ERROR MESSAGE:");
+			DefensiveMeasures.LOGGER.debug(e.getMessage());
+			DefensiveMeasures.LOGGER.debug("===== ERROR MSG END =====");
+			DefensiveMeasures.LOGGER.debug("");
 		}
 	}
 
@@ -855,7 +742,6 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
     }
     
 	static {
-		ATTACHED_FACE = DataTracker.registerData(TurretEntity.class, TrackedDataHandlerRegistry.FACING);
 		LEVEL = DataTracker.registerData(TurretEntity.class, TrackedDataHandlerRegistry.INTEGER);
 		FROM_ITEM = DataTracker.registerData(TurretEntity.class, TrackedDataHandlerRegistry.BYTE);
 		SHOOTING = DataTracker.registerData(TurretEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
@@ -886,7 +772,7 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
 
         @Override
         public void tick() {
-        	entity.setVelocityClient(0, 0, 0);
+        	entity.setVelocityClient(0, entity.getVelocity().y, 0);
         }
     }
 }

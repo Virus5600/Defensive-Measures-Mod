@@ -20,7 +20,7 @@ public class CannonFlash extends SpriteBillboardParticle {
 	protected CannonFlash(ClientWorld level, double x, double y, double z, SpriteProvider spriteSet, double xd, double yd, double zd) {
 		super(level, x, y, z, xd, yd, zd);
 		
-		this.velocityMultiplier = 0.75f;
+		this.velocityMultiplier = 1f;
 		this.x = x;
 		this.y = y;
 		this.z = z;
