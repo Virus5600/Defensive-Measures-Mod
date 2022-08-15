@@ -114,6 +114,7 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
 	protected static final TrackedData<Float> TARGET_POS_X;
 	protected static final TrackedData<Float> TARGET_POS_Y;
 	protected static final TrackedData<Float> TARGET_POS_Z;
+	protected static final TrackedData<Direction> ATTACHED_FACE;
 	protected SoundEvent shootSound = SoundEvents.ENTITY_ARROW_SHOOT;
 	protected Class<?> projectile = null;
 	protected int level;
@@ -177,7 +178,12 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
     protected BodyControl createBodyControl() {
         return new TurretBodyControl(this);
     }
-
+	
+	@Override
+    protected MoveEffect getMoveEffect() {
+        return Entity.MoveEffect.NONE;
+    }
+	
 	// PUBLIC
 	public Vec3d getRelativePos(double offset) {
 		return this.getRelativePos(offset, offset, offset);
@@ -225,7 +231,12 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
 	public int getMinAmbientSoundDelay() {
 		return 120;
 	}
-
+	
+	@Override
+    public boolean canBreatheInWater() {
+        return true;
+    }
+	
 	@Override
 	public boolean canImmediatelyDespawn(double distanceSquared) {
 		return false;
@@ -557,7 +568,12 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
     public boolean isCollidable() {
         return this.isAlive();
     }
-
+	
+	@Override
+	public boolean isPushable() {
+		return false;
+	}
+	
 	@Override
     public SoundCategory getSoundCategory() {
         return SoundCategory.BLOCKS;
@@ -618,8 +634,18 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
 	public void tick() {
 		super.tick();
 		
-		if (!world.isClient())
+		if (!world.isClient()) {
 			this.setHasTarget(this.getTarget() != null);
+		} else {
+			// SNAPPING THE TURRET BACK TO PLACE
+			if (this.getVelocity().x == 0 && this.getVelocity().z == 0) {
+				this.setPos(
+					Math.floor(this.getX()) + 0.5,
+					this.getY(),
+					Math.floor(this.getZ()) + 0.5
+				);
+			}
+		}
 	}
 
 	@Override
@@ -747,9 +773,6 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
 		SHOOTING = DataTracker.registerData(TurretEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
 		SHOOTING_FX_DONE = DataTracker.registerData(TurretEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
 		HAS_TARGET = DataTracker.registerData(TurretEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
-		TARGET_POS_X = DataTracker.registerData(TurretEntity.class, TrackedDataHandlerRegistry.FLOAT);
-		TARGET_POS_Y = DataTracker.registerData(TurretEntity.class, TrackedDataHandlerRegistry.FLOAT);
-		TARGET_POS_Z = DataTracker.registerData(TurretEntity.class, TrackedDataHandlerRegistry.FLOAT);
 		
 		X = DataTracker.registerData(TurretEntity.class, TrackedDataHandlerRegistry.FLOAT);
 		Y = DataTracker.registerData(TurretEntity.class, TrackedDataHandlerRegistry.FLOAT);
@@ -757,6 +780,10 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
 		YAW = DataTracker.registerData(TurretEntity.class, TrackedDataHandlerRegistry.FLOAT);
 		PITCH = DataTracker.registerData(TurretEntity.class, TrackedDataHandlerRegistry.FLOAT);
 		
+		TARGET_POS_X = DataTracker.registerData(TurretEntity.class, TrackedDataHandlerRegistry.FLOAT);
+		TARGET_POS_Y = DataTracker.registerData(TurretEntity.class, TrackedDataHandlerRegistry.FLOAT);
+		TARGET_POS_Z = DataTracker.registerData(TurretEntity.class, TrackedDataHandlerRegistry.FLOAT);
+		ATTACHED_FACE = DataTracker.registerData(ShulkerEntity.class, TrackedDataHandlerRegistry.FACING);
 		SOUTH_VECTOR = Util.make(() -> {
 			Vec3i vec3i = Direction.SOUTH.getVector();
 			return new Vec3f(vec3i.getX(), vec3i.getY(), vec3i.getZ());
@@ -772,7 +799,6 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
 
         @Override
         public void tick() {
-        	entity.setVelocityClient(0, entity.getVelocity().y, 0);
         }
     }
 }

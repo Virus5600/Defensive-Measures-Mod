@@ -98,7 +98,11 @@ public interface Itemable {
 	        		entity.playSound(ModSoundEvents.TURRET_REMOVED_WOOD, 1.0f, new Random().nextFloat(0.75f, 1.25f));
 	        	}
         	}
-        		
+        	
+        	if (player.isCreative() && !player.isSneaking()) {
+        		entity.discard();
+        		return Optional.of(ActionResult.success(true));
+        	}
 
             ItemStack stack = new ItemStack(modItem);
             ((Itemable) entity).copyDataToStack(stack);

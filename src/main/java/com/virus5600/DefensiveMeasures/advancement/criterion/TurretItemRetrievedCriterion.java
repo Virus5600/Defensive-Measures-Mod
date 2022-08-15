@@ -33,8 +33,7 @@ public class TurretItemRetrievedCriterion extends AbstractCriterion<Conditions> 
         this.trigger(player, (Conditions conditions) -> conditions.matches(stack));
     }
 	
-	public static class Conditions
-    extends AbstractCriterionConditions {
+	public static class Conditions extends AbstractCriterionConditions {
         private final ItemPredicate item;
 
         public Conditions(EntityPredicate.Extended player, ItemPredicate item) {

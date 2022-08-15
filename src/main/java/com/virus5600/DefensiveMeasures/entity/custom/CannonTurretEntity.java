@@ -14,6 +14,7 @@ import com.virus5600.DefensiveMeasures.entity.projectile.CannonballEntity;
 import com.virus5600.DefensiveMeasures.item.ModItems;
 import com.virus5600.DefensiveMeasures.particle.ModParticles;
 import com.virus5600.DefensiveMeasures.sound.ModSoundEvents;
+import com.virus5600.DefensiveMeasures.util.anaglyph.Vector3d;
 
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -254,6 +255,7 @@ public class CannonTurretEntity extends TurretEntity implements IAnimatable, Ran
 		this.setBodyYaw(0);
 		
 		if (!this.world.isClient()) {
+			// FIRING ANIMATING RELATED
 			this.setTrackedYaw(this.getHeadYaw());
 			this.setTrackedPitch(this.getPitch());
 			this.setPos(X, this.getX());
