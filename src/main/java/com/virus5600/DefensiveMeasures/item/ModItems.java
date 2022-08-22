@@ -31,7 +31,7 @@ public class ModItems {
 	public final static Item UNFINISHED_CANNON_HEAD = new UnfinishedCannonHeadItem(SETTING_DMI);
 	
 	// BALLISTA
-	public final static Item BALLISTA = new Item(SETTING_DMI);
+	public final static Item BALLISTA = new BallistaTurretItem(ModEntities.BALLISTA, SETTING_DMT);
 	public final static Item BALLISTA_ARROW = new BallistaArrowItem(SETTING_DMI);
 	public final static Item BALLISTA_BASE = new BallistaBaseItem(SETTING_DMI);
 	public final static Item BALLISTA_BASE_WITH_STAND = new BallistaBaseWithStandItem(SETTING_DMI);

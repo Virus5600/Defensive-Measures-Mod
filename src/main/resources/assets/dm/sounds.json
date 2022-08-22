@@ -10,7 +10,7 @@
 				"pitch": 0.8,
 				"volume": 0.8
 			},
-  			{
+				{
 				"name": "mob/irongolem/damage2",
 				"volume": 0.8
 			},
@@ -49,5 +49,65 @@
 			"dm:cannon_turret/shot3"
 		],
 		"subtitle": "subtitles.turret.cannon.shoot"
+	},
+	
+	"turret.ballista.hurt": {
+		"sounds": [
+			"mob/zombie/wood1",
+			"mob/zombie/wood2",
+			"mob/zombie/wood3",
+			"mob/zombie/wood4"
+		],
+		"subtitles": "subtitles.turret.ballista.hurt"
+	},
+	"turret.ballista.destroyed": {
+		"sounds": [
+			"mob/zombie/woodbreak"
+		],
+		"subtitles": "subtitles.turret.ballista.destroyed"
+	},
+	"turret.ballista.shoot": {
+		"sounds": [
+			{
+				"name": "item/crossbow/shoot1",
+				"volume": 0.8
+			},
+			{
+				"name": "item/crossbow/shoot1",
+				"volume": 0.9
+			},
+			{
+				"name": "item/crossbow/shoot1",
+				"pitch": 0.9,
+				"volume": 0.9
+			},
+			{
+				"name": "item/crossbow/shoot2",
+				"volume": 0.8
+			},
+			{
+				"name": "item/crossbow/shoot2",
+				"volume": 0.9
+			},
+			{
+				"name": "item/crossbow/shoot2",
+				"pitch": 0.9,
+				"volume": 0.9
+			},
+			{
+				"name": "item/crossbow/shoot3",
+				"volume": 0.8
+			},
+			{
+				"name": "item/crossbow/shoot3",
+				"volume": 0.9
+			},
+			{
+				"name": "item/crossbow/shoot3",
+				"pitch": 0.9,
+				"volume": 0.9
+			}
+		],
+		"subtitles": "subtitles.turret.ballista.shoot"
 	}
 }

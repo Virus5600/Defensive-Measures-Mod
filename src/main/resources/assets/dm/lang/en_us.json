@@ -43,5 +43,8 @@
 	"subtitles.turret.remove.wood": "Wooden Turret Removed",
 	"subtitles.turret.cannon.hurt" : "Cannon Turret damaged",
 	"subtitles.turret.cannon.destroyed" : "Cannon Turret destroyed",
-	"subtitles.turret.cannon.shoot" : "Cannon Turret shoots"
+	"subtitles.turret.cannon.shoot" : "Cannon Turret shoots",
+	"subtitles.turret.ballista.hurt" : "Ballista damaged",
+	"subtitles.turret.ballista.destroyed" : "Ballista destroyed",
+	"subtitles.turret.ballista.shoot" : "Ballista shoots"
 }

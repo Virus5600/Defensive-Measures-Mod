@@ -38,10 +38,6 @@ public abstract class AnvilScreenMixin extends ForgingScreenHandler {
 	@Shadow
 	private final Property levelCost;
 	
-	public AnvilScreenMixin(int syncId, PlayerInventory inventory) {
-		this(syncId, inventory, ScreenHandlerContext.EMPTY);
-	}
-
 	public AnvilScreenMixin(int syncId, PlayerInventory inventory, ScreenHandlerContext context) {
 		super(ScreenHandlerType.ANVIL, syncId, inventory, context);
 		this.levelCost = Property.create();

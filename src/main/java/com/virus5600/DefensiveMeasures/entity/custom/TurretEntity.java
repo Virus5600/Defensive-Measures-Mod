@@ -121,7 +121,10 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
 	protected final Random random;
 
 	static final Vec3f SOUTH_VECTOR;
-
+	
+	/**
+	 * List of plank items in the game. This allows easy insertion of all the items when needed by iterating through the List.
+	 */
 	public static final List<Item> PLANKS = Arrays.asList(new Item[]{
 		Items.ACACIA_PLANKS,
 		Items.BIRCH_PLANKS,
@@ -133,6 +136,20 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
 		Items.SPRUCE_PLANKS,
 		Items.WARPED_PLANKS
 	});
+	/**
+	 * List of log items in the game. This allows easy insertion of all the items when needed by iterating through the List.
+	 */
+	public static final List<Item> LOGS = Arrays.asList(new Item[]{
+			Items.ACACIA_LOG,
+			Items.BIRCH_LOG,
+			Items.CRIMSON_STEM,
+			Items.DARK_OAK_LOG,
+			Items.JUNGLE_LOG,
+			Items.MANGROVE_LOG,
+			Items.OAK_LOG,
+			Items.SPRUCE_LOG,
+			Items.WARPED_STEM
+		});
 
 	// CONSTRUCTORS //
 	public TurretEntity(EntityType<? extends MobEntity> entityType, World world, TurretMaterial material, Class<?> projectile) {
@@ -686,7 +703,7 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
     public ActionResult interactMob(PlayerEntity player, Hand hand) {
 		ItemStack item = player.getStackInHand(hand);
 		boolean itemDecrement = false;
-
+		
 		// TURRET REMOVER
 		if (item.getItem() == ModItems.TURRET_REMOVER) {
 				item.damage(1, player, player2 -> player2.sendToolBreakStatus(hand));
