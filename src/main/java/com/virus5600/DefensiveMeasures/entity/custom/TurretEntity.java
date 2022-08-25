@@ -664,6 +664,12 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
 			}
 		}
 	}
+	
+	@Override
+	public void tickMovement() {
+		this.setVelocity(this.getVelocity().multiply(0.98));
+		super.tickMovement();
+	}
 
 	@Override
 	public void attack(LivingEntity target, float pullProgress) {

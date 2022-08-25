@@ -1,11 +1,13 @@
 package com.virus5600.DefensiveMeasures.entity;
 
 import com.virus5600.DefensiveMeasures.DefensiveMeasures;
-import com.virus5600.DefensiveMeasures.entity.client.model.renderer.BallistaTurretRenderer;
-import com.virus5600.DefensiveMeasures.entity.client.model.renderer.CannonTurretRenderer;
-import com.virus5600.DefensiveMeasures.entity.client.model.renderer.CannonballRenderer;
+import com.virus5600.DefensiveMeasures.entity.client.renderer.entity.BallistaArrowRenderer;
+import com.virus5600.DefensiveMeasures.entity.client.renderer.entity.BallistaTurretRenderer;
+import com.virus5600.DefensiveMeasures.entity.client.renderer.entity.CannonTurretRenderer;
+import com.virus5600.DefensiveMeasures.entity.client.renderer.entity.CannonballRenderer;
 import com.virus5600.DefensiveMeasures.entity.custom.BallistaTurretEntity;
 import com.virus5600.DefensiveMeasures.entity.custom.CannonTurretEntity;
+import com.virus5600.DefensiveMeasures.entity.projectile.BallistaArrowEntity;
 import com.virus5600.DefensiveMeasures.entity.projectile.CannonballEntity;
 
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
@@ -25,7 +27,7 @@ public class ModEntities {
 		new Identifier(DefensiveMeasures.MOD_ID, "cannon_turret"),
 		FabricEntityTypeBuilder
 			.create(SpawnGroup.MISC, CannonTurretEntity::new)
-			.dimensions(EntityDimensions.fixed(1f, 1f))
+			.dimensions(EntityDimensions.fixed(0.875f, 0.875f))
 			.build()
 	);
 	public static final EntityType<BallistaTurretEntity> BALLISTA = Registry.register(
@@ -33,7 +35,7 @@ public class ModEntities {
 		new Identifier(DefensiveMeasures.MOD_ID, "ballista"),
 		FabricEntityTypeBuilder
 			.create(SpawnGroup.MISC, BallistaTurretEntity::new)
-			.dimensions(EntityDimensions.fixed(1.1875f, 1.1875f))
+			.dimensions(EntityDimensions.fixed(1.0625f, 1.0625f))
 			.build()
 	);
 	
@@ -44,7 +46,15 @@ public class ModEntities {
 		new Identifier(DefensiveMeasures.MOD_ID, "cannonball"),
 		FabricEntityTypeBuilder
 			.<CannonballEntity>create(SpawnGroup.MISC, CannonballEntity::new)
-			.dimensions(EntityDimensions.fixed(0.25f, 0.25f))
+			.dimensions(EntityDimensions.fixed(0.125f, 0.125f))
+			.build()
+	);
+	public static final EntityType<BallistaArrowEntity> BALLISTA_ARROW = Registry.register(
+		Registry.ENTITY_TYPE,
+		new Identifier(DefensiveMeasures.MOD_ID, "ballista_arrow"),
+		FabricEntityTypeBuilder
+			.<BallistaArrowEntity>create(SpawnGroup.MISC, BallistaArrowEntity::new)
+			.dimensions(EntityDimensions.fixed(0.125f, 0.125f))
 			.build()
 	);
 	
@@ -61,5 +71,6 @@ public class ModEntities {
 		/// PROJECTILES
 		// v1.0.0
 		EntityRendererRegistry.register(ModEntities.CANNONBALL, CannonballRenderer::new);
+		EntityRendererRegistry.register(ModEntities.BALLISTA_ARROW, 	BallistaArrowRenderer::new);
 	}
 }

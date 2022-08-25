@@ -51,6 +51,7 @@ import software.bernie.geckolib3.core.manager.AnimationData;
 import software.bernie.geckolib3.core.manager.AnimationFactory;
 
 public class CannonTurretEntity extends TurretEntity implements IAnimatable, RangedAttackMob, Itemable {
+	private static final int totalAttCooldown = 20 * 5;
 	private static final TrackedData<Boolean> FUSE_LIT;
 	/**
 	 * Contains all the items that can heal this entity.
@@ -63,7 +64,7 @@ public class CannonTurretEntity extends TurretEntity implements IAnimatable, Ran
 	private AnimationFactory factory = new AnimationFactory(this);
 	@Nullable
 	private LivingEntity currentTarget = null;
-	private double attCooldown = 20 * 5;
+	private double attCooldown = totalAttCooldown;
 
 	// CONSTRUCTORS //
 	public CannonTurretEntity(EntityType<? extends MobEntity> entityType, World world) {
@@ -154,7 +155,7 @@ public class CannonTurretEntity extends TurretEntity implements IAnimatable, Ran
 	@Override
 	protected void initGoals() {
 		// Goals
-		this.goalSelector.add(1, new ProjectileAttackGoal(this, 0, 100, 16.625F));
+		this.goalSelector.add(1, new ProjectileAttackGoal(this, 0, totalAttCooldown, 16.625F));
 		this.goalSelector.add(2, new LookAtEntityGoal(this, MobEntity.class, 8.0F, 0.02F, true));
 		this.goalSelector.add(8, new LookAroundGoal(this));
 		
@@ -272,7 +273,7 @@ public class CannonTurretEntity extends TurretEntity implements IAnimatable, Ran
 			else if (this.attCooldown <= 80 && this.attCooldown >= 10) {
 				this.setFuseLit(true);
 			}
-
+			
 			if (this.hasTarget()) {
 				this.setPos(TARGET_POS_X, this.getTarget().getX());
 				this.setPos(TARGET_POS_Y, this.getTarget().getBodyY(1/2));
@@ -285,8 +286,12 @@ public class CannonTurretEntity extends TurretEntity implements IAnimatable, Ran
 				else if (this.attCooldown <= 95)
 					this.setShooting(false);
 			}
-			else
-				this.setFuseLit(false);
+			else {
+				if (this.attCooldown != totalAttCooldown) {
+					this.setFuseLit(false);
+					this.attCooldown = totalAttCooldown;
+				}
+			}
 		}
 	}
 	

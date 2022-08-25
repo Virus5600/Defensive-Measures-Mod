@@ -1,4 +1,4 @@
-package com.virus5600.DefensiveMeasures.entity.client.model.renderer;
+package com.virus5600.DefensiveMeasures.entity.client.renderer.entity;
 
 import com.virus5600.DefensiveMeasures.DefensiveMeasures;
 import com.virus5600.DefensiveMeasures.entity.client.model.entity.CannonballModel;

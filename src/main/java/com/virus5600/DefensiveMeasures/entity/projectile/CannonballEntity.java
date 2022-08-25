@@ -2,6 +2,7 @@ package com.virus5600.DefensiveMeasures.entity.projectile;
 
 import java.util.List;
 
+import com.virus5600.DefensiveMeasures.DefensiveMeasuresClient;
 import com.virus5600.DefensiveMeasures.entity.ModEntities;
 
 import net.fabricmc.api.EnvType;
@@ -12,6 +13,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.ExplosiveProjectileEntity;
+import net.minecraft.network.Packet;
 import net.minecraft.particle.ParticleEffect;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.sound.SoundEvent;
@@ -200,5 +202,10 @@ public class CannonballEntity extends ExplosiveProjectileEntity implements IAnim
             	this.setVelocity(this.getVelocity().multiply(1.0, 1.375, 1.0));
             }
         }
+	}
+	
+	@Override
+	public Packet<?> createSpawnPacket() {
+		return DefensiveMeasuresClient.EntityPacket.createPacket(this);
 	}
 }

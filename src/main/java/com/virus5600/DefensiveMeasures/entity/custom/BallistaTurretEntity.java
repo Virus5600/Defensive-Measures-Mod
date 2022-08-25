@@ -9,6 +9,7 @@ import org.jetbrains.annotations.Nullable;
 
 import com.virus5600.DefensiveMeasures.entity.TurretMaterial;
 import com.virus5600.DefensiveMeasures.entity.ai.goal.TargetOtherTeamGoal;
+import com.virus5600.DefensiveMeasures.entity.projectile.BallistaArrowEntity;
 import com.virus5600.DefensiveMeasures.item.ModItems;
 import com.virus5600.DefensiveMeasures.sound.ModSoundEvents;
 
@@ -26,7 +27,6 @@ import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.entity.mob.Monster;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.projectile.ArrowEntity;
 import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -44,6 +44,7 @@ import software.bernie.geckolib3.core.manager.AnimationData;
 import software.bernie.geckolib3.core.manager.AnimationFactory;
 
 public class BallistaTurretEntity extends TurretEntity implements IAnimatable, RangedAttackMob, Itemable {
+	private static final int totalAttCooldown = (int) (20 * 2.5);
 	/**
 	 * Contains all the items that can heal this entity.
 	 */
@@ -55,11 +56,11 @@ public class BallistaTurretEntity extends TurretEntity implements IAnimatable, R
 	private AnimationFactory factory = new AnimationFactory(this);
 	@Nullable
 	private LivingEntity currentTarget = null;
-	private double attCooldown = 20 * 2.5;
+	private double attCooldown = totalAttCooldown;
 	
 	// CONSTRUCTORS //
 	public BallistaTurretEntity(EntityType<? extends MobEntity> entityType, World world) {
-		super(entityType, world, TurretMaterial.WOOD, ArrowEntity.class);
+		super(entityType, world, TurretMaterial.WOOD, BallistaArrowEntity.class);
 		this.setShootSound(ModSoundEvents.TURRET_BALLISTA_SHOOT);
 		this.addHealables(healables);
 		this.addEffectSource(effectSource);
@@ -101,7 +102,7 @@ public class BallistaTurretEntity extends TurretEntity implements IAnimatable, R
 		@Override
 	protected void initGoals() {
 		// Goals
-		this.goalSelector.add(1, new ProjectileAttackGoal(this, 0, 100, 16.8125F));
+		this.goalSelector.add(1, new ProjectileAttackGoal(this, 0, totalAttCooldown, 16.8125F));
 		this.goalSelector.add(2, new LookAtEntityGoal(this, MobEntity.class, 8.0F, 0.02F, true));
 		this.goalSelector.add(8, new LookAroundGoal(this));
 		
@@ -171,14 +172,14 @@ public class BallistaTurretEntity extends TurretEntity implements IAnimatable, R
 			double vz = (target.getZ() - this.getZ()) * 1.0625;
 			double variance = Math.sqrt(vx * vx + vz * vz);
 			float divergence = 0 + this.world.getDifficulty().getId() * 2;
-			ProjectileEntity projectile = (ProjectileEntity) new ArrowEntity(world, this);
+			ProjectileEntity projectile = (ProjectileEntity) new BallistaArrowEntity(world, this);
 			
-			projectile.setVelocity(vx, vy + variance * 0.1f, vz, 1.5f, divergence);
-			projectile.setPos(this.getX(), this.getY() + 0.5, this.getZ());
+			projectile.setVelocity(vx, vy + variance * 0.2f, vz, 1.5f, divergence);
+			projectile.setPos(this.getX(), this.getY() + 0.8125, this.getZ());
 			
 			this.playSound(this.getShootSound(), 1.0f, 1.0f / (this.getRandom().nextFloat() * 0.4f + 0.8f));
 			this.world.spawnEntity(projectile);
-		} catch ( IllegalArgumentException | SecurityException e) {
+		} catch (IllegalArgumentException | SecurityException e) {
 			e.printStackTrace();
 		}
 	}
@@ -209,6 +210,11 @@ public class BallistaTurretEntity extends TurretEntity implements IAnimatable, R
 					this.attCooldown = 20 * 2.5;
 				else if (this.attCooldown <= 45)
 					this.setShooting(false);
+			}
+			else {
+				if (this.attCooldown != totalAttCooldown) {
+					this.attCooldown = totalAttCooldown;
+				}
 			}
 		}
 	}
