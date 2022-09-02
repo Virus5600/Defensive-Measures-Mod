@@ -38,7 +38,7 @@ public class ModItems {
 	public final static Item BALLISTA_BOW = new BallistaBowItem(SETTING_DMI);
 	
 	// MACHINE GUN
-	public final static Item MG_TURRET = new Item(SETTING_DMI);
+	public final static Item MG_TURRET = new MachineGunTurretItem(ModEntities.MG_TURRET, SETTING_DMT);
 	public final static Item AMMO_CASE = new AmmoCaseItem(SETTING_DMI);
 	public final static Item AMMO_ROUNDS = new AmmoRoundsItem(SETTING_DMI);
 	public final static Item MACHINE_GUN_BASE = new MachineGunBaseItem(SETTING_DMI);

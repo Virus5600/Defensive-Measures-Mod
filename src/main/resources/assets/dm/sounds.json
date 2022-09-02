@@ -109,5 +109,33 @@
 			}
 		],
 		"subtitles": "subtitles.turret.ballista.shoot"
+	},
+	
+	"turret.mg_turret.hurt": {
+		"sounds": [
+			"dm:cannon_turret/hurt1",
+			"dm:cannon_turret/hurt2"
+		],
+		"subtitles": "subtitles.mg_turret.hurt"
+	},
+	"turret.mg_turret.destroyed": {
+		"sounds": [
+			"dm:mg_turret/crumbling_mg1",
+			"dm:mg_turret/crumbling_mg2"
+		],
+		"subtitles": "subtitles.mg_turret.destroyed"
+	},
+	"turret.mg_turret.shoot": {
+		"sounds": [
+			{
+				"name": "dm:mg_turret/shot1",
+				"pitch": 0.9,
+				"volume": 0.9
+			},
+			{
+				"name": "dm:mg_turret/shot1",
+				"volume": 0.9
+			}
+		]
 	}
 }

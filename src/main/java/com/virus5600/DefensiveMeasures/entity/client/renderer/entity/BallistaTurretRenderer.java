@@ -26,7 +26,8 @@ public class BallistaTurretRenderer extends GeoEntityRenderer<BallistaTurretEnti
 	
 	@Override
 	public void render(BallistaTurretEntity entity, float entityYaw, float partialTicks, MatrixStack stack, VertexConsumerProvider bufferIn, int packedLightIn) {
-		stack.scale(0.8125f, 0.8125f, 0.8125f);
+		float newSize = 1 * 0.8125f;
+		stack.scale(newSize, newSize, newSize);
 		super.render(entity, entityYaw, partialTicks, stack, bufferIn, packedLightIn);
 	}
 	
