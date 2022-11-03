@@ -5,12 +5,14 @@ import com.virus5600.DefensiveMeasures.entity.client.renderer.entity.BallistaArr
 import com.virus5600.DefensiveMeasures.entity.client.renderer.entity.BallistaTurretRenderer;
 import com.virus5600.DefensiveMeasures.entity.client.renderer.entity.CannonTurretRenderer;
 import com.virus5600.DefensiveMeasures.entity.client.renderer.entity.CannonballRenderer;
+import com.virus5600.DefensiveMeasures.entity.client.renderer.entity.MGBulletRenderer;
 import com.virus5600.DefensiveMeasures.entity.client.renderer.entity.MGTurretRenderer;
 import com.virus5600.DefensiveMeasures.entity.custom.BallistaTurretEntity;
 import com.virus5600.DefensiveMeasures.entity.custom.CannonTurretEntity;
 import com.virus5600.DefensiveMeasures.entity.custom.MGTurretEntity;
 import com.virus5600.DefensiveMeasures.entity.projectile.BallistaArrowEntity;
 import com.virus5600.DefensiveMeasures.entity.projectile.CannonballEntity;
+import com.virus5600.DefensiveMeasures.entity.projectile.MGBulletEntity;
 
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
@@ -29,7 +31,7 @@ public class ModEntities {
 		new Identifier(DefensiveMeasures.MOD_ID, "cannon_turret"),
 		FabricEntityTypeBuilder
 			.create(SpawnGroup.MISC, CannonTurretEntity::new)
-			.dimensions(EntityDimensions.fixed(0.875f, 0.875f))
+			.dimensions(EntityDimensions.changing(0.875f, 0.875f))
 			.build()
 	);
 	public static final EntityType<BallistaTurretEntity> BALLISTA = Registry.register(
@@ -37,7 +39,7 @@ public class ModEntities {
 		new Identifier(DefensiveMeasures.MOD_ID, "ballista"),
 		FabricEntityTypeBuilder
 			.create(SpawnGroup.MISC, BallistaTurretEntity::new)
-			.dimensions(EntityDimensions.fixed(1.0625f, 1.0625f))
+			.dimensions(EntityDimensions.changing(0.875f, 0.875f))
 			.build()
 	);
 	public static final EntityType<MGTurretEntity> MG_TURRET = Registry.register(
@@ -45,7 +47,7 @@ public class ModEntities {
 		new Identifier(DefensiveMeasures.MOD_ID, "mg_turret"),
 		FabricEntityTypeBuilder
 			.create(SpawnGroup.MISC, MGTurretEntity::new)
-			.dimensions(EntityDimensions.fixed(1, 1))
+			.dimensions(EntityDimensions.changing(0.875f, 0.875f))
 			.build()
 	);
 	
@@ -67,6 +69,13 @@ public class ModEntities {
 			.dimensions(EntityDimensions.fixed(0.125f, 0.125f))
 			.build()
 	);
+	public static final EntityType<MGBulletEntity> MG_BULLET = Registry.register(
+		Registry.ENTITY_TYPE,
+		new Identifier(DefensiveMeasures.MOD_ID, "mg_bullet"),
+		FabricEntityTypeBuilder.<MGBulletEntity>create(SpawnGroup.MISC, MGBulletEntity::new)
+		.dimensions(EntityDimensions.fixed(0.125f, 0.125f))
+		.build()
+	);
 	
 	public static void registerModEntities() {
 		DefensiveMeasures.LOGGER.debug("REGISTERING ENTITIES FOR " + DefensiveMeasures.MOD_NAME);
@@ -84,5 +93,6 @@ public class ModEntities {
 		// v1.0.0
 		EntityRendererRegistry.register(ModEntities.CANNONBALL, CannonballRenderer::new);
 		EntityRendererRegistry.register(ModEntities.BALLISTA_ARROW, 	BallistaArrowRenderer::new);
+		EntityRendererRegistry.register(ModEntities.MG_BULLET, 	MGBulletRenderer::new);
 	}
 }

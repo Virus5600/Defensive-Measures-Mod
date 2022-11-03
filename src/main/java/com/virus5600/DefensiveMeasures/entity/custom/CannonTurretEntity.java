@@ -106,6 +106,7 @@ public class CannonTurretEntity extends TurretEntity implements IAnimatable, Ran
 		
 		if (this.hasTarget() && this.isShooting()) {
 			event.getController().setAnimation(new AnimationBuilder().addAnimation("animation.cannon_turret.shoot"));
+			event.getController().markNeedsReload();
 			
 			if (!this.getShootingFXDone()) {
 				int count = MathHelper.nextInt(this.random, 10, 25);
@@ -222,12 +223,12 @@ public class CannonTurretEntity extends TurretEntity implements IAnimatable, Ran
 
 	@Override
 	public void attack(LivingEntity target, float pullProgress) {
-		this.setShooting(true);
-		
 		if (target == null) {
 			this.setShooting(false);
 			return;
 		}
+		
+		this.setShooting(true);
 		
 		try {
 			double vx = (target.getX() - this.getX()) * 1.0625;

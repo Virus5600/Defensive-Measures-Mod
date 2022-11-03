@@ -8,7 +8,11 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.projectile.PersistentProjectileEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.Packet;
+import net.minecraft.particle.BlockStateParticleEffect;
+import net.minecraft.particle.ParticleTypes;
+import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 
 import software.bernie.geckolib3.core.IAnimatable;
@@ -19,29 +23,32 @@ import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
 import software.bernie.geckolib3.core.manager.AnimationData;
 import software.bernie.geckolib3.core.manager.AnimationFactory;
 
-public class BallistaArrowEntity extends PersistentProjectileEntity implements IAnimatable {
+public class MGBulletEntity extends PersistentProjectileEntity implements IAnimatable {
 	private AnimationFactory factory = new AnimationFactory(this);
 	
 	/// CONSTRUCTORS ///
-	public BallistaArrowEntity(EntityType<? extends PersistentProjectileEntity> entityType, World world) {
+	public MGBulletEntity(EntityType<? extends PersistentProjectileEntity> entityType, World world) {
         super((EntityType<? extends PersistentProjectileEntity>)entityType, world);
-        this.setPierceLevel((byte) 5);
+        this.setPierceLevel((byte) 2);
+        this.setDamage(5.0);
     }
 
-    public BallistaArrowEntity(World world, double x, double y, double z) {
-        super(ModEntities.BALLISTA_ARROW, x, y, z, world);
-        this.setPierceLevel((byte) 5);
+    public MGBulletEntity(World world, double x, double y, double z) {
+        super(ModEntities.MG_BULLET, x, y, z, world);
+        this.setPierceLevel((byte) 2);
+        this.setDamage(5.0);
     }
 
-    public BallistaArrowEntity(World world, LivingEntity owner) {
-        super(ModEntities.BALLISTA_ARROW, owner, world);
-        this.setPierceLevel((byte) 5);
+    public MGBulletEntity(World world, LivingEntity owner) {
+        super(ModEntities.MG_BULLET, owner, world);
+        this.setPierceLevel((byte) 2);
+        this.setDamage(5.0);
     }
 	
 	/// METHODS ///
     // PRIVATE
     private <E extends IAnimatable> PlayState predicate(AnimationEvent<E> event) {
-		event.getController().setAnimation(new AnimationBuilder().addAnimation("animation.ballista_arrow.idle"));
+		event.getController().setAnimation(new AnimationBuilder().addAnimation("animation.mg_bullet.idle"));
 		return PlayState.CONTINUE;
 	}
     
@@ -53,14 +60,40 @@ public class BallistaArrowEntity extends PersistentProjectileEntity implements I
     
     @Override
     protected void onHit(LivingEntity target) {
-    	this.setPierceLevel((byte) 5);
+    	if (target.getType().getDimensions().width > 1.125) {
+    		this.setPierceLevel((byte) 0);
+    	}
+    	
         super.onHit(target);
     }
     
     @Override
     protected void onEntityHit(EntityHitResult entityHitResult) {
-    	this.setPierceLevel((byte) 5);
+    	if (entityHitResult.getEntity().getType().getDimensions().width > 1.125) {
+    		this.setPierceLevel((byte) 0);
+    	}
+    	
     	super.onEntityHit(entityHitResult);
+    }
+    
+    @Override
+    protected void onBlockHit(BlockHitResult blockHitResult) {
+    	super.onBlockHit(blockHitResult);
+    	
+    	for (int i = 0; i < ((Math.random() * (10 - 5)) + 5); i++) {
+	    	this.world.addParticle(
+				new BlockStateParticleEffect(ParticleTypes.BLOCK, this.world.getBlockState(blockHitResult.getBlockPos())),
+				true,
+				this.getPos().getX(),
+				this.getPos().getY(),
+				this.getPos().getZ(),
+				MathHelper.nextDouble(this.random, -0.01, 0.01),
+				MathHelper.nextDouble(this.random, 0.1, 0.25),
+				MathHelper.nextDouble(this.random, -0.01, 0.01)
+			);
+    	}
+    	
+    	this.discard();
     }
     
     // PUBLIC
