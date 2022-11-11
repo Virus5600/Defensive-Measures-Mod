@@ -4,4 +4,5 @@ Defensive Add-on is an add-on that allows players to place defensive turrets and
 
 # SOCIAL LINKS
 
-[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/D1D6BFRR3)
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/D1D6BFRR3)<br>
+<a href="https://www.paypal.com/donate/?hosted_button_id=T5LTYWVFU29R8"><img src="https://github.com/Virus5600/Defensive-Measures-Add-on-Guide/blob/main/public/images/UI/paypal_donate.png" height="30px"></a>
