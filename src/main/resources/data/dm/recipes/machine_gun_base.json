@@ -7,7 +7,7 @@
 	],
 	"key": {
 		"b": {
-			"item": "minecraft:nether_bricks"
+			"item": "minecraft:nether_brick"
 		},
 		"p": {
 			"item": "minecraft:heavy_weighted_pressure_plate"

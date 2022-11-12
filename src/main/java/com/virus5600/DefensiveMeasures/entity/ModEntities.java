@@ -50,7 +50,7 @@ public class ModEntities {
 			.dimensions(EntityDimensions.changing(0.875f, 0.875f))
 			.build()
 	);
-	
+
 	/// PROJECTILES
 	// v1.0.0
 	public static final EntityType<CannonballEntity> CANNONBALL = Registry.register(
@@ -76,10 +76,10 @@ public class ModEntities {
 		.dimensions(EntityDimensions.fixed(0.125f, 0.125f))
 		.build()
 	);
-	
+
 	public static void registerModEntities() {
 		DefensiveMeasures.LOGGER.debug("REGISTERING ENTITIES FOR " + DefensiveMeasures.MOD_NAME);
-		
+
 		/// TURRETS
 		// v1.0.0
 		EntityRendererRegistry.register(ModEntities.CANNON_TURRET, CannonTurretRenderer::new);
@@ -88,7 +88,7 @@ public class ModEntities {
 		FabricDefaultAttributeRegistry.register(ModEntities.BALLISTA, BallistaTurretEntity.setAttributes());
 		EntityRendererRegistry.register(ModEntities.MG_TURRET, MGTurretRenderer::new);
 		FabricDefaultAttributeRegistry.register(ModEntities.MG_TURRET, MGTurretEntity.setAttributes());
-		
+
 		/// PROJECTILES
 		// v1.0.0
 		EntityRendererRegistry.register(ModEntities.CANNONBALL, CannonballRenderer::new);

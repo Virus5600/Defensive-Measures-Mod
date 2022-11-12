@@ -57,7 +57,7 @@ public class BallistaTurretEntity extends TurretEntity implements IAnimatable, R
 	@Nullable
 	private LivingEntity currentTarget = null;
 	private double attCooldown = totalAttCooldown;
-	
+
 	// CONSTRUCTORS //
 	public BallistaTurretEntity(EntityType<? extends MobEntity> entityType, World world) {
 		super(entityType, world, TurretMaterial.WOOD, BallistaArrowEntity.class);
@@ -65,19 +65,19 @@ public class BallistaTurretEntity extends TurretEntity implements IAnimatable, R
 		this.addHealables(healables);
 		this.addEffectSource(effectSource);
 	}
-	
+
 	// METHODS //
 	// PRIVATE
 	private <E extends IAnimatable> PlayState idlePredicate(AnimationEvent<E> event) {
 		event.getController().setAnimation(new AnimationBuilder().addAnimation("animation.ballista.setup", true));
 		return PlayState.CONTINUE;
 	}
-	
+
 	private <E extends IAnimatable> PlayState lookAtTargetPredicate(AnimationEvent<E> event) {
 		event.getController().setAnimation(new AnimationBuilder().addAnimation("animation.ballista.look_at_target", true));
 		return PlayState.CONTINUE;
 	}
-	
+
 	private boolean animPlayed = false;
 	private <E extends IAnimatable> PlayState deathPredicate(AnimationEvent<E> event) {
 		if (!this.isAlive() && !animPlayed) {
@@ -87,17 +87,17 @@ public class BallistaTurretEntity extends TurretEntity implements IAnimatable, R
 		}
 		return PlayState.CONTINUE;
 	}
-	
+
 	private <E extends IAnimatable> PlayState firingSequencePredicate(AnimationEvent<E> event) {
 		if (this.hasTarget() && this.isShooting()) {
 			event.getController().setAnimation(new AnimationBuilder().addAnimation("animation.ballista.shoot"));
 			event.getController().markNeedsReload();
 			this.setShooting(false);
 		}
-		
+
 		return PlayState.CONTINUE;
 	}
-	
+
 	// PROTECTED
 		@Override
 	protected void initGoals() {
@@ -105,7 +105,7 @@ public class BallistaTurretEntity extends TurretEntity implements IAnimatable, R
 		this.goalSelector.add(1, new ProjectileAttackGoal(this, 0, totalAttCooldown, 16.8125F));
 		this.goalSelector.add(2, new LookAtEntityGoal(this, MobEntity.class, 8.0F, 0.02F, true));
 		this.goalSelector.add(8, new LookAroundGoal(this));
-		
+
 		// Targets
 		this.targetSelector.add(1, new ActiveTargetGoal<MobEntity>(this, MobEntity.class, 10, true, false, (entity) -> {
 			return entity instanceof Monster;
@@ -123,7 +123,7 @@ public class BallistaTurretEntity extends TurretEntity implements IAnimatable, R
 	protected SoundEvent getHurtSound(DamageSource source) {
 		return ModSoundEvents.TURRET_BALLISTA_HURT;
 	}
-	
+
 	@Nullable
 	@Override
 	protected SoundEvent getDeathSound() {
@@ -138,7 +138,7 @@ public class BallistaTurretEntity extends TurretEntity implements IAnimatable, R
 			.add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0f)
 			.add(EntityAttributes.GENERIC_KNOCKBACK_RESISTANCE, 999999f);
 	}
-	
+
 	@Override
 	public void registerControllers(AnimationData data) {
 		data.addAnimationController(new AnimationController<IAnimatable>(this, "idle", 20, this::idlePredicate));
@@ -151,21 +151,21 @@ public class BallistaTurretEntity extends TurretEntity implements IAnimatable, R
 	public AnimationFactory getFactory() {
 		return this.factory;
 	}
-	
+
 	public ItemStack getEntityItem() {
 		ItemStack stack = new ItemStack(ModItems.BALLISTA, 1);
 		return stack;
 	}
-	
+
 	@Override
 	public void attack(LivingEntity target, float pullProgress) {
 		this.setShooting(true);
-		
+
 		if (target == null) {
 			this.setShooting(false);
 			return;
 		}
-		
+
 		try {
 			double vx = (target.getX() - this.getX()) * 1.0625;
 			double vy = target.getBodyY(2/3) - this.getY() + 0.25;
@@ -173,24 +173,24 @@ public class BallistaTurretEntity extends TurretEntity implements IAnimatable, R
 			double variance = Math.sqrt(vx * vx + vz * vz);
 			float divergence = 0 + this.world.getDifficulty().getId() * 2;
 			ProjectileEntity projectile = (ProjectileEntity) new BallistaArrowEntity(world, this);
-			
+
 			projectile.setVelocity(vx, vy + variance * 0.2f, vz, 1.5f, divergence);
 			projectile.setPos(this.getX(), this.getY() + 0.8125, this.getZ());
-			
+
 			this.playSound(this.getShootSound(), 1.0f, 1.0f / (this.getRandom().nextFloat() * 0.4f + 0.8f));
 			this.world.spawnEntity(projectile);
 		} catch (IllegalArgumentException | SecurityException e) {
 			e.printStackTrace();
 		}
 	}
-	
+
 	@Override
 	public void tick() {
 		super.tick();
-		
+
 		this.setYaw(0);
 		this.setBodyYaw(0);
-		
+
 		if (!this.world.isClient()) {
 			// FIRING ANIMATING RELATED
 			this.setTrackedYaw(this.getHeadYaw());
@@ -198,14 +198,14 @@ public class BallistaTurretEntity extends TurretEntity implements IAnimatable, R
 			this.setPos(X, this.getX());
 			this.setPos(Y, this.getY() + 0.5);
 			this.setPos(Z, this.getZ());
-			
+
 			if (this.hasTarget()) {
 				this.setPos(TARGET_POS_X, this.getTarget().getX());
 				this.setPos(TARGET_POS_Y, this.getTarget().getBodyY(1/2));
 				this.setPos(TARGET_POS_Z, this.getTarget().getZ());
-				
+
 				--this.attCooldown;
-				
+
 				if (this.attCooldown <= 0)
 					this.attCooldown = 20 * 2.5;
 				else if (this.attCooldown <= 45)
@@ -218,12 +218,12 @@ public class BallistaTurretEntity extends TurretEntity implements IAnimatable, R
 			}
 		}
 	}
-	
+
 	@Override
 	public ActionResult interactMob(PlayerEntity player, Hand hand) {
 		return Itemable.tryItem(player, hand, this, ModItems.TURRET_REMOVER, ModItems.BALLISTA).orElse(super.interactMob(player, hand));
 	}
-	
+
 	static {
 		healables = new HashMap<Item, Float>() {
 			private static final long serialVersionUID = 1L;
@@ -236,7 +236,7 @@ public class BallistaTurretEntity extends TurretEntity implements IAnimatable, R
 					put(item, 25f);
 			}
 		};
-		
+
 		effectSource = new HashMap<Item, List<Object[]>>() {
 			private static final long serialVersionUID = 1L;
 			{

@@ -277,7 +277,7 @@ public class MGTurretEntity extends TurretEntity implements IAnimatable, RangedA
 
 	@Override
 	public ActionResult interactMob(PlayerEntity player, Hand hand) {
-		return Itemable.tryItem(player, hand, this, ModItems.TURRET_REMOVER, ModItems.BALLISTA).orElse(super.interactMob(player, hand));
+		return Itemable.tryItem(player, hand, this, ModItems.TURRET_REMOVER, ModItems.MG_TURRET).orElse(super.interactMob(player, hand));
 	}
 
 	static {

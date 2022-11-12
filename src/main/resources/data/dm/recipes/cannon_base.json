@@ -6,7 +6,7 @@
 	],
 	"key": {
 		"p": {
-			"tag": "minecraft:wooden_slab"
+			"tag": "minecraft:wooden_slabs"
 		},
 		"s": {
 			"item": "minecraft:smooth_stone_slab"

@@ -1,0 +1,39 @@
+{
+	"type": "minecraft:entity",
+	"pools": [
+		{
+			"rolls": 1,
+			"entries": [
+				{
+					"type": "minecraft:loot_table",
+					"weight": 20,
+					"name": "dm:entities/cannon_turret/head_1"
+				},
+				{
+					"type": "minecraft:loot_table",
+					"weight": 40,
+					"name": "dm:entities/cannon_turret/head_2"
+				}
+			]
+		},
+		{
+			"rolls": 1,
+			"entries": [
+				{
+					"type": "minecraft:tag",
+					"name": "minecraft:wooden_slabs",
+					"expand": true,
+					"functions": [
+						{
+							"function": "minecraft:set_count",
+							"count": {
+								"min": 0,
+								"max": 3
+							}
+						}
+					]
+				}
+			]
+		}
+	]
+}

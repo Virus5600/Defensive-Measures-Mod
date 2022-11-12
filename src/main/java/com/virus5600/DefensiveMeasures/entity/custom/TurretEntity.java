@@ -547,6 +547,9 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
 
 	@Override
     public boolean startRiding(Entity entity, boolean force) {
+		if (this.world.isClient()) {
+            this.prevAttachedBlock = null;
+        }
         return super.startRiding(entity, force);
     }
 
