@@ -31,9 +31,9 @@ If applicable, add screenshots to help explain your problem.
 A crash report would definitely help if the game crashed. It can be found at `%appdata%/.minecraft/crash-reports`
 
 **Please complete the following information:**
- - Fabric Version: [e.g. 0.14.10]
- - Minecraft Version [e.g. 1.19.2]
- - Mod Version [e.g. v1.0.0-beta]
+- Fabric Version: [e.g. 0.14.10]
+- Minecraft Version [e.g. 1.19.2]
+- Mod Version [e.g. v1.0.0-beta]
 - GeckoLib Version [e.g. 3.1.15]
 
 **Additional context**
