@@ -12,6 +12,7 @@ import org.jetbrains.annotations.Nullable;
 import com.virus5600.DefensiveMeasures.DefensiveMeasures;
 import com.virus5600.DefensiveMeasures.entity.TurretMaterial;
 import com.virus5600.DefensiveMeasures.item.ModItems;
+import com.virus5600.DefensiveMeasures.util.anaglyph.Vector3d;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -25,6 +26,7 @@ import net.minecraft.entity.ai.RangedAttackMob;
 import net.minecraft.entity.ai.brain.Brain;
 import net.minecraft.entity.ai.brain.MemoryModuleType;
 import net.minecraft.entity.ai.control.BodyControl;
+import net.minecraft.entity.damage.DamageRecord;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
@@ -45,6 +47,7 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.Util;
@@ -189,6 +192,7 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
         this.dataTracker.startTracking(TARGET_POS_X, 0f);
         this.dataTracker.startTracking(TARGET_POS_Y, 0f);
         this.dataTracker.startTracking(TARGET_POS_Z, 0f);
+        this.dataTracker.startTracking(ATTACHED_FACE, Direction.DOWN);
     }
 
 	@Override
@@ -199,6 +203,74 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
 	@Override
     protected MoveEffect getMoveEffect() {
         return Entity.MoveEffect.NONE;
+    }
+
+	protected void tryAttachOrFall() {
+        Direction direction = this.findAttachSide(this.getBlockPos());
+        if (direction == null) {
+            this.setAttachedFace(direction);
+        } else if (direction != Direction.DOWN) {
+            this.tryFall();
+        }
+    }
+
+	protected boolean tryFall() {
+		if (this.isAiDisabled() || !this.isAlive())
+            return false;
+
+		BlockPos blockPos = this.getBlockPos().add(new Vec3i(0, -1, 0));
+		if (this.isValidFallingPosition(blockPos)) {
+			this.setVelocity(super.getVelocity().multiply(0.98));
+			return true;
+		}
+
+		return false;
+	}
+
+	protected void setAttachedFace(Direction face) {
+		this.dataTracker.set(ATTACHED_FACE, face);
+	}
+
+	protected Direction getAttachedFace() {
+		return this.dataTracker.get(ATTACHED_FACE);
+	}
+
+	@Nullable
+	protected Direction findAttachSide(BlockPos pos) {
+		for (Direction direction : Direction.values()) {
+			if (!this.canStay(pos, direction))
+				continue;
+
+			return direction;
+		}
+
+		return null;
+	}
+
+	protected boolean canStay(BlockPos pos, Direction direction) {
+		if (!this.isValidFallingPosition(pos))
+			return false;
+
+		direction = direction == null ? Direction.DOWN : direction;
+		Direction oppositeDir = direction.getOpposite();
+		if (!this.world.isDirectionSolid(pos.offset(direction), this, oppositeDir))
+			return false;
+
+		Box box = this.calculateBoundingBox().offset(pos).contract(1.0E-6);
+		return this.world.isSpaceEmpty(this, box);
+	}
+
+	protected boolean isValidFallingPosition(BlockPos pos) {
+        BlockState blockState = this.world.getBlockState(pos);
+
+        if (blockState.isAir())
+            return true;
+
+        if ((blockState.isOf(Blocks.BUBBLE_COLUMN) && pos.equals(this.getBlockPos())) || (blockState.isOf(Blocks.WATER) && pos.equals(this.getBlockPos())))
+        	return true;
+
+        boolean bl = blockState.isOf(Blocks.MOVING_PISTON) && pos.equals(this.getBlockPos());
+        return !bl;
     }
 
 	// PUBLIC
@@ -658,20 +730,33 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
 			this.setHasTarget(this.getTarget() != null);
 		} else {
 			// SNAPPING THE TURRET BACK TO PLACE
-			if (this.getVelocity().x == 0 && this.getVelocity().z == 0) {
-				this.setPos(
-					Math.floor(this.getX()) + 0.5,
+			if (this.getVelocity().x == 0 && this.getVelocity().z == 0 && !this.hasVehicle()) {
+				Vec3d newPos = new Vec3d(
+					(double) MathHelper.floor(this.getX()) + 0.5,
 					this.getY(),
-					Math.floor(this.getZ()) + 0.5
+					(double) MathHelper.floor(this.getZ()) + 0.5
 				);
+
+				this.tryAttachOrFall();
+				super.setPosition(newPos);
+				this.world.emitGameEvent(GameEvent.TELEPORT, newPos, GameEvent.Emitter.of(this));
+
+				if (this.getVelocity() == Vec3d.ZERO && this.world.isClient && !this.hasVehicle()) {
+					this.lastRenderX = this.getX();
+					this.lastRenderY = this.getY();
+					this.lastRenderZ = this.getZ();
+				}
 			}
 		}
 	}
 
 	@Override
 	public void tickMovement() {
-		this.setVelocity(this.getVelocity().multiply(0.98));
 		super.tickMovement();
+
+		if (!(this.world.isClient || this.hasVehicle() || this.canStay(this.getBlockPos(), this.getAttachedFace()))) {
+			this.tryAttachOrFall();
+		}
 	}
 
 	@Override
@@ -793,12 +878,29 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
     	return (double) this.dataTracker.get(PITCH);
     }
 
+    @Override
+    public Vec3d getVelocity() {
+    	DamageRecord record = this.getDamageTracker().getMostRecentDamage();
+    	boolean isExplosive = record == null ? false : record.getDamageSource().isExplosive();
+
+    	if (this.world.getBlockState(this.getVelocityAffectingPos()).isOf(Blocks.BUBBLE_COLUMN) ||
+    			this.world.getBlockState(this.getVelocityAffectingPos().add(0, 1, 0)).isOf(Blocks.BUBBLE_COLUMN) ||
+    			this.world.getBlockState(this.getVelocityAffectingPos()).isOf(Blocks.WATER) ||
+    			this.world.getBlockState(this.getVelocityAffectingPos().add(0, 1, 0)).isOf(Blocks.WATER) ||
+    			this.getAttachedFace() != Direction.DOWN ||
+    			isExplosive)
+    		return new Vec3d(0, -Math.abs(super.getVelocity().getY()), 0);
+
+    	return super.getVelocity();
+    }
+
 	static {
 		LEVEL = DataTracker.registerData(TurretEntity.class, TrackedDataHandlerRegistry.INTEGER);
 		FROM_ITEM = DataTracker.registerData(TurretEntity.class, TrackedDataHandlerRegistry.BYTE);
 		SHOOTING = DataTracker.registerData(TurretEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
 		SHOOTING_FX_DONE = DataTracker.registerData(TurretEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
 		HAS_TARGET = DataTracker.registerData(TurretEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
+		ATTACHED_FACE = DataTracker.registerData(TurretEntity.class, TrackedDataHandlerRegistry.FACING);
 
 		X = DataTracker.registerData(TurretEntity.class, TrackedDataHandlerRegistry.FLOAT);
 		Y = DataTracker.registerData(TurretEntity.class, TrackedDataHandlerRegistry.FLOAT);
@@ -809,7 +911,6 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
 		TARGET_POS_X = DataTracker.registerData(TurretEntity.class, TrackedDataHandlerRegistry.FLOAT);
 		TARGET_POS_Y = DataTracker.registerData(TurretEntity.class, TrackedDataHandlerRegistry.FLOAT);
 		TARGET_POS_Z = DataTracker.registerData(TurretEntity.class, TrackedDataHandlerRegistry.FLOAT);
-		ATTACHED_FACE = DataTracker.registerData(ShulkerEntity.class, TrackedDataHandlerRegistry.FACING);
 		SOUTH_VECTOR = Util.make(() -> {
 			Vec3i vec3i = Direction.SOUTH.getVector();
 			return new Vec3f(vec3i.getX(), vec3i.getY(), vec3i.getZ());
