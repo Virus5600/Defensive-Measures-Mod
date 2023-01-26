@@ -2,8 +2,8 @@ package com.virus5600.DefensiveMeasures.entity.projectile;
 
 import java.util.List;
 
-import com.virus5600.DefensiveMeasures.DefensiveMeasuresClient;
 import com.virus5600.DefensiveMeasures.entity.ModEntities;
+import com.virus5600.DefensiveMeasures.networking.packets.SpawnEvent.SpawnEventC2SPacket;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -35,7 +35,7 @@ public class CannonballEntity extends ExplosiveProjectileEntity implements IAnim
 	private AnimationFactory factory = new AnimationFactory(this);
 
 	public SoundEvent hitSound = this.getHitSound();
-	
+
 	/// CONSTRUCTORS ///
 	public CannonballEntity(EntityType<? extends ExplosiveProjectileEntity> entityType, World world) {
 		super((EntityType<? extends ExplosiveProjectileEntity>)entityType, world);
@@ -44,7 +44,7 @@ public class CannonballEntity extends ExplosiveProjectileEntity implements IAnim
 		this.setNoGravity(false);
 		super.setNoGravity(false);
 	}
-	
+
 	public CannonballEntity(World world, LivingEntity owner) {
         this(ModEntities.CANNONBALL, world);
         this.setOwner(owner);
@@ -52,21 +52,21 @@ public class CannonballEntity extends ExplosiveProjectileEntity implements IAnim
         this.setNoGravity(false);
         super.setNoGravity(false);
     }
-	
+
 	public CannonballEntity(EntityType<? extends ExplosiveProjectileEntity> type, LivingEntity owner, double directionX, double directionY, double directionZ, World world) {
 		super(type, owner, directionX, directionY, directionZ, world);
 		this.setOnFire(false);
         this.setNoGravity(false);
         super.setNoGravity(false);
 	}
-	
+
 	/// METHODS ///
 	// PRIVATE
 	@Environment(EnvType.CLIENT)
 	private ParticleEffect getParticleParameters() {
 		return ParticleTypes.CLOUD;
 	}
-	
+
 	// PROTECTED
 	@Override
 	protected void onBlockHit(BlockHitResult blockHitResult) {
@@ -103,17 +103,17 @@ public class CannonballEntity extends ExplosiveProjectileEntity implements IAnim
 			this.remove(Entity.RemovalReason.DISCARDED);
 		}
 	}
-	
+
 	@Override
 	protected boolean isBurning() {
         return false;
     }
-	
+
 	@Override
 	protected ParticleEffect getParticleType() {
         return ParticleTypes.CLOUD;
     }
-	
+
 	protected void onCollision(HitResult hitResult) {
 		super.onCollision(hitResult);
 		if (!this.world.isClient) {
@@ -131,23 +131,23 @@ public class CannonballEntity extends ExplosiveProjectileEntity implements IAnim
 			this.remove(Entity.RemovalReason.DISCARDED);
 		}
 	}
-	
+
 	protected SoundEvent getHitSound() {
 		return SoundEvents.ENTITY_GENERIC_EXPLODE;
 	}
-	
+
 	// PUBLIC
 	@Environment(EnvType.CLIENT)
 	public void handleStatus(byte status) {
 		if (status == 3) {
 			ParticleEffect particleEffect = this.getParticleParameters();
- 
+
 			for(int i = 0; i < 8; ++i) {
 				this.world.addParticle(particleEffect, this.getX(), this.getY(), this.getZ(), 0.0D, 0.0D, 0.0D);
 			}
 		}
 	}
-	
+
 	public void doDamage() {
 		float q = 4.0F;
 		int k = MathHelper.floor(this.getX() - (double) q - 1.0D);
@@ -161,11 +161,11 @@ public class CannonballEntity extends ExplosiveProjectileEntity implements IAnim
 			this,
 			new Box((double) k, (double) t, (double) v, (double) l, (double) u, (double) w)
 		);
-		
+
 		for (int x = 0; x < list.size(); ++x) {
 			Entity entity = (Entity) list.get(x);
 			double y = (double) (MathHelper.sqrt((float) entity.squaredDistanceTo(vec3d)) / q);
-			
+
 			if (y <= 1.0D) {
 				Explosion explosion = this.world.createExplosion(this, this.getX(), this.getBodyY(0.0625D), this.getZ(), 2.5F, Explosion.DestructionType.NONE);
 				if (entity instanceof LivingEntity) {
@@ -177,7 +177,7 @@ public class CannonballEntity extends ExplosiveProjectileEntity implements IAnim
 			}
 		}
 	}
-	
+
 	public void setSound(SoundEvent soundIn) {
 		this.hitSound = soundIn;
 	}
@@ -194,7 +194,7 @@ public class CannonballEntity extends ExplosiveProjectileEntity implements IAnim
 	@Override
 	public void tick() {
 		super.tick();
-		
+
 		double d = 0.08;
 		if (!this.hasNoGravity()) {
             this.setVelocity(this.getVelocity().add(0.0, -d / 4.0, 0.0));
@@ -203,9 +203,9 @@ public class CannonballEntity extends ExplosiveProjectileEntity implements IAnim
             }
         }
 	}
-	
+
 	@Override
 	public Packet<?> createSpawnPacket() {
-		return DefensiveMeasuresClient.EntityPacket.createPacket(this);
+		return SpawnEventC2SPacket.send(this);
 	}
 }

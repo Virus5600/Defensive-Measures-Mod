@@ -1,12 +1,6 @@
 package com.virus5600.DefensiveMeasures.entity;
 
 import com.virus5600.DefensiveMeasures.DefensiveMeasures;
-import com.virus5600.DefensiveMeasures.entity.client.renderer.entity.BallistaArrowRenderer;
-import com.virus5600.DefensiveMeasures.entity.client.renderer.entity.BallistaTurretRenderer;
-import com.virus5600.DefensiveMeasures.entity.client.renderer.entity.CannonTurretRenderer;
-import com.virus5600.DefensiveMeasures.entity.client.renderer.entity.CannonballRenderer;
-import com.virus5600.DefensiveMeasures.entity.client.renderer.entity.MGBulletRenderer;
-import com.virus5600.DefensiveMeasures.entity.client.renderer.entity.MGTurretRenderer;
 import com.virus5600.DefensiveMeasures.entity.custom.BallistaTurretEntity;
 import com.virus5600.DefensiveMeasures.entity.custom.CannonTurretEntity;
 import com.virus5600.DefensiveMeasures.entity.custom.MGTurretEntity;
@@ -14,7 +8,6 @@ import com.virus5600.DefensiveMeasures.entity.projectile.BallistaArrowEntity;
 import com.virus5600.DefensiveMeasures.entity.projectile.CannonballEntity;
 import com.virus5600.DefensiveMeasures.entity.projectile.MGBulletEntity;
 
-import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
 import net.minecraft.entity.EntityDimensions;
@@ -77,22 +70,13 @@ public class ModEntities {
 		.build()
 	);
 
-	public static void registerModEntities() {
-		DefensiveMeasures.LOGGER.debug("REGISTERING ENTITIES FOR " + DefensiveMeasures.MOD_NAME);
+	public static void registerModEntityAttributes() {
+		DefensiveMeasures.LOGGER.debug("REGISTERING ENTITY ATTRIBUTES FOR " + DefensiveMeasures.MOD_NAME);
 
 		/// TURRETS
 		// v1.0.0
-		EntityRendererRegistry.register(ModEntities.CANNON_TURRET, CannonTurretRenderer::new);
 		FabricDefaultAttributeRegistry.register(ModEntities.CANNON_TURRET, CannonTurretEntity.setAttributes());
-		EntityRendererRegistry.register(ModEntities.BALLISTA, BallistaTurretRenderer::new);
 		FabricDefaultAttributeRegistry.register(ModEntities.BALLISTA, BallistaTurretEntity.setAttributes());
-		EntityRendererRegistry.register(ModEntities.MG_TURRET, MGTurretRenderer::new);
 		FabricDefaultAttributeRegistry.register(ModEntities.MG_TURRET, MGTurretEntity.setAttributes());
-
-		/// PROJECTILES
-		// v1.0.0
-		EntityRendererRegistry.register(ModEntities.CANNONBALL, CannonballRenderer::new);
-		EntityRendererRegistry.register(ModEntities.BALLISTA_ARROW, 	BallistaArrowRenderer::new);
-		EntityRendererRegistry.register(ModEntities.MG_BULLET, 	MGBulletRenderer::new);
 	}
 }
