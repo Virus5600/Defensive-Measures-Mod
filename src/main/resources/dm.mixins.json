@@ -6,7 +6,7 @@
 	"mixins": [
 	],
 	"client": [
-		"screen/AnvilScreenMixin"
+		"screen.AnvilScreenMixin"
 	],
 	"server": [
 	],

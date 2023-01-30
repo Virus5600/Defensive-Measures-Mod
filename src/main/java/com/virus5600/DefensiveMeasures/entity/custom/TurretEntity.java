@@ -14,13 +14,10 @@ import com.virus5600.DefensiveMeasures.entity.TurretMaterial;
 import com.virus5600.DefensiveMeasures.item.ModItems;
 import com.virus5600.DefensiveMeasures.util.anaglyph.Vector3d;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityData;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.MovementType;
 import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.ai.RangedAttackMob;
 import net.minecraft.entity.ai.brain.Brain;
@@ -33,7 +30,6 @@ import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectInstance;
-import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.entity.mob.ShulkerEntity;
 import net.minecraft.entity.passive.PassiveEntity.PassiveData;
@@ -52,9 +48,7 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3f;
 import net.minecraft.util.math.Vec3i;
@@ -62,7 +56,6 @@ import net.minecraft.util.math.random.Random;
 import net.minecraft.world.LocalDifficulty;
 import net.minecraft.world.ServerWorldAccess;
 import net.minecraft.world.World;
-import net.minecraft.world.event.GameEvent;
 
 /**
  * The mob base for all the <b>Turrets</b> that will be added into this mod. The
@@ -84,7 +77,6 @@ import net.minecraft.world.event.GameEvent;
  * @see RangedAttackMob
  *
  */
-@SuppressWarnings("unused")
 public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob {
 	private static final TrackedData<Integer> LEVEL;
 	private static final TrackedData<Byte> FROM_ITEM;
@@ -106,6 +98,7 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
 	 */
 	@Nullable
 	private Map<Item, List<Object[]>> effectSource;
+	@SuppressWarnings("unused")
     private BlockPos prevAttachedBlock;
 	private TurretMaterial material;
 
@@ -776,8 +769,9 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
 			float divergence = 0 + this.world.getDifficulty().getId() * 2;
 
 			projectile.setVelocity(vx, vy + variance * 0.125f, vz, 2.5f, divergence);
-			this.playSound(this.getShootSound(), 1.0f, 1.0f / (this.getRandom().nextFloat() * 0.4f + 0.8f));
 			this.world.spawnEntity(projectile);
+
+			this.playSound(this.getShootSound(), 1.0f, 1.0f / (this.getRandom().nextFloat() * 0.4f + 0.8f));
 		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | SecurityException | NoSuchMethodException e) {
 			e.printStackTrace();
 			DefensiveMeasures.LOGGER.debug("");
@@ -918,8 +912,10 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
 	}
 
 	static class TurretBodyControl extends BodyControl {
+		@SuppressWarnings("unused")
 		private MobEntity entity;
-        public TurretBodyControl(MobEntity mobEntity) {
+
+		public TurretBodyControl(MobEntity mobEntity) {
             super(mobEntity);
             this.entity = mobEntity;
         }
