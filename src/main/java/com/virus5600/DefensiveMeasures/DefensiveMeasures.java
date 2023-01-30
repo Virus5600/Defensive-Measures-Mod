@@ -11,6 +11,7 @@ import com.virus5600.DefensiveMeasures.advancement.criterion.ModCriterion;
 import com.virus5600.DefensiveMeasures.block.ModBlocks;
 import com.virus5600.DefensiveMeasures.entity.ModEntities;
 import com.virus5600.DefensiveMeasures.item.ModItems;
+import com.virus5600.DefensiveMeasures.networking.ModPackets;
 import com.virus5600.DefensiveMeasures.particle.ModParticles;
 import com.virus5600.DefensiveMeasures.sound.ModSoundEvents;
 
@@ -18,21 +19,25 @@ public class DefensiveMeasures implements ModInitializer {
 	public static final String MOD_ID = "dm";
 	public static final String MOD_NAME = "DefensiveMeasures";
 	public static final Logger LOGGER = LoggerFactory.getLogger(DefensiveMeasures.MOD_ID);
-	
+
 	@Override
 	public void onInitialize() {
+		// Client & Server Side Initialization
 		ModItems.registerModItems();
 		ModSoundEvents.registerSoundEvents();
 		ModBlocks.registerModBlocks();
-		ModEntities.registerModEntities();
-		ModCriterion.registerModItems();
+		ModEntities.registerModEntityAttributes();
+		ModCriterion.registerModCriterion();
 		ModParticles.registerParticles();
+
+		// Networking part
+		ModPackets.registerC2SPackets();
 	}
-	
+
 	public static void sendChat(String text, ChatType type) {
 		sendChat(type.format(text));
 	}
-	public static void sendChat(String text) {	
+	public static void sendChat(String text) {
 		MinecraftClient mc = MinecraftClient.getInstance();
 		mc.inGameHud.getChatHud().addMessage(Text.literal(ChatFormat.YELLOW.format("[" + MOD_ID.toUpperCase() + "] ") + text));
 	}
@@ -40,12 +45,12 @@ public class DefensiveMeasures implements ModInitializer {
 		MinecraftClient mc = MinecraftClient.getInstance();
 		mc.inGameHud.getChatHud().addMessage(Text.literal(""));
 	}
-	
-	
+
+
 	/////////////
 	/// ENUMS ///
 	/////////////
-	
+
 	/**
 	 * Provides all the chat text formatting available in Minecraft; from colors to text formats.
 	 * @author Virus5600
@@ -75,15 +80,15 @@ public class DefensiveMeasures implements ModInitializer {
 		RESET('r');
 
 		private char formatCode;
-		
+
 		ChatFormat(char formatCode) {
 			this.formatCode = formatCode;
 		}
-		
+
 		public String format(String msg) {
 			return "§"+this.formatCode + msg + "§r";
 		}
-		
+
 		/**
 		 * Converts the format to its {@code char} representation used by Minecraft in formatting texts.
 		 * @return {@code char} value representing the character used for the format.
@@ -92,7 +97,7 @@ public class DefensiveMeasures implements ModInitializer {
 		@Override
 		public String toString() {return this.formatCode+"";}
 	}
-	
+
 	/**
 	 * Identifies what type of chat message is to send. Good for debugging while in-game.
 	 * @author Virus5600
@@ -103,16 +108,16 @@ public class DefensiveMeasures implements ModInitializer {
 		INFO(new ChatFormat[]{ChatFormat.DARK_AQUA}),
 		WARNING(new ChatFormat[]{ChatFormat.YELLOW}),
 		ERROR(new ChatFormat[]{ChatFormat.RED, ChatFormat.BOLD});
-		
+
 		private ChatFormat colorCode[];
-		
+
 		public String format(String msg) {
 			String str = "";
 			for (ChatFormat c : colorCode)
 				str += "§"+c;
 			return str+msg;
 		}
-		
+
 		ChatType(ChatFormat colorCode[]) {
 			this.colorCode = colorCode;
 		}

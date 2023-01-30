@@ -81,3 +81,18 @@ publishing {
 		// retrieving dependencies.
 	}
 }
+
+// loom configurations
+loom {
+	runs {
+		client {
+			client()
+            vmArg "-Dgeckolib.disable_examples=true"
+		}
+
+		server {
+			server()
+			vmArg "-Dgeckolib.disable_examples=true"
+		}
+	}
+}

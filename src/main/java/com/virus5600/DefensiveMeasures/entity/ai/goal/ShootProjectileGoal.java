@@ -14,7 +14,6 @@ import net.minecraft.entity.mob.ShulkerEntity;
 import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.sound.SoundEvents;
 
-@Deprecated
 public class ShootProjectileGoal extends Goal {
 	private int counter;
 	/**
@@ -26,10 +25,10 @@ public class ShootProjectileGoal extends Goal {
 	 */
 	private Class<?> projectile;
 	/**
-	 * Parameter values for the first constructor of the class provided on {@link #projectile}. 
+	 * Parameter values for the first constructor of the class provided on {@link #projectile}.
 	 */
 	private Object[] args;
-	
+
 	/**
 	 * Similar to the {@link ShulkerEntity}'s {@code ShootBulletGoal} which allows the Shulker to attack using their Shulker Bullet Projectile
 	 * @param entity Owner of the said projectile, defined as a {@link TurretEntity}
@@ -51,7 +50,7 @@ public class ShootProjectileGoal extends Goal {
 			return false;
 		}
 	}
-	
+
 	@Override
     public boolean shouldContinue() {
         return (this.canStart() || !((MobEntity)this.turret).getNavigation().isIdle());
@@ -92,13 +91,13 @@ public class ShootProjectileGoal extends Goal {
 			super.tick();
 		}
 	}
-	
+
 	/**
 	 * Summons a projectile for this entity.
 	 * @param projectile The {@code Class} of the projectile that will be used. Stored at {@link #projectile}
 	 * @param args All the arguments for the 1st constructor of the class
 	 * @return ProjectileEntity
-	 * 
+	 *
 	 * @see Class
 	 */
 	private ProjectileEntity summonProjectile(Class<?> projectile, Object... args) {
