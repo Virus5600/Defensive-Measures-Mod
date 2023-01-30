@@ -240,16 +240,12 @@ public class MGTurretEntity extends TurretEntity implements IAnimatable, RangedA
 
 							double variance = Math.sqrt(vx * vx + vz * vz);
 							float divergence = 0 + this.world.getDifficulty().getId() * 2;
+
 							ProjectileEntity projectile = (ProjectileEntity) new MGBulletEntity(world, this);
-
-							// Calculates the Y velocity (VY) of the projectile..
-							vy = (vy + variance * 0.2f);
-
 							this.barrelPos = getRelativePos(0, -5, 0.46875);
 
-							projectile.setVelocity(vx, vy, vz, 1.5f, divergence + 0.25f);
+							projectile.setVelocity(vx, vy + variance * 0.2f, vz, 1.5f, divergence + 0.25f);
 							projectile.setPos(barrelPos.x + this.getPos(X), barrelPos.y + this.getPos(Y), barrelPos.z + this.getPos(Z));
-
 							this.playSound(this.getShootSound(), 1.0f, 1.0f / (this.getRandom().nextFloat() * 0.4f + 0.8f));
 
 							this.world.spawnEntity(projectile);
@@ -259,11 +255,9 @@ public class MGTurretEntity extends TurretEntity implements IAnimatable, RangedA
 						}
 						else {
 							this.projectileShootCooldown--;
-
 							if (this.projectileShootCooldown == 0)
 								this.setShouldSkipAtt(false);
 						}
-
 					}
 					else {
 						this.getProjectilesFired = 0;

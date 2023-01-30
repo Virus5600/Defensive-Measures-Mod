@@ -3,7 +3,6 @@ package com.virus5600.DefensiveMeasures;
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.text.Text;
-import software.bernie.example.GeckoLibMod;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,8 +22,6 @@ public class DefensiveMeasures implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
-		GeckoLibMod.DISABLE_IN_DEV = true;
-
 		// Client & Server Side Initialization
 		ModItems.registerModItems();
 		ModSoundEvents.registerSoundEvents();

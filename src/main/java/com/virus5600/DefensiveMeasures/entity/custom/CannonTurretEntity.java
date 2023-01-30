@@ -241,9 +241,8 @@ public class CannonTurretEntity extends TurretEntity implements IAnimatable, Ran
 			projectile.setVelocity(vx, vy + variance * 0.1f, vz, 1.5f, divergence);
 			projectile.setPos(this.getX(), this.getY() + 0.5, this.getZ());
 
-			this.world.spawnEntity(projectile);
-
 			this.playSound(this.getShootSound(), 1.0f, 1.0f / (this.getRandom().nextFloat() * 0.4f + 0.8f));
+			this.world.spawnEntity(projectile);
 		} catch ( IllegalArgumentException | SecurityException e) {
 			e.printStackTrace();
 		}

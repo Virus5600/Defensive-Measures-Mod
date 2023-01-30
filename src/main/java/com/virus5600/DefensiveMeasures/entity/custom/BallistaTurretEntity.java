@@ -1,6 +1,5 @@
 package com.virus5600.DefensiveMeasures.entity.custom;
 
-import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -171,17 +170,15 @@ public class BallistaTurretEntity extends TurretEntity implements IAnimatable, R
 			double vx = (target.getX() - this.getX()) * 1.0625;
 			double vy = target.getBodyY(2/3) - this.getY() + 0.25;
 			double vz = (target.getZ() - this.getZ()) * 1.0625;
-			double distance = Point2D.distance(target.getX(), target.getBodyY(2/3), this.getX(), this.getY());
 			double variance = Math.sqrt(vx * vx + vz * vz);
 			float divergence = 0 + this.world.getDifficulty().getId() * 2;
 			ProjectileEntity projectile = (ProjectileEntity) new BallistaArrowEntity(world, this);
 
-			projectile.setVelocity(vx, vy + (variance * 0.2f) - (distance * 0.5), vz, 1.5f, divergence);
+			projectile.setVelocity(vx, vy + variance * 0.2f, vz, 1.5f, divergence);
 			projectile.setPos(this.getX(), this.getY() + 0.8125, this.getZ());
 
-			this.world.spawnEntity(projectile);
-
 			this.playSound(this.getShootSound(), 1.0f, 1.0f / (this.getRandom().nextFloat() * 0.4f + 0.8f));
+			this.world.spawnEntity(projectile);
 		} catch (IllegalArgumentException | SecurityException e) {
 			e.printStackTrace();
 		}
