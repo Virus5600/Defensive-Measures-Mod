@@ -12,8 +12,9 @@ import org.jetbrains.annotations.Nullable;
 import com.virus5600.DefensiveMeasures.DefensiveMeasures;
 import com.virus5600.DefensiveMeasures.entity.TurretMaterial;
 import com.virus5600.DefensiveMeasures.item.ModItems;
-import com.virus5600.DefensiveMeasures.util.anaglyph.Vector3d;
 
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityData;
 import net.minecraft.entity.EntityType;
@@ -31,7 +32,6 @@ import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.mob.MobEntity;
-import net.minecraft.entity.mob.ShulkerEntity;
 import net.minecraft.entity.passive.PassiveEntity.PassiveData;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.ArrowEntity;
@@ -43,12 +43,13 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
-import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3f;
 import net.minecraft.util.math.Vec3i;
@@ -56,6 +57,7 @@ import net.minecraft.util.math.random.Random;
 import net.minecraft.world.LocalDifficulty;
 import net.minecraft.world.ServerWorldAccess;
 import net.minecraft.world.World;
+import net.minecraft.world.event.GameEvent;
 
 /**
  * The mob base for all the <b>Turrets</b> that will be added into this mod. The
@@ -99,7 +101,7 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
 	@Nullable
 	private Map<Item, List<Object[]>> effectSource;
 	@SuppressWarnings("unused")
-    private BlockPos prevAttachedBlock;
+	private BlockPos prevAttachedBlock;
 	private TurretMaterial material;
 
 	protected static final TrackedData<Float> X;
@@ -271,19 +273,23 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
 		return this.getRelativePos(offset, offset, offset);
 	}
 
-	public Vec3d getRelativePos(double yawOffset, double pitchOffset) {
-		return this.getRelativePos(yawOffset, pitchOffset, yawOffset);
-	}
-
+	/**
+	 * Identifies the position of a point relative to this turret rotation and position.
+	 *
+	 * For reference:
+	 * <ul>
+	 * 	<li>X-Axis == Pitch: Identifies the elevation rotation (Horizontal line axis)</li>
+	 * 	<li>Y-Axis == Yaw: Identifies where you are looking (Vertical line axis)</li>
+	 * 	<li>Z-Axis == Roll: It's the one facing you (The 3D line)</li>
+	 * </ul>
+	 *
+	 * @param xOffset The offset of the point at the local X-Axis of this turret
+	 * @param yOffset The offset of the point at the local Y-Axis of this turret
+	 * @param zOffset The offset of the point at the local Z-Axis of this turret
+	 *
+	 * @return Vec3d the relative position of this point, assuming that the origin is at <b>[0, 0, 0]<b>
+	 */
 	public Vec3d getRelativePos(double xOffset, double yOffset, double zOffset) {
-		/*
-		 * {
-		 * x = origin.x + radius * math.cos(math.rad(rotation.y)) * math.cos(math.rad(rotation.x));
-		 * y = origin.y + radius * math.sin(math.rad(rotation.x));
-		 * z = origin.z + radius * math.sin(math.rad(rotation.y)) * math.cos(math.rad(rotation.x));
-		 * }
-		 */
-
 		double yaw = ((this.getTrackedYaw() + 90 + xOffset) * Math.PI) / 180;
 		double pitch = ((this.getTrackedPitch() + yOffset) * Math.PI) / 180;
 
@@ -315,9 +321,9 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
 	}
 
 	@Override
-    public boolean canBreatheInWater() {
-        return true;
-    }
+	public boolean canBreatheInWater() {
+		return true;
+	}
 
 	@Override
 	public boolean canImmediatelyDespawn(double distanceSquared) {
@@ -599,41 +605,41 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
 	}
 
 	@Override
-    public void readCustomDataFromNbt(NbtCompound nbt) {
-        super.readCustomDataFromNbt(nbt);
-        this.setLevel(nbt.getInt("Level"));
-        this.setFromItem(nbt.getByte("FromItem"));
-    }
+	public void readCustomDataFromNbt(NbtCompound nbt) {
+		super.readCustomDataFromNbt(nbt);
+		this.setLevel(nbt.getInt("Level"));
+		this.setFromItem(nbt.getByte("FromItem"));
+	}
 
 	@Override
-    public boolean canBeLeashedBy(PlayerEntity player) {
-        return false;
-    }
+	public boolean canBeLeashedBy(PlayerEntity player) {
+		return false;
+	}
 
 	@Override
-    public boolean startRiding(Entity entity, boolean force) {
+	public boolean startRiding(Entity entity, boolean force) {
 		if (this.world.isClient()) {
-            this.prevAttachedBlock = null;
-        }
-        return super.startRiding(entity, force);
-    }
+			this.prevAttachedBlock = null;
+		}
+		return super.startRiding(entity, force);
+	}
 
 	@Override
-    public void stopRiding() {
-        super.stopRiding();
+	public void stopRiding() {
+		super.stopRiding();
 
-        if (this.world.isClient) {
-            this.prevAttachedBlock = this.getBlockPos();
-        }
-        this.prevBodyYaw = 0.0f;
-        this.bodyYaw = 0.0f;
-    }
+		if (this.world.isClient) {
+			this.prevAttachedBlock = this.getBlockPos();
+		}
+		this.prevBodyYaw = 0.0f;
+		this.bodyYaw = 0.0f;
+	}
 
 	@Override
-    @Nullable
-    public EntityData initialize(ServerWorldAccess world, LocalDifficulty difficulty, SpawnReason spawnReason, @Nullable EntityData entityData, @Nullable NbtCompound entityNbt) {
+	@Nullable
+	public EntityData initialize(ServerWorldAccess world, LocalDifficulty difficulty, SpawnReason spawnReason, @Nullable EntityData entityData, @Nullable NbtCompound entityNbt) {
 		if (entityData == null)
-            entityData = new PassiveData(false);
+			entityData = new PassiveData(false);
 
 		this.headYaw = this.prevHeadYaw;
 		this.prevBodyYaw = 0.0f;
@@ -646,13 +652,13 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
 			}
 		}
 
-        return super.initialize(world, difficulty, spawnReason, entityData, entityNbt);
-    }
+		return super.initialize(world, difficulty, spawnReason, entityData, entityNbt);
+	}
 
 	@Override
-    public boolean isCollidable() {
-        return this.isAlive();
-    }
+	public boolean isCollidable() {
+		return this.isAlive();
+	}
 
 	@Override
 	public boolean isPushable() {
@@ -660,14 +666,14 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
 	}
 
 	@Override
-    public SoundCategory getSoundCategory() {
-        return SoundCategory.BLOCKS;
-    }
+	public SoundCategory getSoundCategory() {
+		return SoundCategory.BLOCKS;
+	}
 
 	@Override
 	public byte isFromItem() {
-        return this.dataTracker.get(FROM_ITEM);
-    }
+		return this.dataTracker.get(FROM_ITEM);
+	}
 
 	@Override
 	public void setFromItem(byte fromItem) {
@@ -697,12 +703,12 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
 
 		if (nbt.contains("Level"))
 			this.setLevel(nbt.getInt("Level"));
-        if (nbt.contains("FromItem"))
-            this.setFromItem(nbt.getByte("FromItem"));
-        if (nbt.contains("Health"))
-        	this.setHealth(nbt.getFloat("Health"));
-        if (nbt.contains("AttackCoolingDown"))
-            this.getBrain().remember(MemoryModuleType.ATTACK_COOLING_DOWN, true, nbt.getLong("AttackCoolingDown"));
+		if (nbt.contains("FromItem"))
+			this.setFromItem(nbt.getByte("FromItem"));
+		if (nbt.contains("Health"))
+			this.setHealth(nbt.getFloat("Health"));
+		if (nbt.contains("AttackCoolingDown"))
+			this.getBrain().remember(MemoryModuleType.ATTACK_COOLING_DOWN, true, nbt.getLong("AttackCoolingDown"));
 	}
 
 	@Override
@@ -775,7 +781,7 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
 		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | SecurityException | NoSuchMethodException e) {
 			e.printStackTrace();
 			DefensiveMeasures.LOGGER.debug("");
-			DefensiveMeasures.LOGGER.debug("     DM ERROR OCCURED     ");
+			DefensiveMeasures.LOGGER.debug("	 DM ERROR OCCURED	 ");
 			DefensiveMeasures.LOGGER.debug("===== ERROR MSG START =====");
 			DefensiveMeasures.LOGGER.debug("LOCALIZED ERROR MESSAGE:");
 			DefensiveMeasures.LOGGER.debug(e.getLocalizedMessage());
@@ -788,7 +794,7 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
 	}
 
 	@Override
-    public ActionResult interactMob(PlayerEntity player, Hand hand) {
+	public ActionResult interactMob(PlayerEntity player, Hand hand) {
 		ItemStack item = player.getStackInHand(hand);
 		boolean itemDecrement = false;
 
@@ -822,55 +828,55 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
 
 		// OTHERWISE
 		return ActionResult.PASS;
-    }
+	}
 
 	public boolean isShooting() {
-        return this.dataTracker.get(SHOOTING);
-    }
+		return this.dataTracker.get(SHOOTING);
+	}
 
-    public void setShooting(boolean shooting) {
-        this.dataTracker.set(SHOOTING, shooting);
-    }
+	public void setShooting(boolean shooting) {
+		this.dataTracker.set(SHOOTING, shooting);
+	}
 
-    public boolean getShootingFXDone() {
-        return this.dataTracker.get(SHOOTING_FX_DONE);
-    }
+	public boolean getShootingFXDone() {
+		return this.dataTracker.get(SHOOTING_FX_DONE);
+	}
 
-    public void setShootingFXDone(boolean status) {
-        this.dataTracker.set(SHOOTING_FX_DONE, status);
-    }
+	public void setShootingFXDone(boolean status) {
+		this.dataTracker.set(SHOOTING_FX_DONE, status);
+	}
 
-    public boolean hasTarget() {
-        return this.dataTracker.get(HAS_TARGET);
-    }
+	public boolean hasTarget() {
+		return this.dataTracker.get(HAS_TARGET);
+	}
 
-    public void setHasTarget(boolean hasTarget) {
-        this.dataTracker.set(HAS_TARGET, hasTarget);
-    }
+	public void setHasTarget(boolean hasTarget) {
+		this.dataTracker.set(HAS_TARGET, hasTarget);
+	}
 
-    public void setPos(TrackedData<Float> axis, double value) {
-    	this.dataTracker.set(axis, (float) value);
-    }
+	public void setPos(TrackedData<Float> axis, double value) {
+		this.dataTracker.set(axis, (float) value);
+	}
 
-    public double getPos(TrackedData<Float> axis) {
-    	return this.dataTracker.get(axis);
-    }
+	public double getPos(TrackedData<Float> axis) {
+		return this.dataTracker.get(axis);
+	}
 
-    public void setTrackedYaw(double value) {
-    	this.dataTracker.set(YAW, (float) value);
-    }
+	public void setTrackedYaw(double value) {
+		this.dataTracker.set(YAW, (float) value);
+	}
 
-    public double getTrackedYaw() {
-    	return (double) this.dataTracker.get(YAW);
-    }
+	public double getTrackedYaw() {
+		return (double) this.dataTracker.get(YAW);
+	}
 
-    public void setTrackedPitch(double value) {
-    	this.dataTracker.set(PITCH, (float) value);
-    }
+	public void setTrackedPitch(double value) {
+		this.dataTracker.set(PITCH, (float) value);
+	}
 
-    public double getTrackedPitch() {
-    	return (double) this.dataTracker.get(PITCH);
-    }
+	public double getTrackedPitch() {
+		return (double) this.dataTracker.get(PITCH);
+	}
 
     @Override
     public Vec3d getVelocity() {
