@@ -14,33 +14,33 @@ import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 
 public class ArrowheadBlock extends Block {
-	
+
 	private static final VoxelShape BOTTOM;
 	private static final VoxelShape MIDDLE;
 	private static final VoxelShape TOP;
 	private static final VoxelShape SHAPE;
-	
+
 	public ArrowheadBlock(Settings settings) {
 		super(settings);
-		
+
 		settings.hardness(1.5f)
 			.resistance(1.0f)
 			.nonOpaque();
 	}
-	
+
 	public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
 		return SHAPE;
 	}
-	
+
 	@Override
 	public void onSteppedOn(World world, BlockPos pos, BlockState state, Entity entity) {
 		if (entity instanceof LivingEntity livingEntity) {
 			livingEntity.damage(ModDamageSource.ARROWHEAD, 2);
 		}
-		
+
 		super.onSteppedOn(world, pos, state, entity);
 	}
-	
+
 	static {
 		BOTTOM = Block.createCuboidShape(6f, 0f, 6f, 10f, 2f, 10f);
 		MIDDLE = Block.createCuboidShape(6.5f, 1.75f, 6.5f, 9.5f, 3.25f, 9.5f);

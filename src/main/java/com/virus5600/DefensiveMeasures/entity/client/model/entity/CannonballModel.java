@@ -8,7 +8,7 @@ import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
 import software.bernie.geckolib3.model.AnimatedGeoModel;
 
 public class CannonballModel extends AnimatedGeoModel<CannonballEntity> {
-	
+
 	// METHODS //
 	// PUBLIC
 	@Override
@@ -25,7 +25,7 @@ public class CannonballModel extends AnimatedGeoModel<CannonballEntity> {
 	public Identifier getTextureResource(CannonballEntity object) {
 		return new Identifier(DefensiveMeasures.MOD_ID, "textures/entity/cannon_turret/cannonball.png");
 	}
-	
+
 	@SuppressWarnings("rawtypes")
 	@Override
 	public void setLivingAnimations(CannonballEntity entity, Integer uniqueID, AnimationEvent customPredicate) {

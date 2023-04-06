@@ -13,14 +13,14 @@ import net.minecraft.util.registry.Registry;
 public class ModParticles {
 	public static final DefaultParticleType CANNON_FLASH = FabricParticleTypes.simple();
 	public static final DefaultParticleType CANNON_FUSE = FabricParticleTypes.simple();
-	
+
 	public static void registerParticles() {
 		DefensiveMeasures.LOGGER.debug("REGISTERING PARTICLES FOR " + DefensiveMeasures.MOD_NAME);
-		
+
 		Registry.register(Registry.PARTICLE_TYPE, new Identifier(DefensiveMeasures.MOD_ID, "cannon_flash"), CANNON_FLASH);
 		Registry.register(Registry.PARTICLE_TYPE, new Identifier(DefensiveMeasures.MOD_ID, "cannon_fuse"), CANNON_FUSE);
 	}
-	
+
 	public static void registerClientParticles() {
 		ParticleFactoryRegistry.getInstance().register(CANNON_FLASH, CannonFlash.Factory::new);
 		ParticleFactoryRegistry.getInstance().register(CANNON_FUSE, CannonFuse.Factory::new);

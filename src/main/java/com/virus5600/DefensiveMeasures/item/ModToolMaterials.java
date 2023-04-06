@@ -25,7 +25,7 @@ public enum ModToolMaterials implements ToolMaterial {
 			put(Items.REDSTONE_BLOCK, 100);
 		}
 	});
-	
+
 	private final int miningLevel;
 	private final int itemDurability;
 	private final float miningSpeed;
@@ -67,11 +67,11 @@ public enum ModToolMaterials implements ToolMaterial {
 	public Ingredient getRepairIngredient() {
 		return (Ingredient)this.repairIngredient.get();
 	}
-	
+
 	public int getRepairAmt(Item item) {
 		return this.repairAmount.get(item);
 	}
-	
+
 	private static Lazy<Ingredient> repairIngredients(Set<Item> ingredients) {
 		Supplier<Ingredient> supplier = () -> {
 			return Ingredient.ofItems(ingredients.toArray(Item[]::new));

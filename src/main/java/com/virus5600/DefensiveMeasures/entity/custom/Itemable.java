@@ -38,7 +38,7 @@ public interface Itemable {
     public ItemStack getEntityItem();
 
     public SoundEvent getTurretRemoveSound();
-    
+
     @Deprecated
     public static void copyDataToStack(MobEntity entity, ItemStack stack) {
         NbtCompound nbtCompound = stack.getOrCreateNbt();
@@ -84,12 +84,12 @@ public interface Itemable {
             entity.setHealth(nbt.getFloat("Health"));
         }
     }
-    
+
     public static <T extends LivingEntity> Optional<ActionResult> tryItem(PlayerEntity player, Hand hand, T entity, Item tool, Item modItem) {
     	ItemStack itemStack = player.getStackInHand(hand);
     	if (itemStack.getItem() == tool && entity.isAlive()) {
         	World world = entity.world;
-        	
+
         	if (!world.isClient) {
 	        	if (((TurretEntity) entity).getTurretMaterial() == TurretMaterial.METAL) {
 	        		entity.playSound(ModSoundEvents.TURRET_REMOVED_METAL, 1.0f, new Random().nextFloat(0.75f, 1.25f));
@@ -98,7 +98,7 @@ public interface Itemable {
 	        		entity.playSound(ModSoundEvents.TURRET_REMOVED_WOOD, 1.0f, new Random().nextFloat(0.75f, 1.25f));
 	        	}
         	}
-        	
+
         	if (player.isCreative() && !player.isSneaking()) {
         		entity.discard();
         		return Optional.of(ActionResult.success(true));
@@ -106,22 +106,22 @@ public interface Itemable {
 
             ItemStack stack = new ItemStack(modItem);
             ((Itemable) entity).copyDataToStack(stack);
-            
+
             float x = (float) entity.getPos().x + 0.5f;
             float y = (float) entity.getPos().y + 0.5f;
             float z = (float) entity.getPos().z + 0.5f;
             double vx = MathHelper.nextDouble(world.random, -0.1, 0.1);
             double vy = MathHelper.nextDouble(world.random, 0.0, 0.1);
             double vz = MathHelper.nextDouble(world.random, -0.1, 0.1);
-            
+
             entity.discard();
             ItemEntity itemStackEntity = new ItemEntity(world, x, y, z, stack, vx, vy, vz);
             world.spawnEntity(itemStackEntity);
-            
+
             if (!world.isClient) {
                 ModCriterion.TURRET_ITEM_RETRIEVED_CRITERION.trigger((ServerPlayerEntity)player, stack);
             }
-            
+
             entity.discard();
             return Optional.of(ActionResult.success(world.isClient));
         }

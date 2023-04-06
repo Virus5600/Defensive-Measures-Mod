@@ -32,6 +32,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.sound.SoundEvent;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.world.World;
@@ -62,6 +63,7 @@ public class BallistaTurretEntity extends TurretEntity implements IAnimatable, R
 	public BallistaTurretEntity(EntityType<? extends MobEntity> entityType, World world) {
 		super(entityType, world, TurretMaterial.WOOD, BallistaArrowEntity.class);
 		this.setShootSound(ModSoundEvents.TURRET_BALLISTA_SHOOT);
+		this.setHealSound(SoundEvents.ENTITY_VILLAGER_WORK_FLETCHER);
 		this.addHealables(healables);
 		this.addEffectSource(effectSource);
 	}

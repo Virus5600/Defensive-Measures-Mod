@@ -22,7 +22,7 @@ public class ItemUtil {
 	public static boolean isTypeMatch(Class<?> type, Item item) {
 		return type.isAssignableFrom(item.getClass());
 	}
-	
+
 	/**
 	 * Identifies whether the provided {@code item} is a subclass of {@link ToolItem}
 	 * @param item Item in question
@@ -32,7 +32,7 @@ public class ItemUtil {
 	public static boolean isToolItem(Item item) {
 		return ToolItem.class.isAssignableFrom(item.getClass());
 	}
-	
+
 	/**
 	 * Retrieves the Class instance provided by the {@code type} of this item.
 	 * @param T Target subclass
@@ -45,7 +45,7 @@ public class ItemUtil {
 			return type.cast(item);
 		return null;
 	}
-	
+
 	/**
 	 * Retrieves the {@link ToolItem} instance of this item.
 	 * @param item Item in question

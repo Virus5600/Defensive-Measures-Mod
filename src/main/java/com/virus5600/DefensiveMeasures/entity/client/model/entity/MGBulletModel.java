@@ -8,7 +8,7 @@ import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
 import software.bernie.geckolib3.model.AnimatedGeoModel;
 
 public class MGBulletModel extends AnimatedGeoModel<MGBulletEntity> {
-	
+
 	// METHODS //
 	// PUBLIC
 	@Override
@@ -25,7 +25,7 @@ public class MGBulletModel extends AnimatedGeoModel<MGBulletEntity> {
 	public Identifier getTextureResource(MGBulletEntity object) {
 		return new Identifier(DefensiveMeasures.MOD_ID, "textures/entity/mg_turret/mg_bullet.png");
 	}
-	
+
 	@SuppressWarnings("rawtypes")
 	@Override
 	public void setLivingAnimations(MGBulletEntity entity, Integer uniqueID, AnimationEvent customPredicate) {
