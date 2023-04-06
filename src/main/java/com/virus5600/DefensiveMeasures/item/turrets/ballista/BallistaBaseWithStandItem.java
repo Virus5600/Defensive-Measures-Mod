@@ -7,13 +7,13 @@ import net.minecraft.util.Rarity;
 public class BallistaBaseWithStandItem extends Item {
 
 	public BallistaBaseWithStandItem(Settings settings) {
-		super(		
+		super(
 			// MAX STACK SIZE
 			settings.maxCount(16)
 			// RARITY
 			.rarity(Rarity.COMMON)
 		);
-		
+
 		// FUEL
 		FuelRegistry.INSTANCE.add(this, 600);
 	}

@@ -15,19 +15,19 @@ import software.bernie.example.entity.RocketProjectile;
 import software.bernie.geckolib3.renderers.geo.GeoProjectilesRenderer;
 
 public class CannonballRenderer extends GeoProjectilesRenderer<CannonballEntity> {
-	
+
 	// CONSTRUCTOR //
 	public CannonballRenderer(Context ctx) {
 		super(ctx, new CannonballModel());
 	}
-	
+
 	// METHODS //
 	// PUBLIC
 	@Override
 	public Identifier getTexture(CannonballEntity instance) {
 		return new Identifier(DefensiveMeasures.MOD_ID, "textures/entity/cannon_turret/cannonball.png");
 	}
-	
+
 	protected int getBlockLight(RocketProjectile entityIn, BlockPos partialTicks) {
 		return 15;
 	}

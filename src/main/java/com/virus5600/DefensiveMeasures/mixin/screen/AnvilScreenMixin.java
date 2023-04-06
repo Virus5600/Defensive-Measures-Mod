@@ -37,13 +37,13 @@ public abstract class AnvilScreenMixin extends ForgingScreenHandler {
 	private String newItemName;
 	@Shadow
 	private final Property levelCost;
-	
+
 	public AnvilScreenMixin(int syncId, PlayerInventory inventory, ScreenHandlerContext context) {
 		super(ScreenHandlerType.ANVIL, syncId, inventory, context);
 		this.levelCost = Property.create();
 		this.addProperty(this.levelCost);
 	}
-	
+
 	@SuppressWarnings("rawtypes")
 	@Intrinsic(displace = true)
 	public void asi$updateResult() {
@@ -68,12 +68,12 @@ public abstract class AnvilScreenMixin extends ForgingScreenHandler {
 				int n;
 				if (itemStack2.isDamageable() && itemStack2.getItem().canRepair(itemStack, itemStack3)) {
 					/// MODIFIED AREA ///
-					
+
 					// Identifies whether this item is a ToolItem.
 					if (ItemUtil.isToolItem(itemStack2.getItem())) {
 						// If it is a ToolItem, proceed to get its Material for further checking.
 						ToolMaterial mats = ItemUtil.getToolItem(itemStack2.getItem()).getMaterial();
-						
+
 						// Check if material is from ModToolMaterials or not.
 						if (mats.getClass().isAssignableFrom(ModToolMaterials.class)) {
 							// If it is, get the lowest between the repair amount of the said item or the current durability damage of the item
@@ -88,7 +88,7 @@ public abstract class AnvilScreenMixin extends ForgingScreenHandler {
 						l = Math.min(itemStack2.getDamage(), itemStack2.getMaxDamage() / 4);
 					}
 					/// MODIFIED AREA END ///
-					
+
 					if (l <= 0) {
 						this.output.setStack(0, ItemStack.EMPTY);
 						this.levelCost.set(0);

@@ -15,11 +15,11 @@ import net.minecraft.util.math.Vec3d;
 
 public class CannonFlash extends SpriteBillboardParticle {
 	private Vec3d source;
-	
+
 	/// CONSTRUCTORS ///
 	protected CannonFlash(ClientWorld level, double x, double y, double z, SpriteProvider spriteSet, double xd, double yd, double zd) {
 		super(level, x, y, z, xd, yd, zd);
-		
+
 		this.velocityMultiplier = 1f;
 		this.x = x;
 		this.y = y;
@@ -31,12 +31,12 @@ public class CannonFlash extends SpriteBillboardParticle {
 		this.setSpriteForAge(spriteSet);
 		this.setVelocity(xd, yd, zd);
 		this.source = new Vec3d(x, y, z);
-		
+
 		this.red = 1f;
 		this.green= 1f;
 		this.blue = 1f;
 	}
-	
+
 	/// METHODS ///
 	// PRIVATE
 	private void fadeOut() {
@@ -46,47 +46,47 @@ public class CannonFlash extends SpriteBillboardParticle {
 			this.green -= 0.05f;
 			this.blue -= 0.05f;
 		}
-		
+
 		// Fades the particle out and make it small overtime
 		if (this.red <= 0.1 && this.green <= 0.1 && this.blue <= 0.1 && this.alpha > 0.05) {
 			this.alpha -= 0.05;
-			
+
 			if (this.scale > 0)
 				this.scale = Math.min(this.scale - 0.5f, 0);
 		}
 	}
-	
+
 	// PUBLIC
 		@Override
 	public ParticleTextureSheet getType() {
 		return ParticleTextureSheet.PARTICLE_SHEET_OPAQUE;
 	}
-	
+
 	@Override
     public int getBrightness(float tint) {
         int i = super.getBrightness(tint);
         @SuppressWarnings("unused") int j = 240;
         int k = i >> 16 & 0xFF;
-		
+
         return 0xF0 | k << 16;
     }
-	
+
 	@Override
     public float getSize(float tickDelta) {
         float f = ((float)this.age + tickDelta) / (float)this.maxAge;
-        
+
         return this.scale * (1.0f - f * f);
     }
-	
+
 	public void setVelocity(double vx, double vy, double vz) {
 		super.setVelocity(vx, vy, vz);
 	}
-	
+
 	@Override
 	public void tick() {
 		super.tick();
 		this.fadeOut();
-		
+
 		if (this.dead) {
 			for (int i = 0; i < MathHelper.nextInt(this.random, 1, 3); i++) {
 				this.world.addParticle(
@@ -101,18 +101,18 @@ public class CannonFlash extends SpriteBillboardParticle {
 			}
 		}
 	}
-	
+
 	@Environment(EnvType.CLIENT)
 	public static class Factory implements ParticleFactory<DefaultParticleType> {
 		private final SpriteProvider sprites;
-		
+
 		public Factory(SpriteProvider sprites) {
 			this.sprites = sprites;
 		}
-		
+
 		public Particle createParticle(DefaultParticleType type, ClientWorld level, double x, double y, double z, double xd, double yd, double zd) {
 			return new CannonFlash(level, x, y, z, this.sprites, xd, yd, zd);
 		}
-		
+
 	}
 }

@@ -33,7 +33,7 @@ public class TurretItem extends Item {
 		super(settings);
 		this.type = type;
 	}
-	
+
 	public ActionResult useOnBlock(ItemUsageContext context) {
 		World world = context.getWorld();
 		if (!(world instanceof ServerWorld)) {
@@ -44,7 +44,7 @@ public class TurretItem extends Item {
 			Direction direction = context.getSide();
 			BlockState blockState = world.getBlockState(blockPos);
 			BlockPos blockPos2;
-			
+
 			if (blockState.getCollisionShape(world, blockPos).isEmpty()) {
 				blockPos2 = blockPos;
 			} else {
@@ -60,7 +60,7 @@ public class TurretItem extends Item {
 			return ActionResult.CONSUME;
 		}
 	}
-	
+
 	public boolean isOfSameEntityType(@Nullable NbtCompound nbt, EntityType<?> type) {
 		return Objects.equals(this.getEntityType(nbt), type);
 	}
@@ -69,12 +69,12 @@ public class TurretItem extends Item {
 	public static TurretItem forEntity(@Nullable EntityType<?> type) {
 		return (TurretItem)TURRETS.get(type);
 	}
-	
+
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public static Iterable<TurretItem> getAll() {
 		return Iterables.unmodifiableIterable((Iterable)TURRETS.values());
 	}
-	
+
 	public EntityType<?> getEntityType(@Nullable NbtCompound nbt) {
 		if (nbt != null && nbt.contains("EntityTag", NbtElement.COMPOUND_TYPE)) {
 			NbtCompound nbtCompound = nbt.getCompound("EntityTag");
