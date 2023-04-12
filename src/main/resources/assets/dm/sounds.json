@@ -28,6 +28,28 @@
 		],
 		"subtitle": "subtitles.turret.remove.wood"
 	},
+
+	"turret.iron.repair": {
+		"sounds": [
+			"mob/irongolem/repair"
+		],
+		"subtitle": "subtitles.turret.iron.repair"
+	},
+	"turret.bow.repair": {
+		"sounds": [
+			"block/fletching_table/fletching_table1",
+			"block/fletching_table/fletching_table2"
+		],
+		"subtitle": "subtitles.turret.bow.repair"
+	},
+	"turret.wood.repair": {
+		"sounds": [
+			"dm:turrets/wood_repair1",
+			"dm:turrets/wood_repair2"
+		],
+		"subtitle": "subtitles.turret.wood.repair"
+	},
+
 	"turret.cannon.hurt": {
 		"sounds": [
 			"dm:cannon_turret/hurt1",
@@ -50,7 +72,7 @@
 		],
 		"subtitle": "subtitles.turret.cannon.shoot"
 	},
-	
+
 	"turret.ballista.hurt": {
 		"sounds": [
 			"mob/zombie/wood1",
@@ -110,7 +132,7 @@
 		],
 		"subtitles": "subtitles.turret.ballista.shoot"
 	},
-	
+
 	"turret.mg_turret.hurt": {
 		"sounds": [
 			"dm:cannon_turret/hurt1",

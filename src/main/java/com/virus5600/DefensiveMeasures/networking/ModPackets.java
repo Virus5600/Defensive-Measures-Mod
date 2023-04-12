@@ -9,7 +9,7 @@ import net.minecraft.util.Identifier;
 
 public class ModPackets {
 	public static final Identifier SPAWN_ENTITY_ID = new Identifier(DefensiveMeasures.MOD_ID, "spawn_entity");
-	public static final Identifier SOUND_EVENT_ID = new Identifier(DefensiveMeasures.MOD_ID, "sound_event");
+	public static final Identifier ENTITY_STATUS_EFFECT = new Identifier(DefensiveMeasures.MOD_ID, "entity_status_effect");
 
 	/**
 	 * A packet registry for <b>Client-to-Server</b>

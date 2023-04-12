@@ -31,6 +31,7 @@ import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.entity.mob.Monster;
+import net.minecraft.entity.passive.GolemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.item.Item;
@@ -67,7 +68,7 @@ public class CannonTurretEntity extends TurretEntity implements IAnimatable, Ran
 	private double attCooldown = totalAttCooldown;
 
 	// CONSTRUCTORS //
-	public CannonTurretEntity(EntityType<? extends MobEntity> entityType, World world) {
+	public CannonTurretEntity(EntityType<? extends GolemEntity> entityType, World world) {
 		super(entityType, world, TurretMaterial.METAL, CannonballEntity.class);
 		this.setShootSound(ModSoundEvents.TURRET_CANNON_SHOOT);
 		this.addHealables(healables);
@@ -82,8 +83,12 @@ public class CannonTurretEntity extends TurretEntity implements IAnimatable, Ran
 	}
 
 	private <E extends IAnimatable> PlayState lookAtTargetPredicate(AnimationEvent<E> event) {
-		event.getController().setAnimation(new AnimationBuilder().addAnimation("animation.cannon_turret.look_at_target", true));
-		return PlayState.CONTINUE;
+		if (this.hasTarget()) {
+			event.getController().setAnimation(new AnimationBuilder().addAnimation("animation.cannon_turret.look_at_target", true));
+			return PlayState.CONTINUE;
+		}
+
+		return this.idlePredicate(event);
 	}
 
 	private boolean animPlayed = false;
@@ -97,11 +102,11 @@ public class CannonTurretEntity extends TurretEntity implements IAnimatable, Ran
 	}
 
 	private <E extends IAnimatable> PlayState firingSequencePredicate(AnimationEvent<E> event) {
-		Vec3d fusePos = getRelativePos(0, 17.5, -0.6);
-		Vec3d barrelPos = getRelativePos(
-			MathHelper.nextDouble(this.random, 0.25, 0.75),
-			MathHelper.nextDouble(this.random, -7.625, -7.375),
-			0.9
+		Vec3d fusePos = this.getRelativePos(0, 0, -0.5);
+		Vec3d barrelPos = this.getRelativePos(
+			MathHelper.nextDouble(this.random, -0.5, 0.5),
+			MathHelper.nextDouble(this.random, -0.75, 0.25),
+			1
 		);
 
 		if (this.hasTarget() && this.isShooting()) {
@@ -123,9 +128,9 @@ public class CannonTurretEntity extends TurretEntity implements IAnimatable, Ran
 					this.world.addParticle(
 						ModParticles.CANNON_FLASH,
 						true,
-						barrelPos.x + this.getPos(X),
-						barrelPos.y + this.getPos(Y),
-						barrelPos.z + this.getPos(Z),
+						barrelPos.x,
+						barrelPos.y,
+						barrelPos.z,
 						vx * MathHelper.nextDouble(this.random, 1.5, 1.75),
 						vy * variance * MathHelper.nextDouble(this.random, -0.5, 0.5),
 						vz * MathHelper.nextDouble(this.random, 1.5, 1.75)
@@ -139,9 +144,9 @@ public class CannonTurretEntity extends TurretEntity implements IAnimatable, Ran
 			this.world.addParticle(
 				ModParticles.CANNON_FUSE,
 				true,
-				fusePos.x + this.getPos(X),
-				fusePos.y + this.getPos(Y),
-				fusePos.z + this.getPos(Z),
+				fusePos.x,
+				fusePos.y,
+				fusePos.z,
 				0,
 				0,
 				0
@@ -196,10 +201,10 @@ public class CannonTurretEntity extends TurretEntity implements IAnimatable, Ran
 	// PUBLIC
 	public static DefaultAttributeContainer.Builder setAttributes() {
 		return MobEntity.createMobAttributes()
-			.add(EntityAttributes.GENERIC_FOLLOW_RANGE, 16)
+			.add(EntityAttributes.GENERIC_FOLLOW_RANGE, 32)
 			.add(EntityAttributes.GENERIC_MAX_HEALTH, 50)
 			.add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0)
-			.add(EntityAttributes.GENERIC_KNOCKBACK_RESISTANCE, 1.0);
+			.add(EntityAttributes.GENERIC_KNOCKBACK_RESISTANCE, Float.MAX_VALUE);
 	}
 
 	@Override

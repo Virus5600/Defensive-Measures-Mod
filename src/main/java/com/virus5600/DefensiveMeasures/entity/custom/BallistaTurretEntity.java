@@ -26,13 +26,13 @@ import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.entity.mob.Monster;
+import net.minecraft.entity.passive.GolemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.sound.SoundEvent;
-import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.world.World;
@@ -60,10 +60,10 @@ public class BallistaTurretEntity extends TurretEntity implements IAnimatable, R
 	private double attCooldown = totalAttCooldown;
 
 	// CONSTRUCTORS //
-	public BallistaTurretEntity(EntityType<? extends MobEntity> entityType, World world) {
+	public BallistaTurretEntity(EntityType<? extends GolemEntity> entityType, World world) {
 		super(entityType, world, TurretMaterial.WOOD, BallistaArrowEntity.class);
 		this.setShootSound(ModSoundEvents.TURRET_BALLISTA_SHOOT);
-		this.setHealSound(SoundEvents.ENTITY_VILLAGER_WORK_FLETCHER);
+		this.setHealSound(ModSoundEvents.TURRET_REPAIRED_BOW);
 		this.addHealables(healables);
 		this.addEffectSource(effectSource);
 	}
@@ -76,8 +76,12 @@ public class BallistaTurretEntity extends TurretEntity implements IAnimatable, R
 	}
 
 	private <E extends IAnimatable> PlayState lookAtTargetPredicate(AnimationEvent<E> event) {
-		event.getController().setAnimation(new AnimationBuilder().addAnimation("animation.ballista.look_at_target", true));
-		return PlayState.CONTINUE;
+		if (this.hasTarget()) {
+			event.getController().setAnimation(new AnimationBuilder().addAnimation("animation.ballista.look_at_target", true));
+			return PlayState.CONTINUE;
+		}
+
+		return this.idlePredicate(event);
 	}
 
 	private boolean animPlayed = false;
@@ -135,10 +139,10 @@ public class BallistaTurretEntity extends TurretEntity implements IAnimatable, R
 	// PUBLIC
 	public static DefaultAttributeContainer.Builder setAttributes() {
 		return MobEntity.createMobAttributes()
-			.add(EntityAttributes.GENERIC_FOLLOW_RANGE, 16)
+			.add(EntityAttributes.GENERIC_FOLLOW_RANGE, 24)
 			.add(EntityAttributes.GENERIC_MAX_HEALTH, 25)
 			.add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0f)
-			.add(EntityAttributes.GENERIC_KNOCKBACK_RESISTANCE, 999999f);
+			.add(EntityAttributes.GENERIC_KNOCKBACK_RESISTANCE, Float.MAX_VALUE);
 	}
 
 	@Override

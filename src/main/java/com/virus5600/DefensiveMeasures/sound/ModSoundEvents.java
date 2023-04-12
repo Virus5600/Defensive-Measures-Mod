@@ -11,6 +11,11 @@ public class ModSoundEvents {
 	// V1.0
 	public final static SoundEvent TURRET_REMOVED_METAL = new SoundEvent(new Identifier(DefensiveMeasures.MOD_ID, "turret.remove.metal"));
 	public final static SoundEvent TURRET_REMOVED_WOOD = new SoundEvent(new Identifier(DefensiveMeasures.MOD_ID, "turret.remove.wood"));
+
+	public final static SoundEvent TURRET_REPAIRED_METAL = new SoundEvent(new Identifier(DefensiveMeasures.MOD_ID, "turret.iron.repair"));
+	public final static SoundEvent TURRET_REPAIRED_BOW = new SoundEvent(new Identifier(DefensiveMeasures.MOD_ID, "turret.bow.repair"));
+	public final static SoundEvent TURRET_REPAIRED_WOOD = new SoundEvent(new Identifier(DefensiveMeasures.MOD_ID, "turret.wood.repair"));
+
 	// CANNON
 	public final static SoundEvent TURRET_CANNON_HURT = new SoundEvent(new Identifier(DefensiveMeasures.MOD_ID, "turret.cannon.hurt"), 16f);
 	public final static SoundEvent TURRET_CANNON_DESTROYED = new SoundEvent(new Identifier(DefensiveMeasures.MOD_ID, "turret.cannon.destroyed"), 16f);
@@ -49,5 +54,9 @@ public class ModSoundEvents {
 		// V1.0 SFX
 		registerSoundEvent(TURRET_REMOVED_METAL);
 		registerSoundEvent(TURRET_REMOVED_WOOD);
+
+		registerSoundEvent(TURRET_REPAIRED_METAL);
+		registerSoundEvent(TURRET_REPAIRED_BOW);
+		registerSoundEvent(TURRET_REPAIRED_WOOD);
 	}
 }

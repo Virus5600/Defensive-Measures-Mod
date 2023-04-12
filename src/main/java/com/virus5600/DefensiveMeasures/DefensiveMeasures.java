@@ -32,6 +32,7 @@ public class DefensiveMeasures implements ModInitializer {
 
 		// Networking part
 		ModPackets.registerC2SPackets();
+		ModPackets.registerS2CPackets();
 	}
 
 	public static void sendChat(String text, ChatType type) {

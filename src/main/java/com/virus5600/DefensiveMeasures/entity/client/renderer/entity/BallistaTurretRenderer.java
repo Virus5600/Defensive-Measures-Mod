@@ -24,13 +24,6 @@ public class BallistaTurretRenderer extends GeoEntityRenderer<BallistaTurretEnti
 		return new Identifier(DefensiveMeasures.MOD_ID, "textures/entity/ballista/ballista.png");
 	}
 
-	@Override
-	public void render(BallistaTurretEntity entity, float entityYaw, float partialTicks, MatrixStack stack, VertexConsumerProvider bufferIn, int packedLightIn) {
-		float newSize = 1 * 0.8125f;
-		stack.scale(newSize, newSize, newSize);
-		super.render(entity, entityYaw, partialTicks, stack, bufferIn, packedLightIn);
-	}
-
 	// PROTECTED
 	@Override
 	protected float getDeathMaxRotation(BallistaTurretEntity entityLivingBaseIn) {

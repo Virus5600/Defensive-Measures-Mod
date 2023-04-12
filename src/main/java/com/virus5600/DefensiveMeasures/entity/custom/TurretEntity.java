@@ -12,9 +12,11 @@ import org.jetbrains.annotations.Nullable;
 import com.virus5600.DefensiveMeasures.DefensiveMeasures;
 import com.virus5600.DefensiveMeasures.entity.TurretMaterial;
 import com.virus5600.DefensiveMeasures.item.ModItems;
+import com.virus5600.DefensiveMeasures.sound.ModSoundEvents;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.command.argument.LookingPosArgument;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityData;
 import net.minecraft.entity.EntityType;
@@ -24,6 +26,7 @@ import net.minecraft.entity.ai.RangedAttackMob;
 import net.minecraft.entity.ai.brain.Brain;
 import net.minecraft.entity.ai.brain.MemoryModuleType;
 import net.minecraft.entity.ai.control.BodyControl;
+import net.minecraft.entity.ai.control.LookControl;
 import net.minecraft.entity.damage.DamageRecord;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.data.DataTracker;
@@ -31,7 +34,7 @@ import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectInstance;
-import net.minecraft.entity.mob.MobEntity;
+import net.minecraft.entity.passive.GolemEntity;
 import net.minecraft.entity.passive.PassiveEntity.PassiveData;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.ArrowEntity;
@@ -50,6 +53,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec2f;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3f;
 import net.minecraft.util.math.Vec3i;
@@ -61,7 +65,7 @@ import net.minecraft.world.event.GameEvent;
 
 /**
  * The mob base for all the <b>Turrets</b> that will be added into this mod. The
- * {@code TurretEntity} extends to the base code of {@code MobEntity}, the same
+ * {@code TurretEntity} extends to the base code of {@code GolemEntity}, the same
  * superclass used by various mobs that has the same trait as this. The custom
  * interface {@code Itemable} and {@code RangedAttackMob} interfaces are also
  * implemented to define this entity as something that can do range attacks
@@ -74,12 +78,12 @@ import net.minecraft.world.event.GameEvent;
  * @author Virus5600
  * @since 1.0.0
  *
- * @see MobEntity
+ * @see GolemEntity
  * @see Itemable
  * @see RangedAttackMob
  *
  */
-public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob {
+public class TurretEntity extends GolemEntity implements Itemable, RangedAttackMob {
 	private static final TrackedData<Integer> LEVEL;
 	private static final TrackedData<Byte> FROM_ITEM;
 	private static final TrackedData<Boolean> SHOOTING;
@@ -88,7 +92,7 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
 	/**
 	 * The sound that will play when this turret is healed.
 	 */
-	private SoundEvent healSound = SoundEvents.ENTITY_IRON_GOLEM_REPAIR;
+	private SoundEvent healSound = ModSoundEvents.TURRET_REPAIRED_METAL;
 	/**
 	 * Contains all the items that can heal this entity.
 	 */
@@ -154,16 +158,19 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
 		});
 
 	// CONSTRUCTORS //
-	public TurretEntity(EntityType<? extends MobEntity> entityType, World world, TurretMaterial material, Class<?> projectile) {
+	public TurretEntity(EntityType<? extends GolemEntity> entityType, World world, TurretMaterial material, Class<?> projectile) {
 		this(entityType, world, material);
 		this.projectile = projectile;
 	}
 
-	public TurretEntity(EntityType<? extends MobEntity> entityType, World world, TurretMaterial material) {
+	public TurretEntity(EntityType<? extends GolemEntity> entityType, World world, TurretMaterial material) {
 		super(entityType, world);
+
 		this.material = material;
 		this.random = Random.create();
 		this.level = 0;
+		this.lookControl = new TurretLookControl(this);
+
 		if (this.projectile == null)
 			this.projectile = ArrowEntity.class;
 	}
@@ -201,7 +208,7 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
 
 	@Override
     protected MoveEffect getMoveEffect() {
-        return Entity.MoveEffect.NONE;
+        return MoveEffect.NONE;
     }
 
 	protected void tryAttachOrFall() {
@@ -273,35 +280,51 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
     }
 
 	// PUBLIC
-	public Vec3d getRelativePos(double offset) {
-		return this.getRelativePos(offset, offset, offset);
-	}
-
 	/**
 	 * Identifies the position of a point relative to this turret rotation and position.
 	 *
 	 * For reference:
 	 * <ul>
-	 * 	<li>X-Axis == Pitch: Identifies the elevation rotation (Horizontal line axis)</li>
-	 * 	<li>Y-Axis == Yaw: Identifies where you are looking (Vertical line axis)</li>
-	 * 	<li>Z-Axis == Roll: It's the one facing you (The 3D line)</li>
+	 * 	<li>X-Axis == Pitch: Identifies the elevation rotation <b>(+ Up & - Down)</b></li>
+	 * 	<li>Y-Axis == Yaw: Identifies where you are looking <b>(+ Left & - Right)</b></li>
+	 * 	<li>Z-Axis == Roll: It's the one facing you <b>(+ Front & - Back)</b></li>
 	 * </ul>
+	 *
+	 * <p>Formula is based from {@link LookingPosArgument#toAbsolutePos(net.minecraft.server.command.ServerCommandSource) LookingPosArguement#toAbsolutePos(ServerCommandSource)}</p>
 	 *
 	 * @param xOffset The offset of the point at the local X-Axis of this turret
 	 * @param yOffset The offset of the point at the local Y-Axis of this turret
 	 * @param zOffset The offset of the point at the local Z-Axis of this turret
 	 *
-	 * @return Vec3d the relative position of this point, assuming that the origin is at <b>[0, 0, 0]<b>
+	 * @return Vec3d the local position of the point, assuming that the origin is at this entity's position
+	 *
+	 * @see LookingPosArgument#toAbsolutePos(net.minecraft.server.command.ServerCommandSource) LookingPosArguement#toAbsolutePos(ServerCommandSource)
+	 * @implNote TIME WASTED IN IMPROVING: <b>161.5 Hours</b>
 	 */
 	public Vec3d getRelativePos(double xOffset, double yOffset, double zOffset) {
-		double yaw = ((this.getTrackedYaw() + 90 + xOffset) * Math.PI) / 180;
-		double pitch = ((this.getTrackedPitch() + yOffset) * Math.PI) / 180;
+		// Gets the head Yaw and Pitch
+		Vec2f vec2f = new Vec2f(this.getPitch(), this.getHeadYaw());
+		// Gets the XZ body position and then the eye elevation position
+        Vec3d vec3d = new Vec3d(this.getX(), this.getEyeY(), this.getZ());
 
-		double x = zOffset * Math.cos(yaw) * Math.cos(pitch);
-		double y = zOffset * Math.sin(pitch);
-		double z = zOffset * Math.sin(yaw) * Math.cos(pitch);
+        // The actual formula begins from here
+        float f = MathHelper.cos((vec2f.y + 90.0f) * ((float)Math.PI / 180));
+        float g = MathHelper.sin((vec2f.y + 90.0f) * ((float)Math.PI / 180));
+        float h = MathHelper.cos(-vec2f.x * ((float)Math.PI / 180));
+        float i = MathHelper.sin(-vec2f.x * ((float)Math.PI / 180));
+        float j = MathHelper.cos((-vec2f.x + 90.0f) * ((float)Math.PI / 180));
+        float k = MathHelper.sin((-vec2f.x + 90.0f) * ((float)Math.PI / 180));
 
-		return new Vec3d(x, -y, z);
+        Vec3d vec3d2 = new Vec3d(f * h, i, g * h);
+        Vec3d vec3d3 = new Vec3d(f * j, k, g * j);
+        Vec3d vec3d4 = vec3d2.crossProduct(vec3d3).multiply(-1.0);
+
+        double d = vec3d2.x * zOffset + vec3d3.x * yOffset + vec3d4.x * xOffset;
+        double e = vec3d2.y * zOffset + vec3d3.y * yOffset + vec3d4.y * xOffset;
+        double l = vec3d2.z * zOffset + vec3d3.z * yOffset + vec3d4.z * xOffset;
+
+        // And ends at this return
+        return new Vec3d(vec3d.x + d, vec3d.y + e, vec3d.z + l);
 	}
 
 	@Override
@@ -680,7 +703,7 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
 
 	@Override
 	public SoundCategory getSoundCategory() {
-		return SoundCategory.BLOCKS;
+		return SoundCategory.NEUTRAL;
 	}
 
 	@Override
@@ -813,22 +836,25 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
 
 		// TURRET REMOVER
 		if (item.getItem() == ModItems.TURRET_REMOVER) {
-				item.damage(1, player, player2 -> player2.sendToolBreakStatus(hand));
+			item.damage(1, player, player2 -> player2.sendToolBreakStatus(hand));
 		}
 
 		// HEALABLES
 		else if (this.isHealableItem(item.getItem())) {
 			this.heal(this.getHealAmt(item.getItem()));
 
-			// Decrement item amount (if it is a plain item) or durability (if it is a tool)
-			if (item.getItem().isDamageable()) {
-				if (item.getDamage() > item.getMaxDamage())
+			// If player isn't in creative...
+			if (!player.isCreative()) {
+				// Decrement item amount (if it is a plain item) or durability (if it is a tool)
+				if (item.getItem().isDamageable()) {
+					if (item.getDamage() > item.getMaxDamage())
+						item.decrement(1);
+					else
+						item.setDamage(item.getDamage() + 1);
+				}
+				else {
 					item.decrement(1);
-				else
-					item.setDamage(item.getDamage() + 1);
-			}
-			else {
-				item.decrement(1);
+				}
 			}
 
 			// Indicates a repair was done
@@ -946,13 +972,23 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
 		});
 	}
 
+	static class TurretLookControl extends LookControl {
+		public TurretLookControl(GolemEntity entity) {
+			super(entity);
+		}
+
+		@Override
+        protected void clampHeadYaw() {
+        }
+	}
+
 	static class TurretBodyControl extends BodyControl {
 		@SuppressWarnings("unused")
-		private MobEntity entity;
+		private GolemEntity entity;
 
-		public TurretBodyControl(MobEntity mobEntity) {
-            super(mobEntity);
-            this.entity = mobEntity;
+		public TurretBodyControl(GolemEntity golemEntity) {
+            super(golemEntity);
+            this.entity = golemEntity;
         }
 
         @Override

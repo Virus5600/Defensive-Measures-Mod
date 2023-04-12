@@ -29,6 +29,7 @@ import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.entity.mob.Monster;
+import net.minecraft.entity.passive.GolemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.item.Item;
@@ -63,7 +64,7 @@ public class MGTurretEntity extends TurretEntity implements IAnimatable, RangedA
 	private AnimationFactory factory = new AnimationFactory(this);
 	@Nullable
 	private LivingEntity currentTarget = null;
-	private Vec3d barrelPos = getRelativePos(0, -5, 0.46875);
+	private Vec3d barrelPos = getRelativePos(0, -.175, .5);
 	private double attCooldown = totalAttCooldown;
 	private int projectileShootCooldown = 1;
 	private int getProjectilesFired = 0;
@@ -71,7 +72,7 @@ public class MGTurretEntity extends TurretEntity implements IAnimatable, RangedA
 	private static final TrackedData<Boolean> SHOULD_SKIP_ATTACK;
 
 	// CONSTRUCTORS //
-	public MGTurretEntity(EntityType<? extends MobEntity> entityType, World world) {
+	public MGTurretEntity(EntityType<? extends GolemEntity> entityType, World world) {
 		super(entityType, world, TurretMaterial.METAL, MGTurretEntity.class);
 		this.setShootSound(ModSoundEvents.TURRET_MG_SHOOT);
 		this.addHealables(healables);
@@ -86,8 +87,12 @@ public class MGTurretEntity extends TurretEntity implements IAnimatable, RangedA
 	}
 
 	private <E extends IAnimatable> PlayState lookAtTargetPredicate(AnimationEvent<E> event) {
-		event.getController().setAnimation(new AnimationBuilder().addAnimation("animation.machine_gun_turret.look_at_target", true));
-		return PlayState.CONTINUE;
+		if (this.hasTarget()) {
+			event.getController().setAnimation(new AnimationBuilder().addAnimation("animation.machine_gun_turret.look_at_target", true));
+			return PlayState.CONTINUE;
+		}
+
+		return this.idlePredicate(event);
 	}
 
 	private boolean animPlayed = false;
@@ -109,13 +114,13 @@ public class MGTurretEntity extends TurretEntity implements IAnimatable, RangedA
 			}
 
 			if (!this.getShouldSkipAtt()) {
-				this.barrelPos = getRelativePos(0, -5, 0.46875);
+				this.barrelPos = this.getRelativePos(0, -.175, .5);
 				this.world.addParticle(
 					ParticleTypes.SMALL_FLAME,
 					true,
-					this.barrelPos.x + this.getPos(X),
-					this.barrelPos.y + this.getPos(Y),
-					this.barrelPos.z + this.getPos(Z),
+					this.barrelPos.x,
+					this.barrelPos.y,
+					this.barrelPos.z,
 					MathHelper.nextDouble(this.random, -0.001, 0.001),
 					MathHelper.nextDouble(this.random, -0.001, 0.001),
 					MathHelper.nextDouble(this.random, -0.001, 0.001)
@@ -173,10 +178,10 @@ public class MGTurretEntity extends TurretEntity implements IAnimatable, RangedA
 	// PUBLIC
 	public static DefaultAttributeContainer.Builder setAttributes() {
 		return MobEntity.createMobAttributes()
-			.add(EntityAttributes.GENERIC_FOLLOW_RANGE, 16)
+			.add(EntityAttributes.GENERIC_FOLLOW_RANGE, 32)
 			.add(EntityAttributes.GENERIC_MAX_HEALTH, 25)
 			.add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0f)
-			.add(EntityAttributes.GENERIC_KNOCKBACK_RESISTANCE, 999999f);
+			.add(EntityAttributes.GENERIC_KNOCKBACK_RESISTANCE, Float.MAX_VALUE);
 	}
 
 	@Override
@@ -243,10 +248,10 @@ public class MGTurretEntity extends TurretEntity implements IAnimatable, RangedA
 							float divergence = 0 + this.world.getDifficulty().getId() * 2;
 
 							ProjectileEntity projectile = (ProjectileEntity) new MGBulletEntity(world, this);
-							this.barrelPos = getRelativePos(0, -5, 0.46875);
+							this.barrelPos = this.getRelativePos(0, -.175, .5);
 
 							projectile.setVelocity(vx, vy + variance * 0.2f, vz, 1.5f, divergence + 0.25f);
-							projectile.setPos(barrelPos.x + this.getPos(X), barrelPos.y + this.getPos(Y), barrelPos.z + this.getPos(Z));
+							projectile.setPos(this.barrelPos.x, this.barrelPos.y, this.barrelPos.z);
 							this.playSound(this.getShootSound(), 1.0f, 1.0f / (this.getRandom().nextFloat() * 0.4f + 0.8f));
 
 							this.world.spawnEntity(projectile);
