@@ -15,6 +15,5 @@ jobs:
           VALIDATE_ALL_CODEBASE: false
           GITHUB_TOKEN: ${{ github.token }}
           
-          LINTER_RULES_PATH: /
           JAVA_FILE_NAME: checkstyle.xml
           VALIDATE_JAVA: true
