@@ -11,20 +11,20 @@ import software.bernie.geckolib3.renderers.geo.GeoEntityRenderer;
 public class BallistaTurretRenderer extends GeoEntityRenderer<BallistaTurretEntity> {
 
 	// CONSTRUCTOR //
-	public BallistaTurretRenderer(Context ctx) {
+	public BallistaTurretRenderer(final Context ctx) {
 		super(ctx, new BallistaTurretModel());
 	}
 
 	// METHODS //
 	// PUBLIC
 	@Override
-	public Identifier getTexture(BallistaTurretEntity instance) {
+	public Identifier getTexture(final BallistaTurretEntity instance) {
 		return new Identifier(DefensiveMeasures.MOD_ID, "textures/entity/ballista/ballista.png");
 	}
 
 	// PROTECTED
 	@Override
-	protected float getDeathMaxRotation(BallistaTurretEntity entityLivingBaseIn) {
+	protected float getDeathMaxRotation(final BallistaTurretEntity entityLivingBaseIn) {
 		return 0.0F;
 	}
 }

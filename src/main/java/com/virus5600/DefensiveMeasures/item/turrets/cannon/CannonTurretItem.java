@@ -7,7 +7,7 @@ import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.util.Rarity;
 
 public class CannonTurretItem extends TurretItem {
-	public CannonTurretItem(EntityType<? extends MobEntity> type, Settings settings) {
+	public CannonTurretItem(final EntityType<? extends MobEntity> type, final Settings settings) {
 		super(
 			type,
 			// MAX STACK SIZE

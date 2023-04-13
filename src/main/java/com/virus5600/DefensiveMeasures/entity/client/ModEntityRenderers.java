@@ -11,7 +11,9 @@ import com.virus5600.DefensiveMeasures.entity.client.renderer.entity.MGTurretRen
 
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 
-public class ModEntityRenderers {
+public final class ModEntityRenderers {
+	private ModEntityRenderers() { }
+
 	public static void registerModEntityRenderers() {
 		DefensiveMeasures.LOGGER.debug("REGISTERING ENTITIES FOR " + DefensiveMeasures.MOD_NAME);
 

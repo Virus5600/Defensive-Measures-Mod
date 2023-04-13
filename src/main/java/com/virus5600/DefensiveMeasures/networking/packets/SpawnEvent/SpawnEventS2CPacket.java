@@ -11,15 +11,17 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.registry.Registry;
 
-public class SpawnEventS2CPacket {
+public final class SpawnEventS2CPacket {
+	private SpawnEventS2CPacket() { }
+
 	/**
-	 * Receives a packet from the server and executes them on the client
+	 * Receives a packet from the server and executes them on the client.
 	 * @param client
 	 * @param handler
 	 * @param buf
 	 * @param responseSender
 	 */
-	public static void receive(MinecraftClient client, ClientPlayNetworkHandler handler, PacketByteBuf buf, PacketSender responseSender) {
+	public static void receive(final MinecraftClient client, final ClientPlayNetworkHandler handler, final PacketByteBuf buf, final PacketSender responseSender) {
 		EntityType<?> type = Registry.ENTITY_TYPE.get(buf.readVarInt());
 		UUID entityUUID = buf.readUuid();
 		int entityID = buf.readVarInt();

@@ -5,11 +5,13 @@ import com.virus5600.DefensiveMeasures.DefensiveMeasures;
 import net.minecraft.advancement.criterion.Criteria;
 import net.minecraft.advancement.criterion.Criterion;
 
-public class ModCriterion {
+public final class ModCriterion {
 
 	public static final TurretItemRetrievedCriterion TURRET_ITEM_RETRIEVED_CRITERION = new TurretItemRetrievedCriterion();
 
-	private static Criterion<?> registerCriterion(String name, Criterion<?> criterion) {
+	private ModCriterion() { }
+
+	private static Criterion<?> registerCriterion(final String name, final Criterion<?> criterion) {
 		return Criteria.register(criterion);
 	}
 

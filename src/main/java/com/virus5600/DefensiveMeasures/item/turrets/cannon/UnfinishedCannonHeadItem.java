@@ -5,7 +5,7 @@ import net.minecraft.util.Rarity;
 
 public class UnfinishedCannonHeadItem extends Item {
 
-	public UnfinishedCannonHeadItem(Settings settings) {
+	public UnfinishedCannonHeadItem(final Settings settings) {
 		super(
 			// MAX STACK SIZE
 			settings.maxCount(1)

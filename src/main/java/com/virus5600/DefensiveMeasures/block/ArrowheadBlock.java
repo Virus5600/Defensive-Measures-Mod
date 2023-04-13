@@ -20,7 +20,7 @@ public class ArrowheadBlock extends Block {
 	private static final VoxelShape TOP;
 	private static final VoxelShape SHAPE;
 
-	public ArrowheadBlock(Settings settings) {
+	public ArrowheadBlock(final Settings settings) {
 		super(settings);
 
 		settings.hardness(1.5f)
@@ -28,12 +28,12 @@ public class ArrowheadBlock extends Block {
 			.nonOpaque();
 	}
 
-	public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
+	public VoxelShape getOutlineShape(final BlockState state, final BlockView world, final BlockPos pos, final ShapeContext context) {
 		return SHAPE;
 	}
 
 	@Override
-	public void onSteppedOn(World world, BlockPos pos, BlockState state, Entity entity) {
+	public void onSteppedOn(final World world, final BlockPos pos, final BlockState state, final Entity entity) {
 		if (entity instanceof LivingEntity livingEntity) {
 			livingEntity.damage(ModDamageSource.ARROWHEAD, 2);
 		}

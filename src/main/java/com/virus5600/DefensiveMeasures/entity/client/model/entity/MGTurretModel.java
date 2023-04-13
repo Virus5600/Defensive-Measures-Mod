@@ -14,23 +14,23 @@ public class MGTurretModel extends AnimatedGeoModel<MGTurretEntity> {
 	// METHODS //
 	// PUBLIC
 	@Override
-	public Identifier getAnimationResource(MGTurretEntity animatable) {
+	public Identifier getAnimationResource(final MGTurretEntity animatable) {
 		return new Identifier(DefensiveMeasures.MOD_ID, "animations/machine_gun_turret.animation.json");
 	}
 
 	@Override
-	public Identifier getModelResource(MGTurretEntity object) {
+	public Identifier getModelResource(final MGTurretEntity object) {
 		return new Identifier(DefensiveMeasures.MOD_ID, "geo/machine_gun_turret.geo.json");
 	}
 
 	@Override
-	public Identifier getTextureResource(MGTurretEntity object) {
+	public Identifier getTextureResource(final MGTurretEntity object) {
 		return new Identifier(DefensiveMeasures.MOD_ID, "textures/entity/mg_turret/machine_gun_turret.png");
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
-	public void setLivingAnimations(MGTurretEntity entity, Integer uniqueID, AnimationEvent customPredicate) {
+	public void setLivingAnimations(final MGTurretEntity entity, final Integer uniqueID, final AnimationEvent customPredicate) {
 		super.setLivingAnimations(entity, uniqueID, customPredicate);
 		IBone base = this.getAnimationProcessor().getBone("base");
 		IBone neck = this.getAnimationProcessor().getBone("body");

@@ -10,14 +10,13 @@ import com.virus5600.DefensiveMeasures.entity.custom.TurretEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.entity.mob.MobEntity;
-import net.minecraft.entity.mob.ShulkerEntity;
 import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.sound.SoundEvents;
 
 public class ShootProjectileGoal extends Goal {
 	private int counter;
 	/**
-	 * Owner of the said projectile
+	 * Owner of the said projectile.
 	 */
 	private TurretEntity turret;
 	/**
@@ -30,12 +29,13 @@ public class ShootProjectileGoal extends Goal {
 	private Object[] args;
 
 	/**
-	 * Similar to the {@link ShulkerEntity}'s {@code ShootBulletGoal} which allows the Shulker to attack using their Shulker Bullet Projectile
+	 * Similar to the {@link ShulkerEntity}'s {@code ShootBulletGoal} which allows the Shulker to attack using their Shulker Bullet Projectile.
+	 *
 	 * @param entity Owner of the said projectile, defined as a {@link TurretEntity}
 	 * @param projectile The class type of the projectile this {@code TurretEntity}
 	 * @param projectileArgs Parameter values for the first constructor of the class provided on {@code projectile}.
 	 */
-	public ShootProjectileGoal(TurretEntity entity, Class<?> projectile, Object... projectileArgs) {
+	public ShootProjectileGoal(final TurretEntity entity, final Class<?> projectile, final Object... projectileArgs) {
 		this.turret = entity;
 		this.projectile = projectile;
 		this.args = projectileArgs;
@@ -44,29 +44,26 @@ public class ShootProjectileGoal extends Goal {
 
 	public boolean canStart() {
 		LivingEntity livingEntity = turret.getTarget();
-		if (livingEntity != null && livingEntity.isAlive()) {
-			return true;
-		} else {
-			return false;
-		}
+
+		return (livingEntity != null && livingEntity.isAlive());
 	}
 
 	@Override
     public boolean shouldContinue() {
-        return (this.canStart() || !((MobEntity)this.turret).getNavigation().isIdle());
+        return (this.canStart() || !((MobEntity) this.turret).getNavigation().isIdle());
     }
 
 	public void start() {
 		super.start();
-		((MobEntity)this.turret).setAttacking(true);
+		((MobEntity) this.turret).setAttacking(true);
 	}
 
 	public void stop() {
 		super.stop();
-        ((MobEntity)this.turret).setAttacking(false);
+        ((MobEntity) this.turret).setAttacking(false);
 //        this.targetSeeingTicker = 0;
 //        this.cooldown = -1;
-        ((LivingEntity)this.turret).clearActiveItem();
+        ((LivingEntity) this.turret).clearActiveItem();
 	}
 
 	public boolean shouldRunEveryTick() {
@@ -84,8 +81,9 @@ public class ShootProjectileGoal extends Goal {
 					turret.world.spawnEntity(summonProjectile(projectile, args));
 					turret.playSound(SoundEvents.ENTITY_SHULKER_SHOOT, 2.0F, (turret.getRandom().nextFloat() - turret.getRandom().nextFloat()) * 0.2F + 1.0F);
 				}
-			} else {
-				turret.setTarget((LivingEntity)null);
+			}
+			else {
+				turret.setTarget((LivingEntity) null);
 			}
 
 			super.tick();
@@ -100,17 +98,20 @@ public class ShootProjectileGoal extends Goal {
 	 *
 	 * @see Class
 	 */
-	private ProjectileEntity summonProjectile(Class<?> projectile, Object... args) {
+	private ProjectileEntity summonProjectile(final Class<?> projectile, final Object... args) {
 		Class<?> clazz;
-		Constructor<?> ctor[];
+		Constructor<?>[] ctor;
 		Object obj = null;
+
 		try {
 			clazz = Class.forName(projectile.getName());
 			ctor = clazz.getConstructors();
 			obj = ctor[0].newInstance(args);
-		} catch (ClassNotFoundException | SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+		}
+		catch (ClassNotFoundException | SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 			DefensiveMeasures.LOGGER.error(e.getMessage());
 		}
+
 		return (ProjectileEntity) obj;
 	}
 }

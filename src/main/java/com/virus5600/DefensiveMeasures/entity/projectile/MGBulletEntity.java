@@ -27,19 +27,19 @@ public class MGBulletEntity extends PersistentProjectileEntity implements IAnima
 	private AnimationFactory factory = new AnimationFactory(this);
 
 	/// CONSTRUCTORS ///
-	public MGBulletEntity(EntityType<? extends PersistentProjectileEntity> entityType, World world) {
-        super((EntityType<? extends PersistentProjectileEntity>)entityType, world);
+	public MGBulletEntity(final EntityType<? extends PersistentProjectileEntity> entityType, final World world) {
+        super((EntityType<? extends PersistentProjectileEntity>) entityType, world);
         this.setPierceLevel((byte) 2);
         this.setDamage(5.0);
     }
 
-    public MGBulletEntity(World world, double x, double y, double z) {
+    public MGBulletEntity(final World world, final double x, final double y, final double z) {
         super(ModEntities.MG_BULLET, x, y, z, world);
         this.setPierceLevel((byte) 2);
         this.setDamage(5.0);
     }
 
-    public MGBulletEntity(World world, LivingEntity owner) {
+    public MGBulletEntity(final World world, final LivingEntity owner) {
         super(ModEntities.MG_BULLET, owner, world);
         this.setPierceLevel((byte) 2);
         this.setDamage(5.0);
@@ -47,7 +47,7 @@ public class MGBulletEntity extends PersistentProjectileEntity implements IAnima
 
 	/// METHODS ///
     // PRIVATE
-    private <E extends IAnimatable> PlayState predicate(AnimationEvent<E> event) {
+    private <E extends IAnimatable> PlayState predicate(final AnimationEvent<E> event) {
 		event.getController().setAnimation(new AnimationBuilder().addAnimation("animation.mg_bullet.idle"));
 		return PlayState.CONTINUE;
 	}
@@ -59,7 +59,7 @@ public class MGBulletEntity extends PersistentProjectileEntity implements IAnima
     }
 
     @Override
-    protected void onHit(LivingEntity target) {
+    protected void onHit(final LivingEntity target) {
     	if (target.getType().getDimensions().width > 1.125) {
     		this.setPierceLevel((byte) 0);
     	}
@@ -68,7 +68,7 @@ public class MGBulletEntity extends PersistentProjectileEntity implements IAnima
     }
 
     @Override
-    protected void onEntityHit(EntityHitResult entityHitResult) {
+    protected void onEntityHit(final EntityHitResult entityHitResult) {
     	if (entityHitResult.getEntity().getType().getDimensions().width > 1.125) {
     		this.setPierceLevel((byte) 0);
     	}
@@ -77,7 +77,7 @@ public class MGBulletEntity extends PersistentProjectileEntity implements IAnima
     }
 
     @Override
-    protected void onBlockHit(BlockHitResult blockHitResult) {
+    protected void onBlockHit(final BlockHitResult blockHitResult) {
     	super.onBlockHit(blockHitResult);
 
     	for (int i = 0; i < ((Math.random() * (10 - 5)) + 5); i++) {
@@ -103,7 +103,7 @@ public class MGBulletEntity extends PersistentProjectileEntity implements IAnima
     }
 
 	@Override
-	public void registerControllers(AnimationData data) {
+	public void registerControllers(final AnimationData data) {
 		data.addAnimationController(new AnimationController<IAnimatable>(this, "idle", 0, this::predicate));
 	}
 

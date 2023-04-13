@@ -11,20 +11,20 @@ import software.bernie.geckolib3.renderers.geo.GeoEntityRenderer;
 public class MGTurretRenderer extends GeoEntityRenderer<MGTurretEntity> {
 
 	// CONSTRUCTOR //
-	public MGTurretRenderer(Context ctx) {
+	public MGTurretRenderer(final Context ctx) {
 		super(ctx, new MGTurretModel());
 	}
 
 	// METHODS //
 	// PUBLIC
 	@Override
-	public Identifier getTexture(MGTurretEntity instance) {
+	public Identifier getTexture(final MGTurretEntity instance) {
 		return new Identifier(DefensiveMeasures.MOD_ID, "textures/entity/mg_turret/machine_gun_turret.png");
 	}
 
 	// PROTECTED
 	@Override
-	protected float getDeathMaxRotation(MGTurretEntity entityLivingBaseIn) {
+	protected float getDeathMaxRotation(final MGTurretEntity entityLivingBaseIn) {
 		return 0.0F;
 	}
 }

@@ -35,10 +35,10 @@ public class DefensiveMeasures implements ModInitializer {
 		ModPackets.registerS2CPackets();
 	}
 
-	public static void sendChat(String text, ChatType type) {
+	public static void sendChat(final String text, final ChatType type) {
 		sendChat(type.format(text));
 	}
-	public static void sendChat(String text) {
+	public static void sendChat(final String text) {
 		MinecraftClient mc = MinecraftClient.getInstance();
 		mc.inGameHud.getChatHud().addMessage(Text.literal(ChatFormat.YELLOW.format("[" + MOD_ID.toUpperCase() + "] ") + text));
 	}
@@ -82,21 +82,26 @@ public class DefensiveMeasures implements ModInitializer {
 
 		private char formatCode;
 
-		ChatFormat(char formatCode) {
+		ChatFormat(final char formatCode) {
 			this.formatCode = formatCode;
 		}
 
-		public String format(String msg) {
-			return "§"+this.formatCode + msg + "§r";
+		public String format(final String msg) {
+			return "§" + this.formatCode + msg + "§r";
 		}
 
 		/**
 		 * Converts the format to its {@code char} representation used by Minecraft in formatting texts.
 		 * @return {@code char} value representing the character used for the format.
 		 */
-		public char getFormatCode() {return this.formatCode;}
+		public char getFormatCode() {
+			return this.formatCode;
+		}
+
 		@Override
-		public String toString() {return this.formatCode+"";}
+		public String toString() {
+			return this.formatCode + "";
+		}
 	}
 
 	/**
@@ -110,16 +115,15 @@ public class DefensiveMeasures implements ModInitializer {
 		WARNING(new ChatFormat[]{ChatFormat.YELLOW}),
 		ERROR(new ChatFormat[]{ChatFormat.RED, ChatFormat.BOLD});
 
-		private ChatFormat colorCode[];
+		private ChatFormat[] colorCode;
 
-		public String format(String msg) {
+		public String format(final String msg) {
 			String str = "";
-			for (ChatFormat c : colorCode)
-				str += "§"+c;
-			return str+msg;
+			for (ChatFormat c : colorCode) str += "§" + c;
+			return str + msg;
 		}
 
-		ChatType(ChatFormat colorCode[]) {
+		ChatType(final ChatFormat[] colorCode) {
 			this.colorCode = colorCode;
 		}
 	}

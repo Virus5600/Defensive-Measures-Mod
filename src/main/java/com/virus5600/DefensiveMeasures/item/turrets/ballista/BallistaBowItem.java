@@ -6,7 +6,7 @@ import net.minecraft.util.Rarity;
 
 public class BallistaBowItem extends Item {
 
-	public BallistaBowItem(Settings settings) {
+	public BallistaBowItem(final Settings settings) {
 		super(
 			// MAX STACK SIZE
 			settings.maxCount(16)

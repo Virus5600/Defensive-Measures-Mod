@@ -43,6 +43,7 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+
 import software.bernie.geckolib3.core.IAnimatable;
 import software.bernie.geckolib3.core.PlayState;
 import software.bernie.geckolib3.core.builder.AnimationBuilder;
@@ -52,23 +53,23 @@ import software.bernie.geckolib3.core.manager.AnimationData;
 import software.bernie.geckolib3.core.manager.AnimationFactory;
 
 public class CannonTurretEntity extends TurretEntity implements IAnimatable, RangedAttackMob, Itemable {
-	private static final int totalAttCooldown = 20 * 5;
+	private static final int TOTAL_ATTACK_COOLDOWN = 20 * 5;
 	private static final TrackedData<Boolean> FUSE_LIT;
 	/**
 	 * Contains all the items that can heal this entity.
 	 */
 	private static Map<Item, Float> healables;
 	/**
-	 * Contains all the items that can give effect to this entity
+	 * Contains all the items that can give effect to this entity.
 	 */
 	private static Map<Item, List<Object[]>> effectSource;
 	private AnimationFactory factory = new AnimationFactory(this);
 	@Nullable
 	private LivingEntity currentTarget = null;
-	private double attCooldown = totalAttCooldown;
+	private double attCooldown = TOTAL_ATTACK_COOLDOWN;
 
 	// CONSTRUCTORS //
-	public CannonTurretEntity(EntityType<? extends GolemEntity> entityType, World world) {
+	public CannonTurretEntity(final EntityType<? extends GolemEntity> entityType, final World world) {
 		super(entityType, world, TurretMaterial.METAL, CannonballEntity.class);
 		this.setShootSound(ModSoundEvents.TURRET_CANNON_SHOOT);
 		this.addHealables(healables);
@@ -77,12 +78,12 @@ public class CannonTurretEntity extends TurretEntity implements IAnimatable, Ran
 
 	// METHODS //
 	// PRIVATE
-	private <E extends IAnimatable> PlayState idlePredicate(AnimationEvent<E> event) {
+	private <E extends IAnimatable> PlayState idlePredicate(final AnimationEvent<E> event) {
 		event.getController().setAnimation(new AnimationBuilder().addAnimation("animation.cannon_turret.setup", true));
 		return PlayState.CONTINUE;
 	}
 
-	private <E extends IAnimatable> PlayState lookAtTargetPredicate(AnimationEvent<E> event) {
+	private <E extends IAnimatable> PlayState lookAtTargetPredicate(final AnimationEvent<E> event) {
 		if (this.hasTarget()) {
 			event.getController().setAnimation(new AnimationBuilder().addAnimation("animation.cannon_turret.look_at_target", true));
 			return PlayState.CONTINUE;
@@ -92,7 +93,7 @@ public class CannonTurretEntity extends TurretEntity implements IAnimatable, Ran
 	}
 
 	private boolean animPlayed = false;
-	private <E extends IAnimatable> PlayState deathPredicate(AnimationEvent<E> event) {
+	private <E extends IAnimatable> PlayState deathPredicate(final AnimationEvent<E> event) {
 		if (!this.isAlive() && !animPlayed) {
 			animPlayed = true;
 			event.getController().setAnimation(new AnimationBuilder().addAnimation("animation.cannon_turret.death", true));
@@ -101,7 +102,7 @@ public class CannonTurretEntity extends TurretEntity implements IAnimatable, Ran
 		return PlayState.CONTINUE;
 	}
 
-	private <E extends IAnimatable> PlayState firingSequencePredicate(AnimationEvent<E> event) {
+	private <E extends IAnimatable> PlayState firingSequencePredicate(final AnimationEvent<E> event) {
 		Vec3d fusePos = this.getRelativePos(0, 0, -0.5);
 		Vec3d barrelPos = this.getRelativePos(
 			MathHelper.nextDouble(this.random, -0.5, 0.5),
@@ -115,9 +116,9 @@ public class CannonTurretEntity extends TurretEntity implements IAnimatable, Ran
 
 			if (!this.getShootingFXDone()) {
 				int count = MathHelper.nextInt(this.random, 10, 25);
-				double vx = (this.getPos(TARGET_POS_X) - this.getPos(X))/10;
+				double vx = (this.getPos(TARGET_POS_X) - this.getPos(X)) / 10;
 				double vy = (this.getPos(TARGET_POS_Y) - this.getPos(Y));
-				double vz = (this.getPos(TARGET_POS_Z) - this.getPos(Z))/10;
+				double vz = (this.getPos(TARGET_POS_Z) - this.getPos(Z)) / 10;
 				double variance = Math.sqrt(vx * vx + vz * vz) * 0.5;
 
 				for (int i = 0; i < count; i++) {
@@ -161,7 +162,7 @@ public class CannonTurretEntity extends TurretEntity implements IAnimatable, Ran
 	@Override
 	protected void initGoals() {
 		// Goals
-		this.goalSelector.add(1, new ProjectileAttackGoal(this, 0, totalAttCooldown, 16.625F));
+		this.goalSelector.add(1, new ProjectileAttackGoal(this, 0, TOTAL_ATTACK_COOLDOWN, 16.625F));
 		this.goalSelector.add(2, new LookAtEntityGoal(this, MobEntity.class, 8.0F, 0.02F, true));
 		this.goalSelector.add(8, new LookAroundGoal(this));
 
@@ -180,7 +181,7 @@ public class CannonTurretEntity extends TurretEntity implements IAnimatable, Ran
 
 	@Nullable
 	@Override
-	protected SoundEvent getHurtSound(DamageSource source) {
+	protected SoundEvent getHurtSound(final DamageSource source) {
 		return ModSoundEvents.TURRET_CANNON_HURT;
 	}
 
@@ -190,7 +191,7 @@ public class CannonTurretEntity extends TurretEntity implements IAnimatable, Ran
 		return ModSoundEvents.TURRET_CANNON_DESTROYED;
 	}
 
-	protected void setFuseLit(boolean lit) {
+	protected void setFuseLit(final boolean lit) {
 		this.dataTracker.set(FUSE_LIT, lit);
 	}
 
@@ -208,7 +209,7 @@ public class CannonTurretEntity extends TurretEntity implements IAnimatable, Ran
 	}
 
 	@Override
-	public void registerControllers(AnimationData data) {
+	public void registerControllers(final AnimationData data) {
 		data.addAnimationController(new AnimationController<IAnimatable>(this, "idle", 20, this::idlePredicate));
 		data.addAnimationController(new AnimationController<IAnimatable>(this, "look_at_target", 20, this::lookAtTargetPredicate));
 		data.addAnimationController(new AnimationController<IAnimatable>(this, "death", 0, this::deathPredicate));
@@ -227,7 +228,7 @@ public class CannonTurretEntity extends TurretEntity implements IAnimatable, Ran
 	}
 
 	@Override
-	public void attack(LivingEntity target, float pullProgress) {
+	public void attack(final LivingEntity target, final float pullProgress) {
 		if (target == null) {
 			this.setShooting(false);
 			return;
@@ -237,7 +238,7 @@ public class CannonTurretEntity extends TurretEntity implements IAnimatable, Ran
 
 		try {
 			double vx = (target.getX() - this.getX()) * 1.0625;
-			double vy = target.getBodyY(2/3) - this.getY() + 0.25;
+			double vy = target.getBodyY(2 / 3) - this.getY() + 0.25;
 			double vz = (target.getZ() - this.getZ()) * 1.0625;
 			double variance = Math.sqrt(vx * vx + vz * vz);
 			float divergence = 0 + this.world.getDifficulty().getId() * 2;
@@ -248,7 +249,8 @@ public class CannonTurretEntity extends TurretEntity implements IAnimatable, Ran
 
 			this.playSound(this.getShootSound(), 1.0f, 1.0f / (this.getRandom().nextFloat() * 0.4f + 0.8f));
 			this.world.spawnEntity(projectile);
-		} catch ( IllegalArgumentException | SecurityException e) {
+		}
+		catch (IllegalArgumentException | SecurityException e) {
 			e.printStackTrace();
 		}
 	}
@@ -268,10 +270,12 @@ public class CannonTurretEntity extends TurretEntity implements IAnimatable, Ran
 			this.setPos(Y, this.getY() + 0.5);
 			this.setPos(Z, this.getZ());
 
-			if (this.attCooldown >= 99)
+			if (this.attCooldown >= 99) {
 				this.setShootingFXDone(false);
-			else
+			}
+			else {
 				this.setShootingFXDone(true);
+			}
 
 			if (this.attCooldown < 20) {
 				this.setFuseLit(false);
@@ -282,27 +286,29 @@ public class CannonTurretEntity extends TurretEntity implements IAnimatable, Ran
 
 			if (this.hasTarget()) {
 				this.setPos(TARGET_POS_X, this.getTarget().getX());
-				this.setPos(TARGET_POS_Y, this.getTarget().getBodyY(1/2));
+				this.setPos(TARGET_POS_Y, this.getTarget().getBodyY(1 / 2));
 				this.setPos(TARGET_POS_Z, this.getTarget().getZ());
 
 				--this.attCooldown;
 
-				if (this.attCooldown <= 0)
+				if (this.attCooldown <= 0) {
 					this.attCooldown = 20 * 5;
-				else if (this.attCooldown <= 95)
+				}
+				else if (this.attCooldown <= 95) {
 					this.setShooting(false);
+				}
 			}
 			else {
-				if (this.attCooldown != totalAttCooldown) {
+				if (this.attCooldown != TOTAL_ATTACK_COOLDOWN) {
 					this.setFuseLit(false);
-					this.attCooldown = totalAttCooldown;
+					this.attCooldown = TOTAL_ATTACK_COOLDOWN;
 				}
 			}
 		}
 	}
 
 	@Override
-	public ActionResult interactMob(PlayerEntity player, Hand hand) {
+	public ActionResult interactMob(final PlayerEntity player, final Hand hand) {
 		return Itemable.tryItem(player, hand, this, ModItems.TURRET_REMOVER, ModItems.CANNON_TURRET).orElse(super.interactMob(player, hand));
 	}
 
@@ -312,8 +318,8 @@ public class CannonTurretEntity extends TurretEntity implements IAnimatable, Ran
 		healables = new HashMap<Item, Float>() {
 			private static final long serialVersionUID = 1L;
 			{
-				for (Item item : TurretEntity.PLANKS)
-					put(item, 1f);
+				for (Item item : TurretEntity.PLANKS) {
+					put(item, 1f); }
 				put(Items.IRON_NUGGET, 1f);
 				put(Items.IRON_INGOT, 10f);
 				put(Items.IRON_BLOCK, 100f);

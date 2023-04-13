@@ -6,7 +6,7 @@ public class ModDamageSource extends DamageSource {
 
 	public static final DamageSource ARROWHEAD = new ModDamageSource("arrowhead").setBypassesArmor().setFromFalling();
 
-	protected ModDamageSource(String name) {
+	protected ModDamageSource(final String name) {
 		super(name);
 	}
 }

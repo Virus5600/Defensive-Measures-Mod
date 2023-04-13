@@ -5,7 +5,7 @@ import net.minecraft.util.Rarity;
 
 public class MachineGunHeadItem extends Item {
 
-	public MachineGunHeadItem(Settings settings) {
+	public MachineGunHeadItem(final Settings settings) {
 		super(
 			// MAX STACK SIZE
 			settings.maxCount(16)

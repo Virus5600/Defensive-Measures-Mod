@@ -37,15 +37,15 @@ public class CannonballEntity extends ExplosiveProjectileEntity implements IAnim
 	public SoundEvent hitSound = this.getHitSound();
 
 	/// CONSTRUCTORS ///
-	public CannonballEntity(EntityType<? extends ExplosiveProjectileEntity> entityType, World world) {
-		super((EntityType<? extends ExplosiveProjectileEntity>)entityType, world);
+	public CannonballEntity(final EntityType<? extends ExplosiveProjectileEntity> entityType, final World world) {
+		super((EntityType<? extends ExplosiveProjectileEntity>) entityType, world);
 		this.setFireTicks(0);
 		this.setOnFire(false);
 		this.setNoGravity(false);
 		super.setNoGravity(false);
 	}
 
-	public CannonballEntity(World world, LivingEntity owner) {
+	public CannonballEntity(final World world, final LivingEntity owner) {
         this(ModEntities.CANNONBALL, world);
         this.setOwner(owner);
         this.setOnFire(false);
@@ -53,7 +53,7 @@ public class CannonballEntity extends ExplosiveProjectileEntity implements IAnim
         super.setNoGravity(false);
     }
 
-	public CannonballEntity(EntityType<? extends ExplosiveProjectileEntity> type, LivingEntity owner, double directionX, double directionY, double directionZ, World world) {
+	public CannonballEntity(final EntityType<? extends ExplosiveProjectileEntity> type, final LivingEntity owner, final double directionX, final double directionY, final double directionZ, final World world) {
 		super(type, owner, directionX, directionY, directionZ, world);
 		this.setOnFire(false);
         this.setNoGravity(false);
@@ -69,7 +69,7 @@ public class CannonballEntity extends ExplosiveProjectileEntity implements IAnim
 
 	// PROTECTED
 	@Override
-	protected void onBlockHit(BlockHitResult blockHitResult) {
+	protected void onBlockHit(final BlockHitResult blockHitResult) {
 		super.onBlockHit(blockHitResult);
 		if (!this.world.isClient) {
 			this.doDamage();
@@ -88,7 +88,7 @@ public class CannonballEntity extends ExplosiveProjectileEntity implements IAnim
 	}
 
 	@Override
-	protected void onEntityHit(EntityHitResult entityHitResult) {
+	protected void onEntityHit(final EntityHitResult entityHitResult) {
 		if (!this.world.isClient) {
 			this.doDamage();
 			this.world.createExplosion(
@@ -114,10 +114,10 @@ public class CannonballEntity extends ExplosiveProjectileEntity implements IAnim
         return ParticleTypes.CLOUD;
     }
 
-	protected void onCollision(HitResult hitResult) {
+	protected void onCollision(final HitResult hitResult) {
 		super.onCollision(hitResult);
 		if (!this.world.isClient) {
-			this.world.sendEntityStatus(this, (byte)3);
+			this.world.sendEntityStatus(this, (byte) 3);
 			this.doDamage();
 			this.world.createExplosion(
 				this,
@@ -138,11 +138,11 @@ public class CannonballEntity extends ExplosiveProjectileEntity implements IAnim
 
 	// PUBLIC
 	@Environment(EnvType.CLIENT)
-	public void handleStatus(byte status) {
+	public void handleStatus(final byte status) {
 		if (status == 3) {
 			ParticleEffect particleEffect = this.getParticleParameters();
 
-			for(int i = 0; i < 8; ++i) {
+			for (int i = 0; i < 8; ++i) {
 				this.world.addParticle(particleEffect, this.getX(), this.getY(), this.getZ(), 0.0D, 0.0D, 0.0D);
 			}
 		}
@@ -169,21 +169,19 @@ public class CannonballEntity extends ExplosiveProjectileEntity implements IAnim
 			if (y <= 1.0D) {
 				Explosion explosion = this.world.createExplosion(this, this.getX(), this.getBodyY(0.0625D), this.getZ(), 2.5F, Explosion.DestructionType.NONE);
 				if (entity instanceof LivingEntity) {
-					if (this.shooter == null)
-						entity.damage(DamageSource.explosion(explosion), 15);
-					else
-						entity.damage(DamageSource.player((PlayerEntity) this.shooter), 15);
+					if (this.shooter == null) entity.damage(DamageSource.explosion(explosion), 15);
+					else entity.damage(DamageSource.player((PlayerEntity) this.shooter), 15);
 				}
 			}
 		}
 	}
 
-	public void setSound(SoundEvent soundIn) {
+	public void setSound(final SoundEvent soundIn) {
 		this.hitSound = soundIn;
 	}
 
 	@Override
-	public void registerControllers(AnimationData data) {
+	public void registerControllers(final AnimationData data) {
 	}
 
 	@Override

@@ -14,23 +14,23 @@ public class BallistaTurretModel extends AnimatedGeoModel<BallistaTurretEntity> 
 	// METHODS //
 	// PUBLIC
 	@Override
-	public Identifier getAnimationResource(BallistaTurretEntity animatable) {
+	public Identifier getAnimationResource(final BallistaTurretEntity animatable) {
 		return new Identifier(DefensiveMeasures.MOD_ID, "animations/ballista.animation.json");
 	}
 
 	@Override
-	public Identifier getModelResource(BallistaTurretEntity object) {
+	public Identifier getModelResource(final BallistaTurretEntity object) {
 		return new Identifier(DefensiveMeasures.MOD_ID, "geo/ballista.geo.json");
 	}
 
 	@Override
-	public Identifier getTextureResource(BallistaTurretEntity object) {
+	public Identifier getTextureResource(final BallistaTurretEntity object) {
 		return new Identifier(DefensiveMeasures.MOD_ID, "textures/entity/ballista/ballista.png");
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
-	public void setLivingAnimations(BallistaTurretEntity entity, Integer uniqueID, AnimationEvent customPredicate) {
+	public void setLivingAnimations(final BallistaTurretEntity entity, final Integer uniqueID, final AnimationEvent customPredicate) {
 		super.setLivingAnimations(entity, uniqueID, customPredicate);
 		IBone base = this.getAnimationProcessor().getBone("base");
 		IBone neck = this.getAnimationProcessor().getBone("head");

@@ -6,7 +6,9 @@ import net.fabricmc.fabric.api.client.itemgroup.FabricItemGroupBuilder;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.util.Identifier;
 
-public class ModItemGroup {
+public final class ModItemGroup {
+	private ModItemGroup() { }
+
 	public static final ItemGroup DEFENSIVE_MEASURES_ITEMS = FabricItemGroupBuilder.build(
 		new Identifier("dm", "defensive_measures.items"),
 		() -> ModItems.CANNON_HEAD.getDefaultStack()

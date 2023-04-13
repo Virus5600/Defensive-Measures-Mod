@@ -14,7 +14,9 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.registry.Registry;
 
-public class SpawnEventC2SPacket {
+public final class SpawnEventC2SPacket {
+	private SpawnEventC2SPacket() { }
+
 	/**
 	 * Receives a packet from the client and executes them on the server.
 	 * @param server
@@ -23,14 +25,14 @@ public class SpawnEventC2SPacket {
 	 * @param buf
 	 * @param responseSender
 	 */
-	public static void receive(MinecraftServer server, ServerPlayerEntity player, ServerPlayNetworkHandler handler, PacketByteBuf buf, PacketSender responseSender) {
+	public static void receive(final MinecraftServer server, final ServerPlayerEntity player, final ServerPlayNetworkHandler handler, final PacketByteBuf buf, final PacketSender responseSender) {
 	}
 
 	/**
 	 * Sends a packet from the server to the client.
 	 * @param entity
 	 */
-	public static Packet<?> send(Entity entity) {
+	public static Packet<?> send(final Entity entity) {
 		PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
 
 		buf.writeVarInt(Registry.ENTITY_TYPE.getRawId(entity.getType()));

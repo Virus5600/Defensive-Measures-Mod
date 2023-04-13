@@ -5,7 +5,7 @@ import net.minecraft.network.packet.s2c.play.EntityStatusEffectS2CPacket;
 
 public class EntityStatusEffectS2C extends EntityStatusEffectS2CPacket {
 
-	public EntityStatusEffectS2C(int entityId, StatusEffectInstance effect) {
+	public EntityStatusEffectS2C(final int entityId, final StatusEffectInstance effect) {
 		super(entityId, effect);
 	}
 }

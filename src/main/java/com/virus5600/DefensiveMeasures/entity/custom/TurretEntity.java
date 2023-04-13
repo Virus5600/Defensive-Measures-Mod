@@ -16,7 +16,6 @@ import com.virus5600.DefensiveMeasures.sound.ModSoundEvents;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.command.argument.LookingPosArgument;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityData;
 import net.minecraft.entity.EntityType;
@@ -158,12 +157,12 @@ public class TurretEntity extends GolemEntity implements Itemable, RangedAttackM
 		});
 
 	// CONSTRUCTORS //
-	public TurretEntity(EntityType<? extends GolemEntity> entityType, World world, TurretMaterial material, Class<?> projectile) {
+	public TurretEntity(final EntityType<? extends GolemEntity> entityType, final World world, final TurretMaterial material, final Class<?> projectile) {
 		this(entityType, world, material);
 		this.projectile = projectile;
 	}
 
-	public TurretEntity(EntityType<? extends GolemEntity> entityType, World world, TurretMaterial material) {
+	public TurretEntity(final EntityType<? extends GolemEntity> entityType, final World world, final TurretMaterial material) {
 		super(entityType, world);
 
 		this.material = material;
@@ -171,13 +170,12 @@ public class TurretEntity extends GolemEntity implements Itemable, RangedAttackM
 		this.level = 0;
 		this.lookControl = new TurretLookControl(this);
 
-		if (this.projectile == null)
-			this.projectile = ArrowEntity.class;
+		if (this.projectile == null) this.projectile = ArrowEntity.class;
 	}
 
 	// METHODS //
 	// PROTECTED
-	protected void setLevel(int level) {
+	protected void setLevel(final int level) {
 		this.dataTracker.set(LEVEL, level);
 	}
 
@@ -215,14 +213,14 @@ public class TurretEntity extends GolemEntity implements Itemable, RangedAttackM
         Direction direction = this.findAttachSide(this.getBlockPos());
         if (direction == null) {
             this.setAttachedFace(direction);
-        } else if (direction != Direction.DOWN) {
+        }
+        else if (direction != Direction.DOWN) {
             this.tryFall();
         }
     }
 
 	protected boolean tryFall() {
-		if (this.isAiDisabled() || !this.isAlive())
-            return false;
+		if (this.isAiDisabled() || !this.isAlive()) return false;
 
 		BlockPos blockPos = this.getBlockPos().add(new Vec3i(0, -1, 0));
 		if (this.isValidFallingPosition(blockPos)) {
@@ -233,7 +231,7 @@ public class TurretEntity extends GolemEntity implements Itemable, RangedAttackM
 		return false;
 	}
 
-	protected void setAttachedFace(Direction face) {
+	protected void setAttachedFace(final Direction face) {
 		this.dataTracker.set(ATTACHED_FACE, face);
 	}
 
@@ -242,10 +240,9 @@ public class TurretEntity extends GolemEntity implements Itemable, RangedAttackM
 	}
 
 	@Nullable
-	protected Direction findAttachSide(BlockPos pos) {
+	protected Direction findAttachSide(final BlockPos pos) {
 		for (Direction direction : Direction.values()) {
-			if (!this.canStay(pos, direction))
-				continue;
+			if (!this.canStay(pos, direction)) continue;
 
 			return direction;
 		}
@@ -253,27 +250,28 @@ public class TurretEntity extends GolemEntity implements Itemable, RangedAttackM
 		return null;
 	}
 
-	protected boolean canStay(BlockPos pos, Direction direction) {
-		if (!this.isValidFallingPosition(pos))
-			return false;
+	protected boolean canStay(final BlockPos pos, final Direction direction) {
+		if (!this.isValidFallingPosition(pos)) return false;
 
-		direction = direction == null ? Direction.DOWN : direction;
-		Direction oppositeDir = direction.getOpposite();
-		if (!this.world.isDirectionSolid(pos.offset(direction), this, oppositeDir))
-			return false;
+		Direction newDir = direction == null ? Direction.DOWN : direction;
+		Direction oppositeDir = newDir.getOpposite();
+		if (!this.world.isDirectionSolid(pos.offset(newDir), this, oppositeDir)) return false;
 
 		Box box = this.calculateBoundingBox().offset(pos).contract(1.0E-6);
 		return this.world.isSpaceEmpty(this, box);
 	}
 
-	protected boolean isValidFallingPosition(BlockPos pos) {
+	protected boolean isValidFallingPosition(final BlockPos pos) {
         BlockState blockState = this.world.getBlockState(pos);
 
-        if (blockState.isAir())
-            return true;
+        if (blockState.isAir()) return true;
 
-        if ((blockState.isOf(Blocks.BUBBLE_COLUMN) && pos.equals(this.getBlockPos())) || (blockState.isOf(Blocks.WATER) && pos.equals(this.getBlockPos())))
+        if ((blockState.isOf(Blocks.BUBBLE_COLUMN)
+        	&& pos.equals(this.getBlockPos()))
+        	|| (blockState.isOf(Blocks.WATER)
+        	&& pos.equals(this.getBlockPos()))) {
         	return true;
+        }
 
         boolean bl = blockState.isOf(Blocks.MOVING_PISTON) && pos.equals(this.getBlockPos());
         return !bl;
@@ -301,19 +299,19 @@ public class TurretEntity extends GolemEntity implements Itemable, RangedAttackM
 	 * @see LookingPosArgument#toAbsolutePos(net.minecraft.server.command.ServerCommandSource) LookingPosArguement#toAbsolutePos(ServerCommandSource)
 	 * @implNote TIME WASTED IN IMPROVING: <b>161.5 Hours</b>
 	 */
-	public Vec3d getRelativePos(double xOffset, double yOffset, double zOffset) {
+	public Vec3d getRelativePos(final double xOffset, final double yOffset, final double zOffset) {
 		// Gets the head Yaw and Pitch
 		Vec2f vec2f = new Vec2f(this.getPitch(), this.getHeadYaw());
 		// Gets the XZ body position and then the eye elevation position
         Vec3d vec3d = new Vec3d(this.getX(), this.getEyeY(), this.getZ());
 
         // The actual formula begins from here
-        float f = MathHelper.cos((vec2f.y + 90.0f) * ((float)Math.PI / 180));
-        float g = MathHelper.sin((vec2f.y + 90.0f) * ((float)Math.PI / 180));
-        float h = MathHelper.cos(-vec2f.x * ((float)Math.PI / 180));
-        float i = MathHelper.sin(-vec2f.x * ((float)Math.PI / 180));
-        float j = MathHelper.cos((-vec2f.x + 90.0f) * ((float)Math.PI / 180));
-        float k = MathHelper.sin((-vec2f.x + 90.0f) * ((float)Math.PI / 180));
+        float f = MathHelper.cos((vec2f.y + 90.0f) * ((float) Math.PI / 180));
+        float g = MathHelper.sin((vec2f.y + 90.0f) * ((float) Math.PI / 180));
+        float h = MathHelper.cos(-vec2f.x * ((float) Math.PI / 180));
+        float i = MathHelper.sin(-vec2f.x * ((float) Math.PI / 180));
+        float j = MathHelper.cos((-vec2f.x + 90.0f) * ((float) Math.PI / 180));
+        float k = MathHelper.sin((-vec2f.x + 90.0f) * ((float) Math.PI / 180));
 
         Vec3d vec3d2 = new Vec3d(f * h, i, g * h);
         Vec3d vec3d3 = new Vec3d(f * j, k, g * j);
@@ -338,7 +336,7 @@ public class TurretEntity extends GolemEntity implements Itemable, RangedAttackM
 	}
 
 	@Override
-	public boolean handleFallDamage(float fallDistance, float damageMultiplier, DamageSource damageSource) {
+	public boolean handleFallDamage(final float fallDistance, final float damageMultiplier, final DamageSource damageSource) {
 		return false;
 	}
 
@@ -353,7 +351,7 @@ public class TurretEntity extends GolemEntity implements Itemable, RangedAttackM
 	}
 
 	@Override
-	public boolean canImmediatelyDespawn(double distanceSquared) {
+	public boolean canImmediatelyDespawn(final double distanceSquared) {
 		return false;
 	}
 
@@ -365,7 +363,7 @@ public class TurretEntity extends GolemEntity implements Itemable, RangedAttackM
 		return this.material;
 	}
 
-	public void setShootSound(SoundEvent sound) {
+	public void setShootSound(final SoundEvent sound) {
 		this.shootSound = sound;
 	}
 
@@ -374,7 +372,7 @@ public class TurretEntity extends GolemEntity implements Itemable, RangedAttackM
 	}
 
 
-	public void setHealSound(SoundEvent sound) {
+	public void setHealSound(final SoundEvent sound) {
 		this.healSound = sound;
 	}
 
@@ -394,9 +392,8 @@ public class TurretEntity extends GolemEntity implements Itemable, RangedAttackM
 	 * @see Items
 	 * @see TurretEntity
 	 */
-	public TurretEntity addHealable(Item item, float amount) {
-		if (this.healables == null)
-			this.healables = new HashMap<>();
+	public TurretEntity addHealable(final Item item, final float amount) {
+		if (this.healables == null) this.healables = new HashMap<>();
 		this.healables.put(item, amount);
 		return this;
 	}
@@ -413,12 +410,10 @@ public class TurretEntity extends GolemEntity implements Itemable, RangedAttackM
 	 * @see Items
 	 * @see TurretEntity
 	 */
-	public TurretEntity addHealable(List<Item> group, float amount) {
-		if (this.healables == null)
-			this.healables = new HashMap<>();
+	public TurretEntity addHealable(final List<Item> group, final float amount) {
+		if (this.healables == null) this.healables = new HashMap<>();
 
-		for (Item item : group)
-			this.healables.put(item, amount);
+		for (Item item : group) this.healables.put(item, amount);
 
 		return this;
 	}
@@ -433,11 +428,9 @@ public class TurretEntity extends GolemEntity implements Itemable, RangedAttackM
 	 * @see Map
 	 * @see TurretEntity
 	 */
-	public TurretEntity addHealables(Map<Item, Float> healables) {
-		if (this.healables == null)
-			this.healables = healables;
-		else
-			this.healables.putAll(healables);
+	public TurretEntity addHealables(final Map<Item, Float> healables) {
+		if (this.healables == null) this.healables = healables;
+		else this.healables.putAll(healables);
 		return this;
 	}
 
@@ -446,7 +439,7 @@ public class TurretEntity extends GolemEntity implements Itemable, RangedAttackM
 	 * @param item The item in question
 	 * @return boolean
 	 */
-	public boolean isHealableItem(Item item) {
+	public boolean isHealableItem(final Item item) {
 		return this.healables.containsKey(item);
 	}
 
@@ -456,7 +449,7 @@ public class TurretEntity extends GolemEntity implements Itemable, RangedAttackM
 	 * @return float Amount of healing this item will give to the entity; otherwise, {@code null}
 	 */
 	@Nullable
-	public float getHealAmt(Item item) {
+	public float getHealAmt(final Item item) {
 		return this.isHealableItem(item) ? this.healables.get(item) : null;
 	}
 
@@ -476,10 +469,11 @@ public class TurretEntity extends GolemEntity implements Itemable, RangedAttackM
 	 * @see TurretEntity
 	 */
 	@SuppressWarnings("serial")
-	public TurretEntity addEffectSource(Item item, StatusEffect effect, float duration, int amplifier) {
-		if (this.effectSource == null)
-			this.effectSource = new HashMap<>();
-		this.effectSource.put(item, new ArrayList<Object[]>() {{add(new Object[] {effect, duration, amplifier});}});
+	public TurretEntity addEffectSource(final Item item, final StatusEffect effect, final float duration, final int amplifier) {
+		if (this.effectSource == null) this.effectSource = new HashMap<>();
+		this.effectSource.put(item, new ArrayList<Object[]>() {{
+			add(new Object[] {effect, duration, amplifier});
+		}});
 
 		return this;
 	}
@@ -499,14 +493,14 @@ public class TurretEntity extends GolemEntity implements Itemable, RangedAttackM
 	 * @see StatusEffect
 	 * @see TurretEntity
 	 */
-	public TurretEntity addEffectSource(List<Item> group, StatusEffect effect, float duration, int amplifier) {
-		if (this.effectSource == null)
-			this.effectSource = new HashMap<>();
+	public TurretEntity addEffectSource(final List<Item> group, final StatusEffect effect, final float duration, final int amplifier) {
+		if (this.effectSource == null) this.effectSource = new HashMap<>();
 
 		@SuppressWarnings("serial")
-		List<Object[]> args = new ArrayList<>() {{add(new Object[] {effect, duration, amplifier});}};
-		for (Item item : group)
-			this.effectSource.put(item, args);
+		List<Object[]> args = new ArrayList<>() {{
+			add(new Object[] {effect, duration, amplifier});
+		}};
+		for (Item item : group) this.effectSource.put(item, args);
 
 		return this;
 	}
@@ -523,11 +517,10 @@ public class TurretEntity extends GolemEntity implements Itemable, RangedAttackM
 	 * @see StatusEffect
 	 * @see TurretEntity
 	 */
-	public TurretEntity addEffectSource(Map<Item, List<Object[]>> effectSource) {
-		if (this.effectSource == null)
-			this.effectSource = effectSource;
-		else
-			this.effectSource.putAll(effectSource);
+	public TurretEntity addEffectSource(final Map<Item, List<Object[]>> effectSource) {
+		if (this.effectSource == null) this.effectSource = effectSource;
+		else this.effectSource.putAll(effectSource);
+
 		return this;
 	}
 
@@ -546,15 +539,13 @@ public class TurretEntity extends GolemEntity implements Itemable, RangedAttackM
 	 * @see StatusEffect
 	 * @see TurretEntity
 	 */
-	public TurretEntity updateEffectSource(Item item, Object[]... args) {
+	public TurretEntity updateEffectSource(final Item item, final Object[]... args) {
 		List<Object[]> currentArgs = this.getMobEffect(item);
 
-		if (args.length == 0)
-			return this;
+		if (args.length == 0) return this;
 
 		for (Object[] arg : args) {
-			if (arg.length == 0)
-				continue;
+			if (arg.length == 0) continue;
 
 			Object[] toPass = new Object[3];
 
@@ -564,10 +555,12 @@ public class TurretEntity extends GolemEntity implements Itemable, RangedAttackM
 				toPass[2] = 0;
 
 				if (arg.length == 2) {
-					if (arg[1] instanceof Float)
+					if (arg[1] instanceof Float) {
 						toPass[1] = arg[1];
-					else if (arg[1] instanceof Integer)
+					}
+					else if (arg[1] instanceof Integer) {
 						toPass[2] = arg[1];
+					}
 				}
 				else if (arg.length == 3) {
 					toPass[1] = arg[1];
@@ -577,12 +570,15 @@ public class TurretEntity extends GolemEntity implements Itemable, RangedAttackM
 				currentArgs.add(new Object[] {toPass[0], toPass[1], toPass[2]});
 			}
 			else {
-				if (arg.length == 3)
+				if (arg.length == 3) {
 					DefensiveMeasures.LOGGER.warn("Effect source at " + this.getName().getString() + " was not " + (this.effectSourceHasEffect(item, (StatusEffect) arg[0]) ? "updated" : "registered") + " due to given array not matching the correct order of items in the array, having [" + arg[0].getClass().getName() + ", " + arg[1].getClass().getName() + ", " + arg[2].getClass().getName() + "] instead of [StatusEffect, Float, Integer]");
-				else if (arg.length == 2)
+				}
+				else if (arg.length == 2) {
 					DefensiveMeasures.LOGGER.warn("Effect source at " + this.getName().getString() + " was not " + (this.effectSourceHasEffect(item, (StatusEffect) arg[0]) ? "updated" : "registered") + " due to given array not matching the correct order of items in the array, having [" + arg[0].getClass().getName() + ", " + arg[1].getClass().getName() + "] instead of [StatusEffect, Float] OR [StatusEffect, Integer]");
-				else if (arg.length == 1)
+				}
+				else if (arg.length == 1) {
 					DefensiveMeasures.LOGGER.warn("Effect source at " + this.getName().getString() + " was not " + (this.effectSourceHasEffect(item, (StatusEffect) arg[0]) ? "updated" : "registered") + " due to given array not matching the correct order of items in the array, having [" + arg[0].getClass().getName() + "] instead of [StatusEffect]");
+				}
 			}
 
 		}
@@ -600,7 +596,7 @@ public class TurretEntity extends GolemEntity implements Itemable, RangedAttackM
 	 *
 	 * @see StatusEffect
 	 */
-	public boolean isEffectSource(Item item) {
+	public boolean isEffectSource(final Item item) {
 		return this.effectSource.containsKey(item);
 	}
 
@@ -616,7 +612,7 @@ public class TurretEntity extends GolemEntity implements Itemable, RangedAttackM
 	 * </ol>
 	 */
 	@Nullable
-	public List<Object[]> getMobEffect(Item item) {
+	public List<Object[]> getMobEffect(final Item item) {
 		return this.isEffectSource(item) ? this.effectSource.get(item) : null;
 	}
 
@@ -626,34 +622,35 @@ public class TurretEntity extends GolemEntity implements Itemable, RangedAttackM
 	 * @param item The item in question
 	 * @return boolean
 	 */
-	public boolean effectSourceHasEffect(Item item, StatusEffect effect) {
-		for (Object[] registeredEffect : this.getMobEffect(item))
-			if ((StatusEffect) registeredEffect[0] == effect)
-				return true;
+	public boolean effectSourceHasEffect(final Item item, final StatusEffect effect) {
+		for (Object[] registeredEffect : this.getMobEffect(item)) {
+			if ((StatusEffect) registeredEffect[0] == effect) return true;
+		}
+
 		return false;
 	}
 
 	@Override
-	public void writeCustomDataToNbt(NbtCompound nbt) {
+	public void writeCustomDataToNbt(final NbtCompound nbt) {
 		super.writeCustomDataToNbt(nbt);
 		nbt.putInt("Level", this.getLevel());
 		nbt.putByte("FromItem", this.isFromItem());
 	}
 
 	@Override
-	public void readCustomDataFromNbt(NbtCompound nbt) {
+	public void readCustomDataFromNbt(final NbtCompound nbt) {
 		super.readCustomDataFromNbt(nbt);
 		this.setLevel(nbt.getInt("Level"));
 		this.setFromItem(nbt.getByte("FromItem"));
 	}
 
 	@Override
-	public boolean canBeLeashedBy(PlayerEntity player) {
+	public boolean canBeLeashedBy(final PlayerEntity player) {
 		return false;
 	}
 
 	@Override
-	public boolean startRiding(Entity entity, boolean force) {
+	public boolean startRiding(final Entity entity, final boolean force) {
 		if (this.world.isClient()) {
 			this.prevAttachedBlock = null;
 		}
@@ -673,9 +670,9 @@ public class TurretEntity extends GolemEntity implements Itemable, RangedAttackM
 
 	@Override
 	@Nullable
-	public EntityData initialize(ServerWorldAccess world, LocalDifficulty difficulty, SpawnReason spawnReason, @Nullable EntityData entityData, @Nullable NbtCompound entityNbt) {
-		if (entityData == null)
-			entityData = new PassiveData(false);
+	public EntityData initialize(final ServerWorldAccess world, final LocalDifficulty difficulty, final SpawnReason spawnReason, @Nullable final EntityData entityData, @Nullable final NbtCompound entityNbt) {
+		EntityData newEntityData = entityData;
+		if (entityData == null) newEntityData = new PassiveData(false);
 
 		this.headYaw = this.prevHeadYaw;
 		this.prevBodyYaw = 0.0f;
@@ -684,11 +681,11 @@ public class TurretEntity extends GolemEntity implements Itemable, RangedAttackM
 		if (entityNbt != null) {
 			if (spawnReason == SpawnReason.SPAWN_EGG && entityNbt.contains("FromItem")) {
 				this.setHealth(entityNbt.getFloat("Health"));
-				return entityData;
+				return newEntityData;
 			}
 		}
 
-		return super.initialize(world, difficulty, spawnReason, entityData, entityNbt);
+		return super.initialize(world, difficulty, spawnReason, newEntityData, entityNbt);
 	}
 
 	@Override
@@ -712,13 +709,13 @@ public class TurretEntity extends GolemEntity implements Itemable, RangedAttackM
 	}
 
 	@Override
-	public void setFromItem(byte fromItem) {
+	public void setFromItem(final byte fromItem) {
 		this.dataTracker.set(FROM_ITEM, fromItem);
 	}
 
 	@SuppressWarnings("deprecation")
 	@Override
-	public void copyDataToStack(ItemStack stack) {
+	public void copyDataToStack(final ItemStack stack) {
 		Itemable.copyDataToStack(this, stack);
 		NbtCompound nbtCompound = stack.getOrCreateNbt();
 
@@ -734,17 +731,13 @@ public class TurretEntity extends GolemEntity implements Itemable, RangedAttackM
 
 	@SuppressWarnings("deprecation")
 	@Override
-	public void copyDataFromNbt(NbtCompound nbt) {
+	public void copyDataFromNbt(final NbtCompound nbt) {
 		Itemable.copyDataFromNbt(this, nbt);
 
-		if (nbt.contains("Level"))
-			this.setLevel(nbt.getInt("Level"));
-		if (nbt.contains("FromItem"))
-			this.setFromItem(nbt.getByte("FromItem"));
-		if (nbt.contains("Health"))
-			this.setHealth(nbt.getFloat("Health"));
-		if (nbt.contains("AttackCoolingDown"))
-			this.getBrain().remember(MemoryModuleType.ATTACK_COOLING_DOWN, true, nbt.getLong("AttackCoolingDown"));
+		if (nbt.contains("Level")) this.setLevel(nbt.getInt("Level"));
+		if (nbt.contains("FromItem")) this.setFromItem(nbt.getByte("FromItem"));
+		if (nbt.contains("Health")) this.setHealth(nbt.getFloat("Health"));
+		if (nbt.contains("AttackCoolingDown")) this.getBrain().remember(MemoryModuleType.ATTACK_COOLING_DOWN, true, nbt.getLong("AttackCoolingDown"));
 	}
 
 	@Override
@@ -763,7 +756,8 @@ public class TurretEntity extends GolemEntity implements Itemable, RangedAttackM
 
 		if (!world.isClient()) {
 			this.setHasTarget(this.getTarget() != null);
-		} else {
+		}
+		else {
 			// SNAPPING THE TURRET BACK TO PLACE
 			if (this.getVelocity().x == 0 && this.getVelocity().z == 0 && !this.hasVehicle()) {
 				Vec3d newPos = new Vec3d(
@@ -795,7 +789,7 @@ public class TurretEntity extends GolemEntity implements Itemable, RangedAttackM
 	}
 
 	@Override
-	public void attack(LivingEntity target, float pullProgress) {
+	public void attack(final LivingEntity target, final float pullProgress) {
 		if (!this.isShooting()) {
 			this.setShooting(target != null);
 		}
@@ -805,7 +799,7 @@ public class TurretEntity extends GolemEntity implements Itemable, RangedAttackM
 
 			ProjectileEntity projectile = (ProjectileEntity) this.projectile.getConstructor(World.class, LivingEntity.class).newInstance(world, this);
 			double vx = target.getX() - this.getX();
-			double vy = target.getBodyY(1/2) - projectile.getY();
+			double vy = target.getBodyY(1 / 2) - projectile.getY();
 			double vz = target.getZ() - this.getZ();
 			double variance = Math.sqrt(vx * vx + vz * vz);
 			float divergence = 0 + this.world.getDifficulty().getId() * 2;
@@ -814,7 +808,8 @@ public class TurretEntity extends GolemEntity implements Itemable, RangedAttackM
 			this.world.spawnEntity(projectile);
 
 			this.playSound(this.getShootSound(), 1.0f, 1.0f / (this.getRandom().nextFloat() * 0.4f + 0.8f));
-		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | SecurityException | NoSuchMethodException e) {
+		}
+		catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | SecurityException | NoSuchMethodException e) {
 			e.printStackTrace();
 			DefensiveMeasures.LOGGER.debug("");
 			DefensiveMeasures.LOGGER.debug("	 DM ERROR OCCURED	 ");
@@ -830,7 +825,7 @@ public class TurretEntity extends GolemEntity implements Itemable, RangedAttackM
 	}
 
 	@Override
-	public ActionResult interactMob(PlayerEntity player, Hand hand) {
+	public ActionResult interactMob(final PlayerEntity player, final Hand hand) {
 		ItemStack item = player.getStackInHand(hand);
 		boolean itemDecrement = false;
 
@@ -847,10 +842,8 @@ public class TurretEntity extends GolemEntity implements Itemable, RangedAttackM
 			if (!player.isCreative()) {
 				// Decrement item amount (if it is a plain item) or durability (if it is a tool)
 				if (item.getItem().isDamageable()) {
-					if (item.getDamage() > item.getMaxDamage())
-						item.decrement(1);
-					else
-						item.setDamage(item.getDamage() + 1);
+					if (item.getDamage() > item.getMaxDamage()) item.decrement(1);
+					else item.setDamage(item.getDamage() + 1);
 				}
 				else {
 					item.decrement(1);
@@ -889,7 +882,7 @@ public class TurretEntity extends GolemEntity implements Itemable, RangedAttackM
 		return this.dataTracker.get(SHOOTING);
 	}
 
-	public void setShooting(boolean shooting) {
+	public void setShooting(final boolean shooting) {
 		this.dataTracker.set(SHOOTING, shooting);
 	}
 
@@ -897,7 +890,7 @@ public class TurretEntity extends GolemEntity implements Itemable, RangedAttackM
 		return this.dataTracker.get(SHOOTING_FX_DONE);
 	}
 
-	public void setShootingFXDone(boolean status) {
+	public void setShootingFXDone(final boolean status) {
 		this.dataTracker.set(SHOOTING_FX_DONE, status);
 	}
 
@@ -905,19 +898,19 @@ public class TurretEntity extends GolemEntity implements Itemable, RangedAttackM
 		return this.dataTracker.get(HAS_TARGET);
 	}
 
-	public void setHasTarget(boolean hasTarget) {
+	public void setHasTarget(final boolean hasTarget) {
 		this.dataTracker.set(HAS_TARGET, hasTarget);
 	}
 
-	public void setPos(TrackedData<Float> axis, double value) {
+	public void setPos(final TrackedData<Float> axis, final double value) {
 		this.dataTracker.set(axis, (float) value);
 	}
 
-	public double getPos(TrackedData<Float> axis) {
+	public double getPos(final TrackedData<Float> axis) {
 		return this.dataTracker.get(axis);
 	}
 
-	public void setTrackedYaw(double value) {
+	public void setTrackedYaw(final double value) {
 		this.dataTracker.set(YAW, (float) value);
 	}
 
@@ -925,7 +918,7 @@ public class TurretEntity extends GolemEntity implements Itemable, RangedAttackM
 		return (double) this.dataTracker.get(YAW);
 	}
 
-	public void setTrackedPitch(double value) {
+	public void setTrackedPitch(final double value) {
 		this.dataTracker.set(PITCH, (float) value);
 	}
 
@@ -938,13 +931,14 @@ public class TurretEntity extends GolemEntity implements Itemable, RangedAttackM
     	DamageRecord record = this.getDamageTracker().getMostRecentDamage();
     	boolean isExplosive = record == null ? false : record.getDamageSource().isExplosive();
 
-    	if (this.world.getBlockState(this.getVelocityAffectingPos()).isOf(Blocks.BUBBLE_COLUMN) ||
-    			this.world.getBlockState(this.getVelocityAffectingPos().add(0, 1, 0)).isOf(Blocks.BUBBLE_COLUMN) ||
-    			this.world.getBlockState(this.getVelocityAffectingPos()).isOf(Blocks.WATER) ||
-    			this.world.getBlockState(this.getVelocityAffectingPos().add(0, 1, 0)).isOf(Blocks.WATER) ||
-    			this.getAttachedFace() != Direction.DOWN ||
-    			isExplosive)
+    	if (this.world.getBlockState(this.getVelocityAffectingPos()).isOf(Blocks.BUBBLE_COLUMN)
+    		|| this.world.getBlockState(this.getVelocityAffectingPos().add(0, 1, 0)).isOf(Blocks.BUBBLE_COLUMN)
+    		|| this.world.getBlockState(this.getVelocityAffectingPos()).isOf(Blocks.WATER)
+    		|| this.world.getBlockState(this.getVelocityAffectingPos().add(0, 1, 0)).isOf(Blocks.WATER)
+    		|| this.getAttachedFace() != Direction.DOWN
+    		|| isExplosive) {
     		return new Vec3d(0, -Math.abs(super.getVelocity().getY()), 0);
+    	}
 
     	return super.getVelocity();
     }
@@ -973,7 +967,7 @@ public class TurretEntity extends GolemEntity implements Itemable, RangedAttackM
 	}
 
 	static class TurretLookControl extends LookControl {
-		public TurretLookControl(GolemEntity entity) {
+		TurretLookControl(final GolemEntity entity) {
 			super(entity);
 		}
 
@@ -986,7 +980,7 @@ public class TurretEntity extends GolemEntity implements Itemable, RangedAttackM
 		@SuppressWarnings("unused")
 		private GolemEntity entity;
 
-		public TurretBodyControl(GolemEntity golemEntity) {
+		TurretBodyControl(final GolemEntity golemEntity) {
             super(golemEntity);
             this.entity = golemEntity;
         }

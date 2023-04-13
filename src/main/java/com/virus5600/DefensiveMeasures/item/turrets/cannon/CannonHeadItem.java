@@ -5,7 +5,7 @@ import net.minecraft.util.Rarity;
 
 public class CannonHeadItem extends Item {
 
-	public CannonHeadItem(Settings settings) {
+	public CannonHeadItem(final Settings settings) {
 		super(
 			// MAX STACK SIZE
 			settings.maxCount(1)

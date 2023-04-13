@@ -16,24 +16,24 @@ import software.bernie.geckolib3.renderers.geo.GeoProjectilesRenderer;
 public class MGBulletRenderer extends GeoProjectilesRenderer<MGBulletEntity> {
 
 	// CONSTRUCTOR //
-	public MGBulletRenderer(Context ctx) {
+	public MGBulletRenderer(final Context ctx) {
 		super(ctx, new MGBulletModel());
 	}
 
 	// METHODS //
 	// PUBLIC
 	@Override
-	public Identifier getTexture(MGBulletEntity instance) {
+	public Identifier getTexture(final MGBulletEntity instance) {
 		return new Identifier(DefensiveMeasures.MOD_ID, "textures/entity/mg_turret/mg_bullet.png");
 	}
 
-	protected int getBlockLight(MGBulletEntity entityIn, BlockPos partialTicks) {
+	protected int getBlockLight(final MGBulletEntity entityIn, final BlockPos partialTicks) {
 		return 15;
 	}
 
-	public RenderLayer getRenderType(MGBulletEntity animatable, float partialTicks, MatrixStack stack,
-			VertexConsumerProvider renderTypeBuffer, VertexConsumer vertexBuilder, int packedLightIn,
-			Identifier textureLocation) {
+	public RenderLayer getRenderType(final MGBulletEntity animatable, final float partialTicks, final MatrixStack stack,
+			final VertexConsumerProvider renderTypeBuffer, final VertexConsumer vertexBuilder, final int packedLightIn,
+			final Identifier textureLocation) {
 		return RenderLayer.getEntityTranslucent(getTextureResource(animatable));
 	}
 }

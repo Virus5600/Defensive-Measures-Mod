@@ -14,23 +14,23 @@ public class CannonTurretModel extends AnimatedGeoModel<CannonTurretEntity> {
 	// METHODS //
 	// PUBLIC
 	@Override
-	public Identifier getAnimationResource(CannonTurretEntity animatable) {
+	public Identifier getAnimationResource(final CannonTurretEntity animatable) {
 		return new Identifier(DefensiveMeasures.MOD_ID, "animations/cannon_turret.animation.json");
 	}
 
 	@Override
-	public Identifier getModelResource(CannonTurretEntity object) {
+	public Identifier getModelResource(final CannonTurretEntity object) {
 		return new Identifier(DefensiveMeasures.MOD_ID, "geo/cannon_turret.geo.json");
 	}
 
 	@Override
-	public Identifier getTextureResource(CannonTurretEntity object) {
+	public Identifier getTextureResource(final CannonTurretEntity object) {
 		return new Identifier(DefensiveMeasures.MOD_ID, "textures/entity/cannon_turret/cannon_turret.png");
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
-	public void setLivingAnimations(CannonTurretEntity entity, Integer uniqueID, AnimationEvent customPredicate) {
+	public void setLivingAnimations(final CannonTurretEntity entity, final Integer uniqueID, final AnimationEvent customPredicate) {
 		super.setLivingAnimations(entity, uniqueID, customPredicate);
 		IBone base = this.getAnimationProcessor().getBone("base");
 		IBone neck = this.getAnimationProcessor().getBone("stand");

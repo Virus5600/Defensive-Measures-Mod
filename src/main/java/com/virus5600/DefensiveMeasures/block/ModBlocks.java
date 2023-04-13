@@ -13,11 +13,13 @@ import net.minecraft.item.ItemGroup;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 
-public class ModBlocks {
-	// 1.0.0
-	public final static Block ARROWHEAD = new ArrowheadBlock(FabricBlockSettings.of(Material.AGGREGATE));
+public final class ModBlocks {
+	private ModBlocks() { }
 
-	private static Block registerBlock(String name, Block block, ItemGroup tab) {
+	// 1.0.0
+	public static final Block ARROWHEAD = new ArrowheadBlock(FabricBlockSettings.of(Material.AGGREGATE));
+
+	private static Block registerBlock(final String name, final Block block, final ItemGroup tab) {
 		registerBlockItem(name, block, tab);
 
 		return Registry.register(
@@ -27,7 +29,7 @@ public class ModBlocks {
 		);
 	}
 
-	private static Item registerBlockItem(String name, Block block, ItemGroup tab) {
+	private static Item registerBlockItem(final String name, final Block block, final ItemGroup tab) {
 		return Registry.register(
 			Registry.ITEM,
 			new Identifier(DefensiveMeasures.MOD_ID, name),

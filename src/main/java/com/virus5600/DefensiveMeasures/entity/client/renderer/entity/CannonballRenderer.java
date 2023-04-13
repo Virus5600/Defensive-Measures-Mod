@@ -17,24 +17,24 @@ import software.bernie.geckolib3.renderers.geo.GeoProjectilesRenderer;
 public class CannonballRenderer extends GeoProjectilesRenderer<CannonballEntity> {
 
 	// CONSTRUCTOR //
-	public CannonballRenderer(Context ctx) {
+	public CannonballRenderer(final Context ctx) {
 		super(ctx, new CannonballModel());
 	}
 
 	// METHODS //
 	// PUBLIC
 	@Override
-	public Identifier getTexture(CannonballEntity instance) {
+	public Identifier getTexture(final CannonballEntity instance) {
 		return new Identifier(DefensiveMeasures.MOD_ID, "textures/entity/cannon_turret/cannonball.png");
 	}
 
-	protected int getBlockLight(RocketProjectile entityIn, BlockPos partialTicks) {
+	protected int getBlockLight(final RocketProjectile entityIn, final BlockPos partialTicks) {
 		return 15;
 	}
 
-	public RenderLayer getRenderType(CannonballEntity animatable, float partialTicks, MatrixStack stack,
-			VertexConsumerProvider renderTypeBuffer, VertexConsumer vertexBuilder, int packedLightIn,
-			Identifier textureLocation) {
+	public RenderLayer getRenderType(final CannonballEntity animatable, final float partialTicks, final MatrixStack stack,
+			final VertexConsumerProvider renderTypeBuffer, final VertexConsumer vertexBuilder, final int packedLightIn,
+			final Identifier textureLocation) {
 		return RenderLayer.getEntityTranslucent(getTextureResource(animatable));
 	}
 }

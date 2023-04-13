@@ -10,7 +10,9 @@ import net.minecraft.particle.DefaultParticleType;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 
-public class ModParticles {
+public final class ModParticles {
+	private ModParticles() { }
+
 	public static final DefaultParticleType CANNON_FLASH = FabricParticleTypes.simple();
 	public static final DefaultParticleType CANNON_FUSE = FabricParticleTypes.simple();
 

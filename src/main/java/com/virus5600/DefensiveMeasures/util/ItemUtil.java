@@ -12,24 +12,28 @@ import net.minecraft.item.ToolItem;
  * @see net.minecraft.item.ToolItem ToolItem
  * @see net.minecraft.item.SwordItem SwordItem
  */
-public class ItemUtil {
+public final class ItemUtil {
+	private ItemUtil() { }
+
 	/**
-	 * Identifies whether the provided {@code item} is a subclass of the provided {@code class}
+	 * Identifies whether the provided {@code item} is a subclass of the provided {@code class}.
+	 *
 	 * @param type Target subclass
 	 * @param item Item in question
 	 * @return boolean
 	 */
-	public static boolean isTypeMatch(Class<?> type, Item item) {
+	public static boolean isTypeMatch(final Class<?> type, final Item item) {
 		return type.isAssignableFrom(item.getClass());
 	}
 
 	/**
-	 * Identifies whether the provided {@code item} is a subclass of {@link ToolItem}
+	 * Identifies whether the provided {@code item} is a subclass of {@link ToolItem}.
+	 *
 	 * @param item Item in question
 	 * @return boolean
 	 * @see ToolItem
 	 */
-	public static boolean isToolItem(Item item) {
+	public static boolean isToolItem(final Item item) {
 		return ToolItem.class.isAssignableFrom(item.getClass());
 	}
 
@@ -40,9 +44,8 @@ public class ItemUtil {
 	 * @param item Item in question
 	 * @return An instance provided on the parameter {@code type}
 	 */
-	public static <T> T getObjectInstance(Class<? extends T> type, Item item) {
-		if (ItemUtil.isTypeMatch(type, item))
-			return type.cast(item);
+	public static <T> T getObjectInstance(final Class<? extends T> type, final Item item) {
+		if (ItemUtil.isTypeMatch(type, item)) return type.cast(item);
 		return null;
 	}
 
@@ -52,9 +55,8 @@ public class ItemUtil {
 	 * @return ToolItem
 	 * @see ToolItem
 	 */
-	public static ToolItem getToolItem(Item item) {
-		if (ItemUtil.isToolItem(item))
-			return (ToolItem) item;
+	public static ToolItem getToolItem(final Item item) {
+		if (ItemUtil.isToolItem(item)) return (ToolItem) item;
 		return null;
 	}
 }

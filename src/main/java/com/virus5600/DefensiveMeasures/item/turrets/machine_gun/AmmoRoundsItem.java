@@ -5,7 +5,7 @@ import net.minecraft.util.Rarity;
 
 public class AmmoRoundsItem extends Item {
 
-	public AmmoRoundsItem(Settings settings) {
+	public AmmoRoundsItem(final Settings settings) {
 		super(
 			// MAX STACK SIZE
 			settings.maxCount(32)

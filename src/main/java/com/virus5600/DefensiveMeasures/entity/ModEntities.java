@@ -16,7 +16,9 @@ import net.minecraft.entity.SpawnGroup;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 
-public class ModEntities {
+public final class ModEntities {
+	private ModEntities() { }
+
 	/// TURRETS
 	// v1.0.0
 	public static final EntityType<CannonTurretEntity> CANNON_TURRET = Registry.register(

@@ -1,8 +1,6 @@
 package com.virus5600.DefensiveMeasures.util;
 
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vec3f;
-import net.minecraft.util.math.Vec3i;
 
 /**
  * An immutable vector composed of 3 doubles, extended from the original {@link Vec3d}. This is to serve as an extension with
@@ -29,16 +27,16 @@ public class Vec3dUtil extends Vec3d {
      *
      * @see Vec3d
      */
-	public Vec3dUtil(double x, double y, double z) {
+	public Vec3dUtil(final double x, final double y, final double z) {
 		super(x, y, z);
 	}
 
 	/**
-     * Clones the original vector to this one
+     * Clones the original vector to this one.
      *
      * @param vec The other vector
      */
-	public Vec3dUtil(Vec3d vec) {
+	public Vec3dUtil(final Vec3d vec) {
 		super(vec.x, vec.y, vec.z);
 	}
 
@@ -64,9 +62,13 @@ public class Vec3dUtil extends Vec3d {
      * @return Vec3d
      * @see Vec3d
      */
-	public Vec3d rotateAroundNonUnitAxis(Vec3d axis, double angle) {
-		double x = getX(), y = getY(), z = getZ();
-        double x2 = axis.getX(), y2 = axis.getY(), z2 = axis.getZ();
+	public Vec3d rotateAroundNonUnitAxis(final Vec3d axis, final double angle) {
+		double x = getX();
+		double y = getY();
+		double z = getZ();
+        double x2 = axis.getX();
+        double y2 = axis.getY();
+        double z2 = axis.getZ();
 
         double cosTheta = Math.cos(angle);
         double sinTheta = Math.sin(angle);

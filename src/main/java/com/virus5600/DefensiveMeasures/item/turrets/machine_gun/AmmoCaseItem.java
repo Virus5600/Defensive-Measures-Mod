@@ -5,7 +5,7 @@ import net.minecraft.util.Rarity;
 
 public class AmmoCaseItem extends Item {
 
-	public AmmoCaseItem(Settings settings) {
+	public AmmoCaseItem(final Settings settings) {
 		super(
 			// MAX STACK SIZE
 			settings.maxCount(16)

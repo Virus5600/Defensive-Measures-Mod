@@ -34,7 +34,7 @@ public enum ModToolMaterials implements ToolMaterial {
 	private final Lazy<Ingredient> repairIngredient;
 	private final Map<Item, Integer> repairAmount;
 
-	private ModToolMaterials(int miningLevel, int itemDurability, float miningSpeed, float attackDamage, int enchantability, Map<Item, Integer> repairIngredient) {
+	ModToolMaterials(final int miningLevel, final int itemDurability, final float miningSpeed, final float attackDamage, final int enchantability, final Map<Item, Integer> repairIngredient) {
 		this.miningLevel = miningLevel;
 		this.itemDurability = itemDurability;
 		this.miningSpeed = miningSpeed;
@@ -65,14 +65,14 @@ public enum ModToolMaterials implements ToolMaterial {
 	}
 
 	public Ingredient getRepairIngredient() {
-		return (Ingredient)this.repairIngredient.get();
+		return (Ingredient) this.repairIngredient.get();
 	}
 
-	public int getRepairAmt(Item item) {
+	public int getRepairAmt(final Item item) {
 		return this.repairAmount.get(item);
 	}
 
-	private static Lazy<Ingredient> repairIngredients(Set<Item> ingredients) {
+	private static Lazy<Ingredient> repairIngredients(final Set<Item> ingredients) {
 		Supplier<Ingredient> supplier = () -> {
 			return Ingredient.ofItems(ingredients.toArray(Item[]::new));
 		};

@@ -12,23 +12,23 @@ public class CannonballModel extends AnimatedGeoModel<CannonballEntity> {
 	// METHODS //
 	// PUBLIC
 	@Override
-	public Identifier getAnimationResource(CannonballEntity animatable) {
+	public Identifier getAnimationResource(final CannonballEntity animatable) {
 		return null;
 	}
 
 	@Override
-	public Identifier getModelResource(CannonballEntity object) {
+	public Identifier getModelResource(final CannonballEntity object) {
 		return new Identifier(DefensiveMeasures.MOD_ID, "geo/cannonball.geo.json");
 	}
 
 	@Override
-	public Identifier getTextureResource(CannonballEntity object) {
+	public Identifier getTextureResource(final CannonballEntity object) {
 		return new Identifier(DefensiveMeasures.MOD_ID, "textures/entity/cannon_turret/cannonball.png");
 	}
 
 	@SuppressWarnings("rawtypes")
 	@Override
-	public void setLivingAnimations(CannonballEntity entity, Integer uniqueID, AnimationEvent customPredicate) {
+	public void setLivingAnimations(final CannonballEntity entity, final Integer uniqueID, final AnimationEvent customPredicate) {
 		super.setLivingAnimations(entity, uniqueID, customPredicate);
 	}
 }

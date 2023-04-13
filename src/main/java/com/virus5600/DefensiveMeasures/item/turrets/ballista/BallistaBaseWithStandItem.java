@@ -6,7 +6,7 @@ import net.minecraft.util.Rarity;
 
 public class BallistaBaseWithStandItem extends Item {
 
-	public BallistaBaseWithStandItem(Settings settings) {
+	public BallistaBaseWithStandItem(final Settings settings) {
 		super(
 			// MAX STACK SIZE
 			settings.maxCount(16)

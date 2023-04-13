@@ -12,5 +12,6 @@ jobs:
       - name: Check for errors.
         uses: github/super-linter@v4
         env:
-          VALIDATE_ALL_CODEBASE: false
+          VALIDATE_ALL_CODEBASE: false,
+          JAVA_FILE_NAME: checkstyle.xml,
           GITHUB_TOKEN: ${{ github.token }}

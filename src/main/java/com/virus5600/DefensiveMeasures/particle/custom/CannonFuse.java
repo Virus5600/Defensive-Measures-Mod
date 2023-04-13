@@ -17,7 +17,7 @@ public class CannonFuse extends SpriteBillboardParticle {
 	private Vec3d source;
 
 	/// CONSTRUCTORS ///
-	protected CannonFuse(ClientWorld level, double x, double y, double z, SpriteProvider spriteSet, double xd, double yd, double zd) {
+	protected CannonFuse(final ClientWorld level, final double x, final double y, final double z, final SpriteProvider spriteSet, final double xd, final double yd, final double zd) {
 		super(level, x, y, z, xd, yd, zd);
 
 		this.velocityMultiplier = 0.75f;
@@ -32,7 +32,7 @@ public class CannonFuse extends SpriteBillboardParticle {
 		this.source = new Vec3d(x, y, z);
 
 		this.red = 1f;
-		this.green= 1f;
+		this.green = 1f;
 		this.blue = 1f;
 	}
 
@@ -59,7 +59,7 @@ public class CannonFuse extends SpriteBillboardParticle {
 	}
 
 	@Override
-    public int getBrightness(float tint) {
+    public int getBrightness(final float tint) {
         int i = super.getBrightness(tint);
         @SuppressWarnings("unused") int j = 240;
         int k = i >> 16 & 0xFF;
@@ -68,8 +68,8 @@ public class CannonFuse extends SpriteBillboardParticle {
     }
 
 	@Override
-    public float getSize(float tickDelta) {
-        float f = ((float)this.age + tickDelta) / (float)this.maxAge;
+    public float getSize(final float tickDelta) {
+        float f = ((float) this.age + tickDelta) / (float) this.maxAge;
 
         return this.scale * (1.0f - f * f);
     }
@@ -90,11 +90,11 @@ public class CannonFuse extends SpriteBillboardParticle {
 	public static class Factory implements ParticleFactory<DefaultParticleType> {
 		private final SpriteProvider sprites;
 
-		public Factory(SpriteProvider sprites) {
+		public Factory(final SpriteProvider sprites) {
 			this.sprites = sprites;
 		}
 
-		public Particle createParticle(DefaultParticleType type, ClientWorld level, double x, double y, double z, double xd, double yd, double zd) {
+		public Particle createParticle(final DefaultParticleType type, final ClientWorld level, final double x, final double y, final double z, final double xd, final double yd, final double zd) {
 			return new CannonFuse(level, x, y, z, this.sprites, xd, yd, zd);
 		}
 

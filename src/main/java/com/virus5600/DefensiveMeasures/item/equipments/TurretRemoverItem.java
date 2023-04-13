@@ -10,7 +10,7 @@ import net.minecraft.world.World;
 
 public class TurretRemoverItem extends ToolItem {
 
-	public TurretRemoverItem(ToolMaterial material, Settings settings) {
+	public TurretRemoverItem(final ToolMaterial material, final Settings settings) {
 		super(
 			material,
 			// RARITY
@@ -19,7 +19,7 @@ public class TurretRemoverItem extends ToolItem {
 	}
 
 	@Override
-	public boolean canMine(BlockState state, World world, BlockPos pos, PlayerEntity miner) {
+	public boolean canMine(final BlockState state, final World world, final BlockPos pos, final PlayerEntity miner) {
 		// CAN'T DESTROY IN CREATIVE
 		return !miner.isCreative();
 	}

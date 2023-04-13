@@ -23,24 +23,31 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 
 public interface Itemable {
-	public byte isFromItem();
+	/**
+	 * Identifies if this is from an item.
+	 * @return byte
+	 */
+	byte isFromItem();
 
-    public void setFromItem(byte fromItem);
+	/*
+	 *
+	 */
+    void setFromItem(byte fromItem);
 
-    public void copyDataToStack(ItemStack stack);
+    void copyDataToStack(ItemStack stack);
 
-    public void copyDataFromNbt(NbtCompound nbt);
+    void copyDataFromNbt(NbtCompound nbt);
 
     /**
      * Retrieves the item this turret is from.
      * @return {@link ItemStack}
      */
-    public ItemStack getEntityItem();
+    ItemStack getEntityItem();
 
-    public SoundEvent getTurretRemoveSound();
+    SoundEvent getTurretRemoveSound();
 
     @Deprecated
-    public static void copyDataToStack(MobEntity entity, ItemStack stack) {
+    static void copyDataToStack(MobEntity entity, ItemStack stack) {
         NbtCompound nbtCompound = stack.getOrCreateNbt();
         if (entity.hasCustomName()) {
             stack.setCustomName(entity.getCustomName());
@@ -64,7 +71,7 @@ public interface Itemable {
     }
 
     @Deprecated
-    public static void copyDataFromNbt(MobEntity entity, NbtCompound nbt) {
+    static void copyDataFromNbt(MobEntity entity, NbtCompound nbt) {
         if (nbt.contains("NoAI")) {
             entity.setAiDisabled(nbt.getBoolean("NoAI"));
         }
@@ -85,7 +92,7 @@ public interface Itemable {
         }
     }
 
-    public static <T extends LivingEntity> Optional<ActionResult> tryItem(PlayerEntity player, Hand hand, T entity, Item tool, Item modItem) {
+    static <T extends LivingEntity> Optional<ActionResult> tryItem(PlayerEntity player, Hand hand, T entity, Item tool, Item modItem) {
     	ItemStack itemStack = player.getStackInHand(hand);
     	if (itemStack.getItem() == tool && entity.isAlive()) {
         	World world = entity.world;
@@ -119,7 +126,7 @@ public interface Itemable {
             world.spawnEntity(itemStackEntity);
 
             if (!world.isClient) {
-                ModCriterion.TURRET_ITEM_RETRIEVED_CRITERION.trigger((ServerPlayerEntity)player, stack);
+                ModCriterion.TURRET_ITEM_RETRIEVED_CRITERION.trigger((ServerPlayerEntity) player, stack);
             }
 
             entity.discard();

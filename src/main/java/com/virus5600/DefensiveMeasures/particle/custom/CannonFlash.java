@@ -17,7 +17,7 @@ public class CannonFlash extends SpriteBillboardParticle {
 	private Vec3d source;
 
 	/// CONSTRUCTORS ///
-	protected CannonFlash(ClientWorld level, double x, double y, double z, SpriteProvider spriteSet, double xd, double yd, double zd) {
+	protected CannonFlash(final ClientWorld level, final double x, final double y, final double z, final SpriteProvider spriteSet, final double xd, final double yd, final double zd) {
 		super(level, x, y, z, xd, yd, zd);
 
 		this.velocityMultiplier = 1f;
@@ -33,7 +33,7 @@ public class CannonFlash extends SpriteBillboardParticle {
 		this.source = new Vec3d(x, y, z);
 
 		this.red = 1f;
-		this.green= 1f;
+		this.green = 1f;
 		this.blue = 1f;
 	}
 
@@ -51,8 +51,7 @@ public class CannonFlash extends SpriteBillboardParticle {
 		if (this.red <= 0.1 && this.green <= 0.1 && this.blue <= 0.1 && this.alpha > 0.05) {
 			this.alpha -= 0.05;
 
-			if (this.scale > 0)
-				this.scale = Math.min(this.scale - 0.5f, 0);
+			if (this.scale > 0) this.scale = Math.min(this.scale - 0.5f, 0);
 		}
 	}
 
@@ -63,7 +62,7 @@ public class CannonFlash extends SpriteBillboardParticle {
 	}
 
 	@Override
-    public int getBrightness(float tint) {
+    public int getBrightness(final float tint) {
         int i = super.getBrightness(tint);
         @SuppressWarnings("unused") int j = 240;
         int k = i >> 16 & 0xFF;
@@ -72,13 +71,13 @@ public class CannonFlash extends SpriteBillboardParticle {
     }
 
 	@Override
-    public float getSize(float tickDelta) {
-        float f = ((float)this.age + tickDelta) / (float)this.maxAge;
+    public float getSize(final float tickDelta) {
+        float f = ((float) this.age + tickDelta) / (float) this.maxAge;
 
         return this.scale * (1.0f - f * f);
     }
 
-	public void setVelocity(double vx, double vy, double vz) {
+	public void setVelocity(final double vx, final double vy, final double vz) {
 		super.setVelocity(vx, vy, vz);
 	}
 
@@ -106,11 +105,11 @@ public class CannonFlash extends SpriteBillboardParticle {
 	public static class Factory implements ParticleFactory<DefaultParticleType> {
 		private final SpriteProvider sprites;
 
-		public Factory(SpriteProvider sprites) {
+		public Factory(final SpriteProvider sprites) {
 			this.sprites = sprites;
 		}
 
-		public Particle createParticle(DefaultParticleType type, ClientWorld level, double x, double y, double z, double xd, double yd, double zd) {
+		public Particle createParticle(final DefaultParticleType type, final ClientWorld level, final double x, final double y, final double z, final double xd, final double yd, final double zd) {
 			return new CannonFlash(level, x, y, z, this.sprites, xd, yd, zd);
 		}
 

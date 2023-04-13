@@ -6,7 +6,7 @@ import net.minecraft.util.Rarity;
 
 public class CannonBaseItem extends Item {
 
-	public CannonBaseItem(Settings settings) {
+	public CannonBaseItem(final Settings settings) {
 		super(
 			// MAX STACK SIZE
 			settings.maxCount(16)

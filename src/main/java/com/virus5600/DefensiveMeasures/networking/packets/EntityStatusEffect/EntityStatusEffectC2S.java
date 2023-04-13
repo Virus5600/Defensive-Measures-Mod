@@ -9,23 +9,22 @@ import net.minecraft.network.Packet;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.registry.Registry;
 
-public class EntityStatusEffectC2S {
+public final class EntityStatusEffectC2S {
+	private EntityStatusEffectC2S() { }
+
 	/**
 	 * Sends a packet from the server to the client.
 	 * @param entityId
 	 * @param effect
 	 */
 	@SuppressWarnings("deprecation")
-	public static Packet<?> send(int entityId, StatusEffectInstance effect) {
+	public static Packet<?> send(final int entityId, final StatusEffectInstance effect) {
 		PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
 
 		byte flags = 0;
-		if (effect.isAmbient())
-			flags = (byte) (flags | 1);
-		if (effect.shouldShowParticles())
-			flags = (byte) (flags | 2);
-		if (effect.shouldShowIcon())
-			flags = (byte) (flags | 4);
+		if (effect.isAmbient()) flags = (byte) (flags | 1);
+		if (effect.shouldShowParticles()) flags = (byte) (flags | 2);
+		if (effect.shouldShowIcon()) flags = (byte) (flags | 4);
 
 		buf.writeVarInt(entityId);
 

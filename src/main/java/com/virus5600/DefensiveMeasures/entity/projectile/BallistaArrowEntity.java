@@ -23,24 +23,24 @@ public class BallistaArrowEntity extends PersistentProjectileEntity implements I
 	private AnimationFactory factory = new AnimationFactory(this);
 
 	/// CONSTRUCTORS ///
-	public BallistaArrowEntity(EntityType<? extends PersistentProjectileEntity> entityType, World world) {
-        super((EntityType<? extends PersistentProjectileEntity>)entityType, world);
+	public BallistaArrowEntity(final EntityType<? extends PersistentProjectileEntity> entityType, final World world) {
+        super((EntityType<? extends PersistentProjectileEntity>) entityType, world);
         this.setPierceLevel((byte) 5);
     }
 
-    public BallistaArrowEntity(World world, double x, double y, double z) {
+    public BallistaArrowEntity(final World world, final double x, final double y, final double z) {
         super(ModEntities.BALLISTA_ARROW, x, y, z, world);
         this.setPierceLevel((byte) 5);
     }
 
-    public BallistaArrowEntity(World world, LivingEntity owner) {
+    public BallistaArrowEntity(final World world, final LivingEntity owner) {
         super(ModEntities.BALLISTA_ARROW, owner, world);
         this.setPierceLevel((byte) 5);
     }
 
 	/// METHODS ///
     // PRIVATE
-    private <E extends IAnimatable> PlayState predicate(AnimationEvent<E> event) {
+    private <E extends IAnimatable> PlayState predicate(final AnimationEvent<E> event) {
 		event.getController().setAnimation(new AnimationBuilder().addAnimation("animation.ballista_arrow.idle"));
 		return PlayState.CONTINUE;
 	}
@@ -52,13 +52,13 @@ public class BallistaArrowEntity extends PersistentProjectileEntity implements I
     }
 
     @Override
-    protected void onHit(LivingEntity target) {
+    protected void onHit(final LivingEntity target) {
     	this.setPierceLevel((byte) 5);
         super.onHit(target);
     }
 
     @Override
-    protected void onEntityHit(EntityHitResult entityHitResult) {
+    protected void onEntityHit(final EntityHitResult entityHitResult) {
     	this.setPierceLevel((byte) 5);
     	super.onEntityHit(entityHitResult);
     }
@@ -70,7 +70,7 @@ public class BallistaArrowEntity extends PersistentProjectileEntity implements I
     }
 
 	@Override
-	public void registerControllers(AnimationData data) {
+	public void registerControllers(final AnimationData data) {
 		data.addAnimationController(new AnimationController<IAnimatable>(this, "idle", 0, this::predicate));
 	}
 
