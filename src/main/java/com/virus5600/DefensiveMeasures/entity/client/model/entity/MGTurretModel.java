@@ -31,7 +31,7 @@ public class MGTurretModel extends AnimatedGeoModel<MGTurretEntity> {
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
 	public void setLivingAnimations(final MGTurretEntity entity, final Integer uniqueID, final AnimationEvent customPredicate) {
-		super.setLivingAnimations(entity, uniqueID, customPredicate);
+		super.setCustomAnimations(entity, uniqueID, customPredicate);
 		IBone base = this.getAnimationProcessor().getBone("base");
 		IBone neck = this.getAnimationProcessor().getBone("body");
 		IBone head = this.getAnimationProcessor().getBone("head");

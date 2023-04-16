@@ -46,12 +46,19 @@ import net.minecraft.world.World;
 import software.bernie.geckolib3.core.IAnimatable;
 import software.bernie.geckolib3.core.PlayState;
 import software.bernie.geckolib3.core.builder.AnimationBuilder;
+import software.bernie.geckolib3.core.builder.ILoopType.EDefaultLoopTypes;
 import software.bernie.geckolib3.core.controller.AnimationController;
 import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
 import software.bernie.geckolib3.core.manager.AnimationData;
 import software.bernie.geckolib3.core.manager.AnimationFactory;
+import software.bernie.geckolib3.util.GeckoLibUtil;
 
 public class MGTurretEntity extends TurretEntity implements IAnimatable, RangedAttackMob, Itemable {
+	/**
+	 * Identifies how long the entity should wait before firing once more.
+	 * The formula use in this is "<code>T * S</code>", whereas <code>T</code>
+	 * represents the ticks (constant at 20) and <code>S</code> as real-time seconds.
+	 */
 	private static final int TOTAL_ATTACK_COOLDOWN = (int) (20 * 5);
 	/**
 	 * Contains all the items that can heal this entity.
@@ -61,12 +68,12 @@ public class MGTurretEntity extends TurretEntity implements IAnimatable, RangedA
 	 * Contains all the items that can give effect to this entity.
 	 */
 	private static Map<Item, List<Object[]>> effectSource;
-	private AnimationFactory factory = new AnimationFactory(this);
+	private AnimationFactory factory = GeckoLibUtil.createFactory(this);
 	@Nullable
 	private LivingEntity currentTarget = null;
 	private Vec3d barrelPos = getRelativePos(0, -.175, .5);
 	private double attCooldown = TOTAL_ATTACK_COOLDOWN;
-	private int projectileShootCooldown = 1;
+	private int projectileShootCooldown = 2;
 	private int getProjectilesFired = 0;
 	private boolean playAnimation = true;
 	private static final TrackedData<Boolean> SHOULD_SKIP_ATTACK;
@@ -82,13 +89,13 @@ public class MGTurretEntity extends TurretEntity implements IAnimatable, RangedA
 	// METHODS //
 	// PRIVATE
 	private <E extends IAnimatable> PlayState idlePredicate(final AnimationEvent<E> event) {
-		event.getController().setAnimation(new AnimationBuilder().addAnimation("animation.machine_gun_turret.setup", true));
+		event.getController().setAnimation(new AnimationBuilder().addAnimation("animation.machine_gun_turret.setup", EDefaultLoopTypes.LOOP));
 		return PlayState.CONTINUE;
 	}
 
 	private <E extends IAnimatable> PlayState lookAtTargetPredicate(final AnimationEvent<E> event) {
 		if (this.hasTarget()) {
-			event.getController().setAnimation(new AnimationBuilder().addAnimation("animation.machine_gun_turret.look_at_target", true));
+			event.getController().setAnimation(new AnimationBuilder().addAnimation("animation.machine_gun_turret.look_at_target", EDefaultLoopTypes.LOOP));
 			return PlayState.CONTINUE;
 		}
 
@@ -135,7 +142,7 @@ public class MGTurretEntity extends TurretEntity implements IAnimatable, RangedA
 	}
 
 	// PROTECTED
-		@Override
+	@Override
 	protected void initGoals() {
 		// Goals
 		this.goalSelector.add(1, new ProjectileAttackGoal(this, 0, TOTAL_ATTACK_COOLDOWN, 16.8125F));

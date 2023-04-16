@@ -2,22 +2,21 @@ package com.virus5600.DefensiveMeasures.entity.projectile;
 
 import java.util.List;
 
-import com.virus5600.DefensiveMeasures.entity.ModEntities;
 import com.virus5600.DefensiveMeasures.networking.packets.SpawnEvent.SpawnEventC2SPacket;
+import com.virus5600.DefensiveMeasures.sound.ModSoundEvents;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.block.Material;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.projectile.ExplosiveProjectileEntity;
 import net.minecraft.network.Packet;
 import net.minecraft.particle.ParticleEffect;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.sound.SoundEvent;
-import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
@@ -31,93 +30,88 @@ import software.bernie.geckolib3.core.manager.AnimationData;
 import software.bernie.geckolib3.core.manager.AnimationFactory;
 import software.bernie.geckolib3.util.GeckoLibUtil;
 
-public class CannonballEntity extends ExplosiveProjectileEntity implements IAnimatable {
+public class AntiAirProjectileEntity extends CannonballEntity implements IAnimatable {
 	private LivingEntity shooter;
 	private AnimationFactory factory = GeckoLibUtil.createFactory(this);
 
-	public SoundEvent hitSound = this.getHitSound();
-
 	/// CONSTRUCTORS ///
-	public CannonballEntity(final EntityType<? extends ExplosiveProjectileEntity> entityType, final World world) {
-		super((EntityType<? extends ExplosiveProjectileEntity>) entityType, world);
-		this.setFireTicks(0);
-		this.setOnFire(false);
-		this.setNoGravity(false);
-		super.setNoGravity(false);
-	}
-
-	public CannonballEntity(final World world, final LivingEntity owner) {
-        this(ModEntities.CANNONBALL, world);
-        this.setOwner(owner);
-        this.setOnFire(false);
-        this.setNoGravity(false);
-        super.setNoGravity(false);
+	public AntiAirProjectileEntity(final EntityType<? extends CannonballEntity> entityType, final World world) {
+        super((EntityType<? extends CannonballEntity>) entityType, world);
     }
 
-	public CannonballEntity(final EntityType<? extends ExplosiveProjectileEntity> type, final LivingEntity owner, final double directionX, final double directionY, final double directionZ, final World world) {
+	public AntiAirProjectileEntity(final World world, final LivingEntity owner) {
+		super(world, owner);
+	}
+
+	public AntiAirProjectileEntity(final EntityType<? extends CannonballEntity> type, final LivingEntity owner, final double directionX, final double directionY, final double directionZ, final World world) {
 		super(type, owner, directionX, directionY, directionZ, world);
-		this.setOnFire(false);
-        this.setNoGravity(false);
-        super.setNoGravity(false);
 	}
 
 	/// METHODS ///
-	// PRIVATE
+    // PRIVATE
 	@Environment(EnvType.CLIENT)
 	private ParticleEffect getParticleParameters() {
-		return ParticleTypes.CLOUD;
+		return ParticleTypes.LAVA;
 	}
 
-	// PROTECTED
-	@Override
-	protected void onBlockHit(final BlockHitResult blockHitResult) {
-		super.onBlockHit(blockHitResult);
+    // PROTECTED
+    @Override
+    protected void onBlockHit(final BlockHitResult blockHitResult) {
+    	super.onBlockHit(blockHitResult);
 
-		if (!this.world.isClient) {
+    	if (!this.world.isClient()) {
+    		this.doDamage();
+    		this.world.createExplosion(
+    			this,
+    			this.getX(),
+    			this.getBodyY(0.0625),
+    			this.getZ(),
+    			0.5f,
+    			true,
+    			Explosion.DestructionType.NONE
+    		);
+    		this.discard();
+    	}
+
+    	// Identifies what block was hit
+    	SoundEvent soundToPlay;
+    	Material mat = world.getBlockState(blockHitResult.getBlockPos()).getMaterial();
+
+    	if (mat.equals(Material.METAL)) {
+    		soundToPlay = ModSoundEvents.BULLET_IMPACT_METAL;
+    	}
+    	else if (mat.equals(Material.STONE)) {
+    		soundToPlay = ModSoundEvents.BULLET_IMPACT_STONE;
+    	}
+    	else if (mat.equals(Material.WOOD)) {
+    		soundToPlay = ModSoundEvents.BULLET_IMPACT_WOOD;
+    	}
+    	else {
+    		soundToPlay = ModSoundEvents.BULLET_IMPACT_DIRT;
+    	}
+
+    	this.setSound(soundToPlay);
+    }
+
+    @Override
+    protected void onEntityHit(final EntityHitResult entityHitResult) {
+    	if (!this.world.isClient) {
 			this.doDamage();
 			this.world.createExplosion(
 				this,
 				this.getX(),
 				this.getBodyY(0.0625),
 				this.getZ(),
-				1.25F,
-				false,
+				0.5F,
+				true,
 				Explosion.DestructionType.NONE
 			);
 			this.remove(Entity.RemovalReason.DISCARDED);
 		}
-		this.setSound(SoundEvents.ENTITY_GENERIC_EXPLODE);
-	}
-
-	@Override
-	protected void onEntityHit(final EntityHitResult entityHitResult) {
-		if (!this.world.isClient) {
-			this.doDamage();
-			this.world.createExplosion(
-				this,
-				this.getX(),
-				this.getBodyY(0.0625),
-				this.getZ(),
-				1.25F,
-				false,
-				Explosion.DestructionType.NONE
-			);
-			this.remove(Entity.RemovalReason.DISCARDED);
-		}
-	}
-
-	@Override
-	protected boolean isBurning() {
-        return false;
     }
 
-	@Override
-	protected ParticleEffect getParticleType() {
-        return ParticleTypes.CLOUD;
-    }
-
-	@Override
-	protected void onCollision(final HitResult hitResult) {
+    @Override
+    protected void onCollision(final HitResult hitResult) {
 		super.onCollision(hitResult);
 		if (!this.world.isClient) {
 			this.world.sendEntityStatus(this, (byte) 3);
@@ -127,21 +121,17 @@ public class CannonballEntity extends ExplosiveProjectileEntity implements IAnim
 				this.getX(),
 				this.getBodyY(0.0625),
 				this.getZ(),
-				1.25F,
-				false,
+				0.5F,
+				true,
 				Explosion.DestructionType.NONE
 			);
 			this.discard();
 		}
 	}
 
-	protected SoundEvent getHitSound() {
-		return SoundEvents.ENTITY_GENERIC_EXPLODE;
-	}
-
-	// PUBLIC
-	@Override
-	@Environment(EnvType.CLIENT)
+    // PUBLIC
+    @Override
+    @Environment(EnvType.CLIENT)
 	public void handleStatus(final byte status) {
 		if (status == 3) {
 			ParticleEffect particleEffect = this.getParticleParameters();
@@ -152,8 +142,9 @@ public class CannonballEntity extends ExplosiveProjectileEntity implements IAnim
 		}
 	}
 
-	public void doDamage() {
-		float q = 4.0F;
+    @Override
+    public void doDamage() {
+    	float q = 1.5F;
 		int xp = MathHelper.floor(this.getX() - (double) q - 1.0D);
 		int xm = MathHelper.floor(this.getX() + (double) q + 1.0D);
 		int yp = MathHelper.floor(this.getY() - (double) q - 1.0D);
@@ -178,22 +169,18 @@ public class CannonballEntity extends ExplosiveProjectileEntity implements IAnim
 				}
 			}
 		}
-	}
+    }
 
-	public void setSound(final SoundEvent soundIn) {
-		this.hitSound = soundIn;
-	}
-
-	@Override
+    @Override
 	public void registerControllers(final AnimationData data) {
 	}
 
-	@Override
+    @Override
 	public AnimationFactory getFactory() {
 		return this.factory;
 	}
 
-	@Override
+    @Override
 	public void tick() {
 		super.tick();
 
@@ -201,12 +188,12 @@ public class CannonballEntity extends ExplosiveProjectileEntity implements IAnim
 		if (!this.hasNoGravity()) {
             this.setVelocity(this.getVelocity().add(0.0, -d / 4.0, 0.0));
             if (this.getVelocity().y < 0 && this.getVelocity().y > -1) {
-            	this.setVelocity(this.getVelocity().multiply(1.0, 1.375, 1.0));
+            	this.setVelocity(this.getVelocity().multiply(1.125, 1.5, 1.125));
             }
         }
 	}
 
-	@Override
+    @Override
 	public Packet<?> createSpawnPacket() {
 		return SpawnEventC2SPacket.send(this);
 	}

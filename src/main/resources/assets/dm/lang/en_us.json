@@ -36,6 +36,9 @@
 	"entity.dm.mg_turret" : "MG Turret",
 	"entity.dm.mg_bullet" : "MG Bullet",
 
+	"entity.dm.anti_air" : "Anti-Air Turret",
+	"entity.dm.flak" : "Flak Round",
+
 	"death.attack.arrowhead" : "%1$s stepepd on an Arrowhead",
 	"death.attack.arrowhead.player" : "%1$s stepped on a random Arrowhead whilst fighting with %2$s",
 
@@ -46,13 +49,24 @@
 	"subtitles.turret.bow.repair" : "Repaired Bow Turret",
 	"subtitles.turret.wood.repair" : "Repaired Wooden Turret",
 
+	"subtitles.generic.impact.bullet.dirt" : "Bullet impacted on dirt",
+	"subtitles.generic.impact.bullet.metal" : "Bullet impacted on metal",
+	"subtitles.generic.impact.bullet.stone" : "Bullet impacted on stone",
+	"subtitles.generic.impact.bullet.wood" : "Bullet impacted on wood",
+
 	"subtitles.turret.cannon.hurt" : "Cannon Turret damaged",
 	"subtitles.turret.cannon.destroyed" : "Cannon Turret destroyed",
 	"subtitles.turret.cannon.shoot" : "Cannon Turret shoots",
+
 	"subtitles.turret.ballista.hurt" : "Ballista damaged",
 	"subtitles.turret.ballista.destroyed" : "Ballista destroyed",
 	"subtitles.turret.ballista.shoot" : "Ballista shoots",
-	"subtitles.turret.mg_turret.hurt" : "MG Turret damage",
+
+	"subtitles.turret.mg_turret.hurt" : "MG Turret damaged",
 	"subtitles.turret.mg_turret.destroyed" : "MG Turret destroyed",
-	"subtitles.turret.mg_turret.shoot" : "MG Turret shoots"
+	"subtitles.turret.mg_turret.shoot" : "MG Turret shoots",
+
+	"subtitles.turret.anti_air.hurt" : "Anti-air Turret damaged",
+	"subtitles.turret.anti_air.destroyed" : "Anti-air Turret destroyed",
+	"subtitles.turret.anti_air.shoot" : "Anti-air Turret shoots"
 }

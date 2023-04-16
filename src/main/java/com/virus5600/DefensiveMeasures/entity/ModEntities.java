@@ -4,6 +4,8 @@ import com.virus5600.DefensiveMeasures.DefensiveMeasures;
 import com.virus5600.DefensiveMeasures.entity.custom.BallistaTurretEntity;
 import com.virus5600.DefensiveMeasures.entity.custom.CannonTurretEntity;
 import com.virus5600.DefensiveMeasures.entity.custom.MGTurretEntity;
+import com.virus5600.DefensiveMeasures.entity.custom.AntiAirTurretEntity;
+import com.virus5600.DefensiveMeasures.entity.projectile.AntiAirProjectileEntity;
 import com.virus5600.DefensiveMeasures.entity.projectile.BallistaArrowEntity;
 import com.virus5600.DefensiveMeasures.entity.projectile.CannonballEntity;
 import com.virus5600.DefensiveMeasures.entity.projectile.MGBulletEntity;
@@ -20,7 +22,7 @@ public final class ModEntities {
 	private ModEntities() { }
 
 	/// TURRETS
-	// v1.0.0
+	// v1.0.0-beta
 	public static final EntityType<CannonTurretEntity> CANNON_TURRET = Registry.register(
 		Registry.ENTITY_TYPE,
 		new Identifier(DefensiveMeasures.MOD_ID, "cannon_turret"),
@@ -46,8 +48,18 @@ public final class ModEntities {
 			.build()
 	);
 
+	// v1.1.0-beta
+	public static final EntityType<AntiAirTurretEntity> ANTI_AIR_TURRET = Registry.register(
+			Registry.ENTITY_TYPE,
+			new Identifier(DefensiveMeasures.MOD_ID, "anti_air_turret"),
+			FabricEntityTypeBuilder
+				.create(SpawnGroup.MISC, AntiAirTurretEntity::new)
+				.dimensions(EntityDimensions.changing(0.875f, 0.875f))
+				.build()
+		);
+
 	/// PROJECTILES
-	// v1.0.0
+	// v1.0.0-beta
 	public static final EntityType<CannonballEntity> CANNONBALL = Registry.register(
 		Registry.ENTITY_TYPE,
 		new Identifier(DefensiveMeasures.MOD_ID, "cannonball"),
@@ -70,6 +82,16 @@ public final class ModEntities {
 		FabricEntityTypeBuilder.<MGBulletEntity>create(SpawnGroup.MISC, MGBulletEntity::new)
 		.dimensions(EntityDimensions.fixed(0.125f, 0.125f))
 		.build()
+	);
+
+	// v1.1.0-beta
+	public static final EntityType<AntiAirProjectileEntity> ANTI_AIR_PROJECTILE = Registry.register(
+		Registry.ENTITY_TYPE,
+		new Identifier(DefensiveMeasures.MOD_ID, "anti_air_projectile"),
+		FabricEntityTypeBuilder
+			.<AntiAirProjectileEntity>create(SpawnGroup.MISC, AntiAirProjectileEntity::new)
+			.dimensions(EntityDimensions.fixed(0.125f, 0.125f))
+			.build()
 	);
 
 	public static void registerModEntityAttributes() {

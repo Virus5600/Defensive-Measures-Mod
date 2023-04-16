@@ -31,7 +31,7 @@ public class CannonTurretModel extends AnimatedGeoModel<CannonTurretEntity> {
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
 	public void setLivingAnimations(final CannonTurretEntity entity, final Integer uniqueID, final AnimationEvent customPredicate) {
-		super.setLivingAnimations(entity, uniqueID, customPredicate);
+		super.setCustomAnimations(entity, uniqueID, customPredicate);
 		IBone base = this.getAnimationProcessor().getBone("base");
 		IBone neck = this.getAnimationProcessor().getBone("stand");
 		IBone head = this.getAnimationProcessor().getBone("head");

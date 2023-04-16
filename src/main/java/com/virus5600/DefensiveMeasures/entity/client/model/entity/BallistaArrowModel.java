@@ -29,6 +29,6 @@ public class BallistaArrowModel extends AnimatedGeoModel<BallistaArrowEntity> {
 	@SuppressWarnings("rawtypes")
 	@Override
 	public void setLivingAnimations(final BallistaArrowEntity entity, final Integer uniqueID, final AnimationEvent customPredicate) {
-		super.setLivingAnimations(entity, uniqueID, customPredicate);
+		super.setCustomAnimations(entity, uniqueID, customPredicate);
 	}
 }

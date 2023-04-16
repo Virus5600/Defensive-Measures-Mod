@@ -1,6 +1,8 @@
 {
 	"values": [
 		"dm:cannonball",
-		"dm:ballista_arrow"
+		"dm:ballista_arrow",
+		"dm:mg_bullet",
+		"dm:anti_air_projectile"
 	]
 }

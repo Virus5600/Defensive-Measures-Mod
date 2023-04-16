@@ -29,6 +29,6 @@ public class CannonballModel extends AnimatedGeoModel<CannonballEntity> {
 	@SuppressWarnings("rawtypes")
 	@Override
 	public void setLivingAnimations(final CannonballEntity entity, final Integer uniqueID, final AnimationEvent customPredicate) {
-		super.setLivingAnimations(entity, uniqueID, customPredicate);
+		super.setCustomAnimations(entity, uniqueID, customPredicate);
 	}
 }

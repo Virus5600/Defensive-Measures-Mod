@@ -29,6 +29,6 @@ public class MGBulletModel extends AnimatedGeoModel<MGBulletEntity> {
 	@SuppressWarnings("rawtypes")
 	@Override
 	public void setLivingAnimations(final MGBulletEntity entity, final Integer uniqueID, final AnimationEvent customPredicate) {
-		super.setLivingAnimations(entity, uniqueID, customPredicate);
+		super.setCustomAnimations(entity, uniqueID, customPredicate);
 	}
 }

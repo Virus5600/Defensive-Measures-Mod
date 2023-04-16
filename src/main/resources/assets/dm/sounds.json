@@ -1,4 +1,33 @@
 {
+	"generic.impact.bullet.dirt": {
+		"sounds": [
+			"dm:turrets/bullet_impacts/bullet_impact_dirt1",
+			"dm:turrets/bullet_impacts/bullet_impact_dirt2"
+		],
+		"subtitle": "subtitles.generic.impact.bullet.dirt"
+	},
+	"generic.impact.bullet.metal": {
+		"sounds": [
+			"dm:turrets/bullet_impacts/bullet_impact_metal1",
+			"dm:turrets/bullet_impacts/bullet_impact_metal2"
+		],
+		"subtitle": "subtitles.generic.impact.bullet.metal"
+	},
+	"generic.impact.bullet.stone": {
+		"sounds": [
+			"dm:turrets/bullet_impacts/bullet_impact_stone1"
+		],
+		"subtitle": "subtitles.generic.impact.bullet.stone"
+	},
+	"generic.impact.bullet.wood": {
+		"sounds": [
+			"dm:turrets/bullet_impacts/bullet_impact_wood1",
+			"dm:turrets/bullet_impacts/bullet_impact_wood2",
+			"dm:turrets/bullet_impacts/bullet_impact_wood3"
+		],
+		"subtitle": "subtitles.generic.impact.bullet.wood"
+	},
+
 	"turret.remove.metal": {
 		"sounds": [
 			{

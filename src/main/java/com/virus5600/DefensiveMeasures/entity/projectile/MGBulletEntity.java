@@ -2,7 +2,9 @@ package com.virus5600.DefensiveMeasures.entity.projectile;
 
 import com.virus5600.DefensiveMeasures.entity.ModEntities;
 import com.virus5600.DefensiveMeasures.networking.packets.SpawnEvent.SpawnEventC2SPacket;
+import com.virus5600.DefensiveMeasures.sound.ModSoundEvents;
 
+import net.minecraft.block.Material;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.projectile.PersistentProjectileEntity;
@@ -10,6 +12,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.network.Packet;
 import net.minecraft.particle.BlockStateParticleEffect;
 import net.minecraft.particle.ParticleTypes;
+import net.minecraft.sound.SoundEvent;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.math.MathHelper;
@@ -22,26 +25,25 @@ import software.bernie.geckolib3.core.controller.AnimationController;
 import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
 import software.bernie.geckolib3.core.manager.AnimationData;
 import software.bernie.geckolib3.core.manager.AnimationFactory;
+import software.bernie.geckolib3.util.GeckoLibUtil;
 
 public class MGBulletEntity extends PersistentProjectileEntity implements IAnimatable {
-	private AnimationFactory factory = new AnimationFactory(this);
+	private AnimationFactory factory = GeckoLibUtil.createFactory(this);
+	private SoundEvent hitSound;
 
 	/// CONSTRUCTORS ///
 	public MGBulletEntity(final EntityType<? extends PersistentProjectileEntity> entityType, final World world) {
         super((EntityType<? extends PersistentProjectileEntity>) entityType, world);
-        this.setPierceLevel((byte) 2);
         this.setDamage(5.0);
     }
 
     public MGBulletEntity(final World world, final double x, final double y, final double z) {
         super(ModEntities.MG_BULLET, x, y, z, world);
-        this.setPierceLevel((byte) 2);
         this.setDamage(5.0);
     }
 
     public MGBulletEntity(final World world, final LivingEntity owner) {
         super(ModEntities.MG_BULLET, owner, world);
-        this.setPierceLevel((byte) 2);
         this.setDamage(5.0);
     }
 
@@ -61,7 +63,7 @@ public class MGBulletEntity extends PersistentProjectileEntity implements IAnima
     @Override
     protected void onHit(final LivingEntity target) {
     	if (target.getType().getDimensions().width > 1.125) {
-    		this.setPierceLevel((byte) 0);
+    		this.setHitSound(ModSoundEvents.BULLET_IMPACT_DIRT);
     	}
 
         super.onHit(target);
@@ -70,7 +72,7 @@ public class MGBulletEntity extends PersistentProjectileEntity implements IAnima
     @Override
     protected void onEntityHit(final EntityHitResult entityHitResult) {
     	if (entityHitResult.getEntity().getType().getDimensions().width > 1.125) {
-    		this.setPierceLevel((byte) 0);
+    		this.setHitSound(ModSoundEvents.BULLET_IMPACT_DIRT);
     	}
 
     	super.onEntityHit(entityHitResult);
@@ -92,11 +94,37 @@ public class MGBulletEntity extends PersistentProjectileEntity implements IAnima
 				MathHelper.nextDouble(this.random, -0.01, 0.01)
 			);
     	}
-
     	this.discard();
+
+    	// Identifies what block was hit
+    	SoundEvent soundToPlay;
+    	Material mat = world.getBlockState(blockHitResult.getBlockPos()).getMaterial();
+
+    	if (mat.equals(Material.METAL)) {
+    		soundToPlay = ModSoundEvents.BULLET_IMPACT_METAL;
+    	}
+    	else if (mat.equals(Material.STONE)) {
+    		soundToPlay = ModSoundEvents.BULLET_IMPACT_STONE;
+    	}
+    	else if (mat.equals(Material.WOOD)) {
+    		soundToPlay = ModSoundEvents.BULLET_IMPACT_WOOD;
+    	}
+    	else {
+    		soundToPlay = ModSoundEvents.BULLET_IMPACT_DIRT;
+    	}
+
+    	this.setHitSound(soundToPlay);
     }
 
     // PUBLIC
+    @Override
+    public SoundEvent getHitSound() {
+        return this.hitSound;
+    }
+
+    public void setHitSound(final SoundEvent hitSound) {
+    	this.hitSound = hitSound;
+    }
     @Override
     public void tick() {
         super.tick();

@@ -47,12 +47,19 @@ import net.minecraft.world.World;
 import software.bernie.geckolib3.core.IAnimatable;
 import software.bernie.geckolib3.core.PlayState;
 import software.bernie.geckolib3.core.builder.AnimationBuilder;
+import software.bernie.geckolib3.core.builder.ILoopType.EDefaultLoopTypes;
 import software.bernie.geckolib3.core.controller.AnimationController;
 import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
 import software.bernie.geckolib3.core.manager.AnimationData;
 import software.bernie.geckolib3.core.manager.AnimationFactory;
+import software.bernie.geckolib3.util.GeckoLibUtil;
 
 public class CannonTurretEntity extends TurretEntity implements IAnimatable, RangedAttackMob, Itemable {
+	/**
+	 * Identifies how long the entity should wait before firing once more.
+	 * The formula use in this is "<code>T * S</code>", whereas <code>T</code>
+	 * represents the ticks (constant at 20) and <code>S</code> as real-time seconds.
+	 */
 	private static final int TOTAL_ATTACK_COOLDOWN = 20 * 5;
 	private static final TrackedData<Boolean> FUSE_LIT;
 	/**
@@ -63,7 +70,7 @@ public class CannonTurretEntity extends TurretEntity implements IAnimatable, Ran
 	 * Contains all the items that can give effect to this entity.
 	 */
 	private static Map<Item, List<Object[]>> effectSource;
-	private AnimationFactory factory = new AnimationFactory(this);
+	private AnimationFactory factory = GeckoLibUtil.createFactory(this);
 	@Nullable
 	private LivingEntity currentTarget = null;
 	private double attCooldown = TOTAL_ATTACK_COOLDOWN;
@@ -79,13 +86,13 @@ public class CannonTurretEntity extends TurretEntity implements IAnimatable, Ran
 	// METHODS //
 	// PRIVATE
 	private <E extends IAnimatable> PlayState idlePredicate(final AnimationEvent<E> event) {
-		event.getController().setAnimation(new AnimationBuilder().addAnimation("animation.cannon_turret.setup", true));
+		event.getController().setAnimation(new AnimationBuilder().addAnimation("animation.cannon_turret.setup", EDefaultLoopTypes.LOOP));
 		return PlayState.CONTINUE;
 	}
 
 	private <E extends IAnimatable> PlayState lookAtTargetPredicate(final AnimationEvent<E> event) {
 		if (this.hasTarget()) {
-			event.getController().setAnimation(new AnimationBuilder().addAnimation("animation.cannon_turret.look_at_target", true));
+			event.getController().setAnimation(new AnimationBuilder().addAnimation("animation.cannon_turret.look_at_target", EDefaultLoopTypes.LOOP));
 			return PlayState.CONTINUE;
 		}
 
@@ -96,7 +103,7 @@ public class CannonTurretEntity extends TurretEntity implements IAnimatable, Ran
 	private <E extends IAnimatable> PlayState deathPredicate(final AnimationEvent<E> event) {
 		if (!this.isAlive() && !animPlayed) {
 			animPlayed = true;
-			event.getController().setAnimation(new AnimationBuilder().addAnimation("animation.cannon_turret.death", true));
+			event.getController().setAnimation(new AnimationBuilder().addAnimation("animation.cannon_turret.death", EDefaultLoopTypes.LOOP));
 			return PlayState.STOP;
 		}
 		return PlayState.CONTINUE;
@@ -152,7 +159,7 @@ public class CannonTurretEntity extends TurretEntity implements IAnimatable, Ran
 				0,
 				0
 			);
-			event.getController().setAnimation(new AnimationBuilder().addAnimation("animation.cannon_turret.fuse", true));
+			event.getController().setAnimation(new AnimationBuilder().addAnimation("animation.cannon_turret.fuse", EDefaultLoopTypes.LOOP));
 		}
 
 		return PlayState.CONTINUE;
