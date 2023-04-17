@@ -29,22 +29,24 @@ import software.bernie.geckolib3.util.GeckoLibUtil;
 
 public class MGBulletEntity extends PersistentProjectileEntity implements IAnimatable {
 	private AnimationFactory factory = GeckoLibUtil.createFactory(this);
-	private SoundEvent hitSound;
 
 	/// CONSTRUCTORS ///
 	public MGBulletEntity(final EntityType<? extends PersistentProjectileEntity> entityType, final World world) {
         super((EntityType<? extends PersistentProjectileEntity>) entityType, world);
         this.setDamage(5.0);
+        this.setSound(ModSoundEvents.BULLET_IMPACT_DIRT);
     }
 
     public MGBulletEntity(final World world, final double x, final double y, final double z) {
         super(ModEntities.MG_BULLET, x, y, z, world);
         this.setDamage(5.0);
+        this.setSound(ModSoundEvents.BULLET_IMPACT_DIRT);
     }
 
     public MGBulletEntity(final World world, final LivingEntity owner) {
         super(ModEntities.MG_BULLET, owner, world);
         this.setDamage(5.0);
+        this.setSound(ModSoundEvents.BULLET_IMPACT_DIRT);
     }
 
 	/// METHODS ///
@@ -61,18 +63,9 @@ public class MGBulletEntity extends PersistentProjectileEntity implements IAnima
     }
 
     @Override
-    protected void onHit(final LivingEntity target) {
-    	if (target.getType().getDimensions().width > 1.125) {
-    		this.setHitSound(ModSoundEvents.BULLET_IMPACT_DIRT);
-    	}
-
-        super.onHit(target);
-    }
-
-    @Override
     protected void onEntityHit(final EntityHitResult entityHitResult) {
     	if (entityHitResult.getEntity().getType().getDimensions().width > 1.125) {
-    		this.setHitSound(ModSoundEvents.BULLET_IMPACT_DIRT);
+    		this.setSound(ModSoundEvents.BULLET_IMPACT_DIRT);
     	}
 
     	super.onEntityHit(entityHitResult);
@@ -113,18 +106,10 @@ public class MGBulletEntity extends PersistentProjectileEntity implements IAnima
     		soundToPlay = ModSoundEvents.BULLET_IMPACT_DIRT;
     	}
 
-    	this.setHitSound(soundToPlay);
+    	this.setSound(soundToPlay);
     }
 
     // PUBLIC
-    @Override
-    public SoundEvent getHitSound() {
-        return this.hitSound;
-    }
-
-    public void setHitSound(final SoundEvent hitSound) {
-    	this.hitSound = hitSound;
-    }
     @Override
     public void tick() {
         super.tick();
