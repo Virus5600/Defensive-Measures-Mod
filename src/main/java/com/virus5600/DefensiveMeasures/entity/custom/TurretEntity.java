@@ -268,6 +268,16 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
         return !bl;
     }
 
+	protected final Vec3d getHeadRotationVector() {
+        float f = this.getPitch() * ((float)Math.PI / 180);
+        float g = -this.getHeadYaw()* ((float)Math.PI / 180);
+        float h = MathHelper.cos(g);
+        float i = MathHelper.sin(g);
+        float j = MathHelper.cos(f);
+        float k = MathHelper.sin(f);
+        return new Vec3d(i * j, -k, h * j);
+    }
+
 	// PUBLIC
 	public Vec3d getRelativePos(double offset) {
 		return this.getRelativePos(offset, offset, offset);

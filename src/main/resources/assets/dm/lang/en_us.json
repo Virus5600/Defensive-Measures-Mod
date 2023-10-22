@@ -41,6 +41,18 @@
 	
 	"subtitles.turret.remove.metal" : "Metallic Turret Removed",
 	"subtitles.turret.remove.wood" : "Wooden Turret Removed",
+
+	"subtitles.turret.iron.repair" : "Repaired Iron Turret",
+	"subtitles.turret.bow.repair" : "Repaired Bow Turret",
+	"subtitles.turret.wood.repair" : "Repaired Wooden Turret",
+
+	"subtitles.generic.impact.bullet.dirt" : "Bullet impacted on dirt",
+	"subtitles.generic.impact.bullet.flesh" : "Bullet hit an entity",
+	"subtitles.generic.impact.bullet.glass" : "Bullet impacted on glass",
+	"subtitles.generic.impact.bullet.metal" : "Bullet impacted on metal",
+	"subtitles.generic.impact.bullet.stone" : "Bullet impacted on stone",
+	"subtitles.generic.impact.bullet.wood" : "Bullet impacted on wood",
+
 	"subtitles.turret.cannon.hurt" : "Cannon Turret damaged",
 	"subtitles.turret.cannon.destroyed" : "Cannon Turret destroyed",
 	"subtitles.turret.cannon.shoot" : "Cannon Turret shoots",
@@ -49,5 +61,11 @@
 	"subtitles.turret.ballista.shoot" : "Ballista shoots",
 	"subtitles.turret.mg_turret.hurt" : "MG Turret damage",
 	"subtitles.turret.mg_turret.destroyed" : "MG Turret destroyed",
-	"subtitles.turret.mg_turret.shoot" : "MG Turret shoots"
+	"subtitles.turret.mg_turret.shoot" : "MG Turret shoots",
+
+	"subtitles.turret.anti_air.hurt" : "Anti-air Turret damaged",
+	"subtitles.turret.anti_air.destroyed" : "Anti-air Turret destroyed",
+	"subtitles.turret.anti_air.shoot.begin" : "Anti-air Turret begins shooting",
+	"subtitles.turret.anti_air.shoot" : "Anti-air Turret shoots",
+	"subtitles.turret.anti_air.shoot.end" : "Anti-air Turret finished shooting"
 }

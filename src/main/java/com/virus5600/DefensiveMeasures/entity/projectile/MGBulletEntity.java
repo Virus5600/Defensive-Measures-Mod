@@ -2,7 +2,9 @@ package com.virus5600.DefensiveMeasures.entity.projectile;
 
 import com.virus5600.DefensiveMeasures.entity.ModEntities;
 import com.virus5600.DefensiveMeasures.networking.packets.SpawnEvent.SpawnEventC2SPacket;
+import com.virus5600.DefensiveMeasures.sound.ModSoundEvents;
 
+import net.minecraft.block.Material;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.projectile.PersistentProjectileEntity;
@@ -10,6 +12,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.network.Packet;
 import net.minecraft.particle.BlockStateParticleEffect;
 import net.minecraft.particle.ParticleTypes;
+import net.minecraft.sound.SoundEvent;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.math.MathHelper;
@@ -27,8 +30,8 @@ public class MGBulletEntity extends PersistentProjectileEntity implements IAnima
 	private AnimationFactory factory = new AnimationFactory(this);
 
 	/// CONSTRUCTORS ///
-	public MGBulletEntity(EntityType<? extends PersistentProjectileEntity> entityType, World world) {
-        super((EntityType<? extends PersistentProjectileEntity>)entityType, world);
+	public MGBulletEntity(final EntityType<? extends MGBulletEntity> entityType, final World world) {
+        super((EntityType<? extends PersistentProjectileEntity>) entityType, world);
         this.setPierceLevel((byte) 2);
         this.setDamage(5.0);
     }
@@ -59,25 +62,48 @@ public class MGBulletEntity extends PersistentProjectileEntity implements IAnima
     }
 
     @Override
-    protected void onHit(LivingEntity target) {
-    	if (target.getType().getDimensions().width > 1.125) {
-    		this.setPierceLevel((byte) 0);
+    protected void onHit(final LivingEntity target) {
+    	if (!target.equals(null)) {
+    		this.setSound(ModSoundEvents.BULLET_IMPACT_FLESH);
     	}
 
-        super.onHit(target);
+    	super.onHit(target);
     }
 
     @Override
-    protected void onEntityHit(EntityHitResult entityHitResult) {
-    	if (entityHitResult.getEntity().getType().getDimensions().width > 1.125) {
-    		this.setPierceLevel((byte) 0);
+    protected void onEntityHit(final EntityHitResult entityHitResult) {
+    	if (entityHitResult.getEntity().getType() != null) {
+    		this.setSound(ModSoundEvents.BULLET_IMPACT_FLESH);
     	}
 
     	super.onEntityHit(entityHitResult);
     }
 
     @Override
-    protected void onBlockHit(BlockHitResult blockHitResult) {
+    protected void onBlockHit(final BlockHitResult blockHitResult) {
+    	// Identifies what block was hit
+    	SoundEvent soundToPlay;
+    	Material mat = world.getBlockState(blockHitResult.getBlockPos()).getMaterial();
+
+    	if (mat.equals(Material.GLASS)) {
+    		soundToPlay = ModSoundEvents.BULLET_IMPACT_GLASS;
+    	}
+    	else if (mat.equals(Material.METAL)) {
+    		soundToPlay = ModSoundEvents.BULLET_IMPACT_METAL;
+    	}
+    	else if (mat.equals(Material.STONE)) {
+    		soundToPlay = ModSoundEvents.BULLET_IMPACT_STONE;
+    	}
+    	else if (mat.equals(Material.WOOD)) {
+    		soundToPlay = ModSoundEvents.BULLET_IMPACT_WOOD;
+    	}
+    	else {
+    		soundToPlay = ModSoundEvents.BULLET_IMPACT_DIRT;
+    	}
+
+    	this.setSound(soundToPlay);
+
+    	// Call the parent's method
     	super.onBlockHit(blockHitResult);
 
     	for (int i = 0; i < ((Math.random() * (10 - 5)) + 5); i++) {
@@ -97,11 +123,6 @@ public class MGBulletEntity extends PersistentProjectileEntity implements IAnima
     }
 
     // PUBLIC
-    @Override
-    public void tick() {
-        super.tick();
-    }
-
 	@Override
 	public void registerControllers(AnimationData data) {
 		data.addAnimationController(new AnimationController<IAnimatable>(this, "idle", 0, this::predicate));

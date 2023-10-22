@@ -24,7 +24,22 @@ public class ModSoundEvents {
 	public final static SoundEvent TURRET_MG_DESTROYED = new SoundEvent(new Identifier(DefensiveMeasures.MOD_ID, "turret.mg_turret.destroyed"), 16f);
 	public final static SoundEvent TURRET_MG_SHOOT = new SoundEvent(new Identifier(DefensiveMeasures.MOD_ID, "turret.mg_turret.shoot"), 16f);
 
-	private static SoundEvent registerSoundEvent(SoundEvent sound) {
+	// v1.1.0-beta
+	public static final SoundEvent BULLET_IMPACT_DIRT = new SoundEvent(new Identifier(DefensiveMeasures.MOD_ID, "generic.impact.bullet.dirt"));
+	public static final SoundEvent BULLET_IMPACT_FLESH = new SoundEvent(new Identifier(DefensiveMeasures.MOD_ID, "generic.impact.bullet.flesh"));
+	public static final SoundEvent BULLET_IMPACT_GLASS = new SoundEvent(new Identifier(DefensiveMeasures.MOD_ID, "generic.impact.bullet.glass"));
+	public static final SoundEvent BULLET_IMPACT_METAL = new SoundEvent(new Identifier(DefensiveMeasures.MOD_ID, "generic.impact.bullet.metal"));
+	public static final SoundEvent BULLET_IMPACT_STONE = new SoundEvent(new Identifier(DefensiveMeasures.MOD_ID, "generic.impact.bullet.stone"));
+	public static final SoundEvent BULLET_IMPACT_WOOD = new SoundEvent(new Identifier(DefensiveMeasures.MOD_ID, "generic.impact.bullet.wood"));
+
+	// ANTI-AIR TURRET
+	public static final SoundEvent TURRET_ANTI_AIR_HURT = new SoundEvent(new Identifier(DefensiveMeasures.MOD_ID, "turret.anti_air_turret.hurt"), 16f);
+	public static final SoundEvent TURRET_ANTI_AIR_DESTROYED = new SoundEvent(new Identifier(DefensiveMeasures.MOD_ID, "turret.anti_air_turret.destroyed"), 16f);
+	public static final SoundEvent TURRET_ANTI_AIR_BEGIN_SHOOT = new SoundEvent(new Identifier(DefensiveMeasures.MOD_ID, "turret.anti_air_turret.shoot.begin"), 16f);
+	public static final SoundEvent TURRET_ANTI_AIR_SHOOT = new SoundEvent(new Identifier(DefensiveMeasures.MOD_ID, "turret.anti_air_turret.shoot"), 16f);
+	public static final SoundEvent TURRET_ANTI_AIR_END_SHOOT = new SoundEvent(new Identifier(DefensiveMeasures.MOD_ID, "turret.anti_air_turret.shoot.end"), 16f);
+
+	private static SoundEvent registerSoundEvent(final SoundEvent sound) {
 		return Registry.register(Registry.SOUND_EVENT, sound.getId(), sound);
 	}
 
@@ -46,7 +61,14 @@ public class ModSoundEvents {
 		registerSoundEvent(TURRET_MG_DESTROYED);
 		registerSoundEvent(TURRET_MG_SHOOT);
 
-		// V1.0 SFX
+		// v1.1.0-beta Turrets
+		registerSoundEvent(TURRET_ANTI_AIR_HURT);
+		registerSoundEvent(TURRET_ANTI_AIR_DESTROYED);
+		registerSoundEvent(TURRET_ANTI_AIR_BEGIN_SHOOT);
+		registerSoundEvent(TURRET_ANTI_AIR_SHOOT);
+		registerSoundEvent(TURRET_ANTI_AIR_END_SHOOT);
+
+		// v1.0.0-beta SFX
 		registerSoundEvent(TURRET_REMOVED_METAL);
 		registerSoundEvent(TURRET_REMOVED_WOOD);
 	}

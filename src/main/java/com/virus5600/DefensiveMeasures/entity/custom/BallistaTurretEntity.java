@@ -12,10 +12,10 @@ import com.virus5600.DefensiveMeasures.entity.ai.goal.TargetOtherTeamGoal;
 import com.virus5600.DefensiveMeasures.entity.projectile.BallistaArrowEntity;
 import com.virus5600.DefensiveMeasures.item.ModItems;
 import com.virus5600.DefensiveMeasures.sound.ModSoundEvents;
+import com.virus5600.DefensiveMeasures.util.Vec3dUtil;
 
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.RangedAttackMob;
 import net.minecraft.entity.ai.goal.ActiveTargetGoal;
 import net.minecraft.entity.ai.goal.LookAroundGoal;
 import net.minecraft.entity.ai.goal.LookAtEntityGoal;
@@ -43,7 +43,7 @@ import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
 import software.bernie.geckolib3.core.manager.AnimationData;
 import software.bernie.geckolib3.core.manager.AnimationFactory;
 
-public class BallistaTurretEntity extends TurretEntity implements IAnimatable, RangedAttackMob, Itemable {
+public class BallistaTurretEntity extends TurretEntity implements IAnimatable {
 	private static final int totalAttCooldown = (int) (20 * 2.5);
 	/**
 	 * Contains all the items that can heal this entity.
@@ -73,6 +73,7 @@ public class BallistaTurretEntity extends TurretEntity implements IAnimatable, R
 		return PlayState.CONTINUE;
 	}
 
+
 	private <E extends IAnimatable> PlayState lookAtTargetPredicate(AnimationEvent<E> event) {
 		event.getController().setAnimation(new AnimationBuilder().addAnimation("animation.ballista.look_at_target", true));
 		return PlayState.CONTINUE;
@@ -99,7 +100,7 @@ public class BallistaTurretEntity extends TurretEntity implements IAnimatable, R
 	}
 
 	// PROTECTED
-		@Override
+	@Override
 	protected void initGoals() {
 		// Goals
 		this.goalSelector.add(1, new ProjectileAttackGoal(this, 0, totalAttCooldown, 16.8125F));
@@ -158,10 +159,34 @@ public class BallistaTurretEntity extends TurretEntity implements IAnimatable, R
 	}
 
 	@Override
-	public void attack(LivingEntity target, float pullProgress) {
-		this.setShooting(true);
+	public void attack(final LivingEntity target, final float pullProgress) {
+		if (this.isAlive()) {
+			this.setShooting(true);
 
-		if (target == null) {
+			if (target == null) {
+				this.setShooting(false);
+				return;
+			}
+
+			try {
+				double vx = (target.getX() - this.getX()) * 1.0625;
+				double vy = target.getBodyY(2 / 3) - this.getY() + 0.25;
+				double vz = (target.getZ() - this.getZ()) * 1.0625;
+				double variance = Math.sqrt(vx * vx + vz * vz);
+				float divergence = 0 + this.world.getDifficulty().getId() * 2;
+				ProjectileEntity projectile = (ProjectileEntity) new BallistaArrowEntity(world, this);
+
+				projectile.setVelocity(vx, vy + variance * 0.2f, vz, 1.5f, divergence);
+				projectile.setPos(this.getX(), this.getY() + 0.8125, this.getZ());
+
+				this.playSound(this.getShootSound(), 1.0f, 1.0f / (this.getRandom().nextFloat() * 0.4f + 0.8f));
+				this.world.spawnEntity(projectile);
+			}
+			catch (IllegalArgumentException | SecurityException e) {
+				e.printStackTrace();
+			}
+		}
+		else {
 			this.setShooting(false);
 			return;
 		}

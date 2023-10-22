@@ -1,4 +1,51 @@
 {
+	"generic.impact.bullet.dirt": {
+		"sounds": [
+			"dm:turrets/bullet_impacts/bullet_impact_dirt1",
+			"dm:turrets/bullet_impacts/bullet_impact_dirt2",
+			"dm:turrets/bullet_impacts/bullet_impact_dirt3",
+			"dm:turrets/bullet_impacts/bullet_impact_dirt4",
+			"dm:turrets/bullet_impacts/bullet_impact_dirt5"
+		],
+		"subtitle": "subtitles.generic.impact.bullet.dirt"
+	},
+	"generic.impact.bullet.flesh": {
+		"sounds": [
+			"dm:turrets/bullet_impacts/bullet_impact_flesh1",
+			"dm:turrets/bullet_impacts/bullet_impact_flesh2",
+			"dm:turrets/bullet_impacts/bullet_impact_flesh3",
+			"dm:turrets/bullet_impacts/bullet_impact_flesh4"
+		],
+		"subtitle": "subtitles.generic.impact.bullet.flesh"
+	},
+	"generic.impact.bullet.glass": {
+		"sounds": [
+			"dm:turrets/bullet_impacts/bullet_impact_glass1",
+			"dm:turrets/bullet_impacts/bullet_impact_glass2"
+		],
+		"subtitle": "subtitles.generic.impact.bullet.glass"
+	},
+	"generic.impact.bullet.metal": {
+		"sounds": [
+			"dm:turrets/bullet_impacts/bullet_impact_metal1",
+			"dm:turrets/bullet_impacts/bullet_impact_metal2"
+		],
+		"subtitle": "subtitles.generic.impact.bullet.metal"
+	},
+	"generic.impact.bullet.stone": {
+		"sounds": [
+			"dm:turrets/bullet_impacts/bullet_impact_stone1"
+		],
+		"subtitle": "subtitles.generic.impact.bullet.stone"
+	},
+	"generic.impact.bullet.wood": {
+		"sounds": [
+			"dm:turrets/bullet_impacts/bullet_impact_wood1",
+			"dm:turrets/bullet_impacts/bullet_impact_wood2",
+			"dm:turrets/bullet_impacts/bullet_impact_wood3"
+		],
+		"subtitle": "subtitles.generic.impact.bullet.wood"
+	},
 	"turret.remove.metal": {
 		"sounds": [
 			{
@@ -10,7 +57,7 @@
 				"pitch": 0.8,
 				"volume": 0.8
 			},
-				{
+			{
 				"name": "mob/irongolem/damage2",
 				"volume": 0.8
 			},
@@ -24,21 +71,57 @@
 	},
 	"turret.remove.wood": {
 		"sounds": [
-			"mob/zombie/woodbreak"
+			{
+				"name": "mob/zombie/woodbreak",
+				"volume": 0.8
+			},
+			{
+				"name": "mob/zombie/woodbreak",
+				"pitch": 0.8,
+				"volume": 0.8
+			}
 		],
 		"subtitle": "subtitles.turret.remove.wood"
 	},
+	"turret.iron.repair": {
+		"sounds": [
+			{
+				"name": "mob/irongolem/repair",
+				"volume": 0.8
+			},
+			{
+				"name": "mob/irongolem/repair",
+				"pitch": 0.8,
+				"volume": 0.8
+			}
+		],
+		"subtitle": "subtitles.turret.iron.repair"
+	},
+	"turret.bow.repair": {
+		"sounds": [
+			"block/fletching_table/fletching_table1",
+			"block/fletching_table/fletching_table2"
+		],
+		"subtitle": "subtitles.turret.bow.repair"
+	},
+	"turret.wood.repair": {
+		"sounds": [
+			"dm:turrets/repair/wood_repair1",
+			"dm:turrets/repair/wood_repair2"
+		],
+		"subtitle": "subtitles.turret.wood.repair"
+	},
 	"turret.cannon.hurt": {
 		"sounds": [
-			"dm:cannon_turret/hurt1",
-			"dm:cannon_turret/hurt2"
+			"dm:turrets/hurt/metal_hurt1",
+			"dm:turrets/hurt/metal_hurt2"
 		],
 		"subtitle": "subtitles.turret.cannon.hurt"
 	},
 	"turret.cannon.destroyed": {
 		"sounds": [
-			"dm:cannon_turret/crumbling_cannon1",
-			"dm:cannon_turret/crumbling_cannon2"
+			"dm:turrets/crumbling_turrets/wood_blocks_crumbling1",
+			"dm:turrets/crumbling_turrets/wood_blocks_crumbling2"
 		],
 		"subtitle": "subtitles.turret.cannon.destroyed"
 	},
@@ -50,7 +133,7 @@
 		],
 		"subtitle": "subtitles.turret.cannon.shoot"
 	},
-	
+
 	"turret.ballista.hurt": {
 		"sounds": [
 			"mob/zombie/wood1",
@@ -110,18 +193,18 @@
 		],
 		"subtitles": "subtitles.turret.ballista.shoot"
 	},
-	
+
 	"turret.mg_turret.hurt": {
 		"sounds": [
-			"dm:cannon_turret/hurt1",
-			"dm:cannon_turret/hurt2"
+			"dm:turrets/hurt/metal_hurt1",
+			"dm:turrets/hurt/metal_hurt2"
 		],
 		"subtitles": "subtitles.mg_turret.hurt"
 	},
 	"turret.mg_turret.destroyed": {
 		"sounds": [
-			"dm:mg_turret/crumbling_mg1",
-			"dm:mg_turret/crumbling_mg2"
+			"dm:turrets/crumbling_turrets/metal_crumbling1",
+			"dm:turrets/crumbling_turrets/metal_crumbling2"
 		],
 		"subtitles": "subtitles.mg_turret.destroyed"
 	},
@@ -137,5 +220,38 @@
 				"volume": 0.9
 			}
 		]
+	},
+
+	"turret.anti_air_turret.hurt": {
+		"sounds": [
+			"dm:turrets/hurt/metal_hurt1",
+			"dm:turrets/hurt/metal_hurt2"
+		],
+		"subtitles": "subtitles.anti_air_turret.hurt"
+	},
+	"turret.anti_air_turret.destroyed": {
+		"sounds": [
+			"dm:turrets/crumbling_turrets/metal_crumbling1",
+			"dm:turrets/crumbling_turrets/metal_crumbling2"
+		],
+		"subtitles": "subtitles.anti_air_turret.destroyed"
+	},
+	"turret.anti_air_turret.shoot.begin": {
+		"sounds": [
+			"dm:anti_air_turret/shoot_begin1"
+		],
+		"subtitles": "subtitles.anti_air_turret.turret.shoot.begin"
+	},
+	"turret.anti_air_turret.shoot": {
+		"sounds": [
+			"dm:anti_air_turret/shoot1"
+		],
+		"subtitles": "subtitles.anti_air_turret.turret.shoot"
+	},
+	"turret.anti_air_turret.shoot.end": {
+		"sounds": [
+			"dm:anti_air_turret/shoot_end1"
+		],
+		"subtitles": "subtitles.anti_air_turret.turret.shoot.end"
 	}
 }

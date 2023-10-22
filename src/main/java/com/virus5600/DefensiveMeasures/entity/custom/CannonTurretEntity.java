@@ -61,6 +61,7 @@ public class CannonTurretEntity extends TurretEntity implements IAnimatable, Ran
 	 * Contains all the items that can give effect to this entity
 	 */
 	private static Map<Item, List<Object[]>> effectSource;
+	@SuppressWarnings("removal")
 	private AnimationFactory factory = new AnimationFactory(this);
 	@Nullable
 	private LivingEntity currentTarget = null;
@@ -76,17 +77,20 @@ public class CannonTurretEntity extends TurretEntity implements IAnimatable, Ran
 
 	// METHODS //
 	// PRIVATE
+	@SuppressWarnings("removal")
 	private <E extends IAnimatable> PlayState idlePredicate(AnimationEvent<E> event) {
 		event.getController().setAnimation(new AnimationBuilder().addAnimation("animation.cannon_turret.setup", true));
 		return PlayState.CONTINUE;
 	}
 
+	@SuppressWarnings("removal")
 	private <E extends IAnimatable> PlayState lookAtTargetPredicate(AnimationEvent<E> event) {
 		event.getController().setAnimation(new AnimationBuilder().addAnimation("animation.cannon_turret.look_at_target", true));
 		return PlayState.CONTINUE;
 	}
 
 	private boolean animPlayed = false;
+	@SuppressWarnings("removal")
 	private <E extends IAnimatable> PlayState deathPredicate(AnimationEvent<E> event) {
 		if (!this.isAlive() && !animPlayed) {
 			animPlayed = true;
@@ -96,6 +100,7 @@ public class CannonTurretEntity extends TurretEntity implements IAnimatable, Ran
 		return PlayState.CONTINUE;
 	}
 
+	@SuppressWarnings("removal")
 	private <E extends IAnimatable> PlayState firingSequencePredicate(AnimationEvent<E> event) {
 		Vec3d fusePos = getRelativePos(0, 17.5, -0.6);
 		Vec3d barrelPos = getRelativePos(

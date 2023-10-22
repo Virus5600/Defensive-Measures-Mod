@@ -8,14 +8,14 @@ import java.util.Map;
 import org.jetbrains.annotations.Nullable;
 
 import com.virus5600.DefensiveMeasures.entity.TurretMaterial;
+import com.virus5600.DefensiveMeasures.entity.ai.goal.PrioritizeAirTargetGoal;
 import com.virus5600.DefensiveMeasures.entity.ai.goal.TargetOtherTeamGoal;
-import com.virus5600.DefensiveMeasures.entity.projectile.MGBulletEntity;
+import com.virus5600.DefensiveMeasures.entity.projectile.AntiAirProjectileEntity;
 import com.virus5600.DefensiveMeasures.item.ModItems;
 import com.virus5600.DefensiveMeasures.sound.ModSoundEvents;
 
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.RangedAttackMob;
 import net.minecraft.entity.ai.goal.ActiveTargetGoal;
 import net.minecraft.entity.ai.goal.LookAroundGoal;
 import net.minecraft.entity.ai.goal.LookAtEntityGoal;
@@ -41,6 +41,7 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+
 import software.bernie.geckolib3.core.IAnimatable;
 import software.bernie.geckolib3.core.PlayState;
 import software.bernie.geckolib3.core.builder.AnimationBuilder;
@@ -49,51 +50,62 @@ import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
 import software.bernie.geckolib3.core.manager.AnimationData;
 import software.bernie.geckolib3.core.manager.AnimationFactory;
 
-public class MGTurretEntity extends TurretEntity implements IAnimatable, RangedAttackMob, Itemable {
-	private static final int totalAttCooldown = (int) (20 * 5);
+public class AntiAirTurretEntity extends TurretEntity implements IAnimatable {
+	/**
+	 * Identifies how long the entity should wait before firing once more.
+	 * The formula use in this is "<code>T * S</code>", whereas <code>T</code>
+	 * represents the ticks (constant at 20) and <code>S</code> as real-time seconds.
+	 */
+	private static final int TOTAL_ATTACK_COOLDOWN = (int) (20 * 2.5);
 	/**
 	 * Contains all the items that can heal this entity.
 	 */
 	private static Map<Item, Float> healables;
 	/**
-	 * Contains all the items that can give effect to this entity
+	 * Contains all the items that can give effect to this entity.
 	 */
 	private static Map<Item, List<Object[]>> effectSource;
 	private AnimationFactory factory = new AnimationFactory(this);
 	@Nullable
 	private LivingEntity currentTarget = null;
-	private Vec3d barrelPos = getRelativePos(0, -5, 0.46875);
-	private double attCooldown = totalAttCooldown;
+	private Vec3d barrelPos = getRelativePos(0, -.175, .5);
+	private double attCooldown = TOTAL_ATTACK_COOLDOWN;
 	private int projectileShootCooldown = 1;
 	private int getProjectilesFired = 0;
 	private boolean playAnimation = true;
 	private static final TrackedData<Boolean> SHOULD_SKIP_ATTACK;
 
 	// CONSTRUCTORS //
-	public MGTurretEntity(final EntityType<? extends MobEntity> entityType, final World world) {
-		super(entityType, world, TurretMaterial.METAL, MGTurretEntity.class);
-		this.setShootSound(ModSoundEvents.TURRET_MG_SHOOT);
+	public AntiAirTurretEntity(EntityType<? extends MobEntity> entityType, World world) {
+		super(entityType, world, TurretMaterial.METAL, AntiAirTurretEntity.class);
+		this.setShootSound(ModSoundEvents.TURRET_ANTI_AIR_SHOOT);
 		this.addHealables(healables);
 		this.addEffectSource(effectSource);
 	}
 
+	// TODO: Continue fixing the AA Turret
+
 	// METHODS //
 	// PRIVATE
 	private <E extends IAnimatable> PlayState idlePredicate(final AnimationEvent<E> event) {
-		event.getController().setAnimation(new AnimationBuilder().addAnimation("animation.machine_gun_turret.setup", true));
+		event.getController().setAnimation(new AnimationBuilder().addAnimation("animation.anti_air_turret.setup", true));
 		return PlayState.CONTINUE;
 	}
 
 	private <E extends IAnimatable> PlayState lookAtTargetPredicate(final AnimationEvent<E> event) {
-		event.getController().setAnimation(new AnimationBuilder().addAnimation("animation.machine_gun_turret.look_at_target", true));
-		return PlayState.CONTINUE;
+		if (this.hasTarget()) {
+			event.getController().setAnimation(new AnimationBuilder().addAnimation("animation.anti_air_turret.look_at_target", true));
+			return PlayState.CONTINUE;
+		}
+
+		return this.idlePredicate(event);
 	}
 
 	private boolean animPlayed = false;
 	private <E extends IAnimatable> PlayState deathPredicate(final AnimationEvent<E> event) {
 		if (!this.isAlive() && !animPlayed) {
 			animPlayed = true;
-			event.getController().setAnimation(new AnimationBuilder().addAnimation("animation.machine_gun_turret.death"));
+			event.getController().setAnimation(new AnimationBuilder().addAnimation("animation.anti_air_turret.death"));
 			return PlayState.STOP;
 		}
 		return PlayState.CONTINUE;
@@ -102,22 +114,22 @@ public class MGTurretEntity extends TurretEntity implements IAnimatable, RangedA
 	private <E extends IAnimatable> PlayState firingSequencePredicate(final AnimationEvent<E> event) {
 		if (this.hasTarget() && this.isShooting()) {
 			if (this.playAnimation) {
-				event.getController().setAnimation(new AnimationBuilder().addAnimation("animation.machine_gun_turret.shoot"));
+				event.getController().setAnimation(new AnimationBuilder().addAnimation("animation.anti_air_turret.shoot"));
 				event.getController().markNeedsReload();
 				this.playAnimation = false;
 			}
 
 			if (!this.getShouldSkipAtt()) {
-				this.barrelPos = getRelativePos(0, -5, 0.46875);
+				this.barrelPos = this.getRelativePos(0, -.175, .5);
 				this.world.addParticle(
-					ParticleTypes.SMALL_FLAME,
+					ParticleTypes.LAVA,
 					true,
-					this.barrelPos.x + this.getPos(X),
-					this.barrelPos.y + this.getPos(Y),
-					this.barrelPos.z + this.getPos(Z),
-					MathHelper.nextDouble(this.random, -0.001, 0.001),
-					MathHelper.nextDouble(this.random, -0.001, 0.001),
-					MathHelper.nextDouble(this.random, -0.001, 0.001)
+					this.barrelPos.x,
+					this.barrelPos.y,
+					this.barrelPos.z,
+					MathHelper.nextDouble(this.random, -0.0001, 0.0001),
+					MathHelper.nextDouble(this.random, -0.0001, 0.0001),
+					MathHelper.nextDouble(this.random, -0.0001, 0.0001)
 				);
 			}
 		}
@@ -129,11 +141,12 @@ public class MGTurretEntity extends TurretEntity implements IAnimatable, RangedA
 	}
 
 	// PROTECTED
-		@Override
+	@Override
 	protected void initGoals() {
 		// Goals
-		this.goalSelector.add(1, new ProjectileAttackGoal(this, 0, totalAttCooldown, 16.8125F));
-		this.goalSelector.add(2, new LookAtEntityGoal(this, MobEntity.class, 8.0F, 0.02F, true));
+		this.goalSelector.add(1, new PrioritizeAirTargetGoal(this, 0, TOTAL_ATTACK_COOLDOWN, 64.8125f));
+		this.goalSelector.add(2, new ProjectileAttackGoal(this, 0, TOTAL_ATTACK_COOLDOWN, 64.8125f));
+		this.goalSelector.add(3, new LookAtEntityGoal(this, MobEntity.class, 8.0F, 0.02F, true));
 		this.goalSelector.add(8, new LookAroundGoal(this));
 
 		// Targets
@@ -159,7 +172,7 @@ public class MGTurretEntity extends TurretEntity implements IAnimatable, RangedA
 
 	@Nullable
 	@Override
-	protected SoundEvent getHurtSound(DamageSource source) {
+	protected SoundEvent getHurtSound(final DamageSource source) {
 		return ModSoundEvents.TURRET_MG_HURT;
 	}
 
@@ -172,14 +185,14 @@ public class MGTurretEntity extends TurretEntity implements IAnimatable, RangedA
 	// PUBLIC
 	public static DefaultAttributeContainer.Builder setAttributes() {
 		return MobEntity.createMobAttributes()
-			.add(EntityAttributes.GENERIC_FOLLOW_RANGE, 16)
+			.add(EntityAttributes.GENERIC_FOLLOW_RANGE, 64)
 			.add(EntityAttributes.GENERIC_MAX_HEALTH, 25)
 			.add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0f)
-			.add(EntityAttributes.GENERIC_KNOCKBACK_RESISTANCE, 999999f);
+			.add(EntityAttributes.GENERIC_KNOCKBACK_RESISTANCE, Float.MAX_VALUE);
 	}
 
 	@Override
-	public void registerControllers(AnimationData data) {
+	public void registerControllers(final AnimationData data) {
 		data.addAnimationController(new AnimationController<IAnimatable>(this, "idle", 20, this::idlePredicate));
 		data.addAnimationController(new AnimationController<IAnimatable>(this, "look_at_target", 20, this::lookAtTargetPredicate));
 		data.addAnimationController(new AnimationController<IAnimatable>(this, "death", 0, this::deathPredicate));
@@ -197,7 +210,7 @@ public class MGTurretEntity extends TurretEntity implements IAnimatable, RangedA
 	}
 
 	@Override
-	public void attack(LivingEntity target, float pullProgress) {
+	public void attack(final LivingEntity target, final float pullProgress) {
 		if (target == null) {
 			this.setShooting(false);
 			return;
@@ -223,29 +236,28 @@ public class MGTurretEntity extends TurretEntity implements IAnimatable, RangedA
 
 			if (this.hasTarget()) {
 				this.setPos(TARGET_POS_X, this.getTarget().getX());
-				this.setPos(TARGET_POS_Y, this.getTarget().getBodyY(1/2));
+				this.setPos(TARGET_POS_Y, this.getTarget().getBodyY(1 / 2));
 				this.setPos(TARGET_POS_Z, this.getTarget().getZ());
 
 				--this.attCooldown;
 
-				if (this.attCooldown <= 0)
-					this.attCooldown = 20 * 2.5;
+				if (this.attCooldown <= 0) this.attCooldown = 20 * 2.5;
 
 				try {
 					if (this.getProjectilesFired < 10 && this.isShooting()) {
 						if (!this.getShouldSkipAtt() && this.projectileShootCooldown == 0) {
 							double vx = (this.getTarget().getX() - this.getX()) * 1.0625;
-							double vy = this.getTarget().getBodyY(2/3) - this.getY() + 0.25;
+							double vy = this.getTarget().getBodyY(2 / 3) - this.getY() + 0.25;
 							double vz = (this.getTarget().getZ() - this.getZ()) * 1.0625;
 
 							double variance = Math.sqrt(vx * vx + vz * vz);
 							float divergence = 0 + this.world.getDifficulty().getId() * 2;
 
-							ProjectileEntity projectile = (ProjectileEntity) new MGBulletEntity(world, this);
-							this.barrelPos = getRelativePos(0, -5, 0.46875);
+							ProjectileEntity projectile = (ProjectileEntity) new AntiAirProjectileEntity(world, this);
+							this.barrelPos = this.getRelativePos(0, -.175, .5);
 
 							projectile.setVelocity(vx, vy + variance * 0.2f, vz, 1.5f, divergence + 0.25f);
-							projectile.setPos(barrelPos.x + this.getPos(X), barrelPos.y + this.getPos(Y), barrelPos.z + this.getPos(Z));
+							projectile.setPos(this.barrelPos.x, this.barrelPos.y, this.barrelPos.z);
 							this.playSound(this.getShootSound(), 1.0f, 1.0f / (this.getRandom().nextFloat() * 0.4f + 0.8f));
 
 							this.world.spawnEntity(projectile);
@@ -255,33 +267,34 @@ public class MGTurretEntity extends TurretEntity implements IAnimatable, RangedA
 						}
 						else {
 							this.projectileShootCooldown--;
-							if (this.projectileShootCooldown == 0)
-								this.setShouldSkipAtt(false);
+
+							if (this.projectileShootCooldown == 0) this.setShouldSkipAtt(false);
 						}
 					}
 					else {
 						this.getProjectilesFired = 0;
 						this.setShooting(false);
 					}
-				} catch (IllegalArgumentException | SecurityException e) {
+				}
+				catch (IllegalArgumentException | SecurityException e) {
 					e.printStackTrace();
 				}
 			}
 			else {
-				if (this.attCooldown != totalAttCooldown) {
-					this.attCooldown = totalAttCooldown;
+				if (this.attCooldown != TOTAL_ATTACK_COOLDOWN) {
+					this.attCooldown = TOTAL_ATTACK_COOLDOWN;
 				}
 			}
 		}
 	}
 
 	@Override
-	public ActionResult interactMob(PlayerEntity player, Hand hand) {
+	public ActionResult interactMob(final PlayerEntity player, final Hand hand) {
 		return Itemable.tryItem(player, hand, this, ModItems.TURRET_REMOVER, ModItems.MG_TURRET).orElse(super.interactMob(player, hand));
 	}
 
 	static {
-		SHOULD_SKIP_ATTACK = DataTracker.registerData(MGTurretEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
+		SHOULD_SKIP_ATTACK = DataTracker.registerData(AntiAirTurretEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
 
 		healables = new HashMap<Item, Float>() {
 			private static final long serialVersionUID = 1L;

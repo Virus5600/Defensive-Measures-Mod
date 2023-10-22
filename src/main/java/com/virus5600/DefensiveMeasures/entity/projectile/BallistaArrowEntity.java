@@ -64,11 +64,6 @@ public class BallistaArrowEntity extends PersistentProjectileEntity implements I
     }
 
     // PUBLIC
-    @Override
-    public void tick() {
-        super.tick();
-    }
-
 	@Override
 	public void registerControllers(AnimationData data) {
 		data.addAnimationController(new AnimationController<IAnimatable>(this, "idle", 0, this::predicate));

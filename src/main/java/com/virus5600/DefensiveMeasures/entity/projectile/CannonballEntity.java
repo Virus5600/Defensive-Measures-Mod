@@ -61,13 +61,12 @@ public class CannonballEntity extends ExplosiveProjectileEntity implements IAnim
 	}
 
 	/// METHODS ///
-	// PRIVATE
+	// PROTECTED
 	@Environment(EnvType.CLIENT)
-	private ParticleEffect getParticleParameters() {
+	protected ParticleEffect getParticleParameters() {
 		return ParticleTypes.CLOUD;
 	}
 
-	// PROTECTED
 	@Override
 	protected void onBlockHit(BlockHitResult blockHitResult) {
 		super.onBlockHit(blockHitResult);
@@ -198,9 +197,6 @@ public class CannonballEntity extends ExplosiveProjectileEntity implements IAnim
 		double d = 0.08;
 		if (!this.hasNoGravity()) {
             this.setVelocity(this.getVelocity().add(0.0, -d / 4.0, 0.0));
-            if (this.getVelocity().y < 0 && this.getVelocity().y > -1) {
-            	this.setVelocity(this.getVelocity().multiply(1.0, 1.375, 1.0));
-            }
         }
 	}
 
