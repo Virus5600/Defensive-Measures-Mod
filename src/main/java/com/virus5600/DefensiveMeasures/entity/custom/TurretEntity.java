@@ -12,6 +12,7 @@ import org.jetbrains.annotations.Nullable;
 import com.virus5600.DefensiveMeasures.DefensiveMeasures;
 import com.virus5600.DefensiveMeasures.entity.TurretMaterial;
 import com.virus5600.DefensiveMeasures.item.ModItems;
+import com.virus5600.DefensiveMeasures.item.turrets.TurretItem;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -839,6 +840,16 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
 		// OTHERWISE
 		return ActionResult.PASS;
 	}
+
+	@Override
+	@Nullable
+	public ItemStack getPickBlockStack() {
+        TurretItem turretItem = TurretItem.forEntity(this.getType());
+        if (turretItem == null) {
+            return null;
+        }
+        return new ItemStack(turretItem);
+    }
 
 	public boolean isShooting() {
 		return this.dataTracker.get(SHOOTING);

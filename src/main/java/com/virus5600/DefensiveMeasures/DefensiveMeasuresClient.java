@@ -16,5 +16,6 @@ public class DefensiveMeasuresClient implements ClientModInitializer {
 
 		// Networking part
 		ModPackets.registerS2CPackets();
+		ModPackets.registerC2SPackets();
 	}
 }

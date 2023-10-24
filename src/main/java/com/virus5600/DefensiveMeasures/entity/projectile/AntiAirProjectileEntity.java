@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.virus5600.DefensiveMeasures.DefensiveMeasures;
 import com.virus5600.DefensiveMeasures.entity.ModEntities;
+import com.virus5600.DefensiveMeasures.networking.packets.SpawnEvent.SpawnEventC2SPacket;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -12,6 +13,7 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.network.Packet;
 import net.minecraft.particle.ParticleEffect;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.util.hit.BlockHitResult;
@@ -143,5 +145,9 @@ public class AntiAirProjectileEntity extends CannonballEntity implements IAnimat
     @Override
 	public AnimationFactory getFactory() {
 		return this.factory;
+	}
+
+    public Packet<?> createSpawnPacket() {
+		return SpawnEventC2SPacket.send(this);
 	}
 }

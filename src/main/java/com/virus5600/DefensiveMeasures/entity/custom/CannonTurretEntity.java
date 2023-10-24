@@ -61,7 +61,6 @@ public class CannonTurretEntity extends TurretEntity implements IAnimatable, Ran
 	 * Contains all the items that can give effect to this entity
 	 */
 	private static Map<Item, List<Object[]>> effectSource;
-	@SuppressWarnings("removal")
 	private AnimationFactory factory = new AnimationFactory(this);
 	@Nullable
 	private LivingEntity currentTarget = null;

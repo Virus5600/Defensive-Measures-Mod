@@ -41,7 +41,10 @@ public class BallistaArrowEntity extends PersistentProjectileEntity implements I
 	/// METHODS ///
     // PRIVATE
     private <E extends IAnimatable> PlayState predicate(AnimationEvent<E> event) {
-		event.getController().setAnimation(new AnimationBuilder().addAnimation("animation.ballista_arrow.idle"));
+		event.getController().setAnimation(
+			new AnimationBuilder().addAnimation("animation.ballista_arrow.idle")
+		);
+
 		return PlayState.CONTINUE;
 	}
 
@@ -66,7 +69,9 @@ public class BallistaArrowEntity extends PersistentProjectileEntity implements I
     // PUBLIC
 	@Override
 	public void registerControllers(AnimationData data) {
-		data.addAnimationController(new AnimationController<IAnimatable>(this, "idle", 0, this::predicate));
+		data.addAnimationController(
+			new AnimationController<IAnimatable>(this, "idle", 0, this::predicate)
+		);
 	}
 
 	@Override

@@ -12,7 +12,6 @@ import com.virus5600.DefensiveMeasures.entity.ai.goal.TargetOtherTeamGoal;
 import com.virus5600.DefensiveMeasures.entity.projectile.BallistaArrowEntity;
 import com.virus5600.DefensiveMeasures.item.ModItems;
 import com.virus5600.DefensiveMeasures.sound.ModSoundEvents;
-import com.virus5600.DefensiveMeasures.util.Vec3dUtil;
 
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -190,23 +189,6 @@ public class BallistaTurretEntity extends TurretEntity implements IAnimatable {
 			this.setShooting(false);
 			return;
 		}
-
-		try {
-			double vx = (target.getX() - this.getX()) * 1.0625;
-			double vy = target.getBodyY(2/3) - this.getY() + 0.25;
-			double vz = (target.getZ() - this.getZ()) * 1.0625;
-			double variance = Math.sqrt(vx * vx + vz * vz);
-			float divergence = 0 + this.world.getDifficulty().getId() * 2;
-			ProjectileEntity projectile = (ProjectileEntity) new BallistaArrowEntity(world, this);
-
-			projectile.setVelocity(vx, vy + variance * 0.2f, vz, 1.5f, divergence);
-			projectile.setPos(this.getX(), this.getY() + 0.8125, this.getZ());
-
-			this.playSound(this.getShootSound(), 1.0f, 1.0f / (this.getRandom().nextFloat() * 0.4f + 0.8f));
-			this.world.spawnEntity(projectile);
-		} catch (IllegalArgumentException | SecurityException e) {
-			e.printStackTrace();
-		}
 	}
 
 	@Override
@@ -246,7 +228,15 @@ public class BallistaTurretEntity extends TurretEntity implements IAnimatable {
 
 	@Override
 	public ActionResult interactMob(PlayerEntity player, Hand hand) {
-		return Itemable.tryItem(player, hand, this, ModItems.TURRET_REMOVER, ModItems.BALLISTA).orElse(super.interactMob(player, hand));
+		return Itemable.tryItem(
+			player,
+			hand,
+			this,
+			ModItems.TURRET_REMOVER,
+			ModItems.BALLISTA
+		).orElse(
+			super.interactMob(player, hand)
+		);
 	}
 
 	static {
