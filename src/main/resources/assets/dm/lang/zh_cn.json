@@ -1,0 +1,53 @@
+{
+	"itemGroup.dm.defensive_measures.items" : "防御建筑-物品",
+	"itemGroup.dm.defensive_measures.equipments" : "防御建筑-装备",
+	"itemGroup.dm.defensive_measures.traps" : "防御建筑-陷阱",
+	"itemGroup.dm.defensive_measures.turrets" : "防御建筑-防御塔",
+	
+	"block.dm.arrowhead" : "箭头",
+
+	"item.dm.turret_remover": "拆卸工具",
+	
+	"item.dm.cannon_base" : "炮塔底座",
+	"item.dm.cannon_stand" : "炮架",
+	"item.dm.unfinished_cannon_head" : "粗制炮身",
+	"item.dm.cannon_head" : "炮身",
+	"item.dm.cannon_turret" : "设置炮塔",
+	
+	"item.dm.ballista_base" : "弩箭塔基座",
+	"item.dm.ballista_base_with_stand" : "弩箭塔塔座",
+	"item.dm.ballista_bow" : "弩弓",
+	"item.dm.ballista_arrow" : "弩箭",
+	"item.dm.ballista" : "设置弩箭塔",
+	
+	"item.dm.ammo_case" : "弹匣",
+	"item.dm.ammo_rounds" : "弹链",
+	"item.dm.machine_gun_base" : "机枪塔底座",
+	"item.dm.machine_gun_head" : "机枪",
+	"item.dm.machine_gun_stand" : "机枪支架",
+	"item.dm.mg_turret" : "设置机枪塔",
+	
+	"entity.dm.cannon_turret" : "炮塔",
+	"entity.dm.cannonball" : "炮弹",
+	
+	"entity.dm.ballista" : "弩箭塔",
+	"entity.dm.ballista_arrow" : "弩箭",
+	
+	"entity.dm.mg_turret" : "机枪塔",
+	"entity.dm.mg_bullet" : "机枪子弹",
+	
+	"death.attack.arrowhead" : "%1$s踩到了箭头陷阱",
+	"death.attack.arrowhead.player" : "%1$s在和与%2$s战斗时踩到了箭头陷阱",
+	
+	"subtitles.turret.remove.metal" : "防御塔：拆除",
+	"subtitles.turret.remove.wood" : "防御塔：拆除",
+	"subtitles.turret.cannon.hurt" : "炮塔：受损",
+	"subtitles.turret.cannon.destroyed" : "炮塔：被摧毁",
+	"subtitles.turret.cannon.shoot" : "炮塔：开火",
+	"subtitles.turret.ballista.hurt" : "弩箭塔：受损",
+	"subtitles.turret.ballista.destroyed" : "弩箭塔：被摧毁",
+	"subtitles.turret.ballista.shoot" : "弩箭塔：射击",
+	"subtitles.turret.mg_turret.hurt" : "机枪塔：受损",
+	"subtitles.turret.mg_turret.destroyed" : "机枪塔：被摧毁",
+	"subtitles.turret.mg_turret.shoot" : "机枪塔：开火"
+}

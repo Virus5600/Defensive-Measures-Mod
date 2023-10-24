@@ -13,7 +13,7 @@ public class BallistaBaseItem extends Item {
 			// RARITY
 			.rarity(Rarity.COMMON)
 		);
-		
+
 		//FUEL
 		FuelRegistry.INSTANCE.add(this, 500);
 	}

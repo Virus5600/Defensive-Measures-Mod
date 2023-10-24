@@ -1,0 +1,53 @@
+{
+	"itemGroup.dm.defensive_measures.items" : "Предметы: Defensive Measures",
+	"itemGroup.dm.defensive_measures.equipments" : "Снаряжение: Defensive Measures",
+	"itemGroup.dm.defensive_measures.traps" : "Ловушки: Defensive Measures",
+	"itemGroup.dm.defensive_measures.turrets" : "Турели: Defensive Measures",
+	
+	"block.dm.arrowhead" : "Наконечник стрелы",
+
+	"item.dm.turret_remover": "Съёмник турели",
+	
+	"item.dm.cannon_base" : "Основание пушки",
+	"item.dm.cannon_stand" : "Крепление для пушки",
+	"item.dm.unfinished_cannon_head" : "Незаконченная картечная голова",
+	"item.dm.cannon_head" : "Картечная голова",
+	"item.dm.cannon_turret" : "Место для пушечной турели",
+	
+	"item.dm.ballista_base" : "Основание баллисты",
+	"item.dm.ballista_base_with_stand" : "Основание баллисты с креплением",
+	"item.dm.ballista_bow" : "Дугообразная баллиста",
+	"item.dm.ballista_arrow" : "Стрела для баллисты",
+	"item.dm.ballista" : "Место для баллисты",
+	
+	"item.dm.ammo_case" : "Коробка для боеприпасов",
+	"item.dm.ammo_rounds" : "Боеприпасы",
+	"item.dm.machine_gun_base" : "Основание пулемётной турели",
+	"item.dm.machine_gun_head" : "Пулемётный механизм",
+	"item.dm.machine_gun_stand" : "Крепление для пулемётной турели",
+	"item.dm.mg_turret" : "Место для пулемётной турели",
+	
+	"entity.dm.cannon_turret" : "Турельная башня",
+	"entity.dm.cannonball" : "Пушечное ядро",
+	
+	"entity.dm.ballista" : "Баллиста",
+	"entity.dm.ballista_arrow" : "Стрела для баллисты",
+	
+	"entity.dm.mg_turret" : "Пулемётная турель",
+	"entity.dm.mg_bullet" : "Пуля для пулемётной турели",
+	
+	"death.attack.arrowhead" : "%1$s раздавлен Наконечником стрелы",
+	"death.attack.arrowhead.player" : "%1$s раздавлен случайным Наконечником стрелы во время борьбы с %2$s",
+	
+	"subtitles.turret.remove.metal" : "Металлическая турель убрана",
+	"subtitles.turret.remove.wood" : "Деревянная турель убрана",
+	"subtitles.turret.cannon.hurt" : "Турельная башня повреждена",
+	"subtitles.turret.cannon.destroyed" : "Турельная башня уничтожена",
+	"subtitles.turret.cannon.shoot" : "Турельная башня стреляет",
+	"subtitles.turret.ballista.hurt" : "Баллиста повреждена",
+	"subtitles.turret.ballista.destroyed" : "Баллиста уничтожена",
+	"subtitles.turret.ballista.shoot" : "Баллиста стреляет",
+	"subtitles.turret.mg_turret.hurt" : "Пулемётная турель повреждена",
+	"subtitles.turret.mg_turret.destroyed" : "Пулемётная турель уничтожена",
+	"subtitles.turret.mg_turret.shoot" : "Пулемётная турель стреляет"
+}

@@ -14,19 +14,19 @@ import net.minecraft.util.math.BlockPos;
 import software.bernie.geckolib3.renderers.geo.GeoProjectilesRenderer;
 
 public class BallistaArrowRenderer extends GeoProjectilesRenderer<BallistaArrowEntity> {
-	
+
 	// CONSTRUCTOR //
 	public BallistaArrowRenderer(Context ctx) {
 		super(ctx, new BallistaArrowModel());
 	}
-	
+
 	// METHODS //
 	// PUBLIC
 	@Override
 	public Identifier getTexture(BallistaArrowEntity instance) {
 		return new Identifier(DefensiveMeasures.MOD_ID, "textures/entity/ballista/ballista_arrow.png");
 	}
-	
+
 	protected int getBlockLight(BallistaArrowEntity entityIn, BlockPos partialTicks) {
 		return 15;
 	}

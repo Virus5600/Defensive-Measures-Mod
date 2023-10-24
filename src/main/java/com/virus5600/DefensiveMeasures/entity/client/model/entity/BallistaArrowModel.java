@@ -8,7 +8,7 @@ import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
 import software.bernie.geckolib3.model.AnimatedGeoModel;
 
 public class BallistaArrowModel extends AnimatedGeoModel<BallistaArrowEntity> {
-	
+
 	// METHODS //
 	// PUBLIC
 	@Override
@@ -25,7 +25,7 @@ public class BallistaArrowModel extends AnimatedGeoModel<BallistaArrowEntity> {
 	public Identifier getTextureResource(BallistaArrowEntity object) {
 		return new Identifier(DefensiveMeasures.MOD_ID, "textures/entity/ballista/ballista_arrow.png");
 	}
-	
+
 	@SuppressWarnings("rawtypes")
 	@Override
 	public void setLivingAnimations(BallistaArrowEntity entity, Integer uniqueID, AnimationEvent customPredicate) {

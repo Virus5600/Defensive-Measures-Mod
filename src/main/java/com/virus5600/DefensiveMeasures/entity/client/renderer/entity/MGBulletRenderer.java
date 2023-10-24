@@ -14,19 +14,19 @@ import net.minecraft.util.math.BlockPos;
 import software.bernie.geckolib3.renderers.geo.GeoProjectilesRenderer;
 
 public class MGBulletRenderer extends GeoProjectilesRenderer<MGBulletEntity> {
-	
+
 	// CONSTRUCTOR //
 	public MGBulletRenderer(Context ctx) {
 		super(ctx, new MGBulletModel());
 	}
-	
+
 	// METHODS //
 	// PUBLIC
 	@Override
 	public Identifier getTexture(MGBulletEntity instance) {
 		return new Identifier(DefensiveMeasures.MOD_ID, "textures/entity/mg_turret/mg_bullet.png");
 	}
-	
+
 	protected int getBlockLight(MGBulletEntity entityIn, BlockPos partialTicks) {
 		return 15;
 	}

@@ -87,6 +87,10 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
 	private static final TrackedData<Boolean> SHOOTING_FX_DONE;
 	private static final TrackedData<Boolean> HAS_TARGET;
 	/**
+	 * The sound that will play when this turret is healed.
+	 */
+	private SoundEvent healSound = SoundEvents.ENTITY_IRON_GOLEM_REPAIR;
+	/**
 	 * Contains all the items that can heal this entity.
 	 */
 	@Nullable
@@ -355,6 +359,15 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
 
 	public SoundEvent getShootSound() {
 		return this.shootSound;
+	}
+
+
+	public void setHealSound(SoundEvent sound) {
+		this.healSound = sound;
+	}
+
+	public SoundEvent getHealSound() {
+		return this.healSound;
 	}
 
 	/**
@@ -818,6 +831,22 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
 		else if (this.isHealableItem(item.getItem())) {
 			this.heal(this.getHealAmt(item.getItem()));
 
+			// Decrement item amount (if it is a plain item) or durability (if it is a tool)
+			if (item.getItem().isDamageable()) {
+				if (item.getDamage() > item.getMaxDamage())
+					item.decrement(1);
+				else
+					item.setDamage(item.getDamage() + 1);
+			}
+			else {
+				item.decrement(1);
+			}
+
+			// Indicates a repair was done
+			this.world.playSoundFromEntity(player, this, this.healSound, SoundCategory.MASTER, 1, 1);
+
+
+			// Applies status effect if it provides one
 			if (this.isEffectSource(item.getItem())) {
 				itemDecrement = true;
 				for (Object[] args : this.getMobEffect(item.getItem())) {

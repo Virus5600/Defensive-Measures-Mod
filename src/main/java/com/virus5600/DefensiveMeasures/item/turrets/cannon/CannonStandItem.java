@@ -13,7 +13,7 @@ public class CannonStandItem extends Item {
 			// RARITY
 			.rarity(Rarity.COMMON)
 		);
-		
+
 		// FUEL
 		FuelRegistry.INSTANCE.add(this, 600);
 	}
