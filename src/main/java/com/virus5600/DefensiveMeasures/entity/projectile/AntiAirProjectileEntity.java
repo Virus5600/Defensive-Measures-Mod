@@ -2,7 +2,6 @@ package com.virus5600.DefensiveMeasures.entity.projectile;
 
 import java.util.List;
 
-import com.virus5600.DefensiveMeasures.DefensiveMeasures;
 import com.virus5600.DefensiveMeasures.entity.ModEntities;
 import com.virus5600.DefensiveMeasures.networking.packets.SpawnEvent.SpawnEventC2SPacket;
 
@@ -21,15 +20,19 @@ import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraft.world.explosion.Explosion;
 import software.bernie.geckolib3.core.IAnimatable;
+import software.bernie.geckolib3.core.PlayState;
+import software.bernie.geckolib3.core.builder.AnimationBuilder;
+import software.bernie.geckolib3.core.controller.AnimationController;
+import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
 import software.bernie.geckolib3.core.manager.AnimationData;
 import software.bernie.geckolib3.core.manager.AnimationFactory;
 
 public class AntiAirProjectileEntity extends CannonballEntity implements IAnimatable {
 	private LivingEntity shooter;
+	private Entity hitEntity;
 	private AnimationFactory factory = new AnimationFactory(this);
 
 	/// CONSTRUCTORS ///
@@ -46,6 +49,15 @@ public class AntiAirProjectileEntity extends CannonballEntity implements IAnimat
 	}
 
 	/// METHODS ///
+	// PRIVATE
+	private <E extends IAnimatable> PlayState predicate(AnimationEvent<E> event) {
+		event.getController().setAnimation(
+			new AnimationBuilder().addAnimation("animation.anti_air_projectile.move")
+		);
+
+		return PlayState.CONTINUE;
+	}
+
 	// PROTECTED
 	@Environment(EnvType.CLIENT)
 	@Override
@@ -68,8 +80,9 @@ public class AntiAirProjectileEntity extends CannonballEntity implements IAnimat
     @Override
     protected void onEntityHit(final EntityHitResult entityHitResult) {
     	if (!this.world.isClient) {
+    		this.hitEntity = entityHitResult.getEntity();
 			this.doDamage();
-			this.remove(Entity.RemovalReason.DISCARDED);
+			this.discard();
 		}
     }
 
@@ -84,6 +97,18 @@ public class AntiAirProjectileEntity extends CannonballEntity implements IAnimat
 	}
 
     // PUBLIC
+    @Override
+	public void registerControllers(AnimationData data) {
+		data.addAnimationController(
+			new AnimationController<IAnimatable>(this, "move", 0, this::predicate)
+		);
+	}
+
+	@Override
+	public AnimationFactory getFactory() {
+		return this.factory;
+	}
+
     @Override
     @Environment(EnvType.CLIENT)
 	public void handleStatus(final byte status) {
@@ -105,47 +130,58 @@ public class AntiAirProjectileEntity extends CannonballEntity implements IAnimat
 		int ym = MathHelper.floor(this.getY() + (double) q + 1.0D);
 		int zp = MathHelper.floor(this.getZ() - (double) q - 1.0D);
 		int zm = MathHelper.floor(this.getZ() + (double) q + 1.0D);
-		Vec3d vec3d = new Vec3d(this.getX(), this.getY(), this.getZ());
-		List<Entity> list = this.world.getOtherEntities(
+
+		Explosion explosion = this.world.createExplosion(
 			this,
-			new Box((double) xp, (double) yp, (double) zp, (double) xm, (double) ym, (double) zm)
+			this.getX(),
+			this.getBodyY(0.0625),
+			this.getZ(),
+			0F,
+			false,
+			Explosion.DestructionType.NONE
 		);
 
-		for (int x = 0; x < list.size(); ++x) {
-			Entity entity = (Entity) list.get(x);
+		// If this projectile is alive for more equal or more than a second...
+		int age = this.age;
+		if (age <= 20) {
+			// ...get all the entities in a 1.5 block radius...
+			List<Entity> list = this.world.getOtherEntities(
+				this,
+				new Box((double) xp, (double) yp, (double) zp, (double) xm, (double) ym, (double) zm)
+			);
 
-			if (entity.age <= 1.0D) {
-				Explosion explosion = this.world.createExplosion(
-					this,
-					this.getX(),
-					this.getBodyY(0.0625),
-					this.getZ(),
-					0F,
-					false,
-					Explosion.DestructionType.NONE
-				);
+			// ...then damage them all
+			for (int x = 0; x < list.size(); ++x) {
+				Entity entity = (Entity) list.get(x);
 
 				if (entity instanceof LivingEntity) {
-					if (this.shooter == null) entity.damage(DamageSource.explosion(explosion), 15);
-					else entity.damage(DamageSource.player((PlayerEntity) this.shooter), 15);
+					if (this.shooter == null)
+						entity.damage(DamageSource.explosion(explosion), 15);
+					else
+						entity.damage(DamageSource.player((PlayerEntity) this.shooter), 15);
 				}
 			}
 		}
+		// Otherwise, just damage the entity it hits.
+		else {
+			if (this.hitEntity != null)
+				this.hitEntity.damage(DamageSource.player((PlayerEntity) this.shooter), 15);
+		}
+
+		this.discard();
     }
 
     @Override
     public void tick() {
-    	DefensiveMeasures.sendChat(this.age + "");
+    	super.tick();
+
+    	// If this projectile is still alive after 5 seconds, make it explode.
+    	if (this.isAlive()) {
+    		if (this.age >= 100) {
+    			this.doDamage();
+    		}
+    	}
     }
-
-    @Override
-	public void registerControllers(final AnimationData data) {
-	}
-
-    @Override
-	public AnimationFactory getFactory() {
-		return this.factory;
-	}
 
     public Packet<?> createSpawnPacket() {
 		return SpawnEventC2SPacket.send(this);

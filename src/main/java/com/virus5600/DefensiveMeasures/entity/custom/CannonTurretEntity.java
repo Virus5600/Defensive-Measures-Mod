@@ -76,20 +76,17 @@ public class CannonTurretEntity extends TurretEntity implements IAnimatable, Ran
 
 	// METHODS //
 	// PRIVATE
-	@SuppressWarnings("removal")
 	private <E extends IAnimatable> PlayState idlePredicate(AnimationEvent<E> event) {
 		event.getController().setAnimation(new AnimationBuilder().addAnimation("animation.cannon_turret.setup", true));
 		return PlayState.CONTINUE;
 	}
 
-	@SuppressWarnings("removal")
 	private <E extends IAnimatable> PlayState lookAtTargetPredicate(AnimationEvent<E> event) {
 		event.getController().setAnimation(new AnimationBuilder().addAnimation("animation.cannon_turret.look_at_target", true));
 		return PlayState.CONTINUE;
 	}
 
 	private boolean animPlayed = false;
-	@SuppressWarnings("removal")
 	private <E extends IAnimatable> PlayState deathPredicate(AnimationEvent<E> event) {
 		if (!this.isAlive() && !animPlayed) {
 			animPlayed = true;
@@ -99,7 +96,6 @@ public class CannonTurretEntity extends TurretEntity implements IAnimatable, Ran
 		return PlayState.CONTINUE;
 	}
 
-	@SuppressWarnings("removal")
 	private <E extends IAnimatable> PlayState firingSequencePredicate(AnimationEvent<E> event) {
 		Vec3d fusePos = getRelativePos(0, 17.5, -0.6);
 		Vec3d barrelPos = getRelativePos(
@@ -127,9 +123,9 @@ public class CannonTurretEntity extends TurretEntity implements IAnimatable, Ran
 					this.world.addParticle(
 						ModParticles.CANNON_FLASH,
 						true,
-						barrelPos.x + this.getPos(X),
-						barrelPos.y + this.getPos(Y),
-						barrelPos.z + this.getPos(Z),
+						barrelPos.x,
+						barrelPos.y,
+						barrelPos.z,
 						vx * MathHelper.nextDouble(this.random, 1.5, 1.75),
 						vy * variance * MathHelper.nextDouble(this.random, -0.5, 0.5),
 						vz * MathHelper.nextDouble(this.random, 1.5, 1.75)

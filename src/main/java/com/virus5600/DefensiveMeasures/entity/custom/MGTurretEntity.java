@@ -113,9 +113,9 @@ public class MGTurretEntity extends TurretEntity implements IAnimatable, RangedA
 				this.world.addParticle(
 					ParticleTypes.SMALL_FLAME,
 					true,
-					this.barrelPos.x + this.getPos(X),
-					this.barrelPos.y + this.getPos(Y),
-					this.barrelPos.z + this.getPos(Z),
+					this.barrelPos.x,
+					this.barrelPos.y,
+					this.barrelPos.z,
 					MathHelper.nextDouble(this.random, -0.001, 0.001),
 					MathHelper.nextDouble(this.random, -0.001, 0.001),
 					MathHelper.nextDouble(this.random, -0.001, 0.001)

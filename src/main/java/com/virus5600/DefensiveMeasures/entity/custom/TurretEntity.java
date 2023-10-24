@@ -312,7 +312,7 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
 		double y = zOffset * Math.sin(pitch);
 		double z = zOffset * Math.sin(yaw) * Math.cos(pitch);
 
-		return new Vec3d(x, -y, z);
+		return new Vec3d(x, -y, z).add(this.getPos());
 	}
 
 	@Override
@@ -820,35 +820,23 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
 	@Override
 	public ActionResult interactMob(PlayerEntity player, Hand hand) {
 		ItemStack item = player.getStackInHand(hand);
-		boolean itemDecrement = false;
+		boolean itemDecrement = !player.isCreative();
 
 		// TURRET REMOVER
 		if (item.getItem() == ModItems.TURRET_REMOVER) {
-				item.damage(1, player, player2 -> player2.sendToolBreakStatus(hand));
+			item.damage(1, player, player2 -> player2.sendToolBreakStatus(hand));
 		}
 
 		// HEALABLES
 		else if (this.isHealableItem(item.getItem())) {
+			// Heals the turret
 			this.heal(this.getHealAmt(item.getItem()));
-
-			// Decrement item amount (if it is a plain item) or durability (if it is a tool)
-			if (item.getItem().isDamageable()) {
-				if (item.getDamage() > item.getMaxDamage())
-					item.decrement(1);
-				else
-					item.setDamage(item.getDamage() + 1);
-			}
-			else {
-				item.decrement(1);
-			}
 
 			// Indicates a repair was done
 			this.world.playSoundFromEntity(player, this, this.healSound, SoundCategory.MASTER, 1, 1);
 
-
 			// Applies status effect if it provides one
 			if (this.isEffectSource(item.getItem())) {
-				itemDecrement = true;
 				for (Object[] args : this.getMobEffect(item.getItem())) {
 					addStatusEffect(
 						new StatusEffectInstance(
@@ -860,9 +848,14 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
 				}
 			}
 
+			// Decrement item amount (if it is a plain item) or durability (if it is a tool) if player is not in Creative mode
 			if (itemDecrement) {
-				item.decrement(1);
-				return ActionResult.success(this.world.isClient);
+				if (item.isDamageable())
+					item.damage(1, player, player2 -> player2.sendToolBreakStatus(hand));
+				else
+					item.decrement(1);
+
+				return ActionResult.SUCCESS;
 			}
 		}
 

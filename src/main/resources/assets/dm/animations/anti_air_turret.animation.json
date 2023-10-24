@@ -37,16 +37,10 @@
 					"position": ["Math.random(-0.025, 0.025)", 0, "Math.random(-0.025, 0.025)"]
 				}
 			},
-			"sound_effects": {
-				"0.0": {
-					"effect": "shoot1"
-				}
-			},
 			"particle_effects": {
 				"0.0": {
 					"effect": "muzzle_flash",
-					"locator": "barrel",
-					"pre_effect_script": "true;"
+					"locator": "barrel"
 				}
 			}
 		},
@@ -132,12 +126,9 @@
 				},
 				"camera": {
 					"rotation": {
-						"0.0833": {
-							"pre": [0, 0, 0],
-							"post": [0, 0, 0],
-							"lerp_mode": "catmullrom"
-						},
+						"0.0833": [0, 0, 0],
 						"0.125": {
+							"pre": [5, 0, 0],
 							"post": [5, 0, 0],
 							"lerp_mode": "catmullrom"
 						},
@@ -185,12 +176,9 @@
 						"1.25": [-77.13935, -21.8797, 53.35452]
 					},
 					"position": {
-						"0.0833": {
-							"pre": [0, 0.28822, -0.08325],
-							"post": [0, 0.28822, -0.08325],
-							"lerp_mode": "catmullrom"
-						},
+						"0.0833": [0, 0.28822, -0.08325],
 						"0.125": {
+							"pre": [0, 0.86465, -0.24975],
 							"post": [0, 0.86465, -0.24975],
 							"lerp_mode": "catmullrom"
 						},

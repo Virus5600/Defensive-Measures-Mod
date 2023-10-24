@@ -28,7 +28,7 @@ public class AntiAirTurretModel extends AnimatedGeoModel<AntiAirTurretEntity> {
 		return new Identifier(DefensiveMeasures.MOD_ID, "textures/entity/anti_air_turret/anti_air_turret.png");
 	}
 
-	@SuppressWarnings({ "unchecked" })
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	public void setLivingAnimations(final AntiAirTurretEntity entity, final Integer uniqueID, final AnimationEvent customPredicate) {
 		super.setLivingAnimations(entity, uniqueID, customPredicate);

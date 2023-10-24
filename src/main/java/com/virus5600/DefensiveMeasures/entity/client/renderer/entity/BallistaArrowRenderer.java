@@ -16,24 +16,24 @@ import software.bernie.geckolib3.renderers.geo.GeoProjectilesRenderer;
 public class BallistaArrowRenderer extends GeoProjectilesRenderer<BallistaArrowEntity> {
 
 	// CONSTRUCTOR //
-	public BallistaArrowRenderer(Context ctx) {
+	public BallistaArrowRenderer(final Context ctx) {
 		super(ctx, new BallistaArrowModel());
 	}
 
 	// METHODS //
 	// PUBLIC
 	@Override
-	public Identifier getTexture(BallistaArrowEntity instance) {
+	public Identifier getTexture(final BallistaArrowEntity instance) {
 		return new Identifier(DefensiveMeasures.MOD_ID, "textures/entity/ballista/ballista_arrow.png");
 	}
 
-	protected int getBlockLight(BallistaArrowEntity entityIn, BlockPos partialTicks) {
+	protected int getBlockLight(final BallistaArrowEntity entityIn, final BlockPos partialTicks) {
 		return 15;
 	}
 
-	public RenderLayer getRenderType(BallistaArrowEntity animatable, float partialTicks, MatrixStack stack,
-			VertexConsumerProvider renderTypeBuffer, VertexConsumer vertexBuilder, int packedLightIn,
-			Identifier textureLocation) {
+	public RenderLayer getRenderType(final BallistaArrowEntity animatable, final float partialTicks, final MatrixStack stack,
+			final VertexConsumerProvider renderTypeBuffer, final VertexConsumer vertexBuilder, final int packedLightIn,
+			final Identifier textureLocation) {
 		return RenderLayer.getEntityTranslucent(getTextureResource(animatable));
 	}
 }

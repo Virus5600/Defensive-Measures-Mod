@@ -8,7 +8,6 @@ import java.util.Map;
 import org.jetbrains.annotations.Nullable;
 
 import com.virus5600.DefensiveMeasures.entity.TurretMaterial;
-import com.virus5600.DefensiveMeasures.entity.ai.goal.PrioritizeAirTargetGoal;
 import com.virus5600.DefensiveMeasures.entity.ai.goal.TargetOtherTeamGoal;
 import com.virus5600.DefensiveMeasures.entity.projectile.AntiAirProjectileEntity;
 import com.virus5600.DefensiveMeasures.item.ModItems;
@@ -22,11 +21,13 @@ import net.minecraft.entity.ai.goal.LookAtEntityGoal;
 import net.minecraft.entity.ai.goal.ProjectileAttackGoal;
 import net.minecraft.entity.attribute.DefaultAttributeContainer;
 import net.minecraft.entity.attribute.EntityAttributes;
+import net.minecraft.entity.boss.dragon.EnderDragonEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.effect.StatusEffects;
+import net.minecraft.entity.mob.FlyingEntity;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.entity.mob.Monster;
 import net.minecraft.entity.player.PlayerEntity;
@@ -82,8 +83,6 @@ public class AntiAirTurretEntity extends TurretEntity implements IAnimatable {
 		this.addHealables(healables);
 		this.addEffectSource(effectSource);
 	}
-
-	// TODO: Continue fixing the AA Turret
 
 	// METHODS //
 	// PRIVATE
@@ -144,13 +143,15 @@ public class AntiAirTurretEntity extends TurretEntity implements IAnimatable {
 	@Override
 	protected void initGoals() {
 		// Goals
-		this.goalSelector.add(1, new PrioritizeAirTargetGoal(this, 0, TOTAL_ATTACK_COOLDOWN, 64.8125f));
-		this.goalSelector.add(2, new ProjectileAttackGoal(this, 0, TOTAL_ATTACK_COOLDOWN, 64.8125f));
+		this.goalSelector.add(1, new ProjectileAttackGoal(this, 0, TOTAL_ATTACK_COOLDOWN, 64.8125f));
 		this.goalSelector.add(3, new LookAtEntityGoal(this, MobEntity.class, 8.0F, 0.02F, true));
 		this.goalSelector.add(8, new LookAroundGoal(this));
 
 		// Targets
 		this.targetSelector.add(1, new ActiveTargetGoal<MobEntity>(this, MobEntity.class, 10, true, false, (entity) -> {
+			return (entity instanceof FlyingEntity) || (entity instanceof EnderDragonEntity);
+		}));
+		this.targetSelector.add(2, new ActiveTargetGoal<MobEntity>(this, MobEntity.class, 10, true, false, (entity) -> {
 			return entity instanceof Monster;
 		}));
 		this.targetSelector.add(3, new TargetOtherTeamGoal(this));
@@ -241,11 +242,12 @@ public class AntiAirTurretEntity extends TurretEntity implements IAnimatable {
 
 				--this.attCooldown;
 
-				if (this.attCooldown <= 0) this.attCooldown = 20 * 2.5;
+				if (this.attCooldown <= 0)
+					this.attCooldown = 20 * 2.5;
 
 				try {
 					if (this.getProjectilesFired < 10 && this.isShooting()) {
-						if (!this.getShouldSkipAtt() && this.projectileShootCooldown == 0) {
+						if (!this.getShouldSkipAtt() && this.projectileShootCooldown <= 0) {
 							double vx = (this.getTarget().getX() - this.getX()) * 1.0625;
 							double vy = this.getTarget().getBodyY(2 / 3) - this.getY() + 0.25;
 							double vz = (this.getTarget().getZ() - this.getZ()) * 1.0625;
@@ -254,9 +256,9 @@ public class AntiAirTurretEntity extends TurretEntity implements IAnimatable {
 							float divergence = 0 + this.world.getDifficulty().getId() * 2;
 
 							ProjectileEntity projectile = (ProjectileEntity) new AntiAirProjectileEntity(world, this);
-							this.barrelPos = this.getRelativePos(0, -.175, .5);
+							this.barrelPos = this.getRelativePos(0, -35, 1);
 
-							projectile.setVelocity(vx, vy + variance * 0.2f, vz, 1.5f, divergence + 0.25f);
+							projectile.setVelocity(vx, vy + variance * 0.2f, vz, 2.5f, divergence + 0.25f);
 							projectile.setPos(this.barrelPos.x, this.barrelPos.y, this.barrelPos.z);
 							this.playSound(this.getShootSound(), 1.0f, 1.0f / (this.getRandom().nextFloat() * 0.4f + 0.8f));
 
@@ -268,7 +270,8 @@ public class AntiAirTurretEntity extends TurretEntity implements IAnimatable {
 						else {
 							this.projectileShootCooldown--;
 
-							if (this.projectileShootCooldown == 0) this.setShouldSkipAtt(false);
+							if (this.projectileShootCooldown == 0)
+								this.setShouldSkipAtt(false);
 						}
 					}
 					else {

@@ -12,23 +12,23 @@ public class BallistaArrowModel extends AnimatedGeoModel<BallistaArrowEntity> {
 	// METHODS //
 	// PUBLIC
 	@Override
-	public Identifier getAnimationResource(BallistaArrowEntity animatable) {
+	public Identifier getAnimationResource(final BallistaArrowEntity animatable) {
 		return new Identifier(DefensiveMeasures.MOD_ID, "animations/ballista_arrow.animation.json");
 	}
 
 	@Override
-	public Identifier getModelResource(BallistaArrowEntity object) {
+	public Identifier getModelResource(final BallistaArrowEntity object) {
 		return new Identifier(DefensiveMeasures.MOD_ID, "geo/ballista_arrow.geo.json");
 	}
 
 	@Override
-	public Identifier getTextureResource(BallistaArrowEntity object) {
+	public Identifier getTextureResource(final BallistaArrowEntity object) {
 		return new Identifier(DefensiveMeasures.MOD_ID, "textures/entity/ballista/ballista_arrow.png");
 	}
 
 	@SuppressWarnings("rawtypes")
 	@Override
-	public void setLivingAnimations(BallistaArrowEntity entity, Integer uniqueID, AnimationEvent customPredicate) {
+	public void setLivingAnimations(final BallistaArrowEntity entity, final Integer uniqueID, final AnimationEvent customPredicate) {
 		super.setLivingAnimations(entity, uniqueID, customPredicate);
 	}
 }
