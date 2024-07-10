@@ -1,12 +1,8 @@
 {
 	"required": true,
-	"package": "com.virus5600.defensive_measures.mixin",
+	"package": "com.virus5600.defensive_measures.mixin.client",
 	"compatibilityLevel": "JAVA_21",
-	"mixins": [
-	],
 	"client": [
-	],
-	"server": [
 	],
 	"injectors": {
 		"defaultRequire": 1

@@ -3,42 +3,42 @@
 	"itemGroup.dm.defensive_measures.equipments" : "Defensive Measures Equipments",
 	"itemGroup.dm.defensive_measures.traps" : "Defensive Measures Traps",
 	"itemGroup.dm.defensive_measures.turrets" : "Defensive Measures Turrets",
-	
+
 	"block.dm.arrowhead" : "Arrowhead",
 
 	"item.dm.turret_remover": "Turret Remover",
-	
+
 	"item.dm.cannon_base" : "Cannon Base",
 	"item.dm.cannon_stand" : "Cannon Stand",
 	"item.dm.unfinished_cannon_head" : "Unfinished Cannon Head",
 	"item.dm.cannon_head" : "Cannon Head",
 	"item.dm.cannon_turret" : "Place Cannon Turret",
-	
+
 	"item.dm.ballista_base" : "Ballista Base",
 	"item.dm.ballista_base_with_stand" : "Ballista Base with Stand",
 	"item.dm.ballista_bow" : "Ballista Bow",
 	"item.dm.ballista_arrow" : "Ballista Arrow",
 	"item.dm.ballista" : "Place Ballista",
-	
+
 	"item.dm.ammo_case" : "Ammo Case",
 	"item.dm.ammo_rounds" : "Ammo Rounds",
 	"item.dm.machine_gun_base" : "MG Base",
 	"item.dm.machine_gun_head" : "MG Head",
 	"item.dm.machine_gun_stand" : "MG Stand",
 	"item.dm.mg_turret" : "Place MG Turret",
-	
+
 	"entity.dm.cannon_turret" : "Cannon Turret",
 	"entity.dm.cannonball" : "Cannon ball",
-	
+
 	"entity.dm.ballista" : "Ballista",
 	"entity.dm.ballista_arrow" : "Ballista Arrow",
-	
+
 	"entity.dm.mg_turret" : "MG Turret",
 	"entity.dm.mg_bullet" : "MG Bullet",
-	
+
 	"death.attack.arrowhead" : "%1$s stepepd on an Arrowhead",
 	"death.attack.arrowhead.player" : "%1$s stepped on a random Arrowhead whilst fighting with %2$s",
-	
+
 	"subtitles.turret.remove.metal" : "Metallic Turret Removed",
 	"subtitles.turret.remove.wood" : "Wooden Turret Removed",
 
