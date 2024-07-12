@@ -320,6 +320,11 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
 		return false;
 	}
 
+	/**
+	 * Retrieves the currently attached side of this turret.
+	 * @param pos The current position of this turret.
+	 * @return {@code Direction} The direction where this turret is attached to.
+	 */
 	@Nullable
 	protected Direction findAttachableSide(BlockPos pos) {
 		for (Direction dir : Direction.values()) {
@@ -488,6 +493,7 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
 	 * Identifies whether this item already have the effect in its list or not. This iterates through all the entries
 	 *
 	 * @param item The item in question
+	 * @param effect The effect to check
 	 * @return boolean
 	 */
 	public boolean effectSourceHasEffect(Item item, StatusEffect effect) {
@@ -523,9 +529,17 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
 		return new Vec3d(i * j, -k, h * j);
 	}
 
+	/**
+	 * Sets the direction where this will be attached to.
+	 * @param dir The direction to attach to.
+	 */
 	protected void setAttachedFace(Direction dir) {
 		this.dataTracker.set(ATTACHED_FACE, dir);
 	}
+	/**
+	 * Retrieves the direction where this turret is attached to.
+	 * @return {@code Direction} The direction where this turret is attached to.
+	 */
 	protected Direction getAttachedFace() {
 		return this.dataTracker.get(ATTACHED_FACE);
 	}
@@ -543,7 +557,7 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
 	 * @param yOffset The offset of the point at the local Y-Axis of this turret.
 	 * @param zOffset The offset of the point at the local Z-Axis of this turret.
 	 *
-	 * @return Vec3d the relative position of this point, assuming that the origin is at <b>[0, 0, 0]<b>
+	 * @return Vec3d the relative position of this point, assuming that the origin is at <b>[0, 0, 0]</b>
 	 */
 	public Vec3d getRelativePos(double xOffset, double yOffset, double zOffset) {
 		return this.raycast(
@@ -740,7 +754,7 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
 	 * @param item The item in question
 	 * @param args An Object array that consists of {@code StatusEffect,} {@code duration} (in seconds), and {@code amplifier} level
 	 *
-	 * @return TuretEntity
+	 * @return TurretEntity
 	 *
 	 * @see #effectSource
 	 * @see Item
@@ -783,11 +797,11 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
 			}
 			else {
 				if (arg.length == 3)
-					DefensiveMeasures.LOGGER.warn("Effect source at " + this.getName().getString() + " was not " + (this.effectSourceHasEffect(item, (StatusEffect) arg[0]) ? "updated" : "registered") + " due to given array not matching the correct order of items in the array, having [" + arg[0].getClass().getName() + ", " + arg[1].getClass().getName() + ", " + arg[2].getClass().getName() + "] instead of [StatusEffect, Float, Integer]");
+					DefensiveMeasures.LOGGER.warn("Effect source at {} was not {} due to given array not matching the correct order of items in the array, having [{}, {}, {}] instead of [StatusEffect, Float, Integer]", this.getName().getString(), this.effectSourceHasEffect(item, (StatusEffect) arg[0]) ? "updated" : "registered", arg[0].getClass().getName(), arg[1].getClass().getName(), arg[2].getClass().getName());
 				else if (arg.length == 2)
-					DefensiveMeasures.LOGGER.warn("Effect source at " + this.getName().getString() + " was not " + (this.effectSourceHasEffect(item, (StatusEffect) arg[0]) ? "updated" : "registered") + " due to given array not matching the correct order of items in the array, having [" + arg[0].getClass().getName() + ", " + arg[1].getClass().getName() + "] instead of [StatusEffect, Float] OR [StatusEffect, Integer]");
+					DefensiveMeasures.LOGGER.warn("Effect source at {} was not {} due to given array not matching the correct order of items in the array, having [{}, {}] instead of [StatusEffect, Float] OR [StatusEffect, Integer]", this.getName().getString(), this.effectSourceHasEffect(item, (StatusEffect) arg[0]) ? "updated" : "registered", arg[0].getClass().getName(), arg[1].getClass().getName());
 				else if (arg.length == 1)
-					DefensiveMeasures.LOGGER.warn("Effect source at " + this.getName().getString() + " was not " + (this.effectSourceHasEffect(item, (StatusEffect) arg[0]) ? "updated" : "registered") + " due to given array not matching the correct order of items in the array, having [" + arg[0].getClass().getName() + "] instead of [StatusEffect]");
+					DefensiveMeasures.LOGGER.warn("Effect source at {} was not {} due to given array not matching the correct order of items in the array, having [{}] instead of [StatusEffect]", this.getName().getString(), this.effectSourceHasEffect(item, (StatusEffect) arg[0]) ? "updated" : "registered", arg[0].getClass().getName());
 			}
 
 		}
@@ -799,9 +813,9 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
 
 	/**
 	 * Retrieves the item and identifies the mob effects this should apply to this turret, otherwise, returns an empty {@code List<Object[]>}.
-	 * @param item
+	 * @param item The item to get the mob effects from.
 	 *
-	 * @return List<Object[]> A list of information consisting an array of the effect data. The data are set in this order:
+	 * @return {@code List<Object[]>} A list of information consisting an array of the effect data. The data are set in this order:
 	 * <ol>
 	 * 	<li>{@code StatusEffect}</li>
 	 * 	<li>{@code duration}</li>
@@ -940,7 +954,7 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
 			e.printStackTrace();
 
 			DefensiveMeasures.LOGGER.error("");
-			DefensiveMeasures.LOGGER.error("	 " + DefensiveMeasures.MOD_ID.toUpperCase() + " ERROR OCCURRED	 ");
+			DefensiveMeasures.LOGGER.error("\t {} ERROR OCCURRED\t ", DefensiveMeasures.MOD_ID.toUpperCase());
 			DefensiveMeasures.LOGGER.error("===== ERROR MSG START =====");
 			DefensiveMeasures.LOGGER.error("LOCALIZED ERROR MESSAGE:");
 			DefensiveMeasures.LOGGER.error(e.getLocalizedMessage());
@@ -974,14 +988,6 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
 		@Override
 		protected void clampHeadYaw() {
 		}
-
-//		@Override
-//		protected Optional<Float> getTargetYaw() {
-//		}
-
-//		@Override
-//		protected Optional<Float> getTargetPitch() {
-//		}
 	}
 
 	///////////////////////

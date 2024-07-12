@@ -4,6 +4,9 @@ import net.fabricmc.fabric.api.registry.FuelRegistry;
 import net.minecraft.item.Item;
 import net.minecraft.util.Rarity;
 
+/**
+ * The class for the Cannon Base {@link Item item}.
+ */
 public class CannonBaseItem extends Item {
 	public CannonBaseItem(Settings settings) {
 		super(

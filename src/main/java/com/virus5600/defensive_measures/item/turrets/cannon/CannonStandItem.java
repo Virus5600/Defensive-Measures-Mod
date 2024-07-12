@@ -4,6 +4,9 @@ import net.fabricmc.fabric.api.registry.FuelRegistry;
 import net.minecraft.item.Item;
 import net.minecraft.util.Rarity;
 
+/**
+ * The class for the Cannon Stand {@link Item item}.
+ */
 public class CannonStandItem extends Item {
 	public CannonStandItem(Settings settings) {
 		super(
