@@ -1,8 +1,8 @@
-package com.virus5600.defensive_measures.entities;
+package com.virus5600.defensive_measures.entity;
 
 import com.virus5600.defensive_measures.DefensiveMeasures;
 
-import com.virus5600.defensive_measures.entities.turrets.CannonTurretEntity;
+import com.virus5600.defensive_measures.entity.turrets.CannonTurretEntity;
 
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
 

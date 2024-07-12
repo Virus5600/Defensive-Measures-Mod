@@ -1,6 +1,5 @@
-package com.virus5600.defensive_measures.entities.turrets;
+package com.virus5600.defensive_measures.entity.turrets;
 
-import net.minecraft.component.ComponentType;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.NbtComponent;
 import net.minecraft.entity.mob.MobEntity;

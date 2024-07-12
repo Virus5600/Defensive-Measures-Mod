@@ -1,11 +1,11 @@
-package com.virus5600.defensive_measures.items.turrets.cannon;
+package com.virus5600.defensive_measures.item.turrets.cannon;
 
 import net.fabricmc.fabric.api.registry.FuelRegistry;
 import net.minecraft.item.Item;
 import net.minecraft.util.Rarity;
 
-public class CannonBaseItem extends Item {
-	public CannonBaseItem(Settings settings) {
+public class CannonStandItem extends Item {
+	public CannonStandItem(Settings settings) {
 		super(
 			settings
 				.maxCount(16)			// MAX STACK SIZE
@@ -13,6 +13,6 @@ public class CannonBaseItem extends Item {
 		);
 
 		// FUEL
-		FuelRegistry.INSTANCE.add(this, 300);
+		FuelRegistry.INSTANCE.add(this, 600);
 	}
 }

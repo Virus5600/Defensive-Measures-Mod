@@ -1,10 +1,10 @@
-package com.virus5600.defensive_measures.items;
+package com.virus5600.defensive_measures.item;
 
 import com.virus5600.defensive_measures.DefensiveMeasures;
 
-import com.virus5600.defensive_measures.entities.ModEntities;
-import com.virus5600.defensive_measures.items.equipments.TurretRemoverItem;
-import com.virus5600.defensive_measures.items.turrets.cannon.*;
+import com.virus5600.defensive_measures.entity.ModEntities;
+import com.virus5600.defensive_measures.item.equipments.TurretRemoverItem;
+import com.virus5600.defensive_measures.item.turrets.cannon.*;
 
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.minecraft.item.Item;

@@ -1,4 +1,4 @@
-package com.virus5600.defensive_measures.items.turrets;
+package com.virus5600.defensive_measures.item.turrets;
 
 import java.util.Map;
 import java.util.Objects;
@@ -9,7 +9,7 @@ import org.jetbrains.annotations.Nullable;
 
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
-import com.virus5600.defensive_measures.entities.turrets.TurretEntity;
+import com.virus5600.defensive_measures.entity.turrets.TurretEntity;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.block.FluidBlock;
@@ -97,7 +97,7 @@ public class TurretItem extends Item {
         if (!(world instanceof ServerWorld)) {
             return TypedActionResult.success(itemStack);
         }
-		
+
         BlockPos blockPos = hitResult.getBlockPos();
 
         if (!(world.getBlockState(blockPos).getBlock() instanceof FluidBlock)) {

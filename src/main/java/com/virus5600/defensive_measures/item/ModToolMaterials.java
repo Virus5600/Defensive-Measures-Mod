@@ -1,4 +1,4 @@
-package com.virus5600.defensive_measures.items;
+package com.virus5600.defensive_measures.item;
 
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;

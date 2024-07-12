@@ -1,4 +1,4 @@
-package com.virus5600.defensive_measures.items.equipments;
+package com.virus5600.defensive_measures.item.equipments;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;

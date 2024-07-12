@@ -1,4 +1,4 @@
-package com.virus5600.defensive_measures.entities.turrets;
+package com.virus5600.defensive_measures.entity.turrets;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -33,9 +33,9 @@ import net.minecraft.world.ServerWorldAccess;
 import net.minecraft.world.World;
 
 import com.virus5600.defensive_measures.DefensiveMeasures;
-import com.virus5600.defensive_measures.entities.TurretMaterial;
-import com.virus5600.defensive_measures.items.ModItems;
-import com.virus5600.defensive_measures.items.turrets.TurretItem;
+import com.virus5600.defensive_measures.entity.TurretMaterial;
+import com.virus5600.defensive_measures.item.ModItems;
+import com.virus5600.defensive_measures.item.turrets.TurretItem;
 
 import org.jetbrains.annotations.Nullable;
 

@@ -1,6 +1,6 @@
-package com.virus5600.defensive_measures.items.turrets.cannon;
+package com.virus5600.defensive_measures.item.turrets.cannon;
 
-import com.virus5600.defensive_measures.items.turrets.TurretItem;
+import com.virus5600.defensive_measures.item.turrets.TurretItem;
 
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.mob.MobEntity;

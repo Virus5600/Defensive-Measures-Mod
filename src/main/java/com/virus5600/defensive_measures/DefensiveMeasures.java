@@ -1,8 +1,8 @@
 package com.virus5600.defensive_measures;
 
-import com.virus5600.defensive_measures.entities.ModEntities;
-import com.virus5600.defensive_measures.items.ModItemGroups;
-import com.virus5600.defensive_measures.items.ModItems;
+import com.virus5600.defensive_measures.entity.ModEntities;
+import com.virus5600.defensive_measures.item.ModItemGroups;
+import com.virus5600.defensive_measures.item.ModItems;
 import net.fabricmc.api.ModInitializer;
 
 import org.slf4j.Logger;

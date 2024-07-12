@@ -20,18 +20,8 @@
 	"entrypoints": {
 		"main": [
 			"com.virus5600.defensive_measures.DefensiveMeasures"
-		],
-		"client": [
-			"com.virus5600.defensive_measures.DefensiveMeasuresClient"
 		]
 	},
-	"mixins": [
-		"dm.mixins.json",
-		{
-			"config": "dm.client.mixins.json",
-			"environment": "client"
-		}
-	],
 	"depends": {
 		"fabricloader": ">=0.15.11",
 		"minecraft": "~1.21",

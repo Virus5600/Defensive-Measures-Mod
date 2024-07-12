@@ -1,11 +1,11 @@
-package com.virus5600.defensive_measures.entities.turrets;
+package com.virus5600.defensive_measures.entity.turrets;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.virus5600.defensive_measures.DefensiveMeasures;
+import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.RangedAttackMob;
@@ -30,14 +30,25 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
 import org.jetbrains.annotations.Nullable;
 
-import com.virus5600.defensive_measures.entities.ai.goal.TargetOtherTeamGoal;
-import com.virus5600.defensive_measures.entities.TurretMaterial;
+import com.virus5600.defensive_measures.DefensiveMeasures;
+import com.virus5600.defensive_measures.entity.TurretMaterial;
+import com.virus5600.defensive_measures.entity.ai.goal.TargetOtherTeamGoal;
 
-public class CannonTurretEntity extends TurretEntity implements RangedAttackMob, Itemable {
+import software.bernie.geckolib.animatable.GeoEntity;
+import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
+import software.bernie.geckolib.animation.AnimatableManager.ControllerRegistrar;
+import software.bernie.geckolib.animation.AnimationState;
+import software.bernie.geckolib.animation.PlayState;
+import software.bernie.geckolib.animation.RawAnimation;
+import software.bernie.geckolib.util.GeckoLibUtil;
+
+public class CannonTurretEntity extends TurretEntity implements GeoEntity, RangedAttackMob, Itemable {
 	private static final int totalAttCooldown = 20 * 5;
 	private static final TrackedData<Boolean> FUSE_LIT;
 	/**
@@ -48,12 +59,15 @@ public class CannonTurretEntity extends TurretEntity implements RangedAttackMob,
 	 * Contains all the items that can give effect to this entity
 	 */
 	private static Map<Item, List<Object[]>> effectSource;
+
+	private final AnimatableInstanceCache geoCache = GeckoLibUtil.createInstanceCache(this);
 	/**
 	 * Defines the current target of this Cannon.
 	 */
 	@Nullable
 	private LivingEntity currentTarget = null;
 	private double attCooldown = totalAttCooldown;
+	private boolean animPlayed = false;
 
 	//////////////////
 	// CONSTRUCTORS //
@@ -174,9 +188,83 @@ public class CannonTurretEntity extends TurretEntity implements RangedAttackMob,
 		return new ItemStack(Items.IRON_BLOCK);
 	}
 
+	///////////////////////////
+	// ANIMATION CONTROLLERS //
+	///////////////////////////
+
+	private <E extends CannonTurretEntity>PlayState deathController(final AnimationState<E> event) {
+		if (!this.isAlive() && !animPlayed) {
+			animPlayed = true;
+			event.setAnimation(
+				RawAnimation
+					.begin()
+					.thenLoop("animation.cannon_turret.death")
+			);
+			return PlayState.STOP;
+		}
+		return PlayState.CONTINUE;
+	}
+
+	private <E extends CannonTurretEntity>PlayState idleController(final AnimationState<E> event) {
+		return event
+			.setAndContinue(
+				RawAnimation
+					.begin()
+					.thenLoop("animation.cannon_turret.setup")
+			);
+	}
+
+	private <E extends CannonTurretEntity>PlayState lookAtTargetController(final AnimationState<E> event) {
+		return event
+			.setAndContinue(
+				RawAnimation
+					.begin()
+					.thenLoop("animation.cannon_turret.look_at_target")
+			);
+	}
+
+	private <E extends CannonTurretEntity>PlayState firingSequenceController(final AnimationState<E> event) {
+		Vec3d fusePos = this.getRelativePos(0, 0, 0),
+			barrelPos = this.getRelativePos(0, 0, 0);
+
+		if (this.hasTarget() && this.isShooting()) {
+			event.getController()
+				.setParticleKeyframeHandler((state) -> {
+					String fuse = state.getKeyframeData().getLocator(),
+						effectName = state.getKeyframeData().getEffect();
+				})
+				.setAnimation(
+					RawAnimation
+						.begin()
+						.thenPlay("animation.cannon_turret.shoot")
+				);
+
+			if (!this.getShootingFXDone()) {
+				int count = MathHelper.nextInt(this.random, 10, 25);
+				double vx = (this.getPos(TARGET_POS_X) - this.getPos(X))/10;
+				double vy = (this.getPos(TARGET_POS_Y) - this.getPos(Y));
+				double vz = (this.getPos(TARGET_POS_Z) - this.getPos(Z))/10;
+				double variance = Math.sqrt(vx * vx + vz * vz) * 0.5;
+			}
+		}
+
+		return PlayState.CONTINUE;
+	}
+
 	///////////////////////////////
 	// INTERFACE IMPLEMENTATIONS //
 	///////////////////////////////
+
+	// GeoEntity //
+	@Override
+	public void registerControllers(ControllerRegistrar controllers) {
+
+	}
+
+	@Override
+	public AnimatableInstanceCache getAnimatableInstanceCache() {
+		return this.geoCache;
+	}
 
 	///////////////////
 	// LOCAL CLASSES //
