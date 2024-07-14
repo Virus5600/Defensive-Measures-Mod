@@ -40,7 +40,8 @@ public class ModItemGroups {
 	////////////////////
 
 	public static void registerModItemGroups() {
-		DefensiveMeasures.LOGGER.info("Registering item groups...");
+		DefensiveMeasures.LOGGER.info("REGISTERING ITEM GROUPS FOR {}...", DefensiveMeasures.MOD_NAME);
+
 		Registry.register(Registries.ITEM_GROUP, DMI_KEY, DEFENSIVE_MEASURES_ITEMS);
 		Registry.register(Registries.ITEM_GROUP, DME_KEY, DEFENSIVE_MEASURES_EQUIPMENTS);
 //		Registry.register(Registries.ITEM_GROUP, DMTR_KEY, DEFENSIVE_MEASURES_TRAPS);

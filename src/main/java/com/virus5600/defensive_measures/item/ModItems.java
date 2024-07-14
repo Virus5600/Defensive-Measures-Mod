@@ -77,7 +77,7 @@ public class ModItems {
 	}
 
 	public static void registerModItems() {
-		DefensiveMeasures.LOGGER.info("Registering items to item groups...");
+		DefensiveMeasures.LOGGER.info("REGISTERING ITEMS TO ITEM GROUPS...");
 
 		Arrays.stream(DM_ITEMS).iterator().forEachRemaining((item) -> {
 			ItemGroupEvents.modifyEntriesEvent(ModItemGroups.DMI_KEY).register((content) -> {

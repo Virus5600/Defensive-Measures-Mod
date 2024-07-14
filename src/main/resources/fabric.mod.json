@@ -20,6 +20,9 @@
 	"entrypoints": {
 		"main": [
 			"com.virus5600.defensive_measures.DefensiveMeasures"
+		],
+		"client": [
+			"com.virus5600.defensive_measures.DefensiveMeasuresClient"
 		]
 	},
 	"depends": {

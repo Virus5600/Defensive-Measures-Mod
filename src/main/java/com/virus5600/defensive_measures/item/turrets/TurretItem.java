@@ -5,6 +5,7 @@ import java.util.Objects;
 
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.NbtComponent;
+import net.minecraft.text.Text;
 import org.jetbrains.annotations.Nullable;
 
 import com.google.common.collect.Iterables;
@@ -68,8 +69,9 @@ public class TurretItem extends Item {
 			NbtComponent nbtComponent = itemStack.get(DataComponentTypes.CUSTOM_DATA);
 			NbtCompound nbt = nbtComponent != null ? nbtComponent.copyNbt() : NbtComponent.DEFAULT.copyNbt();
 			EntityType<?> entityType2 = this.getEntityType(nbt);
+			context.getPlayer().sendMessage(Text.of("Spawning " + entityType2.getName().getString()), true);
 			Entity entity = entityType2.spawnFromItemStack(
-				(ServerWorld)world,
+				(ServerWorld) world,
 				itemStack,
 				context.getPlayer(),
 				blockPos2,

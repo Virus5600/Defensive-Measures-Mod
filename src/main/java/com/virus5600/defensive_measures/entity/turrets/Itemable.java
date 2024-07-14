@@ -1,11 +1,26 @@
 package com.virus5600.defensive_measures.entity.turrets;
 
+import com.virus5600.defensive_measures.advancement.criterion.ModCriterion;
+import com.virus5600.defensive_measures.entity.TurretMaterial;
+import com.virus5600.defensive_measures.sound.ModSoundEvents;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.NbtComponent;
+import net.minecraft.entity.ItemEntity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.mob.MobEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundEvent;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.Hand;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.world.World;
+
+import java.util.Optional;
+import java.util.Random;
 
 /**
  * An interface that serves as a base for all entities that can be stored as an items.
@@ -82,5 +97,58 @@ public interface Itemable {
 	 */
 	public static void copyDataFromNbt(MobEntity entity, NbtCompound nbt) {
 		NbtComponent.of(nbt).applyToEntity(entity);
+	}
+
+	/**
+	 * Attempts to retrieve the {@link Itemable Itemable Entity} as an item.
+	 * @param player The player that is attempting to retrieve the item.
+	 * @param hand The hand the player is using to retrieve the item.
+	 * @param entity The entity to retrieve the item from.
+	 * @param tool The tool the player is using to retrieve the item.
+	 * @param modItem The item to retrieve.
+	 * @return {@link Optional<ActionResult>} The result of the action.
+	 * @param <T> The type of entity.
+	 */
+	public static <T extends LivingEntity> Optional<ActionResult> tryItem(PlayerEntity player, Hand hand, T entity, Item tool, Item modItem) {
+		ItemStack itemStack = player.getStackInHand(hand);
+		if (itemStack.getItem() == tool && entity.isAlive()) {
+			World world = entity.getWorld();
+
+			if (!world.isClient) {
+				if (((TurretEntity) entity).getTurretMaterial() == TurretMaterial.METAL) {
+					entity.playSound(ModSoundEvents.TURRET_REMOVED_METAL, 1.0f, new Random().nextFloat(0.75f, 1.25f));
+				}
+				else if (((TurretEntity) entity).getTurretMaterial() == TurretMaterial.WOOD) {
+					entity.playSound(ModSoundEvents.TURRET_REMOVED_WOOD, 1.0f, new Random().nextFloat(0.75f, 1.25f));
+				}
+			}
+
+			if (player.isCreative() && !player.isSneaking()) {
+				entity.discard();
+				return Optional.of(ActionResult.success(true));
+			}
+
+			ItemStack stack = new ItemStack(modItem);
+			((Itemable) entity).copyDataToStack(stack);
+
+			float x = (float) entity.getPos().x + 0.5f;
+			float y = (float) entity.getPos().y + 0.5f;
+			float z = (float) entity.getPos().z + 0.5f;
+			double vx = MathHelper.nextDouble(world.random, -0.1, 0.1);
+			double vy = MathHelper.nextDouble(world.random, 0.0, 0.1);
+			double vz = MathHelper.nextDouble(world.random, -0.1, 0.1);
+
+			entity.discard();
+			ItemEntity itemStackEntity = new ItemEntity(world, x, y, z, stack, vx, vy, vz);
+			world.spawnEntity(itemStackEntity);
+
+			if (!world.isClient) {
+				ModCriterion.TURRET_ITEM_RETRIEVED_CRITERION.trigger((ServerPlayerEntity) player, stack);
+			}
+
+			entity.discard();
+			return Optional.of(ActionResult.success(world.isClient));
+		}
+		return Optional.empty();
 	}
 }

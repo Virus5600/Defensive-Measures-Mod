@@ -5,7 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
+import com.virus5600.defensive_measures.item.ModItems;
+import com.virus5600.defensive_measures.sound.ModSoundEvents;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.RangedAttackMob;
@@ -23,6 +24,7 @@ import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.entity.mob.Monster;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.ArrowEntity;
 import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.item.Item;
@@ -30,6 +32,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.Hand;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
@@ -40,15 +44,21 @@ import com.virus5600.defensive_measures.DefensiveMeasures;
 import com.virus5600.defensive_measures.entity.TurretMaterial;
 import com.virus5600.defensive_measures.entity.ai.goal.TargetOtherTeamGoal;
 
+import software.bernie.geckolib.animatable.GeoAnimatable;
 import software.bernie.geckolib.animatable.GeoEntity;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.animation.AnimatableManager.ControllerRegistrar;
+import software.bernie.geckolib.animation.AnimationController;
 import software.bernie.geckolib.animation.AnimationState;
 import software.bernie.geckolib.animation.PlayState;
 import software.bernie.geckolib.animation.RawAnimation;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
 public class CannonTurretEntity extends TurretEntity implements GeoEntity, RangedAttackMob, Itemable {
+	/**
+	 * Defines how many seconds the cannon should wait before shooting again.
+	 * The time is calculated in ticks and by default, it's 5 seconds <b>(20 ticks times 5 seconds)</b>.
+	 */
 	private static final int totalAttCooldown = 20 * 5;
 	private static final TrackedData<Boolean> FUSE_LIT;
 	/**
@@ -74,8 +84,8 @@ public class CannonTurretEntity extends TurretEntity implements GeoEntity, Range
 	//////////////////
 	public CannonTurretEntity(EntityType<? extends MobEntity> entityType, World world) {
 		super(entityType, world, TurretMaterial.METAL, ArrowEntity.class);
-//		this.setShootSound(ModSoundEvents.TURRET_CANNON_SHOOT);
-		this.setShootSound(SoundEvents.ENTITY_SHULKER_SHOOT);
+		this.setShootSound(ModSoundEvents.TURRET_CANNON_SHOOT);
+		this.setHealSound(ModSoundEvents.TURRET_REMOVED_METAL);
 		this.addHealables(healables);
 		this.addEffectSource(effectSource);
 	}
@@ -105,7 +115,7 @@ public class CannonTurretEntity extends TurretEntity implements GeoEntity, Range
 	}
 
 	public static DefaultAttributeContainer.Builder setAttributes() {
-		return MobEntity.createMobAttributes()
+		return TurretEntity.createMobAttributes()
 			.add(EntityAttributes.GENERIC_FOLLOW_RANGE, 16)
 			.add(EntityAttributes.GENERIC_MAX_HEALTH, 50)
 			.add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0)
@@ -156,6 +166,21 @@ public class CannonTurretEntity extends TurretEntity implements GeoEntity, Range
 		}
 	}
 
+	@Override
+	public void tick() {
+		super.tick();
+
+		this.setYaw(0);
+		this.setBodyYaw(0);
+	}
+
+	// TODO: Move code to TurretEntity then add a new protected variable where the item counterpart of the turret will be defined.
+	@Override
+	public ActionResult interactMob(PlayerEntity player, Hand hand) {
+		return Itemable.tryItem(player, hand, this, ModItems.TURRET_REMOVER, ModItems.CANNON_TURRET)
+			.orElse(super.interactMob(player, hand));
+	}
+
 	//////////////////////////////////////
 	// QUESTION METHODS (True or False) //
 	//////////////////////////////////////
@@ -167,13 +192,13 @@ public class CannonTurretEntity extends TurretEntity implements GeoEntity, Range
 	@Nullable
 	@Override
 	protected SoundEvent getHurtSound(DamageSource source) {
-		return SoundEvents.ENTITY_IRON_GOLEM_HURT;
+		return ModSoundEvents.TURRET_CANNON_HURT;
 	}
 
 	@Nullable
 	@Override
 	protected SoundEvent getDeathSound() {
-		return SoundEvents.ENTITY_IRON_GOLEM_DEATH;
+		return ModSoundEvents.TURRET_CANNON_DESTROYED;
 	}
 
 	protected boolean isFuseLit() {
@@ -198,7 +223,7 @@ public class CannonTurretEntity extends TurretEntity implements GeoEntity, Range
 			event.setAnimation(
 				RawAnimation
 					.begin()
-					.thenLoop("animation.cannon_turret.death")
+					.thenPlayAndHold("animation.cannon_turret.death")
 			);
 			return PlayState.STOP;
 		}
@@ -210,16 +235,8 @@ public class CannonTurretEntity extends TurretEntity implements GeoEntity, Range
 			.setAndContinue(
 				RawAnimation
 					.begin()
-					.thenLoop("animation.cannon_turret.setup")
-			);
-	}
-
-	private <E extends CannonTurretEntity>PlayState lookAtTargetController(final AnimationState<E> event) {
-		return event
-			.setAndContinue(
-				RawAnimation
-					.begin()
 					.thenLoop("animation.cannon_turret.look_at_target")
+					.thenLoop("animation.cannon_turret.setup")
 			);
 	}
 
@@ -245,6 +262,17 @@ public class CannonTurretEntity extends TurretEntity implements GeoEntity, Range
 				double vy = (this.getPos(TARGET_POS_Y) - this.getPos(Y));
 				double vz = (this.getPos(TARGET_POS_Z) - this.getPos(Z))/10;
 				double variance = Math.sqrt(vx * vx + vz * vz) * 0.5;
+
+				event.getController()
+					.setParticleKeyframeHandler((state) -> {
+						String fuse = state.getKeyframeData().getLocator(),
+							effectName = state.getKeyframeData().getEffect();
+					})
+					.setAnimation(
+						RawAnimation
+							.begin()
+							.thenLoop("animation.cannon_turret.fuse")
+					);
 			}
 		}
 
@@ -257,8 +285,14 @@ public class CannonTurretEntity extends TurretEntity implements GeoEntity, Range
 
 	// GeoEntity //
 	@Override
-	public void registerControllers(ControllerRegistrar controllers) {
+	public void registerControllers(final ControllerRegistrar controllers) {
 
+		controllers
+			.add(
+				new AnimationController<>(this, "Death", this::deathController),
+				new AnimationController<>(this, "Idle", this::idleController),
+				new AnimationController<>(this, "Firing Sequence", this::firingSequenceController)
+			);
 	}
 
 	@Override

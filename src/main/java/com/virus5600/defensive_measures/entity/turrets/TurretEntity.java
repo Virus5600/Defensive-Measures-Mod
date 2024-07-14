@@ -158,6 +158,11 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
 	 */
 	protected Class<?> projectile;
 	/**
+	 * Defines the level of this turret. The higher the level, the stronger
+	 * the turret.
+	 */
+	protected int level;
+	/**
 	 * The material of this turret.
 	 */
 	protected TurretMaterial material;
@@ -228,6 +233,7 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
 	 */
 	public TurretEntity(EntityType<? extends MobEntity> entityType, World world, TurretMaterial material) {
 		super(entityType, world);
+		DefensiveMeasures.LOGGER.debug("Creating a new TurretEntity called {}", entityType.getName());
 
 		this.material = material;
 		this.random = Random.create();
@@ -244,25 +250,27 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
 
 	@Override
 	protected void initDataTracker(DataTracker.Builder builder) {
-		super.initDataTracker(builder);
+//		super.initDataTracker(builder);
 
 		// Entity related tracking
-//		this.dataTracker.set(LEVEL, this.level);
-		builder.add(FROM_ITEM, (byte) 1);
-		builder.add(SHOOTING, false);
-		builder.add(SHOOTING_FX_DONE, true);
-		builder.add(HAS_TARGET, false);
+		builder.add(LEVEL, this.level)
+			.add(FROM_ITEM, (byte) 1)
+			.add(SHOOTING, false)
+			.add(SHOOTING_FX_DONE, true)
+			.add(HAS_TARGET, false)
 
 		// Position related tracking
-		builder.add(X, 0f);
-		builder.add(Y, 0f);
-		builder.add(Z, 0f);
-		builder.add(YAW, 0f);
-		builder.add(PITCH, 0f);
-		builder.add(TARGET_POS_X, 0f);
-		builder.add(TARGET_POS_Y, 0f);
-		builder.add(TARGET_POS_Z, 0f);
-//		this.dataTracker.startTracking(ATTACHED_FACE, Direction.DOWN);
+			.add(ATTACHED_FACE, Direction.DOWN)
+			.add(X, 0f)
+			.add(Y, 0f)
+			.add(Z, 0f)
+			.add(YAW, 0f)
+			.add(PITCH, 0f)
+			.add(TARGET_POS_X, 0f)
+			.add(TARGET_POS_Y, 0f)
+			.add(TARGET_POS_Z, 0f);
+//			.add(ATTACHED_FACE, Direction.DOWN);
+		super.initDataTracker(builder);
 	}
 
 	@Override
@@ -367,9 +375,9 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
 			for (Object[] args : this.getMobEffect(item.getItem())) {
 				this.addStatusEffect(
 					new StatusEffectInstance(
-						RegistryEntry.of((StatusEffect) args[0]),
-						(int) ((float) args[1] * 20),
-						(int) args[2]
+						(RegistryEntry<StatusEffect>) args[0],
+						(int) ((float) ((Integer) args[1]) * 20),
+						(Integer) args[2]
 					)
 				);
 			}

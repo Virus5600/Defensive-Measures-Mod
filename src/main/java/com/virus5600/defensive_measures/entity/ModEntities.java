@@ -21,6 +21,7 @@ public class ModEntities {
 		Identifier.of(DefensiveMeasures.MOD_ID, "cannon_turret"),
 		Builder
 			.create(CannonTurretEntity::new, SpawnGroup.MISC)
+			.dimensions(1F, 1F)
 			.build()
 	);
 
@@ -29,6 +30,7 @@ public class ModEntities {
 //		Identifier.of(DefensiveMeasures.MOD_ID, "ballista"),
 //		Builder
 //			.create(BallistaTurretEntity::new, SpawnGroup.MISC)
+//			.dimensions(1F, 1F)
 //			.build()
 //	);
 //
@@ -37,12 +39,13 @@ public class ModEntities {
 //		Identifier.of(DefensiveMeasures.MOD_ID, "mg_turret"),
 //		Builder
 //			.create(MGTurretEntity::new, SpawnGroup.MISC)
+//			.dimensions(1F, 1F)
 //			.build()
 //	);
 
 	// PROJECTILES //
 	// v1.0.0
-//	public static final EntityType<CannonballEntity> CANNONBAL = Registry.register(
+//	public static final EntityType<CannonballEntity> CANNONBALL = Registry.register(
 //		Registries.ENTITY_TYPE,
 //		Identifier.of(DefensiveMeasures.MOD_ID, "cannonball"),
 //		Builder
@@ -71,7 +74,7 @@ public class ModEntities {
 
 	// REGISTRY //
 	public static void registerModEntityAttributes() {
-		DefensiveMeasures.LOGGER.debug("REGISTERING ENTITY ATTRIBUTES FOR " + DefensiveMeasures.MOD_NAME);
+		DefensiveMeasures.LOGGER.info("REGISTERING ENTITY ATTRIBUTES FOR {}...", DefensiveMeasures.MOD_NAME);
 
 		// TURRETS //
 		// v1.0.0
