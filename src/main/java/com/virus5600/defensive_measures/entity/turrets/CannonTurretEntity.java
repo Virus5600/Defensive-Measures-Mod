@@ -31,7 +31,6 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.sound.SoundEvent;
-import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.MathHelper;
@@ -44,7 +43,6 @@ import com.virus5600.defensive_measures.DefensiveMeasures;
 import com.virus5600.defensive_measures.entity.TurretMaterial;
 import com.virus5600.defensive_measures.entity.ai.goal.TargetOtherTeamGoal;
 
-import software.bernie.geckolib.animatable.GeoAnimatable;
 import software.bernie.geckolib.animatable.GeoEntity;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.animation.AnimatableManager.ControllerRegistrar;
@@ -85,7 +83,7 @@ public class CannonTurretEntity extends TurretEntity implements GeoEntity, Range
 	public CannonTurretEntity(EntityType<? extends MobEntity> entityType, World world) {
 		super(entityType, world, TurretMaterial.METAL, ArrowEntity.class);
 		this.setShootSound(ModSoundEvents.TURRET_CANNON_SHOOT);
-		this.setHealSound(ModSoundEvents.TURRET_REMOVED_METAL);
+		this.setHealSound(ModSoundEvents.TURRET_REPAIR_METAL);
 		this.addHealables(healables);
 		this.addEffectSource(effectSource);
 	}
@@ -150,6 +148,7 @@ public class CannonTurretEntity extends TurretEntity implements GeoEntity, Range
 
 			this.playSound(this.getShootSound(), 1.0f, 1.0f / (this.getRandom().nextFloat() * 0.4f + 0.8f));
 			this.getWorld().spawnEntity(projectile);
+			this.triggerAnim("Firing Sequence", "Shoot");
 		} catch (IllegalArgumentException | SecurityException e) {
 			e.printStackTrace();
 
@@ -210,7 +209,7 @@ public class CannonTurretEntity extends TurretEntity implements GeoEntity, Range
 
 	@Override
 	public ItemStack getEntityItem() {
-		return new ItemStack(Items.IRON_BLOCK);
+		return new ItemStack(ModItems.CANNON_TURRET);
 	}
 
 	///////////////////////////
@@ -240,6 +239,7 @@ public class CannonTurretEntity extends TurretEntity implements GeoEntity, Range
 			);
 	}
 
+	// TODO: Fix particle key-framing
 	private <E extends CannonTurretEntity>PlayState firingSequenceController(final AnimationState<E> event) {
 		Vec3d fusePos = this.getRelativePos(0, 0, 0),
 			barrelPos = this.getRelativePos(0, 0, 0);
@@ -292,6 +292,7 @@ public class CannonTurretEntity extends TurretEntity implements GeoEntity, Range
 				new AnimationController<>(this, "Death", this::deathController),
 				new AnimationController<>(this, "Idle", this::idleController),
 				new AnimationController<>(this, "Firing Sequence", this::firingSequenceController)
+					.triggerableAnim("Shoot", RawAnimation.begin().thenPlay("animation.cannon_turret.shoot"))
 			);
 	}
 

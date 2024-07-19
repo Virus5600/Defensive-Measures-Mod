@@ -22,6 +22,7 @@ public class ModEntities {
 		Builder
 			.create(CannonTurretEntity::new, SpawnGroup.MISC)
 			.dimensions(1F, 1F)
+			.eyeHeight(0.51F)
 			.build()
 	);
 

@@ -37,6 +37,7 @@ import com.virus5600.defensive_measures.entity.TurretMaterial;
 import com.virus5600.defensive_measures.item.ModItems;
 import com.virus5600.defensive_measures.item.turrets.TurretItem;
 
+import net.minecraft.world.event.GameEvent;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.InvocationTargetException;
@@ -410,6 +411,8 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
 		if (this.getWorld().isClient()) {
 			this.prevAttachedBlock = null;
 		}
+
+		this.setAttachedFace(Direction.DOWN);
 		return super.startRiding(entity, force);
 	}
 
@@ -420,6 +423,7 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
 		if (this.getWorld().isClient) {
 			this.prevAttachedBlock = this.getBlockPos();
 		}
+
 		this.prevBodyYaw = 0.0f;
 		this.bodyYaw = 0.0f;
 	}
@@ -433,6 +437,45 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
 			return null;
 
 		return new ItemStack(turretItem);
+	}
+
+	@Override
+	public void tick() {
+		super.tick();
+
+		if (!this.getWorld().isClient()) {
+			this.setHasTarget(this.getTarget() != null);
+		} else {
+			// SNAPPING THE TURRET BACK IN PLACE
+			if (this.getVelocity().x == 0 && this.getVelocity().z == 0 && !this.hasVehicle()) {
+				Vec3d newPos = new Vec3d(
+					(double) MathHelper.floor(this.getX()) + 0.5,
+					this.getY(),
+					(double) MathHelper.floor(this.getZ()) + 0.5
+				);
+
+				this.tryAttachOrFall();
+				super.setPosition(newPos);
+				this.getWorld().emitGameEvent(this, GameEvent.TELEPORT, newPos);
+
+				if (this.getVelocity() == Vec3d.ZERO && this.getWorld().isClient() && !this.hasVehicle()) {
+					this.lastRenderX = this.getX();
+					this.lastRenderY = this.getY();
+					this.lastRenderZ = this.getZ();
+				}
+			}
+		}
+	}
+
+	@Override
+	public void tickMovement() {
+		super.tickMovement();
+
+		if (!(this.getWorld().isClient()
+			|| this.hasVehicle()
+			|| this.canStay(this.getBlockPos(), this.getAttachedFace()))) {
+			this.tryAttachOrFall();
+		}
 	}
 
 	//////////////////////////////////////
@@ -515,6 +558,16 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
 
 	@Override
 	public boolean canBeLeashed() {
+		return false;
+	}
+
+	@Override
+	public boolean isCollidable() {
+		return this.isAlive();
+	}
+
+	@Override
+	public boolean isPushable() {
 		return false;
 	}
 
@@ -934,11 +987,11 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
 		try {
 			this.setHasTarget(target != null);
 
-			ProjectileEntity projectile = (ProjectileEntity) this.projectile
-				.getConstructor(World.class, LivingEntity.class)
-				.newInstance(this.getWorld(), this);
-
 			if (target != null) {
+				ProjectileEntity projectile = (ProjectileEntity) this.projectile
+					.getConstructor(World.class, LivingEntity.class)
+					.newInstance(this.getWorld(), this);
+
 				double[] velocity = new double[] {
 					target.getX() - this.getX(),
 					target.getBodyY((double) 1 / 2) - projectile.getX(),
