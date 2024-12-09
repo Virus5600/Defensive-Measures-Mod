@@ -621,13 +621,7 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
 	 * @return Vec3d the relative position of this point, assuming that the origin is at <b>[0, 0, 0]</b>
 	 */
 	public Vec3d getRelativePos(double xOffset, double yOffset, double zOffset) {
-		return this.raycast(
-			Math.max(Math.max(xOffset, yOffset), zOffset),
-			1.0F,
-			false
-		)
-			.getPos()
-			.add(xOffset, yOffset, zOffset);
+		return this.getRotationVecClient().add(this.getPos());
 	}
 
 	@Override

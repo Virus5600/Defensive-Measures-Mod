@@ -171,6 +171,12 @@ public class CannonTurretEntity extends TurretEntity implements GeoEntity, Range
 
 		this.setYaw(0);
 		this.setBodyYaw(0);
+
+		if (this.isShooting() && this.hasTarget()) {
+			if (!this.getShootingFXDone()) {
+				this.triggerAnim("Firing Sequence", "firing_sequence");
+			}
+		}
 	}
 
 	// TODO: Move code to TurretEntity then add a new protected variable where the item counterpart of the turret will be defined.
@@ -244,37 +250,29 @@ public class CannonTurretEntity extends TurretEntity implements GeoEntity, Range
 		Vec3d fusePos = this.getRelativePos(0, 0, 0),
 			barrelPos = this.getRelativePos(0, 0, 0);
 
-		if (this.hasTarget() && this.isShooting()) {
-			event.getController()
-				.setParticleKeyframeHandler((state) -> {
-					String fuse = state.getKeyframeData().getLocator(),
-						effectName = state.getKeyframeData().getEffect();
-				})
-				.setAnimation(
-					RawAnimation
-						.begin()
-						.thenPlay("animation.cannon_turret.shoot")
-				);
+		String shootAnim = "animation.cannon_turret.shoot",
+			chargeAnim = "animation.cannon_turret.fuse";
 
-			if (!this.getShootingFXDone()) {
-				int count = MathHelper.nextInt(this.random, 10, 25);
-				double vx = (this.getPos(TARGET_POS_X) - this.getPos(X))/10;
-				double vy = (this.getPos(TARGET_POS_Y) - this.getPos(Y));
-				double vz = (this.getPos(TARGET_POS_Z) - this.getPos(Z))/10;
-				double variance = Math.sqrt(vx * vx + vz * vz) * 0.5;
+		// Shooting sequence
+		event.getController()
+			.setParticleKeyframeHandler((state) -> {
+				String locator = state.getKeyframeData().getLocator(),
+					effectName = state.getKeyframeData().getEffect(),
+					currentState = "fuse";
 
-				event.getController()
-					.setParticleKeyframeHandler((state) -> {
-						String fuse = state.getKeyframeData().getLocator(),
-							effectName = state.getKeyframeData().getEffect();
-					})
+				System.out.println("Locator: " + locator + " | Effect: " + effectName);
+				if (this.hasTarget() && this.isShooting()) {
+					if (!this.getShootingFXDone()) currentState = "firingSequence";
+					else currentState = "shoot";
+				}
+
+				state.getController()
 					.setAnimation(
 						RawAnimation
 							.begin()
-							.thenLoop("animation.cannon_turret.fuse")
+							.thenPlay(currentState.equals("fuse") ? chargeAnim : shootAnim)
 					);
-			}
-		}
+			});
 
 		return PlayState.CONTINUE;
 	}
@@ -286,12 +284,12 @@ public class CannonTurretEntity extends TurretEntity implements GeoEntity, Range
 	// GeoEntity //
 	@Override
 	public void registerControllers(final ControllerRegistrar controllers) {
-
 		controllers
 			.add(
 				new AnimationController<>(this, "Death", this::deathController),
 				new AnimationController<>(this, "Idle", this::idleController),
 				new AnimationController<>(this, "Firing Sequence", this::firingSequenceController)
+					.triggerableAnim("Charge", RawAnimation.begin().thenPlay("animation.cannon_turret.fuse"))
 					.triggerableAnim("Shoot", RawAnimation.begin().thenPlay("animation.cannon_turret.shoot"))
 			);
 	}
