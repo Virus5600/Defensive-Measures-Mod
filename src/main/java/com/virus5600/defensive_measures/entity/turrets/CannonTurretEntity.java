@@ -6,14 +6,12 @@ import java.util.List;
 import java.util.Map;
 
 import com.virus5600.defensive_measures.item.ModItems;
+import com.virus5600.defensive_measures.particle.ModParticles;
 import com.virus5600.defensive_measures.sound.ModSoundEvents;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.RangedAttackMob;
-import net.minecraft.entity.ai.goal.ActiveTargetGoal;
-import net.minecraft.entity.ai.goal.LookAroundGoal;
-import net.minecraft.entity.ai.goal.LookAtEntityGoal;
-import net.minecraft.entity.ai.goal.ProjectileAttackGoal;
+import net.minecraft.entity.ai.goal.*;
 import net.minecraft.entity.attribute.DefaultAttributeContainer;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.damage.DamageSource;
@@ -24,16 +22,12 @@ import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.entity.mob.Monster;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.ArrowEntity;
 import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.sound.SoundEvent;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
@@ -69,19 +63,16 @@ public class CannonTurretEntity extends TurretEntity implements GeoEntity, Range
 	private static Map<Item, List<Object[]>> effectSource;
 
 	private final AnimatableInstanceCache geoCache = GeckoLibUtil.createInstanceCache(this);
-	/**
-	 * Defines the current target of this Cannon.
-	 */
-	@Nullable
-	private LivingEntity currentTarget = null;
 	private double attCooldown = totalAttCooldown;
 	private boolean animPlayed = false;
+
+	protected ProjectileAttackGoal attackGoal;
 
 	//////////////////
 	// CONSTRUCTORS //
 	//////////////////
 	public CannonTurretEntity(EntityType<? extends MobEntity> entityType, World world) {
-		super(entityType, world, TurretMaterial.METAL, ArrowEntity.class);
+		super(entityType, world, TurretMaterial.METAL, ArrowEntity.class, ModItems.CANNON_TURRET);
 		this.setShootSound(ModSoundEvents.TURRET_CANNON_SHOOT);
 		this.setHealSound(ModSoundEvents.TURRET_REPAIR_METAL);
 		this.addHealables(healables);
@@ -93,8 +84,9 @@ public class CannonTurretEntity extends TurretEntity implements GeoEntity, Range
 	//////////////////
 	@Override
 	protected void initGoals() {
+		this.attackGoal = new ProjectileAttackGoal(this, 0, totalAttCooldown, 16.625F);
 		// Goals
-		this.goalSelector.add(1, new ProjectileAttackGoal(this, 0, totalAttCooldown, 16.625F));
+		this.goalSelector.add(1, attackGoal);
 		this.goalSelector.add(2, new LookAtEntityGoal(this, MobEntity.class, 8.0F, 0.02F, true));
 		this.goalSelector.add(8, new LookAroundGoal(this));
 
@@ -150,10 +142,10 @@ public class CannonTurretEntity extends TurretEntity implements GeoEntity, Range
 			this.getWorld().spawnEntity(projectile);
 			this.triggerAnim("Firing Sequence", "Shoot");
 		} catch (IllegalArgumentException | SecurityException e) {
-			e.printStackTrace();
+			e.printStackTrace(System.out);
 
 			DefensiveMeasures.LOGGER.error("");
-			DefensiveMeasures.LOGGER.error("	 " + DefensiveMeasures.MOD_ID.toUpperCase() + " ERROR OCCURRED	 ");
+			DefensiveMeasures.LOGGER.error("	 {} ERROR OCCURRED	 ", DefensiveMeasures.MOD_ID.toUpperCase());
 			DefensiveMeasures.LOGGER.error("===== ERROR MSG START =====");
 			DefensiveMeasures.LOGGER.error("LOCALIZED ERROR MESSAGE:");
 			DefensiveMeasures.LOGGER.error(e.getLocalizedMessage());
@@ -173,17 +165,21 @@ public class CannonTurretEntity extends TurretEntity implements GeoEntity, Range
 		this.setBodyYaw(0);
 
 		if (this.isShooting() && this.hasTarget()) {
-			if (!this.getShootingFXDone()) {
-				this.triggerAnim("Firing Sequence", "firing_sequence");
+			if (this.attackGoal != null) {
+				if (this.attackGoal.shouldContinue()) {
+					if (--this.attCooldown <= 0) {
+						this.setShootingFXDone(false);
+						this.setFuseLit(false);
+						this.attCooldown = totalAttCooldown;
+					}
+					else {
+						this.setShootingFXDone(true);
+						this.setFuseLit(true);
+						this.triggerAnim("Firing Sequence", "Charge");
+					}
+				}
 			}
 		}
-	}
-
-	// TODO: Move code to TurretEntity then add a new protected variable where the item counterpart of the turret will be defined.
-	@Override
-	public ActionResult interactMob(PlayerEntity player, Hand hand) {
-		return Itemable.tryItem(player, hand, this, ModItems.TURRET_REMOVER, ModItems.CANNON_TURRET)
-			.orElse(super.interactMob(player, hand));
 	}
 
 	//////////////////////////////////////
@@ -245,13 +241,10 @@ public class CannonTurretEntity extends TurretEntity implements GeoEntity, Range
 			);
 	}
 
-	// TODO: Fix particle key-framing
+	// TODO: Fix particle spawning
 	private <E extends CannonTurretEntity>PlayState firingSequenceController(final AnimationState<E> event) {
-		Vec3d fusePos = this.getRelativePos(0, 0, 0),
+		Vec3d fusePos = this.getRelativePos(0, 1, 0),
 			barrelPos = this.getRelativePos(0, 0, 0);
-
-		String shootAnim = "animation.cannon_turret.shoot",
-			chargeAnim = "animation.cannon_turret.fuse";
 
 		// Shooting sequence
 		event.getController()
@@ -260,17 +253,35 @@ public class CannonTurretEntity extends TurretEntity implements GeoEntity, Range
 					effectName = state.getKeyframeData().getEffect(),
 					currentState = "fuse";
 
-				System.out.println("Locator: " + locator + " | Effect: " + effectName);
 				if (this.hasTarget() && this.isShooting()) {
-					if (!this.getShootingFXDone()) currentState = "firingSequence";
+					if (this.isFuseLit()) currentState = "fuse";
 					else currentState = "shoot";
+				}
+
+				System.out.println("Locator: " + locator + " | Effect: " + effectName + " | State: " + currentState);
+
+				if (currentState.equals("fuse")) {
+					System.out.println("Fuse Position: " + fusePos.toString());
+					this.getWorld().addParticle(
+						ModParticles.CANNON_FUSE,
+						fusePos.getX(), fusePos.getY(), fusePos.getZ(),
+						0,0,0
+					);
+				}
+				else {
+					System.out.println("Barrel Position: " + barrelPos.toString());
+					this.getWorld().addParticle(
+						ModParticles.CANNON_FLASH,
+						barrelPos.getX(), barrelPos.getY(), barrelPos.getZ(),
+						0,0,0
+					);
 				}
 
 				state.getController()
 					.setAnimation(
 						RawAnimation
 							.begin()
-							.thenPlay(currentState.equals("fuse") ? chargeAnim : shootAnim)
+							.thenPlay("animation.cannon_turret." + currentState)
 					);
 			});
 

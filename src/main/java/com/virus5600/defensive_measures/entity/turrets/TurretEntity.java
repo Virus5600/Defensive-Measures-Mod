@@ -168,6 +168,12 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
 	 */
 	protected TurretMaterial material;
 	/**
+	 * The item counterpart of this item. Refer to {@link ModItems} list
+	 * to see the list of items that can be converted to this entity.
+	 * The items should be a subclass of {@link TurretItem}.
+	 */
+	protected Item itemable;
+	/**
 	 * A randomizer for this turret's instance.
 	 */
 	protected final Random random;
@@ -202,7 +208,19 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
 		Items.MANGROVE_LOG,
 		Items.OAK_LOG,
 		Items.SPRUCE_LOG,
-		Items.WARPED_STEM
+		Items.WARPED_HYPHAE,
+		Items.WARPED_STEM,
+		Items.STRIPPED_ACACIA_LOG,
+		Items.STRIPPED_BIRCH_LOG,
+		Items.STRIPPED_CHERRY_LOG,
+		Items.STRIPPED_CRIMSON_STEM,
+		Items.STRIPPED_DARK_OAK_LOG,
+		Items.STRIPPED_JUNGLE_LOG,
+		Items.STRIPPED_MANGROVE_LOG,
+		Items.STRIPPED_OAK_LOG,
+		Items.STRIPPED_SPRUCE_LOG,
+		Items.STRIPPED_WARPED_HYPHAE,
+		Items.STRIPPED_WARPED_STEM
 	});
 
 	//////////////////
@@ -211,32 +229,39 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
 
 	/**
 	 * Constructs a new {@code TurretEntity} with the given {@code EntityType}, {@code World},
-	 * {@code TurretMaterial}, and {@code Class} of the projectile.
+	 * {@code TurretMaterial}, {@code Class} of the projectile, and {@code Item}.
 	 *
 	 * @param entityType The type of this entity.
 	 * @param world The world this entity is in.
 	 * @param material The material of this turret.
 	 * @param projectile The class of the projectile this turret will shoot.
+	 * @param itemable The itemable counterpart of this entity.
+	 *
+	 * @see #itemable
 	 */
-	public TurretEntity(EntityType<? extends MobEntity> entityType, World world, TurretMaterial material, Class<?> projectile) {
-		this(entityType, world, material);
+	public TurretEntity(EntityType<? extends MobEntity> entityType, World world, TurretMaterial material, Class<?> projectile, Item itemable) {
+		this(entityType, world, material, itemable);
 		this.projectile = projectile;
 	}
 
 	/**
 	 * Constructs a new {@code TurretEntity} with the given {@code EntityType}, {@code World},
-	 * and {@code TurretMaterial}. If the {@code projectile} is not yet defined, the default
+	 * {@code TurretMaterial}, and {@code Item}. If the {@code projectile} is not yet defined, the default
 	 * projectile will be used, which is an {@code ArrowEntity}.
 	 *
 	 * @param entityType The type of this entity.
 	 * @param world The world this entity is in.
 	 * @param material The material of this turret.
+	 * @param itemable The itemable counterpart of this entity.
+	 *
+	 * @see #itemable
 	 */
-	public TurretEntity(EntityType<? extends MobEntity> entityType, World world, TurretMaterial material) {
+	public TurretEntity(EntityType<? extends MobEntity> entityType, World world, TurretMaterial material, Item itemable) {
 		super(entityType, world);
 		DefensiveMeasures.LOGGER.debug("Creating a new TurretEntity called {}", entityType.getName());
 
 		this.material = material;
+		this.itemable = itemable;
 		this.random = Random.create();
 		this.lookControl = new TurretEntity.TurretLookControl(this);
 
@@ -251,8 +276,6 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
 
 	@Override
 	protected void initDataTracker(DataTracker.Builder builder) {
-//		super.initDataTracker(builder);
-
 		// Entity related tracking
 		builder.add(LEVEL, this.level)
 			.add(FROM_ITEM, (byte) 1)
@@ -270,7 +293,6 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
 			.add(TARGET_POS_X, 0f)
 			.add(TARGET_POS_Y, 0f)
 			.add(TARGET_POS_Z, 0f);
-//			.add(ATTACHED_FACE, Direction.DOWN);
 		super.initDataTracker(builder);
 	}
 
@@ -306,9 +328,9 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
 	 */
 	protected void tryAttachOrFall() {
 		Direction dir = this.findAttachableSide(this.getBlockPos());
-		if (dir == null)
+		if (dir != null)
 			this.setAttachedFace(dir);
-		else if (dir != Direction.DOWN)
+		else
 			this.tryFall();
 	}
 
@@ -396,6 +418,11 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
 
 		if (isSuccess)
 			return ActionResult.SUCCESS;
+
+		if (item.getItem() == ModItems.TURRET_REMOVER) {
+			return Itemable.tryItem(player, hand, this, ModItems.TURRET_REMOVER, this.itemable)
+				.orElse(super.interactMob(player, hand));
+		}
 		return super.interactMob(player, hand);
 	}
 
@@ -621,7 +648,8 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
 	 * @return Vec3d the relative position of this point, assuming that the origin is at <b>[0, 0, 0]</b>
 	 */
 	public Vec3d getRelativePos(double xOffset, double yOffset, double zOffset) {
-		return this.getRotationVecClient().add(this.getPos());
+		return this.getRotationVecClient().add(this.getPos())
+			.add(xOffset, yOffset, zOffset);
 	}
 
 	@Override
@@ -979,6 +1007,8 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
 			this.setShooting(target != null);
 
 		try {
+			String targetName = target != null ? target.getName().getString() : "(nothing)";
+			System.out.println("Shooting at " + targetName + " with a pull progress of " + pullProgress);
 			this.setHasTarget(target != null);
 
 			if (target != null) {
@@ -1006,7 +1036,7 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
 			| SecurityException
 			| NoSuchMethodException e)
 		{
-			e.printStackTrace();
+			e.printStackTrace(System.out);
 
 			DefensiveMeasures.LOGGER.error("");
 			DefensiveMeasures.LOGGER.error("\t {} ERROR OCCURRED\t ", DefensiveMeasures.MOD_ID.toUpperCase());
