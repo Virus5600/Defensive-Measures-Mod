@@ -56,11 +56,11 @@ public class CannonTurretEntity extends TurretEntity implements GeoEntity, Range
 	/**
 	 * Contains all the items that can heal this entity.
 	 */
-	private static Map<Item, Float> healables;
+	protected static final Map<Item, Float> healables;
 	/**
 	 * Contains all the items that can give effect to this entity
 	 */
-	private static Map<Item, List<Object[]>> effectSource;
+	protected static final Map<Item, List<Object[]>> effectSource;
 
 	private final AnimatableInstanceCache geoCache = GeckoLibUtil.createInstanceCache(this);
 	private double attCooldown = totalAttCooldown;

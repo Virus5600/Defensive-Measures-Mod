@@ -16,7 +16,6 @@ import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.ArrowEntity;
 import net.minecraft.entity.projectile.ProjectileEntity;
-import net.minecraft.item.Equipment;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -308,7 +307,7 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
 		this.prevBodyYaw = 0.0f;
 		this.resetPosition();
 
-		if (spawnReason == SpawnReason.SPAWN_EGG) {
+		if (spawnReason == SpawnReason.SPAWN_ITEM_USE) {
 			return entityData;
 		}
 
@@ -369,14 +368,13 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
 	@Override
 	protected ActionResult interactMob(PlayerEntity player, Hand hand) {
 		ItemStack item = player.getStackInHand(hand);
-		Equipment equipment = Equipment.fromStack(item);
 		boolean isSurvival = !player.isCreative();
 		boolean isSuccess = false;
 
 		// Turret Remover Interaction
-		if (item.getItem() == ModItems.TURRET_REMOVER) {
-			if (equipment != null && isSurvival)
-				item.damage(1, player, equipment.getSlotType());
+		if (item.getItem().getName().equals(ModItems.TURRET_REMOVER)) {
+			if (isSurvival)
+				item.damage(1, player);
 
 			isSuccess = true;
 		}
@@ -406,8 +404,7 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
 			}
 
 			if (item.isDamageable()) {
-				if (equipment != null)
-					item.damage(1, player, equipment.getSlotType());
+				item.damage(1, player);
 			}
 			else {
 				item.decrementUnlessCreative(1, player);

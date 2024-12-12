@@ -9,7 +9,6 @@ import com.virus5600.defensive_measures.item.turrets.cannon.*;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.minecraft.item.Item;
 import net.minecraft.item.Item.Settings;
-import net.minecraft.item.ToolItem;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.util.Identifier;
@@ -53,7 +52,7 @@ public class ModItems {
 	////////////////
 
 	// TURRET REMOVER
-	public final static ToolItem TURRET_REMOVER = (ToolItem) registerItem("turret_remover", new TurretRemoverItem(ModToolMaterials.TURRET_REMOVER, itemSettings()));
+	public final static Item TURRET_REMOVER = registerItem("turret_remover", new TurretRemoverItem(ModToolMaterials.TURRET_REMOVER.getToolMaterialInstance(), itemSettings()));
 
 	//////////////////////////////
 	// REGISTRY RELATED METHODS //

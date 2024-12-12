@@ -2,10 +2,10 @@ package com.virus5600.defensive_measures.entity.ai.goal;
 
 import net.minecraft.entity.ai.goal.ActiveTargetGoal;
 import net.minecraft.entity.player.PlayerEntity;
-
-import com.virus5600.defensive_measures.entity.turrets.TurretEntity;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
+
+import com.virus5600.defensive_measures.entity.turrets.TurretEntity;
 
 public class TargetPlayerGoal extends ActiveTargetGoal<PlayerEntity> {
 	public TargetPlayerGoal(TurretEntity turret) {

@@ -1,6 +1,6 @@
 package com.virus5600.defensive_measures.item.turrets.cannon;
 
-import net.fabricmc.fabric.api.registry.FuelRegistry;
+import net.minecraft.item.FuelRegistry;
 import net.minecraft.item.Item;
 import net.minecraft.util.Rarity;
 
@@ -16,6 +16,6 @@ public class CannonBaseItem extends Item {
 		);
 
 		// FUEL
-		FuelRegistry.INSTANCE.add(this, 300);
+//		FuelRegistry.createDefault(Registry. 300);
 	}
 }

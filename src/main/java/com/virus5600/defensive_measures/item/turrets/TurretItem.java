@@ -5,7 +5,6 @@ import java.util.Objects;
 
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.NbtComponent;
-import net.minecraft.text.Text;
 import org.jetbrains.annotations.Nullable;
 
 import com.google.common.collect.Iterables;
@@ -29,7 +28,6 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.stat.Stats;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
-import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
@@ -74,7 +72,7 @@ public class TurretItem extends Item {
 				itemStack,
 				context.getPlayer(),
 				blockPos2,
-				SpawnReason.SPAWN_EGG,
+				SpawnReason.SPAWN_ITEM_USE,
 				true,
 				!Objects.equals(blockPos, blockPos2) && direction == Direction.UP
 			);
@@ -88,32 +86,32 @@ public class TurretItem extends Item {
 		}
 	}
 
-	public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
+	public ActionResult use(World world, PlayerEntity user, Hand hand) {
 		ItemStack itemStack = user.getStackInHand(hand);
         BlockHitResult hitResult = SpawnEggItem.raycast(world, user, RaycastContext.FluidHandling.SOURCE_ONLY);
 
         if (((HitResult) hitResult).getType() != HitResult.Type.BLOCK) {
-            return TypedActionResult.pass(itemStack);
+            return ActionResult.PASS;
         }
         if (!(world instanceof ServerWorld)) {
-            return TypedActionResult.success(itemStack);
+            return ActionResult.SUCCESS;
         }
 
         BlockPos blockPos = hitResult.getBlockPos();
 
         if (!(world.getBlockState(blockPos).getBlock() instanceof FluidBlock)) {
-            return TypedActionResult.pass(itemStack);
+            return ActionResult.PASS;
         }
         if (!world.canPlayerModifyAt(user, blockPos) || !user.canPlaceOn(blockPos, hitResult.getSide(), itemStack)) {
-            return TypedActionResult.fail(itemStack);
+            return ActionResult.FAIL;
         }
 
 		NbtComponent nbtComponent = itemStack.get(DataComponentTypes.CUSTOM_DATA);
 		NbtCompound nbt = nbtComponent != null ? nbtComponent.copyNbt() : NbtComponent.DEFAULT.copyNbt();
 		EntityType<?> entityType = this.getEntityType(nbt);
-        Entity entity = entityType.spawnFromItemStack((ServerWorld)world, itemStack, user, blockPos, SpawnReason.SPAWN_EGG, false, false);
+        Entity entity = entityType.spawnFromItemStack((ServerWorld)world, itemStack, user, blockPos, SpawnReason.SPAWN_ITEM_USE, false, false);
         if (entity == null) {
-            return TypedActionResult.pass(itemStack);
+            return ActionResult.PASS;
         }
         if (!user.getAbilities().creativeMode) {
             itemStack.decrement(1);
@@ -122,7 +120,7 @@ public class TurretItem extends Item {
         user.incrementStat(Stats.USED.getOrCreateStat(this));
         world.emitGameEvent((Entity)user, GameEvent.ENTITY_PLACE, entity.getPos());
 
-        return TypedActionResult.consume(itemStack);
+        return ActionResult.CONSUME;
 	}
 
 	public boolean isOfSameEntityType(@Nullable NbtCompound nbt, EntityType<?> type) {
