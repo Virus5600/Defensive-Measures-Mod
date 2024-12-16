@@ -125,7 +125,7 @@ public interface Itemable {
 
 			if (player.isCreative() && !player.isSneaking()) {
 				entity.discard();
-				return Optional.of(ActionResult.success(true));
+				return Optional.of(ActionResult.SUCCESS);
 			}
 
 			ItemStack stack = new ItemStack(modItem);
@@ -147,7 +147,7 @@ public interface Itemable {
 			}
 
 			entity.discard();
-			return Optional.of(ActionResult.success(world.isClient));
+			return Optional.of(ActionResult.SUCCESS);
 		}
 		return Optional.empty();
 	}

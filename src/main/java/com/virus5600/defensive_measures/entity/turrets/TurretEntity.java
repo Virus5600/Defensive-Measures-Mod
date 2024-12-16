@@ -708,7 +708,7 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
 	 */
 	public TurretEntity addHealable(Item item, float amount) {
 		if (this.healables == null)
-			this.healables = new HashMap<>();
+			this.healables = new HashMap<Item, Float>();
 		this.healables.put(item, amount);
 		return this;
 	}
@@ -726,7 +726,7 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
 	 */
 	public TurretEntity addHealable(List<Item> group, float amount) {
 		if (this.healables == null)
-			this.healables = new HashMap<>();
+			this.healables = new HashMap<Item, Float>();
 
 		for (Item item : group)
 			this.healables.put(item, amount);
@@ -776,7 +776,7 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
 	 */
 	public TurretEntity addEffectSource(Item item, StatusEffect effect, float duration, int amplifier) {
 		if (this.effectSource == null)
-			this.effectSource = new HashMap<>();
+			this.effectSource = new HashMap<Item, List<Object[]>>();
 		this.effectSource.put(item, new ArrayList<Object[]>() {{add(new Object[] {effect, duration, amplifier});}});
 
 		return this;
@@ -798,9 +798,9 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
 	 */
 	public TurretEntity addEffectSource(List<Item> group, StatusEffect effect, float duration, int amplifier) {
 		if (this.effectSource == null)
-			this.effectSource = new HashMap<>();
+			this.effectSource = new HashMap<Item, List<Object[]>>();
 
-		List<Object[]> args = new ArrayList<>() {{add(new Object[] {effect, duration, amplifier});}};
+		List<Object[]> args = new ArrayList<Object[]>() {{add(new Object[] {effect, duration, amplifier});}};
 		for (Item item : group)
 			this.effectSource.put(item, args);
 

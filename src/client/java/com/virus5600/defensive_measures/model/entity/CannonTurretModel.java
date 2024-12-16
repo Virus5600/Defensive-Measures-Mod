@@ -5,11 +5,13 @@ import com.virus5600.defensive_measures.entity.turrets.CannonTurretEntity;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.util.Identifier;
+import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib.animation.AnimationState;
 import software.bernie.geckolib.cache.object.GeoBone;
 import software.bernie.geckolib.constant.DataTickets;
 import software.bernie.geckolib.model.GeoModel;
 import software.bernie.geckolib.model.data.EntityModelData;
+import software.bernie.geckolib.renderer.GeoRenderer;
 
 import java.util.Optional;
 
@@ -20,12 +22,12 @@ public class CannonTurretModel extends GeoModel<CannonTurretEntity> {
 	///////////////////////
 
 	@Override
-	public Identifier getModelResource(CannonTurretEntity animatable) {
+	public Identifier getModelResource(CannonTurretEntity cannonTurretEntity, @Nullable GeoRenderer<CannonTurretEntity> geoRenderer) {
 		return Identifier.of(DefensiveMeasures.MOD_ID, "geo/cannon_turret.geo.json");
 	}
 
 	@Override
-	public Identifier getTextureResource(CannonTurretEntity animatable) {
+	public Identifier getTextureResource(CannonTurretEntity cannonTurretEntity, @Nullable GeoRenderer<CannonTurretEntity> geoRenderer) {
 		return Identifier.of(DefensiveMeasures.MOD_ID, "textures/entity/cannon_turret/cannon_turret.png");
 	}
 

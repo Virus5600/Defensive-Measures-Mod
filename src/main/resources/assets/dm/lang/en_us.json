@@ -27,6 +27,8 @@
 	"item.dm.machine_gun_stand" : "MG Stand",
 	"item.dm.mg_turret" : "Place MG Turret",
 
+	"itemTooltip.dm.cannon_turret" : "Range: 20 blocks\nDamage: 10\nReload Time: 2 seconds",
+
 	"entity.dm.cannon_turret" : "Cannon Turret",
 	"entity.dm.cannonball" : "Cannon ball",
 

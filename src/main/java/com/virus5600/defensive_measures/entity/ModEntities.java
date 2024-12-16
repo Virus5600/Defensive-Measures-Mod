@@ -11,6 +11,8 @@ import net.minecraft.entity.EntityType.Builder;
 import net.minecraft.entity.SpawnGroup;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.util.Identifier;
 
 public class ModEntities {
@@ -23,7 +25,7 @@ public class ModEntities {
 			.create(CannonTurretEntity::new, SpawnGroup.MISC)
 			.dimensions(1F, 1F)
 			.eyeHeight(0.51F)
-			.build()
+			.build(RegistryKey.of(RegistryKeys.ENTITY_TYPE, Identifier.of(DefensiveMeasures.MOD_ID, "cannon_turret")))
 	);
 
 //	public static final EntityType<BallistaTurretEntity> BALLISTA = Registry.register(

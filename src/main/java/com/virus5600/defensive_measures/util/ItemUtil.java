@@ -1,15 +1,13 @@
 package com.virus5600.defensive_measures.util;
 
 import net.minecraft.item.Item;
-import net.minecraft.item.ToolItem;
 
 /**
- * Contains all utility methods that can be used for the {@link net.minecraft.item.Item Item class} such as identifying if it is a {@link net.minecraft.item.ToolItem ToolItem} instance or other.
+ * Contains all utility methods that can be used for the {@link net.minecraft.item.Item Item class} such as identifying if it matches a superclass or interface.
  * This is to supplement some shortcomings of the primary vanilla {@code Item} class and create flexibility towards applying features and modifications.
  * @author Virus5600
  * @since 1.0.0
  * @see net.minecraft.item.Item Item
- * @see net.minecraft.item.ToolItem ToolItem
  * @see net.minecraft.item.SwordItem SwordItem
  */
 public class ItemUtil {
@@ -24,16 +22,6 @@ public class ItemUtil {
 	}
 
 	/**
-	 * Identifies whether the provided {@code item} is a subclass of {@link ToolItem}
-	 * @param item Item in question
-	 * @return boolean
-	 * @see ToolItem
-	 */
-	public static boolean isToolItem(Item item) {
-		return ToolItem.class.isAssignableFrom(item.getClass());
-	}
-
-	/**
 	 * Retrieves the Class instance provided by the {@code type} of this item.
 	 * @param type Target subclass
 	 * @param item Item in question
@@ -42,18 +30,6 @@ public class ItemUtil {
 	public static <T> T getObjectInstance(Class<? extends T> type, Item item) {
 		if (ItemUtil.isTypeMatch(type, item))
 			return type.cast(item);
-		return null;
-	}
-
-	/**
-	 * Retrieves the {@link ToolItem} instance of this item.
-	 * @param item Item in question
-	 * @return ToolItem
-	 * @see ToolItem
-	 */
-	public static ToolItem getToolItem(Item item) {
-		if (ItemUtil.isToolItem(item))
-			return (ToolItem) item;
 		return null;
 	}
 }

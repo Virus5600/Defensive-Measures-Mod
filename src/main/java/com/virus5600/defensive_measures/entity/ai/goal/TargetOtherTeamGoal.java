@@ -10,9 +10,7 @@ import net.minecraft.util.math.Direction;
 
 public class TargetOtherTeamGoal extends ActiveTargetGoal<LivingEntity> {
 	public TargetOtherTeamGoal(TurretEntity turret) {
-		super(turret, LivingEntity.class, 10, true, false, (entity) -> {
-			return entity instanceof Monster;
-		});
+		super(turret, LivingEntity.class, 10, true, false, (entity, serverWorld) -> entity instanceof Monster);
 	}
 
 	public boolean canStart() {

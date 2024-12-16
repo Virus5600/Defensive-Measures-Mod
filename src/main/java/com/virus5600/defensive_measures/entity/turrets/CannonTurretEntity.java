@@ -91,9 +91,7 @@ public class CannonTurretEntity extends TurretEntity implements GeoEntity, Range
 		this.goalSelector.add(8, new LookAroundGoal(this));
 
 		// Targets
-		this.targetSelector.add(1, new ActiveTargetGoal<MobEntity>(this, MobEntity.class, 10, true, false, (entity) -> {
-			return entity instanceof Monster;
-		}));
+		this.targetSelector.add(1, new ActiveTargetGoal<MobEntity>(this, MobEntity.class, 10, true, false, (entity, serverWorld) -> entity instanceof Monster));
 		this.targetSelector.add(3, new TargetOtherTeamGoal(this));
 	}
 
@@ -106,10 +104,10 @@ public class CannonTurretEntity extends TurretEntity implements GeoEntity, Range
 
 	public static DefaultAttributeContainer.Builder setAttributes() {
 		return TurretEntity.createMobAttributes()
-			.add(EntityAttributes.GENERIC_FOLLOW_RANGE, 16)
-			.add(EntityAttributes.GENERIC_MAX_HEALTH, 50)
-			.add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0)
-			.add(EntityAttributes.GENERIC_KNOCKBACK_RESISTANCE, 1.0);
+			.add(EntityAttributes.FOLLOW_RANGE, 16)
+			.add(EntityAttributes.MAX_HEALTH, 50)
+			.add(EntityAttributes.MOVEMENT_SPEED, 0)
+			.add(EntityAttributes.KNOCKBACK_RESISTANCE, 1.0);
 	}
 
 	/////////////////////

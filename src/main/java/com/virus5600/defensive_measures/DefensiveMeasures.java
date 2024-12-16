@@ -38,6 +38,8 @@ public class DefensiveMeasures implements ModInitializer {
 	public void onInitialize() {
 		LOGGER.info("INITIALIZING MAIN ENTRY POINT FOR {}...", MOD_NAME);
 
+		// Use https://github.com/Khazoda/basic-weapons/blob/latest-stable/src/main/java/com/seacroak/basicweapons/util/Reggie.java as a reference
+
 		// Modded Stuff's Registration
 		ModItemGroups.registerModItemGroups();
 		ModItems.registerModItems();

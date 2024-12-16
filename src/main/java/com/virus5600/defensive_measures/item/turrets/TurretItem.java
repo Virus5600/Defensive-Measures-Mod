@@ -41,7 +41,10 @@ public class TurretItem extends Item {
 	private final EntityType<?> type;
 
 	public TurretItem(EntityType<? extends MobEntity> type, Settings settings) {
-		super(settings);
+		super(
+			settings.translationKey(type.getTranslationKey())
+		);
+
 		this.type = type;
 	}
 
@@ -90,7 +93,7 @@ public class TurretItem extends Item {
 		ItemStack itemStack = user.getStackInHand(hand);
         BlockHitResult hitResult = SpawnEggItem.raycast(world, user, RaycastContext.FluidHandling.SOURCE_ONLY);
 
-        if (((HitResult) hitResult).getType() != HitResult.Type.BLOCK) {
+        if (hitResult.getType() != HitResult.Type.BLOCK) {
             return ActionResult.PASS;
         }
         if (!(world instanceof ServerWorld)) {
@@ -118,7 +121,7 @@ public class TurretItem extends Item {
         }
 
         user.incrementStat(Stats.USED.getOrCreateStat(this));
-        world.emitGameEvent((Entity)user, GameEvent.ENTITY_PLACE, entity.getPos());
+        world.emitGameEvent(user, GameEvent.ENTITY_PLACE, entity.getPos());
 
         return ActionResult.CONSUME;
 	}
@@ -129,12 +132,12 @@ public class TurretItem extends Item {
 
 	@Nullable
 	public static TurretItem forEntity(@Nullable EntityType<?> type) {
-		return (TurretItem)TURRETS.get(type);
+		return TURRETS.get(type);
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public static Iterable<TurretItem> getAll() {
-		return Iterables.unmodifiableIterable((Iterable)TURRETS.values());
+		return Iterables.unmodifiableIterable((Iterable) TURRETS.values());
 	}
 
 	public EntityType<?> getEntityType(@Nullable NbtCompound nbt) {
