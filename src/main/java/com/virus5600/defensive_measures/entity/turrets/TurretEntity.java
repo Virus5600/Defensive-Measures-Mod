@@ -62,7 +62,7 @@ import java.util.*;
  * @see RangedAttackMob
  *
  */
-public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob{
+public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob {
 	/**
 	 * Tracks the level (stage) of this turret entity.
 	 */
@@ -71,18 +71,6 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
 	 * Tracks whether this entity is spawned from an item.
 	 */
 	private static final TrackedData<Byte> FROM_ITEM;
-	/**
-	 * Tracks whether this entity is shooting.
-	 */
-	private static final TrackedData<Boolean> SHOOTING;
-	/**
-	 * Tracks whether the shooting effect is done.
-	 */
-	private static final TrackedData<Boolean> SHOOTING_FX_DONE;
-	/**
-	 * Tracks whether this turret has a target.
-	 */
-	private static final TrackedData<Boolean> HAS_TARGET;
 
 	/**
 	 * Tracks the direction where this turret is attached to.
@@ -278,9 +266,6 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
 		// Entity related tracking
 		builder.add(LEVEL, this.level)
 			.add(FROM_ITEM, (byte) 1)
-			.add(SHOOTING, false)
-			.add(SHOOTING_FX_DONE, true)
-			.add(HAS_TARGET, false)
 
 		// Position related tracking
 			.add(ATTACHED_FACE, Direction.DOWN)
@@ -467,9 +452,7 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
 	public void tick() {
 		super.tick();
 
-		if (!this.getWorld().isClient()) {
-			this.setHasTarget(this.getTarget() != null);
-		} else {
+		if (this.getWorld().isClient()) {
 			// SNAPPING THE TURRET BACK IN PLACE
 			if (this.getVelocity().x == 0 && this.getVelocity().z == 0 && !this.hasVehicle()) {
 				Vec3d newPos = new Vec3d(
@@ -645,8 +628,11 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
 	 * @return Vec3d the relative position of this point, assuming that the origin is at <b>[0, 0, 0]</b>
 	 */
 	public Vec3d getRelativePos(double xOffset, double yOffset, double zOffset) {
-		return this.getRotationVecClient().add(this.getPos())
-			.add(xOffset, yOffset, zOffset);
+		Vec3d rotated = new Vec3d(xOffset, yOffset, zOffset)
+			.rotateX(this.getPitch())
+			.rotateY(this.getYaw());
+
+		return rotated.add(this.getPos());
 	}
 
 	@Override
@@ -906,30 +892,6 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
 		return this.isEffectSource(item) ? this.effectSource.get(item) : List.<Object[]>of();
 	}
 
-	public boolean isShooting() {
-		return this.dataTracker.get(SHOOTING);
-	}
-
-	public void setShooting(boolean shooting) {
-		this.dataTracker.set(SHOOTING, shooting);
-	}
-
-	public boolean getShootingFXDone() {
-		return this.dataTracker.get(SHOOTING_FX_DONE);
-	}
-
-	public void setShootingFXDone(boolean status) {
-		this.dataTracker.set(SHOOTING_FX_DONE, status);
-	}
-
-	public boolean hasTarget() {
-		return this.dataTracker.get(HAS_TARGET);
-	}
-
-	public void setHasTarget(boolean hasTarget) {
-		this.dataTracker.set(HAS_TARGET, hasTarget);
-	}
-
 	public void setPos(TrackedData<Float> axis, double value) {
 		this.dataTracker.set(axis, (float) value);
 	}
@@ -1000,13 +962,9 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
 
 	@Override
 	public void shootAt(LivingEntity target, float pullProgress) {
-		if (!this.isShooting())
-			this.setShooting(target != null);
-
 		try {
 			String targetName = target != null ? target.getName().getString() : "(nothing)";
 			System.out.println("Shooting at " + targetName + " with a pull progress of " + pullProgress);
-			this.setHasTarget(target != null);
 
 			if (target != null) {
 				ProjectileEntity projectile = (ProjectileEntity) this.projectile
@@ -1079,9 +1037,6 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
 	static {
 		LEVEL = DataTracker.registerData(TurretEntity.class, TrackedDataHandlerRegistry.INTEGER);
 		FROM_ITEM = DataTracker.registerData(TurretEntity.class, TrackedDataHandlerRegistry.BYTE);
-		SHOOTING = DataTracker.registerData(TurretEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
-		SHOOTING_FX_DONE = DataTracker.registerData(TurretEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
-		HAS_TARGET = DataTracker.registerData(TurretEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
 
 		ATTACHED_FACE = DataTracker.registerData(TurretEntity.class, TrackedDataHandlerRegistry.FACING);
 		X = DataTracker.registerData(TurretEntity.class, TrackedDataHandlerRegistry.FLOAT);

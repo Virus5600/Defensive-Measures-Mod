@@ -25,9 +25,11 @@ public class CannonTurretItem extends TurretItem {
 
 	@Override
 	public void appendTooltip(ItemStack stack, Item.TooltipContext context, List<Text> tooltip, TooltipType type) {
-		tooltip.add(
-			Text.translatable("itemTooltip.dm.cannon_turret")
-				.formatted(Formatting.DARK_AQUA)
-		);
+		for (int i = 1; i <= 3; i++) {
+			tooltip.add(
+				Text.translatable("itemTooltip.dm.cannon_turret.line" + i)
+					.formatted(Formatting.DARK_AQUA)
+			);
+		}
 	}
 }

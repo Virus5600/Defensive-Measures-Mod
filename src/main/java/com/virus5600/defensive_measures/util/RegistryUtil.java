@@ -42,14 +42,14 @@ public class RegistryUtil {
 
 	// Item Registry
 	private static RegistryKey<Item> createItemKey(String path) {
-		return RegistryKey.of(RegistryKeys.ITEM, Identifier.of(path));
+		return RegistryKey.of(RegistryKeys.ITEM, Identifier.of(DefensiveMeasures.MOD_ID, path));
 	}
 
 	public static Item registerItem(String path, Function<Item.Settings, Item> factory, Item.Settings settings) {
 		return Items.register(createItemKey(path), factory, settings);
 	}
 
-	public static Item registerItem(String path) {
-		return Items.register(path);
+	public static Item registerItem(String path, Function<Item.Settings, Item> factory) {
+		return Items.register(createItemKey(path), factory);
 	}
 }

@@ -91,7 +91,7 @@ public class CannonTurretEntity extends TurretEntity implements GeoEntity, Range
 		this.goalSelector.add(8, new LookAroundGoal(this));
 
 		// Targets
-		this.targetSelector.add(1, new ActiveTargetGoal<MobEntity>(this, MobEntity.class, 10, true, false, (entity, serverWorld) -> entity instanceof Monster));
+		this.targetSelector.add(1, new ActiveTargetGoal<>(this, MobEntity.class, 10, true, false, (entity, _) -> entity instanceof Monster));
 		this.targetSelector.add(3, new TargetOtherTeamGoal(this));
 	}
 
@@ -116,22 +116,14 @@ public class CannonTurretEntity extends TurretEntity implements GeoEntity, Range
 
 	@Override
 	public void shootAt(LivingEntity target, float pullProgress) {
-		if (target == null) {
-			if (this.isShooting())
-				this.setShooting(false);
-			return;
-		}
-
-		this.setShooting(true);
-
 		try {
 			double vx = (target.getX() - this.getX()) * 1.0625;
 			double vy = target.getBodyY((double) 2 / 3) - this.getY() + 0.25;
 			double vz = (target.getZ() - this.getZ()) * 1.0625;
 			double variance = Math.sqrt(vx * vx + vz * vz);
 			float divergence = this.getWorld().getDifficulty().getId() * 2;
-//			ProjectileEntity projectile = (ProjectileEntity) new CannonballEntity(ModEntities.CANNONBALL, this, vx, vy, vz, this.getWorld());
-			ProjectileEntity projectile = (ProjectileEntity) new ArrowEntity(EntityType.ARROW, this.getWorld());
+//			ProjectileEntity projectile = new CannonballEntity(ModEntities.CANNONBALL, this, vx, vy, vz, this.getWorld());
+			ProjectileEntity projectile = new ArrowEntity(EntityType.ARROW, this.getWorld());
 
 			projectile.setVelocity(vx, vy + variance * 0.1f, vz, 1.5f, divergence);
 			projectile.setPos(this.getX(), this.getY() + 0.5, this.getZ());
@@ -162,20 +154,12 @@ public class CannonTurretEntity extends TurretEntity implements GeoEntity, Range
 		this.setYaw(0);
 		this.setBodyYaw(0);
 
-		if (this.isShooting() && this.hasTarget()) {
-			if (this.attackGoal != null) {
-				if (this.attackGoal.shouldContinue()) {
-					if (--this.attCooldown <= 0) {
-						this.setShootingFXDone(false);
-						this.setFuseLit(false);
-						this.attCooldown = totalAttCooldown;
-					}
-					else {
-						this.setShootingFXDone(true);
-						this.setFuseLit(true);
-						this.triggerAnim("Firing Sequence", "Charge");
-					}
-				}
+		if (this.getTarget() != null && this.getWorld().isClient) {
+			if (--this.attCooldown <= 0) {
+				this.attCooldown = totalAttCooldown;
+			}
+			else {
+				this.triggerAnim("Firing Sequence", "Charge");
 			}
 		}
 	}
@@ -198,13 +182,6 @@ public class CannonTurretEntity extends TurretEntity implements GeoEntity, Range
 	@Override
 	protected SoundEvent getDeathSound() {
 		return ModSoundEvents.TURRET_CANNON_DESTROYED;
-	}
-
-	protected boolean isFuseLit() {
-		return this.dataTracker.get(FUSE_LIT);
-	}
-	protected void setFuseLit(boolean lit) {
-		this.dataTracker.set(FUSE_LIT, lit);
 	}
 
 	@Override
@@ -241,8 +218,8 @@ public class CannonTurretEntity extends TurretEntity implements GeoEntity, Range
 
 	// TODO: Fix particle spawning
 	private <E extends CannonTurretEntity>PlayState firingSequenceController(final AnimationState<E> event) {
-		Vec3d fusePos = this.getRelativePos(0, 1, 0),
-			barrelPos = this.getRelativePos(0, 0, 0);
+		Vec3d fusePos = this.getRelativePos(0, 1, -0.5),
+			barrelPos = this.getRelativePos(0, 0.25, 1);
 
 		// Shooting sequence
 		event.getController()
@@ -251,10 +228,7 @@ public class CannonTurretEntity extends TurretEntity implements GeoEntity, Range
 					effectName = state.getKeyframeData().getEffect(),
 					currentState = "fuse";
 
-				if (this.hasTarget() && this.isShooting()) {
-					if (this.isFuseLit()) currentState = "fuse";
-					else currentState = "shoot";
-				}
+				if (locator.equals("barrel")) currentState = "shoot";
 
 				System.out.println("Locator: " + locator + " | Effect: " + effectName + " | State: " + currentState);
 
@@ -319,7 +293,7 @@ public class CannonTurretEntity extends TurretEntity implements GeoEntity, Range
 	static {
 		FUSE_LIT = DataTracker.registerData(CannonTurretEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
 
-		healables = new HashMap<Item, Float>() {
+		healables = new HashMap<>() {
 			{
 				for (Item item : TurretEntity.PLANKS)
 					put(item, 1.0f);
@@ -329,9 +303,9 @@ public class CannonTurretEntity extends TurretEntity implements GeoEntity, Range
 			}
 		};
 
-		effectSource = new HashMap<Item, List<Object[]>>() {
+		effectSource = new HashMap<>() {
 			{
-				put(Items.IRON_BLOCK, new ArrayList<Object[]>() {
+				put(Items.IRON_BLOCK, new ArrayList<>() {
 					{
 						add(new Object[] {StatusEffects.ABSORPTION, 60, 2});
 					}

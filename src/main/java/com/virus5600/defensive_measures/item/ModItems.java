@@ -18,6 +18,12 @@ import net.minecraft.item.Item.Settings;
 
 import java.util.Arrays;
 
+/**
+ * A class that contains all the items in the mod.
+ * This class is used to register all the items in the mod, from turrets, to equipments, to traps, block items,
+ * ingredients, etc. This class is also used to register the items to their respective item groups to categorize
+ * them in the creative inventory.
+ */
 public class ModItems {
 	public final static Item[] DM_ITEMS;
 	public final static Item[] DM_EQUIPMENTS;
@@ -31,10 +37,10 @@ public class ModItems {
 
 	// CANNON
 	public final static Item CANNON_TURRET = registerItem("cannon_turret", ModEntities.CANNON_TURRET, CannonTurretItem::new);
-	public final static Item CANNON_BASE = registerItem("cannon_base");
-	public final static Item CANNON_HEAD = registerItem("cannon_head");
-	public final static Item CANNON_STAND = registerItem("cannon_stand");
-	public final static Item UNFINISHED_CANNON_HEAD = registerItem("unfinished_cannon_head");
+	public final static Item CANNON_BASE = registerItem("cannon_base", CannonBaseItem::new);
+	public final static Item CANNON_HEAD = registerItem("cannon_head", CannonHeadItem::new);
+	public final static Item CANNON_STAND = registerItem("cannon_stand", CannonStandItem::new);
+	public final static Item UNFINISHED_CANNON_HEAD = registerItem("unfinished_cannon_head", UnfinishedCannonHeadItem::new);
 
 	// BALLISTA
 //	public final static Item BALLISTA = new BallistaTurretItem(ModEntities.BALLISTA, SETTING_DMT);
@@ -56,13 +62,20 @@ public class ModItems {
 	////////////////
 
 	// TURRET REMOVER
-	public final static Item TURRET_REMOVER = registerItem("turret_remover");
+	public final static Item TURRET_REMOVER = registerItem("turret_remover", TurretRemoverItem::new);
 
 	//////////////////////////////
 	// REGISTRY RELATED METHODS //
 	//////////////////////////////
 
-	private static Item registerItem(String name, EntityType<? extends MobEntity> entityType, ItemFactory<? extends TurretItem> factory) {
+	/**
+	 * Registers a turret item which spawns a turret entity.
+	 * @param name The name of the item. (e.g. "cannon_turret")
+	 * @param entityType The entity type of the turret. (e.g. {@code ModEntities.CANNON_TURRET})
+	 * @param factory The factory method to create the turret item. Usually a lambda expression like {@code CannonTurretItem::new}.
+	 * @return The registered item.
+	 */
+	private static Item registerItem(String name, EntityType<? extends MobEntity> entityType, TurretItemFactory<? extends TurretItem> factory) {
 		return RegistryUtil.registerItem(
 			name,
 			(settings) -> factory.create(entityType, settings),
@@ -70,8 +83,18 @@ public class ModItems {
 		);
 	}
 
-	private static Item registerItem(String name) {
-		return RegistryUtil.registerItem(name);
+	/**
+	 * Registers a normal item such as ingredients, tools, etc.
+	 * @param name The name of the item. (e.g. "cannon_base")
+	 * @param factory The factory method to create the item. Usually a lambda expression like {@code CannonBaseItem::new}.
+	 * @return The registered item.
+	 */
+	private static Item registerItem(String name, ItemFactory<? extends Item> factory) {
+		return RegistryUtil.registerItem(
+			name,
+			factory::create,
+			new Settings()
+		);
 	}
 
 	public static void registerModItems() {
@@ -108,8 +131,12 @@ public class ModItems {
 		}));
 	}
 
-	private interface ItemFactory<T extends Item> {
+	private interface TurretItemFactory<T extends TurretItem> {
 		T create(EntityType<? extends MobEntity> entityType, Settings settings);
+	}
+
+	private interface ItemFactory<T extends Item> {
+		T create(Settings settings);
 	}
 
 	static {

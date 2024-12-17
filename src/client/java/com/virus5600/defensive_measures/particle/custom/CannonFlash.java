@@ -1,5 +1,6 @@
 package com.virus5600.defensive_measures.particle.custom;
 
+import com.virus5600.defensive_measures.particle.ModParticles;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.particle.*;
@@ -20,7 +21,7 @@ public class CannonFlash extends SpriteBillboardParticle {
 	private final Vec3d source;
 
 	/// CONSTRUCTORS ///
-	protected CannonFlash(ClientWorld level, double x, double y, double z, SpriteProvider spriteSet, double xd, double yd, double zd) {
+	public CannonFlash(ClientWorld level, double x, double y, double z, SpriteProvider spriteSet, double xd, double yd, double zd) {
 		super(level, x, y, z, xd, yd, zd);
 
 		this.velocityMultiplier = 1f;
@@ -36,8 +37,20 @@ public class CannonFlash extends SpriteBillboardParticle {
 		this.source = new Vec3d(x, y, z);
 
 		this.red = 1f;
-		this.green= 1f;
+		this.green = 1f;
 		this.blue = 1f;
+
+		// TODO: Create a separete emitter for the cannon flash, distinguishing the actual flash from the sparks.
+		final int maxParticles = MathHelper.nextInt(this.random, 15, 25);
+		for (int i = 10; i <= maxParticles; i++) {
+			level.addParticle(
+				ModParticles.CANNON_FLASH,
+				x, y, z,
+				MathHelper.nextDouble(this.random, -0.1, 0.1) + xd,
+				MathHelper.nextDouble(this.random, -0.1, 0.1) + yd,
+				MathHelper.nextDouble(this.random, -0.1, 0.1) + zd
+			);
+		}
 	}
 
 	/// METHODS ///
@@ -68,7 +81,6 @@ public class CannonFlash extends SpriteBillboardParticle {
 	@Override
     public int getBrightness(float tint) {
         int i = super.getBrightness(tint);
-        @SuppressWarnings("unused") int j = 240;
         int k = i >> 16 & 0xFF;
 
         return 0xF0 | k << 16;
@@ -116,6 +128,5 @@ public class CannonFlash extends SpriteBillboardParticle {
 		public Particle createParticle(SimpleParticleType type, ClientWorld level, double x, double y, double z, double xd, double yd, double zd) {
 			return new CannonFlash(level, x, y, z, this.sprites, xd, yd, zd);
 		}
-
 	}
 }
