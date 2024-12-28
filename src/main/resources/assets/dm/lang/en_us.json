@@ -27,7 +27,7 @@
 	"item.dm.machine_gun_stand" : "MG Stand",
 	"item.dm.mg_turret" : "Place MG Turret",
 
-	"itemTooltip.dm.cannon_turret.line1" : "Range: 20 blocks",
+	"itemTooltip.dm.cannon_turret.line1" : "Range: 16 blocks",
 	"itemTooltip.dm.cannon_turret.line2" : "Damage: 10",
 	"itemTooltip.dm.cannon_turret.line3" : "Reload Time: 2 seconds",
 
@@ -40,7 +40,7 @@
 	"entity.dm.mg_turret" : "MG Turret",
 	"entity.dm.mg_bullet" : "MG Bullet",
 
-	"death.attack.arrowhead" : "%1$s stepepd on an Arrowhead",
+	"death.attack.arrowhead" : "%1$s stepped on an Arrowhead",
 	"death.attack.arrowhead.player" : "%1$s stepped on a random Arrowhead whilst fighting with %2$s",
 
 	"subtitles.turret.remove.metal" : "Metallic Turret Removed",

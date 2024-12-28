@@ -17,9 +17,9 @@ import java.util.Optional;
 
 @Environment(EnvType.CLIENT)
 public class CannonTurretModel extends GeoModel<CannonTurretEntity> {
-	///////////////////////
-	// INTERFACE METHODS //
-	///////////////////////
+	/////////////////////////
+	/// INTERFACE METHODS ///
+	/////////////////////////
 
 	@Override
 	public Identifier getModelResource(CannonTurretEntity cannonTurretEntity, @Nullable GeoRenderer<CannonTurretEntity> geoRenderer) {
@@ -62,9 +62,4 @@ public class CannonTurretModel extends GeoModel<CannonTurretEntity> {
 			base.get().setRotZ(0);
 		}
 	}
-
-	/*
-	 * TODO: Consult Discord Servers for potential issue why this is thrown specifically when placed on Lightning Rods:
-	 *  [09:11:45] [Netty Server IO #1/ERROR] (Minecraft) Error sending packet clientbound/minecraft:set_entity_data
-	 */
 }

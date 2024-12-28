@@ -40,6 +40,7 @@ import com.virus5600.defensive_measures.DefensiveMeasures;
 import com.virus5600.defensive_measures.entity.TurretMaterial;
 import com.virus5600.defensive_measures.entity.ai.goal.ProjectileAttackGoal;
 import com.virus5600.defensive_measures.entity.ai.goal.TargetOtherTeamGoal;
+import com.virus5600.defensive_measures.entity.projectiles.CannonballEntity;
 import com.virus5600.defensive_measures.item.ModItems;
 import com.virus5600.defensive_measures.particle.ModParticles;
 import com.virus5600.defensive_measures.sound.ModSoundEvents;
@@ -120,9 +121,7 @@ public class CannonTurretEntity extends TurretEntity implements GeoEntity, Range
 			double vz = (target.getZ() - this.getZ()) * 1.0625;
 			double variance = Math.sqrt(vx * vx + vz * vz);
 			float divergence = this.getWorld().getDifficulty().getId() * 2;
-//			ProjectileEntity projectile = new CannonballEntity(ModEntities.CANNONBALL, this, vx, vy, vz, this.getWorld());
-			ProjectileEntity projectile = new ArrowEntity(EntityType.ARROW, this.getWorld());
-			projectile.setOwner(this);
+			ProjectileEntity projectile = new CannonballEntity(this, vx, vy, vz, this.getWorld());
 
 			projectile.setPos(this.getX(), this.getY() + 0.5, this.getZ());
 			projectile.setVelocity(vx, vy + variance * 0.1f, vz, 1.5f, divergence);

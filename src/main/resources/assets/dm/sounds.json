@@ -3,9 +3,7 @@
 		"sounds": [
 			"dm:turrets/bullet_impacts/bullet_impact_dirt1",
 			"dm:turrets/bullet_impacts/bullet_impact_dirt2",
-			"dm:turrets/bullet_impacts/bullet_impact_dirt3",
-			"dm:turrets/bullet_impacts/bullet_impact_dirt4",
-			"dm:turrets/bullet_impacts/bullet_impact_dirt5"
+			"dm:turrets/bullet_impacts/bullet_impact_dirt3"
 		],
 		"subtitle": "subtitles.generic.impact.bullet.dirt"
 	},
@@ -83,28 +81,29 @@
 		],
 		"subtitle": "subtitles.turret.remove.wood"
 	},
-	"turret.iron.repair": {
+	"turret.repair.metal": {
 		"sounds": [
 			{
-				"name": "mob/irongolem/repair",
-				"volume": 0.8
+				"name": "dm:turrets/repair/metal_repair1",
+				"volume": 0.8,
+				"pitch": 1
 			},
 			{
-				"name": "mob/irongolem/repair",
-				"pitch": 0.8,
-				"volume": 0.8
+				"name": "dm:turrets/repair/metal_repair2",
+				"volume": 0.8,
+				"pitch": 0.8
 			}
 		],
 		"subtitle": "subtitles.turret.iron.repair"
 	},
-	"turret.bow.repair": {
+	"turret.repair.bow": {
 		"sounds": [
 			"block/fletching_table/fletching_table1",
 			"block/fletching_table/fletching_table2"
 		],
 		"subtitle": "subtitles.turret.bow.repair"
 	},
-	"turret.wood.repair": {
+	"turret.repair.wood": {
 		"sounds": [
 			"dm:turrets/repair/wood_repair1",
 			"dm:turrets/repair/wood_repair2"

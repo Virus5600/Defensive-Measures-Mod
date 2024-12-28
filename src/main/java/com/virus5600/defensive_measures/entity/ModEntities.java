@@ -2,30 +2,25 @@ package com.virus5600.defensive_measures.entity;
 
 import com.virus5600.defensive_measures.DefensiveMeasures;
 
-import com.virus5600.defensive_measures.entity.turrets.CannonTurretEntity;
+import com.virus5600.defensive_measures.entity.projectiles.*;
+import com.virus5600.defensive_measures.entity.turrets.*;
+import com.virus5600.defensive_measures.util.RegistryUtil;
 
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
 
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EntityType.Builder;
 import net.minecraft.entity.SpawnGroup;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.Registry;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.util.Identifier;
 
 public class ModEntities {
 	// TURRETS //
 	// v1.0.0
-	public static final EntityType<CannonTurretEntity> CANNON_TURRET = Registry.register(
-		Registries.ENTITY_TYPE,
-		Identifier.of(DefensiveMeasures.MOD_ID, "cannon_turret"),
+	public static final EntityType<CannonTurretEntity> CANNON_TURRET = RegistryUtil.registerEntity(
+		"cannon_turret",
 		Builder
 			.create(CannonTurretEntity::new, SpawnGroup.MISC)
 			.dimensions(1F, 1F)
 			.eyeHeight(0.51F)
-			.build(RegistryKey.of(RegistryKeys.ENTITY_TYPE, Identifier.of(DefensiveMeasures.MOD_ID, "cannon_turret")))
 	);
 
 //	public static final EntityType<BallistaTurretEntity> BALLISTA = Registry.register(
@@ -48,14 +43,15 @@ public class ModEntities {
 
 	// PROJECTILES //
 	// v1.0.0
-//	public static final EntityType<CannonballEntity> CANNONBALL = Registry.register(
-//		Registries.ENTITY_TYPE,
-//		Identifier.of(DefensiveMeasures.MOD_ID, "cannonball"),
-//		Builder
-//			.create(CannonballEntity::new, SpawnGroup.MISC)
-//			.dimensions(EntityDimensions.fixed(0.125f, 0.125f))
-//			.build()
-//	);
+	public static final EntityType<CannonballEntity> CANNONBALL = RegistryUtil.registerEntity(
+		"cannonball",
+		Builder
+			.<CannonballEntity>create(CannonballEntity::new, SpawnGroup.MISC)
+			.dropsNothing()
+			.dimensions(0.125f, 0.125f)
+			.maxTrackingRange(4)
+			.trackingTickInterval(10)
+	);
 
 //	public static final EntityType<BallistaArrowEntity> BALLISTA_ARROW = Registry.register(
 //		Registries.ENTITY_TYPE,

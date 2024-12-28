@@ -4,6 +4,8 @@ import com.virus5600.defensive_measures.DefensiveMeasures;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityType;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import net.minecraft.registry.Registries;
@@ -51,5 +53,20 @@ public class RegistryUtil {
 
 	public static Item registerItem(String path, Function<Item.Settings, Item> factory) {
 		return Items.register(createItemKey(path), factory);
+	}
+
+	// Entity Registry
+	private static RegistryKey<EntityType<?>> createEntityKey(String path) {
+		return RegistryKey.of(RegistryKeys.ENTITY_TYPE, Identifier.of(DefensiveMeasures.MOD_ID, path));
+	}
+
+	public static <T extends Entity> EntityType<T> registerEntity(String path, EntityType.Builder<T> builder) {
+		RegistryKey<EntityType<?>> key = createEntityKey(path);
+
+		return Registry.register(
+			Registries.ENTITY_TYPE,
+			key,
+			builder.build(key)
+		);
 	}
 }
