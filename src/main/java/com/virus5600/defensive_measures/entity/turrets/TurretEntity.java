@@ -37,6 +37,7 @@ import com.virus5600.defensive_measures.item.ModItems;
 import com.virus5600.defensive_measures.item.turrets.TurretItem;
 
 import net.minecraft.world.event.GameEvent;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.InvocationTargetException;
@@ -54,7 +55,7 @@ import java.util.*;
  * and {@code FROM_ITEM} to identify their level variation and whether
  * this entity is spawned from an instance of already spawned turret entity.
  *
- * @author Virus5600
+ * @author <a href="https://github.com/Virus5600">Virus5600</a>
  * @since 1.0.0
  *
  * @see MobEntity
@@ -88,26 +89,6 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
 	 * Tracks the Z position of this turret.
 	 */
 	protected static final TrackedData<Float> Z;
-	/**
-	 * Tracks the yaw of this turret.
-	 */
-	protected static final TrackedData<Float> YAW;
-	/**
-	 * Tracks the pitch of this turret.
-	 */
-	protected static final TrackedData<Float> PITCH;
-	/**
-	 * Tracks the X position of this turret's target.
-	 */
-	protected static final TrackedData<Float> TARGET_POS_X;
-	/**
-	 * Tracks the Y position of this turret's target.
-	 */
-	protected static final TrackedData<Float> TARGET_POS_Y;
-	/**
-	 * Tracks the Z position of this turret's target.
-	 */
-	protected static final TrackedData<Float> TARGET_POS_Z;
 
 	////////////////////////
 	// INSTANCE VARIABLES //
@@ -168,7 +149,7 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
 	/**
 	 * List of plank items in the game. This allows easy insertion of all the items when needed by iterating through the List.
 	 */
-	public static final List<Item> PLANKS = Arrays.asList(new Item[] {
+	public static final List<Item> PLANKS = Arrays.asList(
 		Items.ACACIA_PLANKS,
 		Items.BAMBOO_PLANKS,
 		Items.BIRCH_PLANKS,
@@ -180,11 +161,12 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
 		Items.OAK_PLANKS,
 		Items.SPRUCE_PLANKS,
 		Items.WARPED_PLANKS
-	});
+	);
+
 	/**
 	 * List of log items in the game. This allows easy insertion of all the items when needed by iterating through the List.
 	 */
-	public static final List<Item> LOGS = Arrays.asList(new Item[]{
+	public static final List<Item> LOGS = Arrays.asList(
 		Items.ACACIA_LOG,
 		Items.BAMBOO,
 		Items.BIRCH_LOG,
@@ -208,7 +190,7 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
 		Items.STRIPPED_SPRUCE_LOG,
 		Items.STRIPPED_WARPED_HYPHAE,
 		Items.STRIPPED_WARPED_STEM
-	});
+	);
 
 	//////////////////
 	// CONSTRUCTORS //
@@ -271,12 +253,7 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
 			.add(ATTACHED_FACE, Direction.DOWN)
 			.add(X, 0f)
 			.add(Y, 0f)
-			.add(Z, 0f)
-			.add(YAW, 0f)
-			.add(PITCH, 0f)
-			.add(TARGET_POS_X, 0f)
-			.add(TARGET_POS_Y, 0f)
-			.add(TARGET_POS_Z, 0f);
+			.add(Z, 0f);
 		super.initDataTracker(builder);
 	}
 
@@ -409,6 +386,11 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
 	}
 
 	@Override
+	protected float getJumpVelocityMultiplier() {
+		return 0.0f;
+	}
+
+	@Override
 	public void readCustomDataFromNbt(NbtCompound nbt) {
 		super.readCustomDataFromNbt(nbt);
 		this.setLevel(nbt.getInt("Level"));
@@ -446,6 +428,18 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
 			return null;
 
 		return new ItemStack(turretItem);
+	}
+
+	@Override
+	public Vec3d getVelocity() {
+		if (this.getWorld().getBlockState(this.getVelocityAffectingPos()).isOf(Blocks.BUBBLE_COLUMN)
+			|| this.getWorld().getBlockState(this.getVelocityAffectingPos().add(0, 1, 0)).isOf(Blocks.BUBBLE_COLUMN)
+			|| this.getWorld().getBlockState(this.getVelocityAffectingPos()).isOf(Blocks.WATER)
+			|| this.getWorld().getBlockState(this.getVelocityAffectingPos().add(0, 1, 0)).isOf(Blocks.WATER)
+			|| this.getAttachedFace() != Direction.DOWN)
+			return new Vec3d(0, -Math.abs(super.getVelocity().getY()), 0);
+
+		return super.getVelocity();
 	}
 
 	@Override
@@ -558,7 +552,7 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
 		List<Object[]> mobEffects = this.getMobEffect(item);
 		if (mobEffects!= null)
 			for (Object[] registeredEffect : mobEffects)
-				if ((StatusEffect) registeredEffect[0] == effect)
+				if (registeredEffect[0] == effect)
 					return true;
 		return false;
 	}
@@ -587,33 +581,9 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
 		return MoveEffect.NONE;
 	}
 
-	protected final Vec3d getHeadRotationVector() {
-		float f = this.getPitch() * ((float)Math.PI / 180);
-		float g = -this.getHeadYaw()* ((float)Math.PI / 180);
-		float h = MathHelper.cos(g);
-		float i = MathHelper.sin(g);
-		float j = MathHelper.cos(f);
-		float k = MathHelper.sin(f);
-		return new Vec3d(i * j, -k, h * j);
-	}
-
 	/**
-	 * Sets the direction where this will be attached to.
-	 * @param dir The direction to attach to.
-	 */
-	protected void setAttachedFace(Direction dir) {
-		this.dataTracker.set(ATTACHED_FACE, dir);
-	}
-	/**
-	 * Retrieves the direction where this turret is attached to.
-	 * @return {@code Direction} The direction where this turret is attached to.
-	 */
-	protected Direction getAttachedFace() {
-		return this.dataTracker.get(ATTACHED_FACE);
-	}
-
-	/**
-	 * Identifies the position of a point relative to this turret rotation and position.
+	 * Identifies the position of a point relative to this turret's rotation and
+	 * {@link #getEyePos() eye position}.
 	 * For reference:
 	 * <ul>
 	 * 	<li>X-Axis == Pitch: Identifies the elevation rotation (Horizontal line axis)</li>
@@ -625,14 +595,18 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
 	 * @param yOffset The offset of the point at the local Y-Axis of this turret.
 	 * @param zOffset The offset of the point at the local Z-Axis of this turret.
 	 *
-	 * @return Vec3d the relative position of this point, assuming that the origin is at <b>[0, 0, 0]</b>
+	 * @return Vec3d the relative position of this point, assuming that the origin of the offset is at <b>[0, 0, 0]</b>
 	 */
 	public Vec3d getRelativePos(double xOffset, double yOffset, double zOffset) {
-		Vec3d rotated = new Vec3d(xOffset, yOffset, zOffset)
-			.rotateX(this.getPitch())
-			.rotateY(this.getYaw());
+		float pitchRad = -this.getPitch() * (float) (Math.PI / 180.0);
+		float yawRad = -this.getHeadYaw() * (float) (Math.PI / 180.0);
 
-		return rotated.add(this.getPos());
+		Vec3d rotated = new Vec3d(xOffset, yOffset, zOffset)
+			.rotateX(pitchRad)
+			.rotateY(yawRad);
+
+		return this.getEyePos()
+			.add(rotated);
 	}
 
 	@Override
@@ -653,13 +627,6 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
 	@Override
 	public int getMinAmbientSoundDelay() {
 		return 120;
-	}
-
-	public int getLevel() {
-		return this.dataTracker.get(LEVEL);
-	}
-	public void setLevel(int level) {
-		this.dataTracker.set(LEVEL, level);
 	}
 
 	public SoundEvent getShootSound() {
@@ -694,7 +661,7 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
 	 */
 	public TurretEntity addHealable(Item item, float amount) {
 		if (this.healables == null)
-			this.healables = new HashMap<Item, Float>();
+			this.healables = new HashMap<>();
 		this.healables.put(item, amount);
 		return this;
 	}
@@ -712,7 +679,7 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
 	 */
 	public TurretEntity addHealable(List<Item> group, float amount) {
 		if (this.healables == null)
-			this.healables = new HashMap<Item, Float>();
+			this.healables = new HashMap<>();
 
 		for (Item item : group)
 			this.healables.put(item, amount);
@@ -762,8 +729,10 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
 	 */
 	public TurretEntity addEffectSource(Item item, StatusEffect effect, float duration, int amplifier) {
 		if (this.effectSource == null)
-			this.effectSource = new HashMap<Item, List<Object[]>>();
-		this.effectSource.put(item, new ArrayList<Object[]>() {{add(new Object[] {effect, duration, amplifier});}});
+			this.effectSource = new HashMap<>();
+		this.effectSource.put(item, new ArrayList<>() {{
+			add(new Object[]{effect, duration, amplifier});
+		}});
 
 		return this;
 	}
@@ -784,9 +753,11 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
 	 */
 	public TurretEntity addEffectSource(List<Item> group, StatusEffect effect, float duration, int amplifier) {
 		if (this.effectSource == null)
-			this.effectSource = new HashMap<Item, List<Object[]>>();
+			this.effectSource = new HashMap<>();
 
-		List<Object[]> args = new ArrayList<Object[]>() {{add(new Object[] {effect, duration, amplifier});}};
+		List<Object[]> args = new ArrayList<>() {{
+			add(new Object[]{effect, duration, amplifier});
+		}};
 		for (Item item : group)
 			this.effectSource.put(item, args);
 
@@ -889,43 +860,33 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
 	 * </ol>
 	 */
 	public List<Object[]> getMobEffect(Item item) {
-		return this.isEffectSource(item) ? this.effectSource.get(item) : List.<Object[]>of();
+		return this.isEffectSource(item) ? this.effectSource.get(item) : List.of();
 	}
 
-	public void setPos(TrackedData<Float> axis, double value) {
-		this.dataTracker.set(axis, (float) value);
+	//////////////////
+	// TRACKED DATA //
+	//////////////////
+
+	public int getLevel() {
+		return this.dataTracker.get(LEVEL);
+	}
+	public void setLevel(int level) {
+		this.dataTracker.set(LEVEL, level);
 	}
 
-	public double getPos(TrackedData<Float> axis) {
-		return this.dataTracker.get(axis);
+	/**
+	 * Retrieves the direction where this turret is attached to.
+	 * @return {@code Direction} The direction where this turret is attached to.
+	 */
+	protected Direction getAttachedFace() {
+		return this.dataTracker.get(ATTACHED_FACE);
 	}
-
-	public void setTrackedYaw(double value) {
-		this.dataTracker.set(YAW, (float) value);
-	}
-
-	public double getTrackedYaw() {
-		return (double) this.dataTracker.get(YAW);
-	}
-
-	public void setTrackedPitch(double value) {
-		this.dataTracker.set(PITCH, (float) value);
-	}
-
-	public double getTrackedPitch() {
-		return (double) this.dataTracker.get(PITCH);
-	}
-
-	@Override
-	public Vec3d getVelocity() {
-		if (this.getWorld().getBlockState(this.getVelocityAffectingPos()).isOf(Blocks.BUBBLE_COLUMN)
-			|| this.getWorld().getBlockState(this.getVelocityAffectingPos().add(0, 1, 0)).isOf(Blocks.BUBBLE_COLUMN)
-			|| this.getWorld().getBlockState(this.getVelocityAffectingPos()).isOf(Blocks.WATER)
-			|| this.getWorld().getBlockState(this.getVelocityAffectingPos().add(0, 1, 0)).isOf(Blocks.WATER)
-			|| this.getAttachedFace() != Direction.DOWN)
-			return new Vec3d(0, -Math.abs(super.getVelocity().getY()), 0);
-
-		return super.getVelocity();
+	/**
+	 * Sets the direction where this will be attached to.
+	 * @param dir The direction to attach to.
+	 */
+	protected void setAttachedFace(Direction dir) {
+		this.dataTracker.set(ATTACHED_FACE, dir);
 	}
 
 	///////////////////////////////
@@ -958,7 +919,7 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
 
 	public SoundEvent getEntityRemoveSound() {
 		return null;
-	};
+	}
 
 	@Override
 	public void shootAt(LivingEntity target, float pullProgress) {
@@ -1042,11 +1003,5 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
 		X = DataTracker.registerData(TurretEntity.class, TrackedDataHandlerRegistry.FLOAT);
 		Y = DataTracker.registerData(TurretEntity.class, TrackedDataHandlerRegistry.FLOAT);
 		Z = DataTracker.registerData(TurretEntity.class, TrackedDataHandlerRegistry.FLOAT);
-		YAW = DataTracker.registerData(TurretEntity.class, TrackedDataHandlerRegistry.FLOAT);
-		PITCH = DataTracker.registerData(TurretEntity.class, TrackedDataHandlerRegistry.FLOAT);
-
-		TARGET_POS_X = DataTracker.registerData(TurretEntity.class, TrackedDataHandlerRegistry.FLOAT);
-		TARGET_POS_Y = DataTracker.registerData(TurretEntity.class, TrackedDataHandlerRegistry.FLOAT);
-		TARGET_POS_Z = DataTracker.registerData(TurretEntity.class, TrackedDataHandlerRegistry.FLOAT);
 	}
 }

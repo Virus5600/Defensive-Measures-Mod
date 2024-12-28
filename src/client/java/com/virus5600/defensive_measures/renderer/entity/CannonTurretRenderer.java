@@ -11,4 +11,9 @@ public class CannonTurretRenderer extends GeoEntityRenderer<CannonTurretEntity> 
 	public CannonTurretRenderer(Context ctx) {
 		super(ctx, new CannonTurretModel());
 	}
+
+	@Override
+	protected float getDeathMaxRotation(CannonTurretEntity animatable, float partialTick) {
+		return 0.0f;
+	}
 }

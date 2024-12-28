@@ -13,6 +13,8 @@ import net.minecraft.particle.SimpleParticleType;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 
+import com.virus5600.defensive_measures.particle.ModParticles;
+
 /**
  * Defines the particles emitted by the {@link com.virus5600.defensive_measures.entity.turrets.CannonTurretEntity Cannon Turret}
  * when charging up to fire.
@@ -22,6 +24,7 @@ import net.minecraft.util.math.Vec3d;
 @Environment(EnvType.CLIENT)
 public class CannonFuse extends SpriteBillboardParticle {
 	private final Vec3d source;
+	private final float maxParticleAge = 25;
 
 	/// CONSTRUCTORS ///
 	protected CannonFuse(ClientWorld level, double x, double y, double z, SpriteProvider spriteSet, double xd, double yd, double zd) {
@@ -32,7 +35,7 @@ public class CannonFuse extends SpriteBillboardParticle {
 		this.y = y;
 		this.z = z;
 		this.scale *= 0.5f;
-		this.maxAge = 25;
+		this.maxAge = 2;
 		this.gravityStrength = 1f;
 		this.collidesWithWorld = true;
 		this.setSpriteForAge(spriteSet);
@@ -68,7 +71,6 @@ public class CannonFuse extends SpriteBillboardParticle {
 	@Override
     public int getBrightness(float tint) {
         int i = super.getBrightness(tint);
-        @SuppressWarnings("unused") int j = 240;
         int k = i >> 16 & 0xFF;
 
         return 0xF0 | k << 16;
@@ -86,10 +88,30 @@ public class CannonFuse extends SpriteBillboardParticle {
 		super.tick();
 		this.fadeOut();
 
-		if (this.age < 10) {
+		if (this.age < this.maxAge) {
             if (MathHelper.nextInt(this.random, 0, 100) > 90) {
-                this.world.addParticle(ParticleTypes.SMOKE, this.source.x, this.source.y, this.source.z, MathHelper.nextDouble(this.random, -0.01, 0.01), MathHelper.clamp(Math.abs(this.velocityY), 0.0625, 0.125), MathHelper.nextDouble(this.random, -0.01, 0.01));
+                this.world.addParticle(
+					ParticleTypes.SMOKE,
+					this.source.x,
+					this.source.y,
+					this.source.z,
+					MathHelper.nextDouble(this.random, -0.01, 0.01),
+					MathHelper.clamp(Math.abs(this.velocityY), 0.0625, 0.125),
+					MathHelper.nextDouble(this.random, -0.01, 0.01)
+				);
             }
+
+			if (MathHelper.nextInt(this.random, 0, 100) > 25) {
+				this.world.addParticle(
+					ModParticles.SPARKS,
+					this.source.x,
+					this.source.y,
+					this.source.z,
+					MathHelper.nextDouble(this.random, -0.01, 0.01),
+					MathHelper.clamp(Math.abs(this.velocityY), 0.0625, 0.125),
+					MathHelper.nextDouble(this.random, -0.01, 0.01)
+				);
+			}
         }
 	}
 

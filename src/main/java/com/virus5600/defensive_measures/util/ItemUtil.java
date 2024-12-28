@@ -5,7 +5,7 @@ import net.minecraft.item.Item;
 /**
  * Contains all utility methods that can be used for the {@link net.minecraft.item.Item Item class} such as identifying if it matches a superclass or interface.
  * This is to supplement some shortcomings of the primary vanilla {@code Item} class and create flexibility towards applying features and modifications.
- * @author Virus5600
+ * @author <a href="https://github.com/Virus5600">Virus5600</a>
  * @since 1.0.0
  * @see net.minecraft.item.Item Item
  * @see net.minecraft.item.SwordItem SwordItem

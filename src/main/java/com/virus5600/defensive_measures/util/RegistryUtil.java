@@ -23,7 +23,7 @@ import java.util.function.Function;
  * to easily maintain the codes and update them when needed.
  *
  * @see <a href="https://github.com/Khazoda/basic-weapons/blob/latest-stable/src/main/java/com/seacroak/basicweapons/util/Reggie.java">Reggie.java 「(c) Khazoda」</a>
- * @author Virus5600
+ * @author <a href="https://github.com/Virus5600">Virus5600</a>
  * @version 1.0.0
  */
 public class RegistryUtil {

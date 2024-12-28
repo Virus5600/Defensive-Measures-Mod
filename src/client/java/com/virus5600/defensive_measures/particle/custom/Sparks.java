@@ -1,27 +1,22 @@
 package com.virus5600.defensive_measures.particle.custom;
 
-import com.virus5600.defensive_measures.particle.ModParticles;
+import com.virus5600.defensive_measures.particle.custom.emitters.CannonFlash;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.particle.*;
 import net.minecraft.client.world.ClientWorld;
-import net.minecraft.particle.ParticleTypes;
 import net.minecraft.particle.SimpleParticleType;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
 
 /**
- * Defines the particles emitted by the {@link com.virus5600.defensive_measures.entity.turrets.CannonTurretEntity Cannon Turret}
- * when it fires.
- * The particle shots out in a cone shape and fades out over time. The direction is
- * determined by the direction the turret is facing.
+ * Defines the particles emitted by certain turrets that creates sparks when they
+ * shoot. This particle is the base particle for some spark-based particles such
+ * as the {@link CannonFlash Cannon Flash Emitter}.
  */
 @Environment(EnvType.CLIENT)
-public class CannonFlash extends SpriteBillboardParticle {
-	private final Vec3d source;
+public class Sparks extends SpriteBillboardParticle {
 
 	/// CONSTRUCTORS ///
-	public CannonFlash(ClientWorld level, double x, double y, double z, SpriteProvider spriteSet, double xd, double yd, double zd) {
+	public Sparks(ClientWorld level, double x, double y, double z, SpriteProvider spriteSet, double xd, double yd, double zd) {
 		super(level, x, y, z, xd, yd, zd);
 
 		this.velocityMultiplier = 1f;
@@ -34,23 +29,10 @@ public class CannonFlash extends SpriteBillboardParticle {
 		this.collidesWithWorld = true;
 		this.setSpriteForAge(spriteSet);
 		this.setVelocity(xd, yd, zd);
-		this.source = new Vec3d(x, y, z);
 
 		this.red = 1f;
 		this.green = 1f;
 		this.blue = 1f;
-
-		// TODO: Create a separete emitter for the cannon flash, distinguishing the actual flash from the sparks.
-		final int maxParticles = MathHelper.nextInt(this.random, 15, 25);
-		for (int i = 10; i <= maxParticles; i++) {
-			level.addParticle(
-				ModParticles.CANNON_FLASH,
-				x, y, z,
-				MathHelper.nextDouble(this.random, -0.1, 0.1) + xd,
-				MathHelper.nextDouble(this.random, -0.1, 0.1) + yd,
-				MathHelper.nextDouble(this.random, -0.1, 0.1) + zd
-			);
-		}
 	}
 
 	/// METHODS ///
@@ -101,20 +83,6 @@ public class CannonFlash extends SpriteBillboardParticle {
 	public void tick() {
 		super.tick();
 		this.fadeOut();
-
-		if (this.dead) {
-			for (int i = 0; i < MathHelper.nextInt(this.random, 1, 3); i++) {
-				this.world.addParticle(
-					ParticleTypes.CAMPFIRE_COSY_SMOKE,
-					this.source.x,
-					this.source.y,
-					this.source.z,
-					MathHelper.nextDouble(this.random, -0.01, 0.01),
-					MathHelper.nextDouble(this.random, 0.01, 0.025),
-					MathHelper.nextDouble(this.random, -0.01, 0.01)
-				);
-			}
-		}
 	}
 
 	@Environment(EnvType.CLIENT)
@@ -126,7 +94,7 @@ public class CannonFlash extends SpriteBillboardParticle {
 		}
 
 		public Particle createParticle(SimpleParticleType type, ClientWorld level, double x, double y, double z, double xd, double yd, double zd) {
-			return new CannonFlash(level, x, y, z, this.sprites, xd, yd, zd);
+			return new Sparks(level, x, y, z, this.sprites, xd, yd, zd);
 		}
 	}
 }
