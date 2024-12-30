@@ -24,8 +24,7 @@ jobs:
 
       - name: Get jar name
         id: get_jar_name
-        run: |
-          run: echo "JAR_NAME=$( ./gradlew -q :getJarName )" >> $GITHUB_ENV
+        run: echo "JAR_NAME=$( ./gradlew -q :getJarName )" >> $GITHUB_ENV
 
       - name: Stage mod for test client
         run: |
