@@ -25,7 +25,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Prepare Testing
-        uses: ./.github/workflows/prep.yml
+        uses: ./.github/actions/prep
         with:
           java: ${{ matrix.java }}
           os: ${{ matrix.os }}

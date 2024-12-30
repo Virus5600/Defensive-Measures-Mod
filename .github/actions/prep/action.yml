@@ -1,5 +1,6 @@
 name: "Pre Testing"
 description: "Prepare the environment for testing"
+
 inputs:
   java:
     required: true
