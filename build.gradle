@@ -97,10 +97,14 @@ publishing {
 	}
 }
 
+test {
+	useJUnitPlatform()
+}
+
 tasks.register("getJarName") {
 	println("${project.archives_base_name}-${project.version}")
 }
 
-test {
-	useJUnitPlatform()
+tasks.register("getGeckolib3Version") {
+	println("${project.geckolib_version}")
 }

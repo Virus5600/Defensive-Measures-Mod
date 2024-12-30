@@ -1,0 +1,27 @@
+name: "Download Dependencies"
+description: "Downloads the dependencies for the mod"
+
+inputs:
+  minecraft_version:
+    type: string
+    description: 'Minecraft version to use for testing. Defaults to "1.21.3".'
+    default: "1.21.3"
+
+  loader:
+    type: string
+    description: 'Mod loader to use for testing. Defaults to "fabric".'
+    default: "fabric"
+
+runs:
+  using: "composite"
+  steps:
+    - name: "[Geckolib 3] Fetch Version"
+      id: get_geckolib3_version
+      shell: bash
+      run: echo "GECKOLIB3_VERSION=$( ./gradlew -q :getGeckolib3Version )" >> $GITHUB_ENV
+
+    - name: "[Geckolib 3] Downloading..."
+      shell: bash
+      run: >
+        wget -O run/mods/geckolib-${{ inputs.loader }}-${{ inputs.minecraft_version }}-${{ env.GECKOLIB3_VERSION }}.jar
+        https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/software/bernie/geckolib/geckolib-${{ inputs.loader }}-${{ inputs.minecraft_version }}/${{ env.GECKOLIB3_VERSION }}/geckolib-${{ inputs.loader }}-${{ inputs.minecraft_version }}-${{ env.GECKOLIB3_VERSION }}.jar

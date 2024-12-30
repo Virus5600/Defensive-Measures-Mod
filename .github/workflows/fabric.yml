@@ -32,6 +32,13 @@ jobs:
           mkdir -p run/mods
           cp build/libs/${{ env.JAR_NAME }}.jar run/mods
 
+      - name: Download dependencies
+        uses: ./.github/actions/download_dependencies
+        with:
+          minecraft_version: ${{ matrix.version.minecraft_version }}
+          loader: ${{ matrix.version.loader }}
+
+
       - name: "[Fabric Testing] Debug Info"
         run: |
           echo "Minecraft Version: ${{ matrix.version.minecraft_version }}"

@@ -43,4 +43,4 @@ runs:
 
     - name: Build Mod with Gradle
       shell: bash
-      run: ./gradlew build
+      run: ./gradlew buildNeeded
