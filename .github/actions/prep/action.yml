@@ -3,19 +3,16 @@ description: "Prepare the environment for testing"
 
 inputs:
   java:
-    required: false
     type: number
     description: 'Java version to use for testing. Defaults to 22.'
     default: 22
 
   java_dist:
-    required: false
     type: string
     description: 'Java distribution to use for testing. Defaults to "adopt".'
     default: 'adopt'
 
   os:
-    required: false,
     type: string
     description: 'Operating system to use for testing. Defaults to "ubuntu-latest".'
     default: 'ubuntu-latest'
