@@ -1,0 +1,29 @@
+name: Fabric CI
+on: [pull_request, push]
+
+jobs:
+  runTests:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        minecraftVersion:
+         - 1.21.3
+         - latest
+
+    steps:
+      - name: Checkout Project
+        uses: actions/checkout@v4
+        with:
+          lfs: true
+
+      - name: "Run Fabric Tests"
+        uses: Geometrically/fabric-test-runner@v1
+        with:
+          minecraftVersion: ${{ matrix.minecraftVersion }}
+
+      - name: "Upload Test Results"
+        uses: actions/upload-artifact@v1
+        with:
+          name: Builds
+          path: build/libs
