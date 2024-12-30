@@ -22,7 +22,7 @@ runs:
         env_var: GECKOLIB3_VERSION
 
     - name: "[Geckolib 3] Downloading..."
-      uses: suisei-cn/actions-download-file@v1.6
+      uses: suisei-cn/actions-download-file@v818d6b7dc8fe73f2f924b6241f2b1134ca1377d9
       with:
         url: "https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/software/bernie/geckolib/geckolib-${{ inputs.loader }}-${{ inputs.minecraft_version }}/${{ env.GECKOLIB3_VERSION }}/geckolib-${{ inputs.loader }}-${{ inputs.minecraft_version }}-${{ env.GECKOLIB3_VERSION }}.jar"
         target: "run/mods"
