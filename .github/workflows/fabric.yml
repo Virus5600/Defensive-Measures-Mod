@@ -9,7 +9,6 @@ jobs:
       matrix:
         minecraftVersion:
          - 1.21.3
-         - latest
 
     steps:
       - name: Checkout Project
