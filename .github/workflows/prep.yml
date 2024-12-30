@@ -17,9 +17,6 @@ jobs:
   test:
     runs-on: composite
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-
       - name: Validate Gradle Wrapper
         uses: gradle/wrapper-validation-action@v1
 
