@@ -15,7 +15,7 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - name: "[Geckolib 3] (${{ runer.os }}) Fetch Version"
+    - name: "[Geckolib 3] (${{ runner.os }}) Fetch Version"
       uses: ./.github/actions/set_to_env
       with:
         value: $( ./gradlew -q :getGeckolib3Version )
