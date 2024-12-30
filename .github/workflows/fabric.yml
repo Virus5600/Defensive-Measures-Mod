@@ -22,10 +22,15 @@ jobs:
           java: ${{ matrix.version.java }}
           os: ubuntu-latest
 
+      - name: Get jar name
+        id: get_jar_name
+        run: |
+          run: echo "JAR_NAME=$( ./gradlew -q app:printVersionName )" >> $GITHUB_ENV
+
       - name: Stage mod for test client
         run: |
           mkdir -p run/mods
-          cp build/libs/.jar run/mods
+          cp build/libs/${{ env.JAR_NAME }}.jar run/mods
 
       - name: Run MC test client
         uses: headlesshq/mc-runtime-test@3.0.0
