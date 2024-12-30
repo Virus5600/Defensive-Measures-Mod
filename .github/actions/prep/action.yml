@@ -23,6 +23,13 @@ inputs:
 runs:
   using: "composite"
   steps:
+    - name: Debug Info
+      shell: bash
+      run: |
+        echo "Java Version: ${{ inputs.java }}"
+        echo "Java Distribution: ${{ inputs.java_dist }}"
+        echo "Operating System: ${{ inputs.os }}"
+
     - name: Validate Gradle Wrapper
       uses: gradle/wrapper-validation-action@v1
 
