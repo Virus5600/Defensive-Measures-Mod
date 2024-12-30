@@ -19,14 +19,14 @@ runs:
     - name: Validate Gradle Wrapper
       uses: gradle/wrapper-validation-action@v1
 
-    - name: Setup JDK ${{ matrix.java }}
+    - name: Setup JDK ${{ inputs.java }}
       uses: actions/setup-java@v4
       with:
         distribution: 'adopt'
-        java-version: ${{ matrix.java }}
+        java-version: ${{ inputs.java }}
 
     - name: Make Gradle Wrapper Executable
-      if: ${{ runner.os != 'Windows' }}
+      if: ${{ inputs.os != 'Windows' }}
       shell: bash
       run: chmod +x ./gradlew
 
