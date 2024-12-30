@@ -24,8 +24,10 @@ jobs:
           os: ubuntu-latest
 
       - name: Get jar name
-        id: get_jar_name
-        run: echo "JAR_NAME=$( ./gradlew -q :getJarName )" >> $GITHUB_ENV
+        uses: ./.github/actions/set_to_env
+        with:
+          value: $( ./gradlew -q :getJarName )
+          env_var: JAR_NAME
 
       - name: Stage mod for test client
         run: |
@@ -58,3 +60,5 @@ jobs:
           mc-runtime-test: ${{ matrix.version.loader }}
           xvfb: false
           fabric-api: ${{ matrix.version.api }}
+          headlessmc-command: -lwjgl --jvm -Djava.awt.headless=true
+

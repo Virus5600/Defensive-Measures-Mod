@@ -101,10 +101,14 @@ test {
 	useJUnitPlatform()
 }
 
+// All custom tasks goes below this line
+
+/** Prints the built jar name. */
 tasks.register("getJarName") {
 	println("${project.archives_base_name}-${project.version}")
 }
 
+/** Prints the Geckolib3 version */
 tasks.register("getGeckolib3Version") {
 	println("${project.geckolib_version}")
 }
