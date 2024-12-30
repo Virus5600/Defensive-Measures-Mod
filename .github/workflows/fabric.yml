@@ -44,7 +44,7 @@ jobs:
       - name: Run MC test client
         uses: headlesshq/mc-runtime-test@3.0.0
         with:
-          mc: ${{ matrix.minecraft_version }}
+          mc: ${{ matrix.version.minecraft_version }}
           modloader: ${{ matrix.version.loader }}
           regex: .*${{ matrix.version.loader }}.*
           java: ${{ matrix.version.java }}
