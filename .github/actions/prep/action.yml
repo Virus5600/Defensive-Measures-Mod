@@ -23,7 +23,7 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - name: Debug Info
+    - name: [Pre Testing] Debug Info
       shell: bash
       run: |
         echo "Java Version: ${{ inputs.java }}"

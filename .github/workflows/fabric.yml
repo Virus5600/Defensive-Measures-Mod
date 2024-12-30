@@ -32,13 +32,22 @@ jobs:
           mkdir -p run/mods
           cp build/libs/${{ env.JAR_NAME }}.jar run/mods
 
+      - name: [Fabric Testing] Debug Info
+        run: |
+          echo "Minecraft Version: ${{ matrix.mc }}"
+          echo "Mod Loader: ${{ matrix.version.loader }}"
+          echo "Regex: .*${{ matrix.version.loader }}.*"
+          echo "Java Version: ${{ matrix.version.java }}"
+          echo "Runtime Test Version: ${{ matrix.version.loader }}"
+          echo "Fabric API Version: ${{ matrix.version.api }}"
+
       - name: Run MC test client
         uses: headlesshq/mc-runtime-test@3.0.0
         with:
           mc: ${{ matrix.minecraft_version }}
           modloader: ${{ matrix.version.loader }}
           regex: .*${{ matrix.version.loader }}.*
-          mc-runtime-test: ${{ matrix.version.loader }}
           java: ${{ matrix.version.java }}
+          mc-runtime-test: ${{ matrix.version.loader }}
           xvfb: false
           fabric-api: ${{ matrix.version.api }}
