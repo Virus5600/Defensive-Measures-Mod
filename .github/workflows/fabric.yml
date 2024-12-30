@@ -32,7 +32,7 @@ jobs:
           mkdir -p run/mods
           cp build/libs/${{ env.JAR_NAME }}.jar run/mods
 
-      - name: [Fabric Testing] Debug Info
+      - name: "[Fabric Testing] Debug Info"
         run: |
           echo "Minecraft Version: ${{ matrix.mc }}"
           echo "Mod Loader: ${{ matrix.version.loader }}"
