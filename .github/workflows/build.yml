@@ -18,22 +18,22 @@ jobs:
         os: [ubuntu-20.04, windows-2022]
     runs-on: ${{ matrix.os }}
     steps:
-      - name: checkout repository
+      - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: validate gradle wrapper
+      - name: Validate Gradle Wrapper
         uses: gradle/wrapper-validation-action@v1
 
-      - name: setup jdk ${{ matrix.java }}
+      - name: Setup JDK ${{ matrix.java }}
         uses: actions/setup-java@v1
         with:
           java-version: ${{ matrix.java }}
 
-      - name: make gradle wrapper executable
+      - name: Make Gradle Wrapper Executable
         if: ${{ runner.os != 'Windows' }}
         run: chmod +x ./gradlew
 
-      - name: build
+      - name: Build with Gradle
         run: ./gradlew build
 
       - name: capture build artifacts

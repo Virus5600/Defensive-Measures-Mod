@@ -1,28 +1,35 @@
-name: Fabric CI
+name: Fabric Testing
 on: [pull_request, push]
 
 jobs:
-  runTests:
-    runs-on: ubuntu-latest
+  run:
     strategy:
-      fail-fast: false
-      matrix:
-        minecraftVersion:
-         - 1.21.3
+        matrix:
+          version:
+            - {mc: 1.21.3, java: 21, loader: fabric}
+    runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Project
-        uses: actions/checkout@v4
+      - name: Setup Java
+        uses: actions/setup-java@v4
         with:
-          lfs: true
+          distribution: 'adopt'
+          java-version: ${{ matrix.version.java }}
 
-      - name: "Run Fabric Tests"
-        uses: Geometrically/fabric-test-runner@v1
-        with:
-          minecraftVersion: ${{ matrix.minecraftVersion }}
+      - name: Build mod
+        run: ./gradlew build
 
-      - name: "Upload Test Results"
-        uses: actions/upload-artifact@v4
+      - name: Stage mod for test client
+        run: |
+          mkdir -p run/mods
+          cp build/libs/.jar run/mods
+
+      - name: Run MC test client
+        uses: headlesshq/mc-runtime-test@3
         with:
-          name: Builds
-          path: build/libs
+          mc: ${{ matrix.minecraft_version }}
+          modloader: ${{ matrix.version.loader }}
+          regex: .*${{ matrix.version.loader }}.*
+          mc-runtime-test: ${{ matrix.version.loader }}
+          xvfb: false
+          java: ${{ matrix.version.java }}
