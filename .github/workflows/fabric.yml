@@ -6,7 +6,7 @@ jobs:
     strategy:
       matrix:
         version:
-          - {mc: 1.21.3, java: 22, loader: fabric, api: 0.110.0+1.21.3}
+          - {mc: 1.21.3, java: 21, loader: fabric, api: 0.110.0+1.21.3}
         os:
           - ubuntu-latest
           - windows-latest
