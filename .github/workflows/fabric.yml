@@ -6,7 +6,7 @@ jobs:
     strategy:
       matrix:
         version:
-          - {mc: 1.21.3, java: 22, loader: fabric}
+          - {mc: 1.21.3, java: 22, loader: fabric, api: 0.110.0+1.21.3}
         os:
           - ubuntu-latest
           - windows-latest
@@ -38,5 +38,6 @@ jobs:
           modloader: ${{ matrix.version.loader }}
           regex: .*${{ matrix.version.loader }}.*
           mc-runtime-test: ${{ matrix.version.loader }}
-          xvfb: false
           java: ${{ matrix.version.java }}
+          xvfb: false
+          fabric-api:
