@@ -22,6 +22,7 @@ runs:
     - name: Setup JDK ${{ matrix.java }}
       uses: actions/setup-java@v4
       with:
+        distribution: 'adopt'
         java-version: ${{ matrix.java }}
 
     - name: Make Gradle Wrapper Executable
