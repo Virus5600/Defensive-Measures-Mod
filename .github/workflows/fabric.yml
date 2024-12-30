@@ -20,6 +20,7 @@ jobs:
         uses: ./.github/actions/prep
         with:
           java: ${{ matrix.version.java }}
+          java_dist: temurin
           os: ubuntu-latest
 
       - name: Get jar name
