@@ -14,9 +14,12 @@ on:
         default: 'ubuntu-latest'
 
 jobs:
-  test:
-    runs-on: composite
+  reusable_workflow_job:
+    runs-on: ${{ github.event.inputs.os }}
     steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
       - name: Validate Gradle Wrapper
         uses: gradle/wrapper-validation-action@v1
 
