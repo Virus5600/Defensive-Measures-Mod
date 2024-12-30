@@ -47,6 +47,8 @@ dependencies {
 	// GeckoLib
 	modImplementation "software.bernie.geckolib:geckolib-fabric-${minecraft_version}:${geckolib_version}"
 
+	// Testing
+	testImplementation "net.fabricmc:fabric-loader-junit:${project.loader_version}"
 }
 
 processResources {
@@ -93,4 +95,20 @@ publishing {
 		// The repositories here will be used for publishing your artifact, not for
 		// retrieving dependencies.
 	}
+}
+
+test {
+	useJUnitPlatform()
+}
+
+// All custom tasks goes below this line
+
+/** Prints the built jar name. */
+tasks.register("getJarName") {
+	println("${project.archives_base_name}-${project.version}")
+}
+
+/** Prints the Geckolib3 version */
+tasks.register("getGeckolib3Version") {
+	println("${project.geckolib_version}")
 }
