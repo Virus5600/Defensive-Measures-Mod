@@ -1,0 +1,36 @@
+name: Pre Testing
+on:
+  workflow_call:
+    inputs:
+      java:
+        required: true
+        type: number
+        description: 'Java version to use for testing'
+        default: 22
+      os:
+        required: true
+        type: string
+        description: 'Operating system to use for testing'
+        default: 'ubuntu-latest'
+
+jobs:
+  test:
+    runs-on: ${{ github.event.inputs.os }}
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Validate Gradle Wrapper
+        uses: gradle/wrapper-validation-action@v1
+
+      - name: Setup JDK ${{ matrix.java }}
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ matrix.java }}
+
+      - name: Make Gradle Wrapper Executable
+        if: ${{ runner.os != 'Windows' }}
+        run: chmod +x ./gradlew
+
+      - name: Build Mod with Gradle
+        run: ./gradlew build

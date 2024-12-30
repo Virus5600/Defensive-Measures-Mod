@@ -6,18 +6,18 @@ jobs:
     strategy:
         matrix:
           version:
-            - {mc: 1.21.3, java: 21, loader: fabric}
-    runs-on: ubuntu-latest
+            - {mc: 1.21.3, java: 22, loader: fabric}
+          os:
+            - ubuntu-latest
+            - windows-latest
+    runs-on: ${{ matrix.os }}
 
     steps:
-      - name: Setup Java
-        uses: actions/setup-java@v4
+      - name: Prepare Testing
+        uses: ./.github/workflows/prep.yml
         with:
-          distribution: 'adopt'
-          java-version: ${{ matrix.version.java }}
-
-      - name: Build mod
-        run: ./gradlew build
+          java: ${{ matrix.version.java }}
+          os: ubuntu-latest
 
       - name: Stage mod for test client
         run: |
