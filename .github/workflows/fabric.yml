@@ -40,4 +40,4 @@ jobs:
           mc-runtime-test: ${{ matrix.version.loader }}
           java: ${{ matrix.version.java }}
           xvfb: false
-          fabric-api:
+          fabric-api: ${{ matrix.version.api }}
