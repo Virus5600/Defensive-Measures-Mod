@@ -21,6 +21,9 @@ jobs:
 
     runs-on: ${{ matrix.os }}
     steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
       - name: Prepare Testing
         uses: ./.github/workflows/prep.yml
         with:
