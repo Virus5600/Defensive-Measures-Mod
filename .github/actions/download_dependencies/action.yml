@@ -22,7 +22,7 @@ runs:
         env_var: GECKOLIB3_VERSION
 
     - name: "[Geckolib 3] Downloading..."
-      shell: bash
-      run: >
-        wget -O run/mods/geckolib-${{ inputs.loader }}-${{ inputs.minecraft_version }}-${{ env.GECKOLIB3_VERSION }}.jar
-        https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/software/bernie/geckolib/geckolib-${{ inputs.loader }}-${{ inputs.minecraft_version }}/${{ env.GECKOLIB3_VERSION }}/geckolib-${{ inputs.loader }}-${{ inputs.minecraft_version }}-${{ env.GECKOLIB3_VERSION }}.jar
+      uses: suisei-cn/actions-download@v1.6
+      with:
+        url: "https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/software/bernie/geckolib/geckolib-${{ inputs.loader }}-${{ inputs.minecraft_version }}/${{ env.GECKOLIB3_VERSION }}/geckolib-${{ inputs.loader }}-${{ inputs.minecraft_version }}-${{ env.GECKOLIB3_VERSION }}.jar"
+        target: "run/mods"
