@@ -11,15 +11,15 @@ jobs:
     strategy:
       matrix:
         # Use these Java versions
-        java:
-          # Current Java LTS & minimum supported by Minecraft
-          - 22
+        java: [
+          22  # Current Java LTS & minimum supported by Minecraft
+        ]
         # Run on both Linux and Windows
         os:
           - ubuntu-latest
           - windows-latest
-    runs-on: ${{ matrix.os }}
 
+    runs-on: ${{ matrix.os }}
     steps:
       - name: Prepare Testing
         uses: ./.github/workflows/prep.yml

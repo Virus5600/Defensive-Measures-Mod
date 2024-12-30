@@ -15,7 +15,7 @@ on:
 
 jobs:
   test:
-    runs-on: ${{ github.event.inputs.os }}
+    runs-on: composite
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
