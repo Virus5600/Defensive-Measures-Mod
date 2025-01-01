@@ -27,7 +27,6 @@ import com.virus5600.defensive_measures.entity.ModEntities;
 
 public class CannonballEntity extends ExplosiveProjectileEntity implements GeoEntity {
 	private final AnimatableInstanceCache geoCache = GeckoLibUtil.createInstanceCache(this);
-	private LivingEntity shooter;
 
 	////////////////////
 	/// CONSTRUCTORS ///

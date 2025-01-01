@@ -9,7 +9,6 @@ jobs:
           - {minecraft_version: "1.21.3", java: 22, loader: fabric, api: "0.110.0"}
         os:
           - ubuntu-latest
-          - windows-latest
 
     runs-on: ${{ matrix.os }}
     steps:
