@@ -1,14 +1,14 @@
 plugins {
-	id 'fabric-loom' version '0.12-SNAPSHOT'
+	id 'fabric-loom' version '1.9-SNAPSHOT'
 	id 'maven-publish'
 }
 
-sourceCompatibility = JavaVersion.VERSION_17
-targetCompatibility = JavaVersion.VERSION_17
-
-archivesBaseName = project.archives_base_name
 version = project.mod_version
 group = project.maven_group
+
+base {
+	archivesName = project.archives_base_name
+}
 
 repositories {
 	// Add repositories to retrieve artifacts from in here.
@@ -16,9 +16,24 @@ repositories {
 	// Loom adds the essential maven repositories to download Minecraft and libraries from automatically.
 	// See https://docs.gradle.org/current/userguide/declaring_repositories.html
 	// for more information about repositories.
+	maven {
+		name = 'GeckoLib'
+		url 'https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/'
+		content {
+			includeGroup("software.bernie.geckolib")
+		}
+	}
+}
 
-	// GeckoLib
-	maven { url 'https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/' }
+loom {
+	splitEnvironmentSourceSets()
+
+	mods {
+		"dm" {
+			sourceSet sourceSets.main
+			sourceSet sourceSets.client
+		}
+	}
 }
 
 dependencies {
@@ -29,14 +44,11 @@ dependencies {
 
 	// Fabric API. This is technically optional, but you probably want it anyway.
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
-
-	// Uncomment the following line to enable the deprecated Fabric API modules.
-	// These are included in the Fabric API production distribution and allow you to update your mod to the latest modules at a later more convenient time.
-
-	// modImplementation "net.fabricmc.fabric-api:fabric-api-deprecated:${project.fabric_version}"
-
 	// GeckoLib
-	modImplementation 'software.bernie.geckolib:geckolib-fabric-1.19:3.1.6'
+	modImplementation "software.bernie.geckolib:geckolib-fabric-${minecraft_version}:${geckolib_version}"
+
+	// Testing
+	testImplementation "net.fabricmc:fabric-loader-junit:${project.loader_version}"
 }
 
 processResources {
@@ -48,8 +60,7 @@ processResources {
 }
 
 tasks.withType(JavaCompile).configureEach {
-	// Minecraft 1.18 (1.18-pre2) upwards uses Java 17.
-	it.options.release = 17
+	it.options.release = 22
 }
 
 java {
@@ -57,18 +68,22 @@ java {
 	// if it is present.
 	// If you remove this line, sources will not be generated.
 	withSourcesJar()
+
+	sourceCompatibility = JavaVersion.VERSION_21
+	targetCompatibility = JavaVersion.VERSION_21
 }
 
 jar {
 	from("LICENSE") {
-		rename { "${it}_${project.archivesBaseName}"}
+		rename { "${it}_${project.base.archivesName.get()}"}
 	}
 }
 
 // configure the maven publication
 publishing {
 	publications {
-		mavenJava(MavenPublication) {
+		create("mavenJava", MavenPublication) {
+			artifactId = project.archives_base_name
 			from components.java
 		}
 	}
@@ -82,17 +97,18 @@ publishing {
 	}
 }
 
-// loom configurations
-loom {
-	runs {
-		client {
-			client()
-            vmArg "-Dgeckolib.disable_examples=true"
-		}
+test {
+	useJUnitPlatform()
+}
 
-		server {
-			server()
-			vmArg "-Dgeckolib.disable_examples=true"
-		}
-	}
+// All custom tasks goes below this line
+
+/** Prints the built jar name. */
+tasks.register("getJarName") {
+	println("${project.archives_base_name}-${project.version}")
+}
+
+/** Prints the Geckolib3 version */
+tasks.register("getGeckolib3Version") {
+	println("${project.geckolib_version}")
 }

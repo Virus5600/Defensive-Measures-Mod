@@ -1,0 +1,24 @@
+name: "Set Variable to Environment"
+description: "Sets a value to an environment variable with respect to the operating system"
+
+inputs:
+  value:
+    type: string
+    description: 'Value to set to the environment variable.'
+    required: true
+
+  env_var:
+    type: string
+    description: 'Name of the environment variable to set.'
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - if: runner.os != 'Windows'
+      shell: bash
+      run: echo "${{ inputs.env_var }}=${{ inputs.value }}" >> $GITHUB_ENV
+
+    - if: runner.os == 'Windows'
+      shell: powershell
+      run: echo "${{ inputs.env_var }}=${{ inputs.value }}" | Out-File -FilePath $env:GITHUB_ENV -Append

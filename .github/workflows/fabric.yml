@@ -1,0 +1,63 @@
+name: Fabric Testing
+on: [pull_request, push]
+
+jobs:
+  run:
+    strategy:
+      matrix:
+        version:
+          - {minecraft_version: "1.21.3", java: 22, loader: fabric, api: "0.110.0"}
+        os:
+          - ubuntu-latest
+
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Prepare Testing
+        uses: ./.github/actions/prep
+        with:
+          java: ${{ matrix.version.java }}
+          java_dist: temurin
+          os: ubuntu-latest
+
+      - name: Get jar name
+        uses: ./.github/actions/set_to_env
+        with:
+          value: $( ./gradlew -q :getJarName )
+          env_var: JAR_NAME
+
+      - name: Stage mod for test client
+        run: |
+          mkdir -p run/mods
+          cp build/libs/${{ env.JAR_NAME }}.jar run/mods
+
+      - name: Download dependencies
+        uses: ./.github/actions/download_dependencies
+        with:
+          minecraft_version: ${{ matrix.version.minecraft_version }}
+          loader: ${{ matrix.version.loader }}
+
+
+      - name: "[Fabric Testing] Debug Info"
+        run: |
+          echo "Minecraft Version: ${{ matrix.version.minecraft_version }}"
+          echo "Mod Loader: ${{ matrix.version.loader }}"
+          echo "Regex: .*${{ matrix.version.loader }}.*"
+          echo "Java Version: ${{ matrix.version.java }}"
+          echo "Runtime Test Version: ${{ matrix.version.loader }}"
+          echo "Fabric API Version: ${{ matrix.version.api }}"
+
+      - name: Run MC test client
+        uses: headlesshq/mc-runtime-test@3.0.0
+        with:
+          mc: ${{ matrix.version.minecraft_version }}
+          modloader: ${{ matrix.version.loader }}
+          regex: .*${{ matrix.version.loader }}.*
+          java: ${{ matrix.version.java }}
+          mc-runtime-test: ${{ matrix.version.loader }}
+          xvfb: false
+          fabric-api: ${{ matrix.version.api }}
+          headlessmc-command: -lwjgl --jvm -Djava.awt.headless=true
+

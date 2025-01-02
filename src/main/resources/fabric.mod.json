@@ -9,7 +9,7 @@
 		"Virus5600"
 	],
 	"contact": {
-		"homepage": "http://dma-guide.herokuapp.com/",
+		"homepage": "https://dma-guide.herokuapp.com/",
 		"sources": "https://github.com/Virus5600/Defensive-Measures-Mod"
 	},
 
@@ -19,22 +19,18 @@
 	"environment": "*",
 	"entrypoints": {
 		"main": [
-			"com.virus5600.DefensiveMeasures.DefensiveMeasures"
+			"com.virus5600.defensive_measures.DefensiveMeasures"
 		],
 		"client": [
-			"com.virus5600.DefensiveMeasures.DefensiveMeasuresClient"
+			"com.virus5600.defensive_measures.DefensiveMeasuresClient"
 		]
 	},
-	"mixins": [
-		"dm.mixins.json"
-	],
-
 	"depends": {
-		"fabricloader": ">=0.14.6",
-		"fabric": "*",
-		"minecraft": "~1.19",
-		"java": ">=17",
-		"geckolib3": ">=3.1.6"
+		"fabricloader": ">=0.15.11",
+		"minecraft": "~1.21",
+		"java": ">=21",
+		"fabric-api": "*",
+		"geckolib": ">=4.5.5"
 	},
 	"suggests": {
 		"another-mod": "*"
