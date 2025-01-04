@@ -21,10 +21,10 @@ public class TurretItemRetrievedCriterion extends AbstractCriterion<TurretItemRe
 	}
 
     public void trigger(ServerPlayerEntity player, ItemStack stack) {
-        this.trigger(player, conditions -> conditions.matches(stack));
+        super.trigger(player, conditions -> conditions.matches(stack));
     }
 
-	public static record Conditions(Optional<LootContextPredicate> player, Optional<ItemPredicate> item) implements AbstractCriterion.Conditions {
+	public record Conditions(Optional<LootContextPredicate> player, Optional<ItemPredicate> item) implements AbstractCriterion.Conditions {
         public static final Codec<TurretItemRetrievedCriterion.Conditions> CODEC = RecordCodecBuilder.create(
 				instance -> instance.group(
 					EntityPredicate.LOOT_CONTEXT_PREDICATE_CODEC

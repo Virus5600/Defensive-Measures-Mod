@@ -38,13 +38,13 @@ public class CannonballEntity extends ExplosiveProjectileEntity implements GeoEn
 		this.setNoGravity(false);
 	}
 
-	public CannonballEntity(World world, LivingEntity owner) {
+	public CannonballEntity(LivingEntity owner, World world) {
 		this(ModEntities.CANNONBALL, world);
 		this.setOwner(owner);
 	}
 
 	public CannonballEntity(LivingEntity owner, double directionX, double directionY, double directionZ, World world) {
-		this(world, owner);
+		this(owner, world);
 		this.setVelocity(directionX, directionY, directionZ);
 	}
 

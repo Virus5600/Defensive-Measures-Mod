@@ -4,6 +4,8 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.util.Identifier;
 
+import org.jetbrains.annotations.Nullable;
+
 import software.bernie.geckolib.animation.AnimationState;
 import software.bernie.geckolib.cache.object.GeoBone;
 import software.bernie.geckolib.constant.DataTickets;
@@ -11,41 +13,39 @@ import software.bernie.geckolib.model.GeoModel;
 import software.bernie.geckolib.model.data.EntityModelData;
 import software.bernie.geckolib.renderer.GeoRenderer;
 
-import org.jetbrains.annotations.Nullable;
-
 import com.virus5600.defensive_measures.DefensiveMeasures;
-import com.virus5600.defensive_measures.entity.turrets.CannonTurretEntity;
+import com.virus5600.defensive_measures.entity.turrets.BallistaTurretEntity;
 
 import java.util.Optional;
 
 @Environment(EnvType.CLIENT)
-public class CannonTurretModel extends GeoModel<CannonTurretEntity> {
+public class BallistaTurretModel extends GeoModel<BallistaTurretEntity> {
 	/////////////////////////
 	/// INTERFACE METHODS ///
 	/////////////////////////
 
 	@Override
-	public Identifier getModelResource(CannonTurretEntity cannonTurretEntity, @Nullable GeoRenderer<CannonTurretEntity> geoRenderer) {
-		return Identifier.of(DefensiveMeasures.MOD_ID, "geo/cannon_turret.geo.json");
+	public Identifier getModelResource(BallistaTurretEntity ballistaTurretEntity, @Nullable GeoRenderer<BallistaTurretEntity> geoRenderer) {
+		return Identifier.of(DefensiveMeasures.MOD_ID, "geo/ballista.geo.json");
 	}
 
 	@Override
-	public Identifier getTextureResource(CannonTurretEntity cannonTurretEntity, @Nullable GeoRenderer<CannonTurretEntity> geoRenderer) {
-		return Identifier.of(DefensiveMeasures.MOD_ID, "textures/entity/cannon_turret/cannon_turret.png");
+	public Identifier getTextureResource(BallistaTurretEntity ballistaTurretEntity, @Nullable GeoRenderer<BallistaTurretEntity> geoRenderer) {
+		return Identifier.of(DefensiveMeasures.MOD_ID, "textures/entity/ballista/ballista.png");
 	}
 
 	@Override
-	public Identifier getAnimationResource(CannonTurretEntity animatable) {
-		return Identifier.of(DefensiveMeasures.MOD_ID, "animations/cannon_turret.animation.json");
+	public Identifier getAnimationResource(BallistaTurretEntity animatable) {
+		return Identifier.of(DefensiveMeasures.MOD_ID, "animations/ballista.animation.json");
 	}
 
 	@Override
-	public void setCustomAnimations(CannonTurretEntity animatable, long instanceId, AnimationState<CannonTurretEntity> animationState) {
+	public void setCustomAnimations(BallistaTurretEntity animatable, long instanceId, AnimationState<BallistaTurretEntity> animationState) {
 		super.setCustomAnimations(animatable, instanceId, animationState);
 
 		Optional<GeoBone> base = this.getBone("base");
-		Optional<GeoBone> neck = this.getBone("stand");
-		Optional<GeoBone> head = this.getBone("head");
+		Optional<GeoBone> neck = this.getBone("head");
+		Optional<GeoBone> head = this.getBone("bow");
 
 		EntityModelData extraData = (EntityModelData) animationState.getExtraData()
 			.get(DataTickets.ENTITY_MODEL_DATA);

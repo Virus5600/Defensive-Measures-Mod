@@ -82,6 +82,10 @@ public class BallistaArrowEntity extends PersistentProjectileEntity implements G
 
 		// Reduces the speed of the arrow when it hits an entity
 		Entity entity = entityHitResult.getEntity();
+		// For reference, max armor points is 30
+		int armor = entity instanceof LivingEntity livingEntity ? livingEntity.getArmor() : 0;
+		boolean hasHeavyArmor = armor > 15,
+			hasLightArmor = armor <= 15 && armor > 0;
 
 		if (entity instanceof LivingEntity livingEntity) {
 			double targetH = livingEntity.getHeight(),
@@ -90,29 +94,28 @@ public class BallistaArrowEntity extends PersistentProjectileEntity implements G
 
 			double arrowMin = arrowH - variance,
 				arrowMax = arrowH + variance,
-				reducedVelocity = 0.875;
-
-			System.out.println("Arrow Height: " + arrowH + ", Target Height: " + targetH);
+				reducedVelocity = 0.125;
 
 			// Reduce velocity and pierce level based on the side of the entity hit
 			if (this.getPierceLevel() > 0) {
-				// If the arrow is smaller than the target, reduce the pierce level by 2 and velocity by 50%
-				if (targetH > arrowMax) {
+				// If the arrow is smaller than the target or has heavy armor, reduce the pierce level by 2 and velocity by 50%
+				if (targetH > arrowMax || hasHeavyArmor) {
 					this.setPierceLevel((byte) (this.getPierceLevel() - 2));
 					reducedVelocity = 0.5;
 				}
-				// If the arrow is almost the same size as the target, reduce the pierce level by 1 and velocity by 25%
-				else if (targetH < arrowMax && arrowMin < targetH) {
+				// If the arrow is almost the same size as the target or has a light armor, reduce the pierce level by 1 and velocity by 25%
+				else if ((targetH < arrowMax && arrowMin < targetH) || hasLightArmor) {
 					this.setPierceLevel((byte) (this.getPierceLevel() - 1));
-					reducedVelocity = 0.75;
+					reducedVelocity = 0.25;
 				}
 				// Otherwise, just reduce the velocity by 12.5% without reducing the pierce level
 			}
 
 			// Apply reduced velocity
-			this.setVelocity(
+			this.addVelocity(
 				this.getVelocity()
 					.multiply(reducedVelocity)
+					.negate()
 			);
 		}
 
@@ -126,6 +129,11 @@ public class BallistaArrowEntity extends PersistentProjectileEntity implements G
 	@Override
 	protected ItemStack asItemStack() {
 		return null;
+	}
+
+	@Override
+	public byte getPierceLevel() {
+		return this.dataTracker.get(PIERCE_LEVEL);
 	}
 
 	///////////////////////////

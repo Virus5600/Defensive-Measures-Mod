@@ -1,11 +1,11 @@
 package com.virus5600.defensive_measures.renderer;
 
+import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
+
 import com.virus5600.defensive_measures.DefensiveMeasures;
 import com.virus5600.defensive_measures.entity.ModEntities;
-import com.virus5600.defensive_measures.renderer.entity.CannonTurretRenderer;
-import com.virus5600.defensive_measures.renderer.projectiles.BallistaArrowRenderer;
-import com.virus5600.defensive_measures.renderer.projectiles.CannonballRenderer;
-import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
+import com.virus5600.defensive_measures.renderer.entity.*;
+import com.virus5600.defensive_measures.renderer.projectiles.*;
 
 public class ModEntityRenderer {
 	public static void registerEntityRenderers() {
@@ -17,6 +17,7 @@ public class ModEntityRenderer {
 
 		// v1.0.0
 		EntityRendererRegistry.register(ModEntities.CANNON_TURRET, CannonTurretRenderer::new);
+		EntityRendererRegistry.register(ModEntities.BALLISTA_TURRET, BallistaTurretRenderer::new);
 
 		/////////////////
 		// PROJECTILES //

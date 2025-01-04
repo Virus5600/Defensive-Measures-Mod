@@ -1,7 +1,10 @@
 package com.virus5600.defensive_measures;
 
 import com.virus5600.defensive_measures.advancement.criterion.ModCriterion;
+import com.virus5600.defensive_measures.block.ModBlocks;
 import com.virus5600.defensive_measures.entity.ModEntities;
+import com.virus5600.defensive_measures.entity.damage.ModDamageSources;
+import com.virus5600.defensive_measures.entity.damage.ModDamageTypes;
 import com.virus5600.defensive_measures.item.ModItemGroups;
 import com.virus5600.defensive_measures.item.ModItems;
 import com.virus5600.defensive_measures.particle.ModParticles;
@@ -41,12 +44,14 @@ public class DefensiveMeasures implements ModInitializer {
 		// Use https://github.com/Khazoda/basic-weapons/blob/latest-stable/src/main/java/com/seacroak/basicweapons/util/Reggie.java as a reference
 
 		// Modded Stuff's Registration
+		ModDamageTypes.registerDamageTypes();
 		ModItemGroups.registerModItemGroups();
 		ModItems.registerModItems();
 		ModSoundEvents.registerSoundEvents();
+		ModBlocks.registerModBlocks();
 		ModCriterion.registerModCriterion();
-		ModParticles.registerParticles();
 		ModEntities.registerModEntityAttributes();
+		ModParticles.registerParticles();
 
 		// Networking part
 
