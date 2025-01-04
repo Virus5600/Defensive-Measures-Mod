@@ -6,6 +6,11 @@ import net.minecraft.entity.*;
 import net.minecraft.entity.ai.RangedAttackMob;
 import net.minecraft.entity.ai.control.BodyControl;
 import net.minecraft.entity.ai.control.LookControl;
+import net.minecraft.entity.ai.goal.ActiveTargetGoal;
+import net.minecraft.entity.ai.goal.LookAroundGoal;
+import net.minecraft.entity.ai.goal.LookAtEntityGoal;
+import net.minecraft.entity.attribute.DefaultAttributeContainer;
+import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
@@ -13,8 +18,8 @@ import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.mob.MobEntity;
+import net.minecraft.entity.mob.Monster;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.projectile.ArrowEntity;
 import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -33,14 +38,15 @@ import net.minecraft.world.World;
 
 import com.virus5600.defensive_measures.DefensiveMeasures;
 import com.virus5600.defensive_measures.entity.TurretMaterial;
+import com.virus5600.defensive_measures.entity.ai.goal.ProjectileAttackGoal;
+import com.virus5600.defensive_measures.entity.ai.goal.TargetOtherTeamGoal;
+import com.virus5600.defensive_measures.entity.turrets.interfaces.Itemable;
 import com.virus5600.defensive_measures.item.ModItems;
 import com.virus5600.defensive_measures.item.turrets.TurretItem;
 
 import net.minecraft.world.event.GameEvent;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
 /**
@@ -63,7 +69,7 @@ import java.util.*;
  * @see RangedAttackMob
  *
  */
-public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob {
+public abstract class TurretEntity extends MobEntity implements Itemable, RangedAttackMob {
 	/**
 	 * Tracks the level (stage) of this turret entity.
 	 */
@@ -89,6 +95,15 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
 	 * Tracks the Z position of this turret.
 	 */
 	protected static final TrackedData<Float> Z;
+	/**
+	 * The maximum health of this turret entity. Change this value using the {@link #setTurretMaxHealth(float)}
+	 * method before calling the {@link TurretEntity#setAttributes()} method to set the max health
+	 * of this entity properly.
+	 *
+	 * @see TurretEntity#setTurretMaxHealth(float)
+	 * @see TurretEntity#setAttributes()
+	 */
+	protected static float MAX_HEALTH = 20.0F;
 
 	////////////////////////
 	// INSTANCE VARIABLES //
@@ -125,7 +140,21 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
 	/**
 	 * Defines what kind of projectile this turret will shoot.
 	 */
-	protected Class<?> projectile;
+	protected EntityType<?> projectile;
+	/**
+	 * Defines the attack goal of this turret. Uses the {@link ProjectileAttackGoal} class instead
+	 * of the default {@link net.minecraft.entity.ai.goal.ProjectileAttackGoal Vanilla ProjectileAttackGoal}.
+	 */
+	protected ProjectileAttackGoal attackGoal;
+	/**
+	 * Defines how many projectile spawnpoints (barrels, bolt holder, etc.) this turret has. Useful
+	 * for iterating through multiple barrels where the turret can shoot.
+	 */
+	protected int barrels = 1;
+	/**
+	 * Determines what barrel is next to shoot the projectile.
+	 */
+	protected int currentBarrel = 0;
 	/**
 	 * Defines the level of this turret. The higher the level, the stronger
 	 * the turret.
@@ -203,12 +232,13 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
 	 * @param entityType The type of this entity.
 	 * @param world The world this entity is in.
 	 * @param material The material of this turret.
-	 * @param projectile The class of the projectile this turret will shoot.
+	 * @param projectile The registry key of the projectile this turret will shoot. (e.g. {@code EntityType.ARROW})
 	 * @param itemable The itemable counterpart of this entity.
 	 *
 	 * @see #itemable
+	 * @see EntityType
 	 */
-	public TurretEntity(EntityType<? extends MobEntity> entityType, World world, TurretMaterial material, Class<?> projectile, Item itemable) {
+	public TurretEntity(EntityType<? extends MobEntity> entityType, World world, TurretMaterial material, EntityType<?> projectile, Item itemable) {
 		this(entityType, world, material, itemable);
 		this.projectile = projectile;
 	}
@@ -235,13 +265,57 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
 		this.lookControl = new TurretEntity.TurretLookControl(this);
 
 		if (this.projectile == null) {
-			this.projectile = ArrowEntity.class;
+			this.projectile = EntityType.ARROW;
 		}
 	}
 
 	//////////////////
 	// INITIALIZERS //
 	//////////////////
+
+	/**
+	 * {@inheritDoc}
+	 * <br><br>
+	 * Initializes the standard goals for this entity. These goals are as follows:
+	 * <ul>
+	 * 	<li>{@link ProjectileAttackGoal} - The goal that allows this entity to shoot projectiles.</li>
+	 * 	<li>{@link LookAtEntityGoal} - The goal that allows this entity to look at other entities.</li>
+	 * 	<li>{@link LookAroundGoal} - The goal that allows this entity to look around.</li>
+	 * 	<li>{@link ActiveTargetGoal} - The goal that allows this entity to target other entities.</li>
+	 * 	<li>{@link TargetOtherTeamGoal} - The goal that allows this entity to target entities from other teams.</li>
+	 * </ul>
+	 * <br>
+	 * By default, the {@link ProjectileAttackGoal} is set to {@code null} and can be initialized
+	 * by defining the {@link #attackGoal} variable. If the said goal is not defined, then this
+	 * entity will use {@code new ProjectileAttackGoal(this, 0, this.getMaxAttackRange(), this.getMinAttackRange())}
+	 * as the default attack goal. This will allow the entity to shoot projectiles at a range of
+	 * 16 blocks in a 1-second interval.
+	 * <br><br>
+	 * When changing the attack ranges, you can do so by overriding the {@link #getMaxAttackRange()}
+	 * and {@link #getMinAttackRange()} methods to set the maximum and minimum attack ranges of this
+	 * turret. However, for more precise control, you can override the {@link #initGoals()} method
+	 * and set the {@link ProjectileAttackGoal} with the desired parameters but this still requires
+	 * the overriding of both {@link #getMaxAttackRange()} and {@link #getMinAttackRange()} methods.
+	 *
+	 * @see ProjectileAttackGoal
+	 * @see #getMaxAttackRange()
+	 * @see #getMinAttackRange()
+	 */
+	@Override
+	protected void initGoals() {
+		if (attackGoal == null) {
+			this.attackGoal = new ProjectileAttackGoal(this, 0, 20, this.getMaxAttackRange(), this.getMinAttackRange());
+		}
+
+		// Goals
+		this.goalSelector.add(1, this.attackGoal);
+		this.goalSelector.add(2, new LookAtEntityGoal(this, MobEntity.class, 8.0F, 0.02F, true));
+		this.goalSelector.add(8, new LookAroundGoal(this));
+
+		// Targets
+		this.targetSelector.add(1, new ActiveTargetGoal<>(this, MobEntity.class, 10, true, false, (entity, _) -> entity instanceof Monster));
+		this.targetSelector.add(3, new TargetOtherTeamGoal(this));
+	}
 
 	@Override
 	protected void initDataTracker(DataTracker.Builder builder) {
@@ -257,6 +331,66 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
 		super.initDataTracker(builder);
 	}
 
+	/**
+	 * Sets the standard attributes for this entity. The attributes that are set are as follows:
+	 * <ul>
+	 *	<li>
+	 * 		<b>{@link EntityAttributes#MAX_HEALTH}</b> - The maximum health of this entity. By
+	 * 		default, it is set to 20 like most mobs. You can leave it be or change it to a value
+	 * 		more suitable for your entity.
+	 * 		<br><br>
+	 * 		<b>NOTE:</b> When setting the max health, it is recommended to use the {@link #setTurretMaxHealth(float)}
+	 * 		method to set the default max health value for the turret entity since this is the one
+	 * 		that is used to set the max health of the entity. Call the said method inside the subclass's
+	 * 		{@code setAttributes()} before calling {@code TurretEntity.setAttributes()}.
+	 *	</li>
+	 * 	<li>
+	 * 		<b>{@link EntityAttributes#FOLLOW_RANGE}</b> - The range this entity can follow its
+	 * 		target. By default, it is 16 like most mobs.
+	 * 	</li>
+	 * 	<li>
+	 * 		<b>{@link EntityAttributes#MOVEMENT_SPEED}</b> - The speed of this entity. This is by
+	 * 		design set to 0 to prevent the entity from moving as it is a stationary turret. If you
+	 * 		want to make a mobile turret, you can set this to a value greater than 0.
+	 * 	</li>
+	 * 	<li>
+	 * 		<b>{@link EntityAttributes#KNOCKBACK_RESISTANCE}</b> - The knockback resistance of this
+	 * 		entity. This is also by design set to 1.0 to prevent the entity from being knocked back.
+	 * 		However, the turret would still be affected by knockback on some occasions. You can set
+	 * 		this to a value less than 1.0 to make the entity more susceptible to knockback.
+	 * 	</li>
+	 * </ul>
+	 *
+	 * <hr>
+	 *
+	 * Make sure to always call the {@code setAttributes()} method when setting the
+	 * local attributes for this class's inheritor to ensure that the attributes are set correctly.
+	 * If you plan to change the values of the standard attributes, you can do so by still calling
+	 * this method and re-adding the attributes with the new values.
+	 * <br><br>
+	 * For example:
+	 * <pre><code>
+	 * TurretEntity.setAttributes()
+	 * 	.add(EntityAttributes.FOLLOW_RANGE, 32);
+	 * </code></pre>
+	 * <br>
+	 * This code will overwrite the default {@code FOLLOW_RANGE} attribute value from 16 to 32 blocks
+	 * for the entity that calls this method, allowing to set a new {@code FOLLOW_RANGE} value while
+	 * also keeping the other default attributes.
+	 *
+	 * @return {@link DefaultAttributeContainer.Builder} The builder that contains the attributes.
+	 *
+	 * @see EntityAttributes
+	 * @see DefaultAttributeContainer.Builder
+	 */
+	public static DefaultAttributeContainer.Builder setAttributes() {
+		return TurretEntity.createMobAttributes()
+			.add(EntityAttributes.MAX_HEALTH, TurretEntity.getTurretMaxHealth())
+			.add(EntityAttributes.FOLLOW_RANGE, 16)
+			.add(EntityAttributes.MOVEMENT_SPEED, 0)
+			.add(EntityAttributes.KNOCKBACK_RESISTANCE, 1.0);
+	}
+
 	@Override
 	protected BodyControl createBodyControl() {
 		return new TurretBodyControl(this);
@@ -270,9 +404,11 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
 		this.resetPosition();
 
 		if (spawnReason == SpawnReason.SPAWN_ITEM_USE) {
+			this.setFromItem((byte) 1);
 			return entityData;
 		}
 
+		this.setFromItem((byte) 0);
 		return super.initialize(world, difficulty, spawnReason, entityData);
 	}
 
@@ -327,6 +463,7 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
 		return null;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	protected ActionResult interactMob(PlayerEntity player, Hand hand) {
 		ItemStack item = player.getStackInHand(hand);
@@ -334,15 +471,16 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
 		boolean isSuccess = false;
 
 		// Turret Remover Interaction
-		if (item.getItem().getName().equals(ModItems.TURRET_REMOVER)) {
+		if (item.getItem().equals(ModItems.TURRET_REMOVER)) {
 			if (isSurvival)
 				item.damage(1, player);
 
-			isSuccess = true;
+			return Itemable.tryItem(player, hand, this, item.getItem(), this.itemable)
+				.orElse(super.interactMob(player, hand));
 		}
 
 		// Healables
-		else if (this.isHealableItem(item.getItem())) {
+		if (this.isHealableItem(item.getItem())) {
 			// Heals the turret
 			this.heal(this.getHealAmt(item.getItem()));
 
@@ -377,11 +515,6 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
 
 		if (isSuccess)
 			return ActionResult.SUCCESS;
-
-		if (item.getItem() == ModItems.TURRET_REMOVER) {
-			return Itemable.tryItem(player, hand, this, ModItems.TURRET_REMOVER, this.itemable)
-				.orElse(super.interactMob(player, hand));
-		}
 		return super.interactMob(player, hand);
 	}
 
@@ -419,15 +552,33 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
 		this.bodyYaw = 0.0f;
 	}
 
+	/**
+	 * Sets the target of this turret, accounting for the minimum and maximum attack range unlike its
+	 * parent method {@link MobEntity#setTarget(LivingEntity)}.
+	 *
+	 * @param target The target to set. Can be {@code null}.
+	 *
+	 * @see MobEntity#setTarget(LivingEntity)
+	 */
+	@Override
+	public void setTarget(@Nullable LivingEntity target) {
+		// Sets the target when it is null
+		if (target == null) {
+			super.setTarget(null);
+			return;
+		}
+
+		// If the target isn't null, check if the target is within range.
+		boolean inRange = this.isWithinRange(target, this.getMinAttackRange(), this.getMaxAttackRange());
+		if (inRange)
+			super.setTarget(target);
+	}
+
 	@Override
 	@Nullable
 	public ItemStack getPickBlockStack() {
 		TurretItem turretItem = TurretItem.forEntity(this.getType());
-
-		if (turretItem == null)
-			return null;
-
-		return new ItemStack(turretItem);
+		return turretItem == null ? null : new ItemStack(turretItem);
 	}
 
 	@Override
@@ -572,9 +723,27 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
 		return false;
 	}
 
+	public boolean isWithinRange(Entity entity, double minRange, double maxRange) {
+		return this.isWithinRange(entity.getX(), entity.getY(), entity.getZ(), minRange, maxRange);
+	}
+
+	public boolean isWithinRange(double x, double y, double z, double minRange, double maxRange) {
+		double squaredDistance = this.squaredDistanceTo(x, y, z);
+		return squaredDistance >= minRange * minRange
+			&& squaredDistance <= maxRange * maxRange;
+	}
+
 	/////////////////////////
 	// GETTERS AND SETTERS //
 	/////////////////////////
+
+	public static float getTurretMaxHealth() {
+		return TurretEntity.MAX_HEALTH;
+	};
+
+	public static void setTurretMaxHealth(float health) {
+		TurretEntity.MAX_HEALTH = health;
+	}
 
 	@Override
 	protected MoveEffect getMoveEffect() {
@@ -607,6 +776,24 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
 
 		return this.getEyePos()
 			.add(rotated);
+	}
+
+	/**
+	 * Identifies the position of a point relative to this turret's rotation and
+	 * {@link #getEyePos() eye position}.
+	 * For reference:
+	 * <ul>
+	 * 	<li>X-Axis == Pitch: Identifies the elevation rotation (Horizontal line axis)</li>
+	 * 	<li>Y-Axis == Yaw: Identifies where you are looking (Vertical line axis)</li>
+	 * 	<li>Z-Axis == Roll: It's the one facing you (The 3D line)</li>
+	 * </ul>
+	 *
+	 * @param offsets The offsets of the point at the local X, Y, and Z-Axis of this turret.
+	 *
+	 * @return Vec3d the relative position of this point, assuming that the origin of the offset is at <b>[0, 0, 0]</b>
+	 */
+	public Vec3d getRelativePos(Vec3d offsets) {
+		return this.getRelativePos(offsets.getX(), offsets.getY(), offsets.getZ());
 	}
 
 	@Override
@@ -863,6 +1050,14 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
 		return this.isEffectSource(item) ? this.effectSource.get(item) : List.of();
 	}
 
+	public float getMaxAttackRange() {
+		return 16.625f;
+	}
+
+	public float getMinAttackRange() {
+		return 0.1f;
+	}
+
 	//////////////////
 	// TRACKED DATA //
 	//////////////////
@@ -903,7 +1098,6 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
 		this.getDataTracker().set(FROM_ITEM, fromItem);
 	}
 
-	@Override
 	public void copyDataToStack(ItemStack stack) {
 		Itemable.copyDataToStack(this, stack);
 	}
@@ -913,45 +1107,120 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
 		Itemable.copyDataFromNbt(this, nbt);
 	}
 
-	public ItemStack getEntityItem() {
-		return null;
-	}
-
-	public SoundEvent getEntityRemoveSound() {
-		return null;
-	}
-
 	@Override
 	public void shootAt(LivingEntity target, float pullProgress) {
+		this.shoot(target);
+	}
+
+	////////////////////////////////////
+	// ABSTRACT & OVERRIDABLE METHODS //
+	////////////////////////////////////
+
+	// ABSTRACTS //
+	/**
+	 * Defines where the turret's projectile spawn is. This is, basically, the barrel of a cannon or
+	 * machine gun, or the crossbow's bolt holder.
+	 * <br><br>
+	 * The returned value should be an instance of a {@link List} of {@link Vec3d} so that it can
+	 * also account for turrets that have multiple projectile spawns like for instance, the
+	 * dual-barrel AA turret.
+	 * <hr>
+	 * For manipulating the actual <b>"shoot"</b> behavior, override the {@link #shootAt(LivingEntity, float)}
+	 * method of {@link TurretEntity} class.
+	 *
+	 * @return {@code List<Vec3d>} The list of projectile spawn points.
+	 */
+	abstract List<Vec3d> getTurretProjectileSpawn();
+
+	// OVERRIDABLES //
+	/**
+	 * Sets the velocity of a projectile, along with the power and uncertainty of the projectile.
+	 * <br><br>
+	 * For more optional parameter control, see overloaded versions of this method.
+	 * <br><br>
+	 * For cases where there's no target, use {@link #setProjectileVelocity(ProjectileEntity, TurretProjectileVelocity)}.
+	 *
+	 * @param target The target of this entity. This will be used to calculate the velocity of the
+	 *                  projectile towards the target's direction.
+	 * @param projectile The projectile to set the velocity to.
+	 */
+	protected void setProjectileVelocity(LivingEntity target, ProjectileEntity projectile) {
+		this.setProjectileVelocity(target, projectile, TurretProjectileVelocity.init(this));
+	}
+
+	/**
+	 * Sets the velocity of a projectile, along with the power and uncertainty of the projectile.
+	 *
+	 * @param target The target of this entity. This will be used to calculate the velocity of the
+	 * @param projectile The projectile to set the velocity to.
+	 * @param velocityData The data that will be used to set the velocity of the projectile.
+	 */
+	protected void setProjectileVelocity(LivingEntity target, ProjectileEntity projectile, TurretProjectileVelocity velocityData) {
+		this.setProjectileVelocity(projectile, velocityData.setVelocity(target));
+	}
+
+	/**
+	 * Sets the velocity of a projectile, along with the power and uncertainty of the projectile. This
+	 * method is particularly useful for setting the velocity of a projectile when there is no target,
+	 * allowing for more control over the projectile's behavior.
+	 * <br><br>
+	 * Some potential application of this method is allowing a turret to misfire or shoot in a random
+	 * direction, or to shoot in a specific direction without having to target an entity.
+	 *
+	 * @param projectile The projectile to set the velocity to.
+	 * @param velocityData The data that will be used to set the velocity of the projectile.
+	 */
+	protected void setProjectileVelocity(ProjectileEntity projectile, TurretProjectileVelocity velocityData) {
+		double vx = velocityData.getVelocity().getX();
+		double vy = velocityData.getVelocity().getY();
+		double vz = velocityData.getVelocity().getZ();
+
+		projectile.setVelocity(
+			vx, vy, vz,
+			velocityData.power,
+			velocityData.uncertainty
+		);
+	}
+
+	protected void shoot() {
+		this.shoot(TurretProjectileVelocity.init(this));
+	}
+
+	protected void shoot(LivingEntity target) {
+		this.shoot(
+			TurretProjectileVelocity.init(this)
+				.setVelocity(target)
+		);
+	}
+
+	protected void shoot(TurretProjectileVelocity velocityData) {
 		try {
-			String targetName = target != null ? target.getName().getString() : "(nothing)";
-			System.out.println("Shooting at " + targetName + " with a pull progress of " + pullProgress);
+			ProjectileEntity projectile = (ProjectileEntity) this.projectile.create(
+				this.getWorld(),
+				SpawnReason.TRIGGERED
+			);
 
-			if (target != null) {
-				ProjectileEntity projectile = (ProjectileEntity) this.projectile
-					.getConstructor(World.class, LivingEntity.class)
-					.newInstance(this.getWorld(), this);
-
-				double[] velocity = new double[] {
-					target.getX() - this.getX(),
-					target.getBodyY((double) 1 / 2) - projectile.getX(),
-					target.getZ() - this.getZ(),
-				};
-				double variance = Math.sqrt(velocity[0] * velocity[0] + velocity[2] + velocity[2]);
-				float divergence = this.getWorld().getDifficulty().getId() * 2;
-
-				projectile.setVelocity(velocity[0], velocity[1] + variance * 0.125F, velocity[2], 2.5F, divergence);
-				this.getWorld().spawnEntity(projectile);
-				this.playSound(this.getShootSound(), 1F, 1F / (this.random.nextFloat() * 0.4F + 0.8F));
+			if (projectile == null) {
+				System.err.println("Projectile is null at " + this.getName().getString());
+				DefensiveMeasures.LOGGER.info("Projectile is null at {}", this.getName().getString());
+				return;
 			}
 
-		} catch (InstantiationException
-			| IllegalAccessException
-			| IllegalArgumentException
-			| InvocationTargetException
-			| SecurityException
-			| NoSuchMethodException e)
-		{
+			Vec3d pos = this.getRelativePos(
+				this.getTurretProjectileSpawn()
+					.get(this.currentBarrel++ % this.barrels)
+			);
+			projectile.setPosition(pos);
+			projectile.setOwner(this);
+			this.setProjectileVelocity(projectile, velocityData);
+
+			this.playSound(this.getShootSound(), 1.0f, 1.0f / (this.getRandom().nextFloat() * 0.4f + 0.8f));
+			this.getWorld().spawnEntity(projectile);
+
+			// Resets the current barrel to 0 if it exceeds the number of barrels to prevent overflow
+			if (this.currentBarrel % this.barrels == 0)
+				this.currentBarrel = 0;
+		} catch (IllegalArgumentException | SecurityException e) {
 			e.printStackTrace(System.out);
 
 			DefensiveMeasures.LOGGER.error("");
@@ -988,6 +1257,238 @@ public class TurretEntity extends MobEntity implements Itemable, RangedAttackMob
 
 		@Override
 		protected void clampHeadYaw() {
+		}
+	}
+
+	/**
+	 * A class that holds the velocity data of a turret's projectile. This was created to provide a
+	 * simplified way of setting the velocity of a projectile without having to deal with the complex
+	 * calculations of the projectile's velocity.
+	 * <br><br>
+	 * This class can be overridden to provide customized velocity calculations for the projectile,
+	 * allowing for more control over the projectile's behavior such as making it shoot up in a
+	 * parabolic arc or making it shoot in a straight line.
+	 * <br><br>
+	 * The default values for the power, uncertainty, and upward velocity multiplier are set to
+	 * {@code 1.5f}, {@code 2 * difficulty}, and {@code 0.1f} respectively. These values can be
+	 * changed via their respective setters after initializing an instance with the use of the
+	 * {@link #init(TurretEntity)} method.
+	 *
+	 * <hr>
+	 *
+	 * <h1>Setting the Velocity</h1>
+	 * There are several ways to set the velocity of the projectile since by default, the velocity
+	 * is set to {@link Vec3d#ZERO}:
+	 * <ol>
+	 *     <li>Setting the velocity directly using {@link #setVelocity(Vec3d)} or {@link #setVelocity(double, double, double)}</li>
+	 *     <li>Setting the velocity using the target's position using {@link #setVelocity(LivingEntity)}</li>
+	 * </ol>
+	 *
+	 * <hr>
+	 *
+	 * <h1>Properties</h1>
+	 * The properties defined in this class are:
+	 * <ul>
+	 * 	<li>{@link #turret} - The turret entity that will be shooting the projectile</li>
+	 * 	<li>{@link #power} - The power of the projectile's velocity</li>
+	 * 	<li>{@link #uncertainty} - The distortion of the projectile's trajectory, allowing for inaccuracies</li>
+	 * 	<li>{@link #upwardVelocityMultiplier} - The multiplier for the upward velocity of the projectile</li>
+	 * 	<li>{@link #velocity} - The velocity of the projectile</li>
+	 * </ul>
+	 *
+	 * Each of these properties can be set using their respective setters and retrieved using their
+	 * respective getters.
+	 */
+	public static class TurretProjectileVelocity {
+		/** The turret entity that will be shooting the projectile */
+		private final TurretEntity turret;
+		/** The power of the projectile's velocity */
+		private float power;
+		/** The distortion of the projectile's trajectory, allowing for inaccuracies */
+		private float uncertainty;
+		/** The multiplier for the upward velocity of the projectile */
+		private float upwardVelocityMultiplier;
+		/** The velocity of the projectile */
+		private Vec3d velocity;
+
+		/**
+		 * Initializes the velocity data of the turret's projectile. This can only be initialized
+		 * using the {@link #init(TurretEntity)} method.
+		 *
+		 * @param turret The turret entity that will be shooting the projectile
+		 */
+		private TurretProjectileVelocity(TurretEntity turret) {
+			this.turret = turret;
+			this.power = 1.5f;
+			this.uncertainty = turret.getWorld().getDifficulty().getId() * 2;
+			this.upwardVelocityMultiplier = 0.1f;
+			this.velocity = Vec3d.ZERO;
+		}
+
+		/**
+		 * Creates an instance of the {@link TurretProjectileVelocity} class with the turret entity
+		 * that will be shooting the projectile.
+		 *
+		 * @param turret The turret entity that will be shooting the projectile
+		 *
+		 * @return {@code TurretProjectileVelocity} The instance of the {@link TurretProjectileVelocity} class
+		 *
+		 * @see #turret
+		 */
+		public static TurretProjectileVelocity init(TurretEntity turret) {
+			return new TurretProjectileVelocity(turret);
+		}
+
+		/**
+		 * Sets the power of the projectile's velocity.
+		 *
+		 * @param power The power of the projectile's velocity
+		 *
+		 * @return {@code TurretProjectileVelocity} The instance of the {@link TurretProjectileVelocity} class
+		 *
+		 * @see #power
+		 */
+		public TurretProjectileVelocity setPower(float power) {
+			this.power = power;
+			return this;
+		}
+
+		/**
+		 * Retrieves the power of the projectile's velocity.
+		 *
+		 * @return float The power of the projectile's velocity
+		 *
+		 * @see #power
+		 */
+		public float getPower() {
+			return this.power;
+		}
+
+		/**
+		 * Sets the uncertainty of the projectile's trajectory, allowing for inaccuracies.
+		 *
+		 * @param uncertainty The distortion of the projectile's trajectory
+		 *
+		 * @return {@code TurretProjectileVelocity} The instance of the {@link TurretProjectileVelocity} class
+		 *
+		 * @see #uncertainty
+		 */
+		public TurretProjectileVelocity setUncertainty(float uncertainty) {
+			this.uncertainty = uncertainty;
+			return this;
+		}
+
+		/**
+		 * Retrieves the uncertainty of the projectile's trajectory.
+		 *
+		 * @return float The distortion of the projectile's trajectory
+		 *
+		 * @see #uncertainty
+		 */
+		public float getUncertainty() {
+			return this.uncertainty;
+		}
+
+		/**
+		 * Sets the multiplier for the upward velocity of the projectile.
+		 *
+		 * @param upwardVelocityMultiplier The multiplier for the upward velocity of the projectile
+		 *
+		 * @return {@code TurretProjectileVelocity} The instance of the {@link TurretProjectileVelocity} class
+		 *
+		 * @see #upwardVelocityMultiplier
+		 */
+		public TurretProjectileVelocity setUpwardVelocityMultiplier(float upwardVelocityMultiplier) {
+			this.upwardVelocityMultiplier = upwardVelocityMultiplier;
+			return this;
+		}
+
+		/**
+		 * Retrieves the multiplier for the upward velocity of the projectile.
+		 *
+		 * @return float The multiplier for the upward velocity of the projectile
+		 *
+		 * @see #upwardVelocityMultiplier
+		 */
+		public float getUpwardVelocityMultiplier() {
+			return this.upwardVelocityMultiplier;
+		}
+
+		/**
+		 * Sets the velocity of the projectile.
+		 *
+		 * @param velocity The velocity of the projectile
+		 *
+		 * @return {@code TurretProjectileVelocity} The instance of the {@link TurretProjectileVelocity} class
+		 *
+		 * @see #velocity
+		 */
+		public TurretProjectileVelocity setVelocity(Vec3d velocity) {
+			this.velocity = velocity;
+			return this;
+		}
+
+		/**
+		 * Sets the velocity of the projectile.
+		 *
+		 * @param x The X-axis velocity of the projectile
+		 * @param y The Y-axis velocity of the projectile
+		 * @param z The Z-axis velocity of the projectile
+		 *
+		 * @return {@code TurretProjectileVelocity} The instance of the {@link TurretProjectileVelocity} class
+		 *
+		 * @see #velocity
+		 */
+		public TurretProjectileVelocity setVelocity(double x, double y, double z) {
+			return this.setVelocity(new Vec3d(x, y, z));
+		}
+
+		/**
+		 * Sets the velocity of the projectile using the target's position.
+		 *
+		 * @param target The target of the projectile
+		 *
+		 * @return {@code TurretProjectileVelocity} The instance of the {@link TurretProjectileVelocity} class
+		 */
+		public TurretProjectileVelocity setVelocity(LivingEntity target) {
+			double vx = (target.getX() - this.turret.getX()) * 1.0625;
+			double vy = target.getBodyY((double) 1 / 3) - this.turret.getY();
+			double vz = (target.getZ() - this.turret.getZ()) * 1.0625;
+			double variance = Math.sqrt(vx * vx + vz * vz);
+
+			vy += variance * this.upwardVelocityMultiplier;
+
+			return this.setVelocity(vx, vy, vz);
+		}
+
+		/**
+		 * Retrieves the velocity of the projectile.
+		 *
+		 * @return {@code Vec3d} The velocity of the projectile
+		 *
+		 * @see #velocity
+		 */
+		public Vec3d getVelocity() {
+			return this.velocity;
+		}
+
+		/**
+		 * Sets the velocity of the projectile in the direction of where the turret is facing. The
+		 * {@code range} parameter is a value from {@code 0} to {@code 1} representing a percentile
+		 * of the set turret's attack range. So for example, if the turret's range is {@code 10} and
+		 * the {@code range} is set to {@code 0.5}, the approximate distance of the projectile will
+		 * be expected to travel is {@code 5} blocks.
+		 *
+		 * @param range {@code 0} to {@code 1} value representing a percentile of the turret's attack range
+		 *
+		 * @return {@code TurretProjectileVelocity} The instance of the {@link TurretProjectileVelocity} class
+		 */
+		public TurretProjectileVelocity setDirectionalVelocity(float range) {
+			Vec3d targetRange = this.turret
+				.getRelativePos(0, 0, this.turret.getMaxAttackRange() * range)
+				.subtract(this.turret.getEyePos());
+
+			return this.setVelocity(targetRange);
 		}
 	}
 

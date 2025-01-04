@@ -6,6 +6,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.damage.DamageType;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import net.minecraft.registry.Registries;
@@ -34,10 +35,6 @@ public class RegistryUtil {
 		return RegistryKey.of(RegistryKeys.BLOCK, Identifier.of(DefensiveMeasures.MOD_ID, name));
 	}
 
-	private static Block registerBlock(String path, AbstractBlock.Settings settings) {
-		return Blocks.register(createBlockKey(path), Block::new, settings);
-	}
-
 	public static Block registerBlock(String path, Function<AbstractBlock.Settings, Block> function, AbstractBlock.Settings settings) {
 		return Blocks.register(createBlockKey(path), function, settings);
 	}
@@ -55,6 +52,10 @@ public class RegistryUtil {
 		return Items.register(createItemKey(path), factory);
 	}
 
+	public static Item registerItem(Block block) {
+		return Items.register(block);
+	}
+
 	// Entity Registry
 	private static RegistryKey<EntityType<?>> createEntityKey(String path) {
 		return RegistryKey.of(RegistryKeys.ENTITY_TYPE, Identifier.of(DefensiveMeasures.MOD_ID, path));
@@ -68,5 +69,10 @@ public class RegistryUtil {
 			key,
 			builder.build(key)
 		);
+	}
+
+	// Damage Type Registry
+	public static RegistryKey<DamageType> getDamageTypeKey(String path) {
+		return RegistryKey.of(RegistryKeys.DAMAGE_TYPE, Identifier.of(DefensiveMeasures.MOD_ID, path));
 	}
 }

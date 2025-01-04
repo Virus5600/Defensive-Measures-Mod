@@ -5,6 +5,7 @@ import net.minecraft.entity.ai.RangedAttackMob;
 import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.util.math.MathHelper;
+
 import org.jetbrains.annotations.Nullable;
 
 import java.util.EnumSet;
@@ -28,13 +29,23 @@ public class ProjectileAttackGoal extends net.minecraft.entity.ai.goal.Projectil
 	private final int minIntervalTicks;
 	private final int maxIntervalTicks;
 	private final float maxShootRange;
+	private final float minShootRange;
 	private final float squaredMaxShootRange;
+	private final float squaredMinShootRange;
 
 	public ProjectileAttackGoal(RangedAttackMob mob, double mobSpeed, int intervalTicks, float maxShootRange) {
 		this(mob, mobSpeed, intervalTicks, intervalTicks, maxShootRange);
 	}
 
+	public ProjectileAttackGoal(RangedAttackMob mob, double mobSpeed, int intervalTicks, float maxShootRange, float minShootRange) {
+		this(mob, mobSpeed, intervalTicks, intervalTicks, maxShootRange, minShootRange);
+	}
+
 	public ProjectileAttackGoal(RangedAttackMob mob, double mobSpeed, int minIntervalTicks, int maxIntervalTicks, float maxShootRange) {
+		this(mob, mobSpeed, minIntervalTicks, maxIntervalTicks, maxShootRange, 0.1F);
+	}
+
+	public ProjectileAttackGoal(RangedAttackMob mob, double mobSpeed, int minIntervalTicks, int maxIntervalTicks, float maxShootRange, float minShootRange) {
 		super(mob, mobSpeed, minIntervalTicks, maxIntervalTicks, maxShootRange);
 
 		if (!(mob instanceof LivingEntity)) {
@@ -46,7 +57,9 @@ public class ProjectileAttackGoal extends net.minecraft.entity.ai.goal.Projectil
 			this.minIntervalTicks = minIntervalTicks;
 			this.maxIntervalTicks = maxIntervalTicks;
 			this.maxShootRange = maxShootRange;
+			this.minShootRange = minShootRange;
 			this.squaredMaxShootRange = maxShootRange * maxShootRange;
+			this.squaredMinShootRange = minShootRange * minShootRange;
 			this.setControls(EnumSet.of(Goal.Control.MOVE, Goal.Control.LOOK));
 		}
 	}
@@ -80,15 +93,20 @@ public class ProjectileAttackGoal extends net.minecraft.entity.ai.goal.Projectil
 	@Override
 	public void tick() {
 		if (this.target != null) {
-			double d = this.mob.squaredDistanceTo(this.target.getX(), this.target.getY(), this.target.getZ());
-			boolean bl = this.mob.getVisibilityCache().canSee(this.target);
-			if (bl) {
+			double squaredDistance = this.mob.squaredDistanceTo(this.target.getX(), this.target.getY(), this.target.getZ());
+			boolean canBeSeen = this.mob.getVisibilityCache().canSee(this.target);
+			boolean isPastMaxRange = squaredDistance > (double) this.squaredMaxShootRange,
+				isPastMinRange = squaredDistance < (double) this.squaredMinShootRange,
+				isInRange = !isPastMaxRange && !isPastMinRange,
+				isStillSeen = this.seenTargetTicks >= 5;
+
+			if (canBeSeen) {
 				this.seenTargetTicks++;
 			} else {
 				this.seenTargetTicks = 0;
 			}
 
-			if (!(d > (double) this.squaredMaxShootRange) && this.seenTargetTicks >= 5) {
+			if (isInRange && isStillSeen) {
 				this.mob.getNavigation().stop();
 			} else {
 				this.mob.getNavigation().startMovingTo(this.target, this.mobSpeed);
@@ -96,17 +114,18 @@ public class ProjectileAttackGoal extends net.minecraft.entity.ai.goal.Projectil
 
 			this.mob.getLookControl().lookAt(this.target, 30.0F, 30.0F);
 			if (--this.updateCountdownTicks == 0) {
-				if (!bl) {
+				if (!canBeSeen) {
 					return;
 				}
 
-				float f = (float) Math.sqrt(d) / this.maxShootRange;
-				float g = MathHelper.clamp(f, 0.1F, 1.0F);
-				this.owner.shootAt(this.target, g);
-				this.updateCountdownTicks = MathHelper.floor(f * (float) (this.maxIntervalTicks - this.minIntervalTicks) + (float) this.minIntervalTicks);
+				float nextShotScaler = (float) Math.sqrt(squaredDistance) / this.maxShootRange;
+				float pullProgress = MathHelper.clamp(nextShotScaler, 0.1F, 1.0F);
+
+				this.owner.shootAt(this.target, pullProgress);
+				this.updateCountdownTicks = MathHelper.floor(nextShotScaler * (float) (this.maxIntervalTicks - this.minIntervalTicks) + (float) this.minIntervalTicks);
 			} else if (this.updateCountdownTicks < 0) {
 				this.updateCountdownTicks = MathHelper.floor(
-					MathHelper.lerp(Math.sqrt(d) / (double) this.maxShootRange, this.minIntervalTicks, this.maxIntervalTicks)
+					MathHelper.lerp(Math.sqrt(squaredDistance) / (double) this.maxShootRange, this.minIntervalTicks, this.maxIntervalTicks)
 				);
 			}
 		}
@@ -150,5 +169,13 @@ public class ProjectileAttackGoal extends net.minecraft.entity.ai.goal.Projectil
 	 */
 	public int getUpdateCountdownTicks() {
 		return this.updateCountdownTicks;
+	}
+
+	public float getMaxAttackRange() {
+		return this.maxShootRange;
+	}
+
+	public float getMinAttackRange() {
+		return this.minShootRange;
 	}
 }

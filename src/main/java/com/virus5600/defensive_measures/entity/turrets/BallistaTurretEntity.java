@@ -1,24 +1,22 @@
 package com.virus5600.defensive_measures.entity.turrets;
 
-import java.util.*;
-
-import com.virus5600.defensive_measures.entity.ModEntities;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.attribute.DefaultAttributeContainer;
-import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.damage.DamageSource;
-import net.minecraft.entity.data.DataTracker.Builder;
+import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.mob.MobEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.sound.SoundEvent;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.Hand;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-
-import org.jetbrains.annotations.Nullable;
 
 import software.bernie.geckolib.animatable.GeoEntity;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
@@ -27,23 +25,30 @@ import software.bernie.geckolib.animation.AnimationController;
 import software.bernie.geckolib.animation.AnimationState;
 import software.bernie.geckolib.animation.PlayState;
 import software.bernie.geckolib.animation.RawAnimation;
-import software.bernie.geckolib.animation.keyframe.event.ParticleKeyframeEvent;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
+import org.jetbrains.annotations.Nullable;
+
+import com.virus5600.defensive_measures.entity.ModEntities;
 import com.virus5600.defensive_measures.entity.TurretMaterial;
 import com.virus5600.defensive_measures.entity.ai.goal.ProjectileAttackGoal;
 import com.virus5600.defensive_measures.item.ModItems;
-import com.virus5600.defensive_measures.particle.ModParticles;
 import com.virus5600.defensive_measures.sound.ModSoundEvents;
 
-public class CannonTurretEntity extends TurretEntity implements GeoEntity {
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+public class BallistaTurretEntity extends TurretEntity implements GeoEntity {
 	/**
 	 * Defines how many seconds the cannon should wait before shooting again.
-	 * The time is calculated in ticks and by default, it's 5 seconds <b>(20 ticks times 5 seconds)</b>.
+	 * The time is calculated in ticks and by default, it's 2.5 seconds <b>(20 ticks times 2.5 seconds)</b>.
 	 */
-	private static final int TOTAL_ATT_COOLDOWN = 20 * 5;
+	private static final int TOTAL_ATT_COOLDOWN = (int) (20 * 2.5);
 	private static final Map<String, RawAnimation> ANIMATIONS;
 	private static final Map<Offsets, List<Vec3d>> OFFSETS;
+	private static final Map<Item, SoundEvent> HEAL_SOUNDS;
 
 	/**
 	 * Contains all the items that can heal this entity.
@@ -60,11 +65,11 @@ public class CannonTurretEntity extends TurretEntity implements GeoEntity {
 	//////////////////
 	// CONSTRUCTORS //
 	//////////////////
-	public CannonTurretEntity(EntityType<? extends MobEntity> entityType, World world) {
-		super(entityType, world, TurretMaterial.METAL, ModEntities.CANNONBALL, ModItems.CANNON_TURRET);
+	public BallistaTurretEntity(EntityType<? extends MobEntity> entityType, World world) {
+		super(entityType, world, TurretMaterial.WOOD, ModEntities.BALLISTA_ARROW, ModItems.BALLISTA_TURRET);
 
-		this.setShootSound(ModSoundEvents.TURRET_CANNON_SHOOT);
-		this.setHealSound(ModSoundEvents.TURRET_REPAIR_METAL);
+		this.setShootSound(ModSoundEvents.TURRET_BALLISTA_SHOOT);
+		this.setHealSound(ModSoundEvents.TURRET_REPAIR_WOOD);
 		this.addHealables(healables);
 		this.addEffectSource(effectSource);
 	}
@@ -82,17 +87,15 @@ public class CannonTurretEntity extends TurretEntity implements GeoEntity {
 	}
 
 	@Override
-	protected void initDataTracker(Builder builder) {
+	protected void initDataTracker(DataTracker.Builder builder) {
 		// Initialize standard data trackers
 		super.initDataTracker(builder);
 	}
 
 	public static DefaultAttributeContainer.Builder setAttributes() {
-		TurretEntity.setTurretMaxHealth(50);
+		TurretEntity.setTurretMaxHealth(25);
 
-		return TurretEntity.setAttributes()
-			.add(EntityAttributes.ARMOR, 3)
-			.add(EntityAttributes.ARMOR_TOUGHNESS, 2);
+		return TurretEntity.setAttributes();
 	}
 
 	/////////////////////
@@ -101,23 +104,37 @@ public class CannonTurretEntity extends TurretEntity implements GeoEntity {
 
 	@Override
 	public void shootAt(LivingEntity target, float pullProgress) {
+		this.triggerAnim("Attack", "shoot");
 		super.shootAt(target, pullProgress);
-		this.stopTriggeredAnim("FiringSequence", "charge");
-		this.triggerAnim("FiringSequence", "shoot");
+	}
+
+	@Override
+	public void onRemove(Entity.RemovalReason reason) {
+		if (this.isDead()) {
+			this.shoot(
+				TurretEntity.TurretProjectileVelocity
+					.init(this)
+					.setDirectionalVelocity(0.5f)
+			);
+		}
+
+		super.onRemove(reason);
+	}
+
+	@Override
+	public ActionResult interactMob(PlayerEntity player, Hand hand) {
+		Item usedItem = player.getStackInHand(hand).getItem();
+
+		if (this.isHealableItem(usedItem) && this.getHealSound() != ModSoundEvents.TURRET_REPAIR_WOOD) {
+			this.setHealSound(HEAL_SOUNDS.get(usedItem));
+		}
+
+		return super.interactMob(player, hand);
 	}
 
 	@Override
 	public void tick() {
 		super.tick();
-
-		if (!this.getWorld().isClient) {
-			int updateCountdownTicks = this.attackGoal.getUpdateCountdownTicks(),
-				afterAttackTick = 5,
-				beforeAttackTick = CannonTurretEntity.TOTAL_ATT_COOLDOWN - afterAttackTick;
-			if (updateCountdownTicks > afterAttackTick && updateCountdownTicks < beforeAttackTick ) {
-				this.triggerAnim("FiringSequence", "charge");
-			}
-		}
 	}
 
 	/////////////////////////
@@ -127,35 +144,30 @@ public class CannonTurretEntity extends TurretEntity implements GeoEntity {
 	@Nullable
 	@Override
 	protected SoundEvent getHurtSound(DamageSource source) {
-		return ModSoundEvents.TURRET_CANNON_HURT;
+		return ModSoundEvents.TURRET_BALLISTA_HURT;
 	}
 
 	@Nullable
 	@Override
 	protected SoundEvent getDeathSound() {
-		return ModSoundEvents.TURRET_CANNON_DESTROYED;
+		return ModSoundEvents.TURRET_BALLISTA_DESTROYED;
 	}
 
 	@Override
 	public ItemStack getEntityItem() {
-		return new ItemStack(ModItems.CANNON_TURRET);
+		return new ItemStack(ModItems.BALLISTA_TURRET);
 	}
 
 	@Override
 	public SoundEvent getEntityRemoveSound() {
-		return ModSoundEvents.TURRET_REMOVED_METAL;
-	}
-
-	@Override
-	public float getMinAttackRange() {
-		return 3f;
+		return ModSoundEvents.TURRET_REMOVED_WOOD;
 	}
 
 	///////////////////////////
 	// ANIMATION CONTROLLERS //
 	///////////////////////////
 
-	private <E extends CannonTurretEntity>PlayState deathController(final AnimationState<E> event) {
+	private <E extends BallistaTurretEntity> PlayState deathController(final AnimationState<E> event) {
 		if (!this.isAlive() && !this.animPlayed) {
 			this.animPlayed = true;
 			event.setAnimation(ANIMATIONS.get("Death"));
@@ -164,41 +176,13 @@ public class CannonTurretEntity extends TurretEntity implements GeoEntity {
 		return PlayState.CONTINUE;
 	}
 
-	private <E extends CannonTurretEntity>PlayState idleController(final AnimationState<E> event) {
+	private <E extends BallistaTurretEntity>PlayState idleController(final AnimationState<E> event) {
 		return event
 			.setAndContinue(ANIMATIONS.get("Idle"));
 	}
 
-	private <E extends CannonTurretEntity>PlayState firingSequenceController(final AnimationState<E> event) {
+	private <E extends BallistaTurretEntity>PlayState shootController(final AnimationState<E> event) {
 		return PlayState.STOP;
-	}
-
-	private void firingSequenceKeyframeHandler(ParticleKeyframeEvent<CannonTurretEntity> state) {
-		final String LOCATOR = state.getKeyframeData()
-			.getLocator();
-
-
-		if (LOCATOR.equals("barrel")) {
-			Vec3d barrelPos = this.getRelativePos(this.getTurretProjectileSpawn().getFirst()),
-				velocityModifier = this.getRelativePos(0, 0, 1.5).subtract(this.getEyePos());
-
-			this.getWorld().addParticle(
-				ModParticles.CANNON_FLASH,
-				barrelPos.getX(), barrelPos.getY(), barrelPos.getZ(),
-				velocityModifier.getX(), velocityModifier.getY(), velocityModifier.getZ()
-			);
-		}
-		else if (LOCATOR.equals("fuse")) {
-			Vec3d fusePos = this.getRelativePos(
-				OFFSETS.get(Offsets.FUSE).getFirst()
-			);
-
-			this.getWorld().addParticle(
-				ModParticles.CANNON_FUSE,
-				fusePos.getX(), fusePos.getY(), fusePos.getZ(),
-				0, 0.225, -0.50
-			);
-		}
 	}
 
 	///////////////////////////////
@@ -212,10 +196,8 @@ public class CannonTurretEntity extends TurretEntity implements GeoEntity {
 			.add(
 				new AnimationController<>(this, "Death", this::deathController),
 				new AnimationController<>(this, "Idle", this::idleController),
-				new AnimationController<>(this, "FiringSequence", this::firingSequenceController)
-					.triggerableAnim("charge", ANIMATIONS.get("Charge"))
+				new AnimationController<>(this, "Attack", this::shootController)
 					.triggerableAnim("shoot", ANIMATIONS.get("Shoot"))
-					.setParticleKeyframeHandler(this::firingSequenceKeyframeHandler)
 			);
 	}
 
@@ -228,14 +210,14 @@ public class CannonTurretEntity extends TurretEntity implements GeoEntity {
 	// ABSTRACT IMPLEMENTATIONS //
 	//////////////////////////////
 	protected List<Vec3d> getTurretProjectileSpawn() {
-		return OFFSETS.get(Offsets.BARREL);
+		return OFFSETS.get(Offsets.BOLT_HOLDER);
 	}
 
 	/////////////////////////
 	// LOCAL CLASSES/ENUMS //
 	/////////////////////////
 	public enum Offsets {
-		BARREL, FUSE
+		BOLT_HOLDER
 	}
 
 	///////////////////////
@@ -244,42 +226,50 @@ public class CannonTurretEntity extends TurretEntity implements GeoEntity {
 
 	static {
 		OFFSETS = Map.of(
-			Offsets.BARREL, List.of(
+			Offsets.BOLT_HOLDER, List.of(
 				new Vec3d(0, 0, 0.875)
-			),
-			Offsets.FUSE, List.of(
-				new Vec3d(0, 0.25, -0.55)
 			)
 		);
 
 		ANIMATIONS = Map.of(
 			"Death", RawAnimation.begin()
-				.thenPlayAndHold("animation.cannon_turret.death"),
+				.thenPlayAndHold("animation.ballista.death"),
 			"Idle", RawAnimation.begin()
-				.thenLoop("animation.cannon_turret.setup"),
-			"Charge", RawAnimation.begin()
-				.thenPlay("animation.cannon_turret.fuse"),
+				.thenLoop("animation.ballista.setup"),
 			"Shoot", RawAnimation.begin()
-				.thenPlay("animation.cannon_turret.shoot")
+				.thenPlay("animation.ballista.shoot")
 		);
+
+		HEAL_SOUNDS = new HashMap<>() {
+			{
+				put(Items.STICK, ModSoundEvents.TURRET_REPAIR_WOOD);
+				put(Items.STRING, ModSoundEvents.TURRET_REPAIR_BOW);
+
+				final List<Item> WOODS = new ArrayList<>(TurretEntity.PLANKS.stream().toList());
+				WOODS.addAll(TurretEntity.LOGS);
+				WOODS.forEach(item -> put(item, ModSoundEvents.TURRET_REPAIR_WOOD));
+			}
+		};
 
 		healables = new HashMap<>() {
 			{
-				for (Item item : TurretEntity.PLANKS)
-					put(item, 1.0f);
-				put(Items.IRON_NUGGET, 1f);
-				put(Items.IRON_INGOT, 10f);
-				put(Items.IRON_BLOCK, 100f);
+				put(Items.STICK, 1.0f);
+				put(Items.STRING, 1.0f);
+
+				TurretEntity.PLANKS.forEach(item -> put(item, 3.0f));
+				TurretEntity.LOGS.forEach(item -> put(item, 25.0f));
 			}
 		};
 
 		effectSource = new HashMap<>() {
 			{
-				put(Items.IRON_BLOCK, new ArrayList<>() {
-					{
-						add(new Object[] {StatusEffects.ABSORPTION, 60, 2});
-					}
-				});
+				for (Item item : TurretEntity.LOGS) {
+					put(item, new ArrayList<>() {
+						{
+							add(new Object[] {StatusEffects.ABSORPTION, 60, 2});
+						}
+					});
+				}
 			}
 		};
 	}

@@ -1,4 +1,4 @@
-package com.virus5600.defensive_measures.item.turrets.cannon;
+package com.virus5600.defensive_measures.item.turrets.ballista;
 
 import com.virus5600.defensive_measures.entity.turrets.TurretEntity;
 import net.minecraft.entity.EntityType;
@@ -15,8 +15,8 @@ import com.virus5600.defensive_measures.item.turrets.TurretItem;
 import java.lang.reflect.Type;
 import java.util.List;
 
-public class CannonTurretItem extends TurretItem {
-	public CannonTurretItem(EntityType<? extends MobEntity> type, Settings settings) {
+public class BallistaTurretItem extends TurretItem {
+	public BallistaTurretItem(EntityType<? extends MobEntity> type, Settings settings) {
 		super(
 			type,
 			settings
@@ -31,7 +31,7 @@ public class CannonTurretItem extends TurretItem {
 
 		for (int i = 1; i <= 2; i++) {
 			tooltip.add(
-				Text.translatable("itemTooltip.dm.cannon_turret.line" + i)
+				Text.translatable("itemTooltip.dm.ballista.line" + i)
 					.formatted(Formatting.DARK_AQUA)
 			);
 		}

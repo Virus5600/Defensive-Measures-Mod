@@ -27,9 +27,13 @@
 	"item.dm.machine_gun_stand" : "MG Stand",
 	"item.dm.mg_turret" : "Place MG Turret",
 
-	"itemTooltip.dm.cannon_turret.line1" : "Range: 16 blocks",
-	"itemTooltip.dm.cannon_turret.line2" : "Damage: 10",
-	"itemTooltip.dm.cannon_turret.line3" : "Reload Time: 2 seconds",
+	"itemTooltip.dm.generic.health" : "Health: %s / %s",
+
+	"itemTooltip.dm.cannon_turret.line1" : "Range: 3-16 blocks",
+	"itemTooltip.dm.cannon_turret.line3" : "Reload Time: 5 seconds",
+
+	"itemTooltip.dm.ballista.line1" : "Range: 16 blocks",
+	"itemTooltip.dm.ballista.line3" : "Reload Time: 2.5 seconds",
 
 	"entity.dm.cannon_turret" : "Cannon Turret",
 	"entity.dm.cannonball" : "Cannon ball",
@@ -40,7 +44,7 @@
 	"entity.dm.mg_turret" : "MG Turret",
 	"entity.dm.mg_bullet" : "MG Bullet",
 
-	"death.attack.arrowhead" : "%1$s stepped on an Arrowhead",
+	"death.attack.arrowhead" : "%1$s got poked to death with a sticking arrowhead on a ground",
 	"death.attack.arrowhead.player" : "%1$s stepped on a random Arrowhead whilst fighting with %2$s",
 
 	"subtitles.turret.remove.metal" : "Metallic Turret Removed",

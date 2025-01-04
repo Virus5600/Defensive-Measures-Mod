@@ -1,18 +1,14 @@
 package com.virus5600.defensive_measures.item.turrets;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.NbtComponent;
-import org.jetbrains.annotations.Nullable;
-
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Maps;
-import com.virus5600.defensive_measures.entity.turrets.TurretEntity;
-
 import net.minecraft.block.BlockState;
 import net.minecraft.block.FluidBlock;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.NbtComponent;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnReason;
@@ -22,11 +18,14 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
 import net.minecraft.item.SpawnEggItem;
+import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.stat.Stats;
+import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
@@ -36,9 +35,12 @@ import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
 import net.minecraft.world.event.GameEvent;
 
-public class TurretItem extends Item {
-	private static final Map<EntityType<? extends TurretEntity>, TurretItem> TURRETS = Maps.newIdentityHashMap();
-	private final EntityType<?> type;
+import org.jetbrains.annotations.Nullable;
+
+public abstract class TurretItem extends Item {
+	protected final EntityType<?> type;
+	private static final Map<EntityType<? extends MobEntity>, TurretItem> TURRETS = new HashMap<>();
+
 
 	public TurretItem(EntityType<? extends MobEntity> type, Settings settings) {
 		super(
@@ -46,6 +48,7 @@ public class TurretItem extends Item {
 		);
 
 		this.type = type;
+		TURRETS.put(type, this);
 	}
 
 	public ActionResult useOnBlock(ItemUsageContext context) {
@@ -135,9 +138,8 @@ public class TurretItem extends Item {
 		return TURRETS.get(type);
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public static Iterable<TurretItem> getAll() {
-		return Iterables.unmodifiableIterable((Iterable) TURRETS.values());
+		return TURRETS.values();
 	}
 
 	public EntityType<?> getEntityType(@Nullable NbtCompound nbt) {
@@ -150,4 +152,35 @@ public class TurretItem extends Item {
 
 		return this.type;
 	}
+
+	@Override
+	public void appendTooltip(ItemStack stack, Item.TooltipContext context, List<Text> tooltip, TooltipType type) {
+		int maxHealth = (int) this.getTurretMaxHealth();
+		int currentHealth = maxHealth;
+
+		NbtComponent nbtComponent = stack.get(DataComponentTypes.CUSTOM_DATA);
+		NbtCompound nbt;
+		if (nbtComponent != null) {
+			nbt = nbtComponent.copyNbt();
+
+			if (nbt.contains("Health", NbtElement.FLOAT_TYPE)) {
+				currentHealth = (int) nbt.getFloat("Health");
+			}
+
+			if (nbt.contains("MaxHealth", NbtElement.FLOAT_TYPE)) {
+				maxHealth = (int) nbt.getFloat("MaxHealth");
+			}
+		}
+
+		if (maxHealth != 0) {
+			tooltip.add(
+				Text.translatable(
+					"itemTooltip.dm.generic.health",
+					currentHealth, maxHealth)
+					.formatted(Formatting.RED)
+			);
+		}
+	}
+
+	protected abstract float getTurretMaxHealth();
 }

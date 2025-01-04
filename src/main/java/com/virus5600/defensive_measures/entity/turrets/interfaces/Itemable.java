@@ -1,12 +1,8 @@
-package com.virus5600.defensive_measures.entity.turrets;
+package com.virus5600.defensive_measures.entity.turrets.interfaces;
 
-import com.virus5600.defensive_measures.advancement.criterion.ModCriterion;
-import com.virus5600.defensive_measures.entity.TurretMaterial;
-import com.virus5600.defensive_measures.sound.ModSoundEvents;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.NbtComponent;
 import net.minecraft.entity.ItemEntity;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
@@ -18,6 +14,9 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
+
+import com.virus5600.defensive_measures.advancement.criterion.ModCriterion;
+import com.virus5600.defensive_measures.entity.turrets.TurretEntity;
 
 import java.util.Optional;
 import java.util.Random;
@@ -33,37 +32,37 @@ public interface Itemable {
 	 * Determines whether this entity is from an item.
 	 * @return {@link byte}
 	 */
-	public byte isFromItem();
+	byte isFromItem();
 
 	/**
 	 * Sets the value that identifies whether this entity is from an item.
 	 * @param fromItem {@link byte} A `1` or `0` value.
 	 */
-	public void setFromItem(byte fromItem);
+	void setFromItem(byte fromItem);
 
 	/**
 	 * Copies the data to the given stack.
 	 * @param stack {@link ItemStack} The stack to copy the data to.
 	 */
-	public void copyDataToStack(ItemStack stack);
+	void copyDataToStack(ItemStack stack);
 
 	/**
 	 * Copies the data from the given NBT to this entity.
 	 * @param nbt {@link NbtCompound} The NBT to copy the data from.
 	 */
-	public void copyDataFromNbt(NbtCompound nbt);
+	void copyDataFromNbt(NbtCompound nbt);
 
 	/**
 	 * Retrieves the item this turret is from.
 	 * @return {@link ItemStack}
 	 */
-	public ItemStack getEntityItem();
+	ItemStack getEntityItem();
 
 	/**
 	 * Retrieves the sound that plays when the turret is removed.
 	 * @return {@link SoundEvent}
 	 */
-	public SoundEvent getEntityRemoveSound();
+	SoundEvent getEntityRemoveSound();
 
 	/**
 	 * Copies the data from this entity to the given stack.
@@ -71,7 +70,7 @@ public interface Itemable {
 	 * @param entity {@link MobEntity} The entity to copy the data from.
 	 * @param stack {@link ItemStack} The stack to copy the data to.
 	 */
-	public static void copyDataToStack(MobEntity entity, ItemStack stack) {
+	static void copyDataToStack(MobEntity entity, ItemStack stack) {
 		// Sets the name
 		stack.set(DataComponentTypes.CUSTOM_NAME, entity.hasCustomName() ? entity.getCustomName() : stack.getName());
 
@@ -84,6 +83,7 @@ public interface Itemable {
 		nbtCompound.putBoolean("Glowing", entity.isGlowing());
 		nbtCompound.putBoolean("Invulnerable", entity.isInvulnerable());
 		nbtCompound.putFloat("Health", entity.getHealth());
+		nbtCompound.putFloat("MaxHealth", entity.getMaxHealth());
 		nbtCompound.putUuid("UUID", entity.getUuid());
 
 		stack.set(DataComponentTypes.CUSTOM_DATA, NbtComponent.of(nbtCompound));
@@ -95,7 +95,7 @@ public interface Itemable {
 	 * @param entity {@link MobEntity} The entity to copy the data to.
 	 * @param nbt {@link NbtCompound} The NBT to copy the data from.
 	 */
-	public static void copyDataFromNbt(MobEntity entity, NbtCompound nbt) {
+	static void copyDataFromNbt(MobEntity entity, NbtCompound nbt) {
 		NbtComponent.of(nbt).applyToEntity(entity);
 	}
 
@@ -109,18 +109,13 @@ public interface Itemable {
 	 * @return {@link Optional<ActionResult>} The result of the action.
 	 * @param <T> The type of entity.
 	 */
-	public static <T extends LivingEntity> Optional<ActionResult> tryItem(PlayerEntity player, Hand hand, T entity, Item tool, Item modItem) {
+	static <T extends TurretEntity> Optional<ActionResult> tryItem(PlayerEntity player, Hand hand, T entity, Item tool, Item modItem) {
 		ItemStack itemStack = player.getStackInHand(hand);
 		if (itemStack.getItem() == tool && entity.isAlive()) {
 			World world = entity.getWorld();
 
 			if (!world.isClient) {
-				if (((TurretEntity) entity).getTurretMaterial() == TurretMaterial.METAL) {
-					entity.playSound(ModSoundEvents.TURRET_REMOVED_METAL, 1.0f, new Random().nextFloat(0.75f, 1.25f));
-				}
-				else if (((TurretEntity) entity).getTurretMaterial() == TurretMaterial.WOOD) {
-					entity.playSound(ModSoundEvents.TURRET_REMOVED_WOOD, 1.0f, new Random().nextFloat(0.75f, 1.25f));
-				}
+				entity.playSound(entity.getEntityRemoveSound(), 1.0f, new Random().nextFloat(0.75f, 1.25f));
 			}
 
 			if (player.isCreative() && !player.isSneaking()) {
@@ -129,7 +124,7 @@ public interface Itemable {
 			}
 
 			ItemStack stack = new ItemStack(modItem);
-			((Itemable) entity).copyDataToStack(stack);
+			entity.copyDataToStack(stack);
 
 			float x = (float) entity.getPos().x + 0.5f;
 			float y = (float) entity.getPos().y + 0.5f;

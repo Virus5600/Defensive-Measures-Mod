@@ -1,5 +1,6 @@
 package com.virus5600.defensive_measures.item.turrets.cannon;
 
+import com.virus5600.defensive_measures.item.interfaces.FuelItem;
 import net.minecraft.item.FuelRegistry;
 import net.minecraft.item.Item;
 import net.minecraft.util.Rarity;
@@ -7,7 +8,7 @@ import net.minecraft.util.Rarity;
 /**
  * The class for the Cannon Base {@link Item item}.
  */
-public class CannonBaseItem extends Item {
+public class CannonBaseItem extends Item implements FuelItem {
 	public CannonBaseItem(Settings settings) {
 		super(
 			settings
@@ -15,7 +16,10 @@ public class CannonBaseItem extends Item {
 				.rarity(Rarity.COMMON)	// RARITY
 		);
 
-		// FUEL
-//		FuelRegistry.createDefault(Registry. 300);
+	}
+
+	// FUEL
+	public int getFuelTime() {
+		return 300;
 	}
 }

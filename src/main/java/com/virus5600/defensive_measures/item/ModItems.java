@@ -2,15 +2,18 @@ package com.virus5600.defensive_measures.item;
 
 import com.virus5600.defensive_measures.DefensiveMeasures;
 
+import com.virus5600.defensive_measures.block.ModBlocks;
 import com.virus5600.defensive_measures.entity.ModEntities;
 import com.virus5600.defensive_measures.item.equipments.TurretRemoverItem;
 import com.virus5600.defensive_measures.item.interfaces.FuelItem;
 import com.virus5600.defensive_measures.item.turrets.TurretItem;
+import com.virus5600.defensive_measures.item.turrets.ballista.*;
 import com.virus5600.defensive_measures.item.turrets.cannon.*;
-
 import com.virus5600.defensive_measures.util.RegistryUtil;
+
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.fabricmc.fabric.api.registry.FuelRegistryEvents;
+import net.minecraft.block.Block;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.item.Item;
@@ -43,11 +46,12 @@ public class ModItems {
 	public final static Item UNFINISHED_CANNON_HEAD = registerItem("unfinished_cannon_head", UnfinishedCannonHeadItem::new);
 
 	// BALLISTA
-//	public final static Item BALLISTA = new BallistaTurretItem(ModEntities.BALLISTA, SETTING_DMT);
-//	public final static Item BALLISTA_ARROW = new BallistaArrowItem(SETTING_DMI);
-//	public final static Item BALLISTA_BASE = new BallistaBaseItem(SETTING_DMI);
-//	public final static Item BALLISTA_BASE_WITH_STAND = new BallistaBaseWithStandItem(SETTING_DMI);
-//	public final static Item BALLISTA_BOW = new BallistaBowItem(SETTING_DMI);
+	public final static Item BALLISTA_TURRET = registerItem("ballista", ModEntities.BALLISTA_TURRET, BallistaTurretItem::new);
+	public final static Item ARROWHEAD = registerItem(ModBlocks.ARROWHEAD);
+	public final static Item BALLISTA_ARROW = registerItem("ballista_arrow", BallistaArrowItem::new);
+	public final static Item BALLISTA_BASE = registerItem("ballista_base", BallistaBaseItem::new);
+	public final static Item BALLISTA_BASE_WITH_STAND = registerItem("ballista_base_with_stand", BallistaBaseWithStandItem::new);
+	public final static Item BALLISTA_BOW = registerItem("ballista_bow", BallistaBowItem::new);
 
 	// MACHINE GUN
 //	public final static Item MG_TURRET = new MachineGunTurretItem(ModEntities.MG_TURRET, SETTING_DMT);
@@ -97,6 +101,15 @@ public class ModItems {
 		);
 	}
 
+	/**
+	 * Registers a block item.
+	 * @param block The block to register as an item.
+	 * @return The registered item.
+	 */
+	private static Item registerItem(Block block) {
+		return RegistryUtil.registerItem(block);
+	}
+
 	public static void registerModItems() {
 		DefensiveMeasures.LOGGER.info("REGISTERING ITEMS TO ITEM GROUPS...");
 
@@ -112,11 +125,11 @@ public class ModItems {
 			)
 		);
 
-//		Arrays.stream(DM_TRAPS).iterator().forEachRemaining(
-//			(item) -> ItemGroupEvents.modifyEntriesEvent(ModItemGroups.DMTR_KEY).register(
-//				(content) -> {content.add(item)
-//			)
-//		);
+		Arrays.stream(DM_TRAPS).iterator().forEachRemaining(
+			(item) -> ItemGroupEvents.modifyEntriesEvent(ModItemGroups.DMTR_KEY).register(
+				(content) -> content.add(item)
+			)
+		);
 
 		Arrays.stream(DM_TURRETS).iterator().forEachRemaining(
 			(item) -> ItemGroupEvents.modifyEntriesEvent(ModItemGroups.DMTT_KEY).register(
@@ -128,6 +141,8 @@ public class ModItems {
 			// Verifies whether the item is a valid fuel item. Ignores the item if it is not.
 			if (item instanceof FuelItem)
 				builder.add(item, ((FuelItem) item).getFuelTime());
+			else
+				DefensiveMeasures.LOGGER.warn("Item {} is not a valid fuel item.", item.getName().getString());
 		}));
 	}
 
@@ -140,15 +155,20 @@ public class ModItems {
 	}
 
 	static {
-		DM_ITEMS = new Item[]{
+		DM_ITEMS = new Item[] {
+			// CANNON
 			CANNON_BASE,
 			CANNON_HEAD,
 			CANNON_STAND,
 			UNFINISHED_CANNON_HEAD,
-//			BALLISTA_ARROW,
-//			BALLISTA_BASE,
-//			BALLISTA_BASE_WITH_STAND,
-//			BALLISTA_BOW,
+
+			// BALLISTA
+			BALLISTA_ARROW,
+			BALLISTA_BASE,
+			BALLISTA_BASE_WITH_STAND,
+			BALLISTA_BOW,
+
+			// MACHINE GUN
 //			AMMO_CASE,
 //			AMMO_ROUNDS,
 //			MACHINE_GUN_BASE,
@@ -156,21 +176,30 @@ public class ModItems {
 //			MACHINE_GUN_STAND
 		};
 
-		DM_EQUIPMENTS = new Item[]{
+		DM_EQUIPMENTS = new Item[] {
 			TURRET_REMOVER
 		};
 
-		DM_TRAPS = new Item[]{
+		DM_TRAPS = new Item[] {
+			ARROWHEAD
 		};
 
-		DM_TURRETS = new Item[]{
+		DM_TURRETS = new Item[] {
 			CANNON_TURRET,
-//			BALLISTA,
+			BALLISTA_TURRET,
 //			MG_TURRET
 		};
 
-		FUEL_ITEMS = new Item[]{
-			CANNON_STAND
+		FUEL_ITEMS = new Item[] {
+			// CANNON
+			CANNON_STAND,
+			CANNON_HEAD,
+
+			// BALLISTA
+			BALLISTA_ARROW,
+			BALLISTA_BASE,
+			BALLISTA_BASE_WITH_STAND,
+			BALLISTA_BOW
 		};
 	}
 }
