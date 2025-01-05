@@ -62,14 +62,15 @@ public class ModEntities {
 			.trackingTickInterval(10)
 	);
 
-//	public static final EntityType<MGBulletEntity> MG_BULLET = Registry.register(
-//		Registries.ENTITY_TYPE,
-//		Identifier.of(DefensiveMeasures.MOD_ID, "mg_bullet"),
-//		Builder
-//			.create(MGBulletEntity::new, SpawnGroup.MISC)
-//			.dimensions(EntityDimensions.fixed(0.125f, 0.125f))
-//			.build()
-//	);
+	public static final EntityType<BulletEntity> MG_BULLET = RegistryUtil.registerEntity(
+		"mg_bullet",
+		Builder
+			.<BulletEntity>create(BulletEntity::new, SpawnGroup.MISC)
+			.dropsNothing()
+			.dimensions(0.125f, 0.125f)
+			.maxTrackingRange(4)
+			.trackingTickInterval(10)
+	);
 
 	// REGISTRY //
 	public static void registerModEntityAttributes() {

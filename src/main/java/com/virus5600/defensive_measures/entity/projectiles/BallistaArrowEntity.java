@@ -28,6 +28,7 @@ import com.virus5600.defensive_measures.entity.ModEntities;
 
 import java.util.Map;
 
+// TODO: Convert this class to TurretProjectileEntity
 public class BallistaArrowEntity extends PersistentProjectileEntity implements GeoEntity {
 	private static final TrackedData<Byte> PIERCE_LEVEL = DataTracker.registerData(BallistaArrowEntity.class, TrackedDataHandlerRegistry.BYTE);
 	private static final Map<String, RawAnimation> ANIMATIONS;
