@@ -6,17 +6,18 @@ import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.DataTracker.Builder;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
-import net.minecraft.entity.projectile.PersistentProjectileEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 
 import software.bernie.geckolib.animatable.GeoEntity;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
+import software.bernie.geckolib.animation.AnimatableManager;
+import software.bernie.geckolib.animation.AnimationController;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
 import com.virus5600.defensive_measures.entity.ModEntities;
 
-public class BulletEntity extends PersistentProjectileEntity implements GeoEntity {
+public class BulletEntity extends TurretProjectileEntity implements GeoEntity {
 	protected static final TrackedData<Byte> PIERCE_LEVEL = DataTracker.registerData(BulletEntity.class, TrackedDataHandlerRegistry.BYTE);
 
 	private final AnimatableInstanceCache geoCache = GeckoLibUtil.createInstanceCache(this);
@@ -25,7 +26,7 @@ public class BulletEntity extends PersistentProjectileEntity implements GeoEntit
 	/// CONSTRUCTORS ///
 	////////////////////
 	public BulletEntity(
-		EntityType<? extends PersistentProjectileEntity> entityType,
+		EntityType<? extends TurretProjectileEntity> entityType,
 		World world
 	) {
 		super(entityType, world);
@@ -61,9 +62,8 @@ public class BulletEntity extends PersistentProjectileEntity implements GeoEntit
 		this.dataTracker.set(PIERCE_LEVEL, pierceLevel);
 	}
 
-	@Override
-	public byte getPierceLevel() {
-		return this.dataTracker.get(PIERCE_LEVEL);
+	public byte getMaxPierceLevel() {
+		return 0;
 	}
 
 	@Override
@@ -75,9 +75,12 @@ public class BulletEntity extends PersistentProjectileEntity implements GeoEntit
 	/// INTERFACE IMPLEMENTATION ///
 	////////////////////////////////
 
-	// PersistentProjectileEntity //
+	// GeoEntity //
 	@Override
-	protected ItemStack getDefaItemStack() {
-		return null;
+	public void registerControllers(final AnimatableManager.ControllerRegistrar controllers) { }
+
+	@Override
+	public AnimatableInstanceCache getAnimatableInstanceCache() {
+		return this.geoCache;
 	}
 }

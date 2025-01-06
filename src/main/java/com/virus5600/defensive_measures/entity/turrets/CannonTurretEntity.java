@@ -114,10 +114,12 @@ public class CannonTurretEntity extends TurretEntity implements GeoEntity {
 			int updateCountdownTicks = this.attackGoal.getUpdateCountdownTicks(),
 				afterAttackTick = 5,
 				beforeAttackTick = CannonTurretEntity.TOTAL_ATT_COOLDOWN - afterAttackTick;
+
 			if (updateCountdownTicks > afterAttackTick && updateCountdownTicks < beforeAttackTick ) {
 				this.triggerAnim("FiringSequence", "charge");
 			}
 		}
+
 	}
 
 	/////////////////////////

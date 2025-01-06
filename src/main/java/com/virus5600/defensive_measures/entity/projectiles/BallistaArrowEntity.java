@@ -1,20 +1,12 @@
 package com.virus5600.defensive_measures.entity.projectiles;
 
-import com.virus5600.defensive_measures.item.ModItems;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.DataTracker.Builder;
-import net.minecraft.entity.data.TrackedData;
-import net.minecraft.entity.data.TrackedDataHandlerRegistry;
-import net.minecraft.entity.projectile.PersistentProjectileEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.world.World;
 
-import software.bernie.geckolib.animatable.GeoAnimatable;
 import software.bernie.geckolib.animatable.GeoEntity;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.animation.AnimatableManager.ControllerRegistrar;
@@ -28,9 +20,7 @@ import com.virus5600.defensive_measures.entity.ModEntities;
 
 import java.util.Map;
 
-// TODO: Convert this class to TurretProjectileEntity
-public class BallistaArrowEntity extends PersistentProjectileEntity implements GeoEntity {
-	private static final TrackedData<Byte> PIERCE_LEVEL = DataTracker.registerData(BallistaArrowEntity.class, TrackedDataHandlerRegistry.BYTE);
+public class BallistaArrowEntity extends TurretProjectileEntity implements GeoEntity {
 	private static final Map<String, RawAnimation> ANIMATIONS;
 
 	private final AnimatableInstanceCache geoCache = GeckoLibUtil.createInstanceCache(this);
@@ -39,11 +29,13 @@ public class BallistaArrowEntity extends PersistentProjectileEntity implements G
 	/// CONSTRUCTORS ///
 	////////////////////
 	public BallistaArrowEntity(
-		EntityType<? extends PersistentProjectileEntity> entityType,
+		EntityType<? extends TurretProjectileEntity> entityType,
 		World world
 	) {
 		super(entityType, world);
 
+		this.setDamage(4);
+		this.setPierceLevel(this.getMaxPierceLevel());
 	}
 
 	public BallistaArrowEntity(World world, LivingEntity owner) {
@@ -69,12 +61,6 @@ public class BallistaArrowEntity extends PersistentProjectileEntity implements G
 	@Override
 	protected void initDataTracker(Builder builder) {
 		super.initDataTracker(builder);
-
-		builder.add(PIERCE_LEVEL, (byte) 5);
-	}
-
-	protected void setPierceLevel(byte pierceLevel) {
-		this.dataTracker.set(PIERCE_LEVEL, pierceLevel);
 	}
 
 	@Override
@@ -127,14 +113,8 @@ public class BallistaArrowEntity extends PersistentProjectileEntity implements G
 		);
 	}
 
-	@Override
-	protected ItemStack asItemStack() {
-		return null;
-	}
-
-	@Override
-	public byte getPierceLevel() {
-		return this.dataTracker.get(PIERCE_LEVEL);
+	public byte getMaxPierceLevel() {
+		return 5;
 	}
 
 	///////////////////////////
@@ -156,12 +136,6 @@ public class BallistaArrowEntity extends PersistentProjectileEntity implements G
 	/////////////////////////////////
 	/// INTERFACE IMPLEMENTATIONS ///
 	/////////////////////////////////
-
-	// PersistentProjectileEntity //
-	@Override
-	protected ItemStack getDefaultItemStack() {
-		return new ItemStack(Items.ARROW);
-	}
 
 	// GeoEntity //
 	@Override

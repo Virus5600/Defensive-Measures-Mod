@@ -78,6 +78,7 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 	 * Tracks whether this entity is spawned from an item.
 	 */
 	private static final TrackedData<Byte> FROM_ITEM;
+	private static final TrackedData<Float> SHOOTING_PITCH;
 
 	/**
 	 * Tracks the direction where this turret is attached to.
@@ -319,16 +320,18 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 
 	@Override
 	protected void initDataTracker(DataTracker.Builder builder) {
+		super.initDataTracker(builder);
+
 		// Entity related tracking
 		builder.add(LEVEL, this.level)
 			.add(FROM_ITEM, (byte) 1)
+			.add(SHOOTING_PITCH, 0f)
 
 		// Position related tracking
 			.add(ATTACHED_FACE, Direction.DOWN)
 			.add(X, 0f)
 			.add(Y, 0f)
 			.add(Z, 0f);
-		super.initDataTracker(builder);
 	}
 
 	/**
@@ -597,6 +600,7 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 	public void tick() {
 		super.tick();
 
+		// CLIENT SIDE
 		if (this.getWorld().isClient()) {
 			// SNAPPING THE TURRET BACK IN PLACE
 			if (this.getVelocity().x == 0 && this.getVelocity().z == 0 && !this.hasVehicle()) {
@@ -615,6 +619,27 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 					this.lastRenderY = this.getY();
 					this.lastRenderZ = this.getZ();
 				}
+			}
+
+			// PITCHING THE HEAD TO MATCH PROJECTILE ARC
+			this.setPitch(this.dataTracker.get(SHOOTING_PITCH));
+		}
+		// SERVER SIDE
+		else {
+			this.dataTracker.set(SHOOTING_PITCH, this.getPitch());
+
+			if (this.getTarget() != null) {
+				System.out.println("Current Pitch:" + this.getPitch());
+				Vec3d velocity = TurretEntity.TurretProjectileVelocity
+					.init(this)
+					.setVelocity(this.getTarget())
+					.getVelocity();
+
+				// TODO: Fix the fucking issue with pitch. It's head is reversed!
+				float p = (float) Math.atan(velocity.y / velocity.x) * ((float) (Math.PI * 180f));
+				this.dataTracker.set(SHOOTING_PITCH, p);
+				this.setPitch(-p);
+				System.out.println("Modified Pitch:" + p + " | Applied Pitch: " + this.getPitch());
 			}
 		}
 	}
@@ -748,6 +773,10 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 	@Override
 	protected MoveEffect getMoveEffect() {
 		return MoveEffect.NONE;
+	}
+
+	public float getTrackedPitch() {
+		return this.dataTracker.get(SHOOTING_PITCH);
 	}
 
 	/**
@@ -1499,6 +1528,7 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 	static {
 		LEVEL = DataTracker.registerData(TurretEntity.class, TrackedDataHandlerRegistry.INTEGER);
 		FROM_ITEM = DataTracker.registerData(TurretEntity.class, TrackedDataHandlerRegistry.BYTE);
+		SHOOTING_PITCH = DataTracker.registerData(TurretEntity.class, TrackedDataHandlerRegistry.FLOAT);
 
 		ATTACHED_FACE = DataTracker.registerData(TurretEntity.class, TrackedDataHandlerRegistry.FACING);
 		X = DataTracker.registerData(TurretEntity.class, TrackedDataHandlerRegistry.FLOAT);

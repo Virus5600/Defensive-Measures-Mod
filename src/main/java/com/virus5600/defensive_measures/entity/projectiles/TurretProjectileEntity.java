@@ -67,22 +67,32 @@ public abstract class TurretProjectileEntity extends ProjectileEntity implements
 	protected static final int CRITICAL_FLAG = 1;
 	protected static final int NO_CLIP_FLAG = 2;
 
+	/** Holds the blockstate information of the block in this projectile's position. */
 	@Nullable
 	private BlockState inBlockState;
+	/** Holds the information about the list of entities this projectile have pierced through. */
 	@Nullable
 	private IntOpenHashSet piercedEntities;
+	/** Holds the information about the list of entities this projectile have pierced through and died. */
 	@Nullable
 	private List<Entity> piercingKilledEntities;
+	/** Defines the current sound this projectile will play when it hit something */
 	private SoundEvent sound = this.getHitSound();
+	/** Defines the item stack this projectile is. Used when picking up the projectile to turn into items. */
 	@Nullable
 	private ItemStack stack;
 	private int life;
 
+	/** Identifies if this projectile can be picked up or not. */
+	protected PickupPermission pickupType = PickupPermission.DISALLOWED;
+	/** Defines how long the shaking animation will play (in ticks). */
+	protected int shake;
+	/** Determines how long this projectile have been stuck "**in**" the ground. */
 	protected int inGroundTime;
+	/** Defines the amount of damage this entity will deal when it hits an entity. */
 	protected double damage = 2.0;
-
-	public PickupPermission pickupType = PickupPermission.DISALLOWED;
-	public int shake;
+	/** Determines whether this projectile scales its damage based on its speed. */
+	protected boolean speedAffectDamage = true;
 
 	// //////////// //
 	// CONSTRUCTORS //
@@ -143,17 +153,21 @@ public abstract class TurretProjectileEntity extends ProjectileEntity implements
 
 		Entity hitEntity = entityHitResult.getEntity();
 		Entity owner = this.getOwner();
+
+		// Handles the damage calculation
 		DamageSource dmgSrc = this.getDamageSources().create(DamageTypes.ARROW, this, owner != null ? owner : this);
 		float velocityMagnitude = (float) this.getVelocity().length();
 		double damage = this.getDamage();
 		int damageToDeal = MathHelper.ceil(
-			MathHelper.clamp(
-				(double) velocityMagnitude * damage,
-				0.0,
-				2.147483647E9
-			)
+			this.speedAffectDamage ?
+				MathHelper.clamp(
+					(double) velocityMagnitude * damage,
+					0.0,
+					2.147483647E9
+				) : damage
 		);
 
+		// Handles the pierce behavior
 		if (this.getPierceLevel() > 0) {
 			if (this.piercedEntities == null) {
 				this.piercedEntities = new IntOpenHashSet(this.getMaxPierceLevel());
@@ -171,21 +185,25 @@ public abstract class TurretProjectileEntity extends ProjectileEntity implements
 			this.piercedEntities.add(hitEntity.getId());
 		}
 
+		// Handles the critical damage multiplier
 		if (this.isCritical()) {
-			long critDamage = (long) this.random.nextInt(damageToDeal / 2 + 2);
+			long critDamage = this.random.nextInt(damageToDeal / 2 + 2);
 			damageToDeal = (int) Math.min(critDamage + damageToDeal, 2147483647L);
 		}
 
+		// Makes sure that the owner of this projectile gets to know that it is attacking
 		if (owner instanceof LivingEntity livingEntity) {
 			livingEntity.onAttacking(hitEntity);
 		}
 
+		// Handles the behavior of setting its target on fire if hit
 		boolean isEnderman = hitEntity.getType().equals(EntityType.ENDERMAN);
 		int fireTime = hitEntity.getFireTicks();
 		if (this.isOnFire() && !isEnderman) {
 			hitEntity.setOnFireFor(5F);
 		}
 
+		// Handles the application of damage to the target
 		if (hitEntity.sidedDamage(dmgSrc, (float) damageToDeal)) {
 			if (isEnderman) return;
 
@@ -204,7 +222,8 @@ public abstract class TurretProjectileEntity extends ProjectileEntity implements
 			if (this.getPierceLevel() <= 0) {
 				this.discard();
 			}
-		} else {
+		}
+		else {
 			hitEntity.setFireTicks(fireTime);
 			this.deflect(ProjectileDeflection.SIMPLE, hitEntity, owner, false);
 			this.setVelocity(this.getVelocity().multiply(0.2));
@@ -586,7 +605,9 @@ public abstract class TurretProjectileEntity extends ProjectileEntity implements
 	}
 
 	@Nullable
-	protected abstract ItemStack getDefaultItemStack();
+	protected ItemStack getDefaultItemStack() {
+		return null;
+	}
 
 	protected void setStack(@Nullable ItemStack stack) {
 		if (stack != null && !stack.isEmpty()) {
