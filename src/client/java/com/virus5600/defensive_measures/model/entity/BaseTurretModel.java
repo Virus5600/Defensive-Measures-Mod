@@ -2,19 +2,17 @@ package com.virus5600.defensive_measures.model.entity;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.util.Identifier;
 
 import software.bernie.geckolib.animatable.GeoAnimatable;
 import software.bernie.geckolib.animation.AnimationState;
 import software.bernie.geckolib.cache.object.GeoBone;
 import software.bernie.geckolib.constant.DataTickets;
-import software.bernie.geckolib.model.GeoModel;
 import software.bernie.geckolib.model.data.EntityModelData;
-import software.bernie.geckolib.renderer.GeoRenderer;
-
-import org.jetbrains.annotations.Nullable;
 
 import com.virus5600.defensive_measures.entity.turrets.TurretEntity;
+import com.virus5600.defensive_measures.model.BaseModel;
+
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
 
@@ -28,7 +26,7 @@ import java.util.Optional;
  * @param <T> A turret entity that extends {@link TurretEntity} and implements {@link GeoAnimatable}
  */
 @Environment(EnvType.CLIENT)
-public class BaseTurretModel<T extends TurretEntity & GeoAnimatable> extends GeoModel<T> {
+public class BaseTurretModel<T extends TurretEntity & GeoAnimatable> extends BaseModel<T> {
 	/**
 	 * Identifies the bone that serves as the base or stand of the turret so that
 	 * it can be fixed in place while the turret's head and neck rotate.
@@ -45,13 +43,6 @@ public class BaseTurretModel<T extends TurretEntity & GeoAnimatable> extends Geo
 	 */
 	private final String head;
 
-	/** Determines the path of the model. (i.e.: {@code "geo/cannon_turret.geo.json"}) */
-	protected Identifier modelPath;
-	/** Determines the path of the texture this model will use. (i.e.: {@code "textures/entity/cannon_turret/cannon_turret.png"}) */
-	protected Identifier texturePath;
-	/** Determines the path of the animation this model will use. (i.e.: {@code "animations/cannon_turret.animation.json"}) */
-	protected Identifier animationPath;
-
 	/// //////////// ///
 	/// CONSTRUCTORS ///
 	/// //////////// ///
@@ -67,9 +58,11 @@ public class BaseTurretModel<T extends TurretEntity & GeoAnimatable> extends Geo
 	 * @param modID The mod ID of the mod that owns this model
 	 * @param modelPath The path of the model
 	 * @param texturePath The path of the texture
-	 * @param animationPath The path of the animation
+	 * @param animationPath The path of the animation (can be {@code null})
 	 */
-	public BaseTurretModel(String modID, String modelPath, String texturePath, String animationPath) {
+	public BaseTurretModel(String modID, String modelPath,
+		String texturePath, @Nullable String animationPath
+	) {
 		this(
 			modID,
 			modelPath,
@@ -94,20 +87,16 @@ public class BaseTurretModel<T extends TurretEntity & GeoAnimatable> extends Geo
 	 * @param modID The mod ID of the mod that owns this model
 	 * @param modelPath The path of the model
 	 * @param texturePath The path of the texture
-	 * @param animationPath The path of the animation
+	 * @param animationPath The path of the animation (can be {@code null})
 	 * @param boneBase The name of the bone that represents the base or stand of the turret
 	 * @param boneNeck The name of the bone that represents the neck of the turret
 	 * @param boneHead The name of the bone that represents the head of the turret
 	 */
 	public BaseTurretModel(String modID,
-		String modelPath, String texturePath, String animationPath,
+		String modelPath, String texturePath, @Nullable String animationPath,
 		String boneBase, String boneNeck, String boneHead
 	) {
-		super();
-
-		this.modelPath = Identifier.of(modID, modelPath);
-		this.texturePath = Identifier.of(modID, texturePath);
-		this.animationPath = animationPath != null ? Identifier.of(modID, animationPath) : null;
+		super(modID, modelPath, texturePath, animationPath);
 
 		this.base = boneBase;
 		this.neck = boneNeck;
@@ -179,21 +168,6 @@ public class BaseTurretModel<T extends TurretEntity & GeoAnimatable> extends Geo
 	/////////////////////////
 	/// INTERFACE METHODS ///
 	/////////////////////////
-
-	@Override
-	public Identifier getModelResource(T animatable, @Nullable GeoRenderer<T> geoRenderer) {
-		return this.modelPath;
-	}
-
-	@Override
-	public Identifier getTextureResource(T animatable, @Nullable GeoRenderer<T> geoRenderer) {
-		return this.texturePath;
-	}
-
-	@Override
-	public Identifier getAnimationResource(T animatable) {
-		return this.animationPath;
-	}
 
 	@Override
 	public void setCustomAnimations(T animatable, long instanceId, AnimationState<T> state) {
