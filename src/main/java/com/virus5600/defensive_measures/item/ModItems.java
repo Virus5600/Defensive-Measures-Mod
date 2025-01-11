@@ -193,7 +193,7 @@ public class ModItems {
 		FUEL_ITEMS = new Item[] {
 			// CANNON
 			CANNON_STAND,
-			CANNON_HEAD,
+			CANNON_BASE,
 
 			// BALLISTA
 			BALLISTA_ARROW,

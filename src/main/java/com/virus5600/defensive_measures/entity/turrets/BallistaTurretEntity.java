@@ -141,6 +141,11 @@ public class BallistaTurretEntity extends TurretEntity implements GeoEntity {
 	// GETTERS AND SETTERS //
 	/////////////////////////
 
+	@Override
+	public int getMaxLookPitchChange() {
+		return 25;
+	}
+
 	@Nullable
 	@Override
 	protected SoundEvent getHurtSound(DamageSource source) {

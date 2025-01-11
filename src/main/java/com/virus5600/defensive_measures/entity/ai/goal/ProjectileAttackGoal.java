@@ -6,14 +6,53 @@ import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.util.math.MathHelper;
 
+import net.minecraft.util.math.Vec3d;
 import org.jetbrains.annotations.Nullable;
+
+import com.virus5600.defensive_measures.entity.turrets.TurretEntity;
 
 import java.util.EnumSet;
 
 /**
- * Literally a copy of {@link net.minecraft.entity.ai.goal.ProjectileAttackGoal ProjectileAttackGoal} aside
- * from some additional timing related methods to allow for more control over what the entity is doing
- * during the attack.
+ * Literally a copy of {@link net.minecraft.entity.ai.goal.ProjectileAttackGoal ProjectileAttackGoal}
+ * aside from some additional timing related methods to allow for more control over what the entity
+ * is doing during the attack. This goal is primarily designed to work on
+ * {@link TurretEntity turret entities} that can shoot projectiles at a target.
+ * <br><br>
+ * Specifically, the methods that are tailored-fit for the turret entities are:
+ *
+ * <ul>
+ * 	<li>
+ * 	    {@link #canStart()} to determine if the turret can start attacking the target.<br>
+ * 		This method is modified to also check if the target is within the rotation limits of the turret.
+ * 	</li>
+ *
+ * 	<li>
+ *		{@link #tick()} to determine what the turret should be doing every tick.<br>
+ * 		This method is modified to also check if the target is within the rotation limits of the turret.
+ * 	</li>
+ *
+ * 	<li>
+ * 		{@link #getShootingPitch(LivingEntity)} to calculate the initial pitch angle in degrees for
+ * 		the shooter to aim at the target.<br>
+ * 		This is due to the use of {@link TurretEntity.TurretProjectileVelocity} class to calculate
+ * 		the projectile velocity based on the target's position and the turret's position.
+ * 	</li>
+ *
+ * 	<li>
+ * 		{@link #getShootingYaw(LivingEntity)} to calculate the initial yaw angle in degrees for
+ * 		the shooter to aim at the target.<br>
+ * 		This is due to the use of {@link TurretEntity.TurretProjectileVelocity} class to calculate
+ * 		the projectile velocity based on the target's position and the turret's position.
+ * 	</li>
+ *
+ * 	<li>
+ * 		{@link #isWithinRotationLimit(LivingEntity)} to determine if the target is within the
+ * 		rotation limits of the turret.<br>
+ * 		This is due to the use of {@link TurretEntity.TurretProjectileVelocity} class to calculate
+ * 		the projectile velocity based on the target's position and the turret's position.
+ * 	</li>
+ * </ul>
  *
  * @see net.minecraft.entity.ai.goal.ProjectileAttackGoal ProjectileAttackGoal
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
@@ -67,7 +106,7 @@ public class ProjectileAttackGoal extends net.minecraft.entity.ai.goal.Projectil
 	@Override
 	public boolean canStart() {
 		LivingEntity livingEntity = this.mob.getTarget();
-		if (livingEntity != null && livingEntity.isAlive()) {
+		if (livingEntity != null && livingEntity.isAlive() && this.isWithinRotationLimit(livingEntity)) {
 			this.target = livingEntity;
 			return true;
 		} else {
@@ -94,7 +133,7 @@ public class ProjectileAttackGoal extends net.minecraft.entity.ai.goal.Projectil
 	public void tick() {
 		if (this.target != null) {
 			double squaredDistance = this.mob.squaredDistanceTo(this.target.getX(), this.target.getY(), this.target.getZ());
-			boolean canBeSeen = this.mob.getVisibilityCache().canSee(this.target);
+			boolean canBeSeen = this.mob.getVisibilityCache().canSee(this.target) && this.isWithinRotationLimit(this.target);
 			boolean isPastMaxRange = squaredDistance > (double) this.squaredMaxShootRange,
 				isPastMinRange = squaredDistance < (double) this.squaredMinShootRange,
 				isInRange = !isPastMaxRange && !isPastMinRange,
@@ -177,5 +216,69 @@ public class ProjectileAttackGoal extends net.minecraft.entity.ai.goal.Projectil
 
 	public float getMinAttackRange() {
 		return this.minShootRange;
+	}
+
+	/**
+	 * Calculates the initial pitch angle in degrees for the shooter to aim at the target. This
+	 * allows the shooter to align its pitch angle to the trajectory of the projectile it will
+	 * shoot.
+	 *
+	 * @param target The target on which the shooter will aim at.
+	 * @return The pitch angle in degrees.
+	 */
+	public float getShootingPitch(LivingEntity target, boolean shouldClamp) {
+		Vec3d velocity = TurretEntity.TurretProjectileVelocity
+			.init((TurretEntity) this.mob)
+			.setVelocity(target)
+			.getVelocity();
+
+		float maxPitch = this.mob.getMaxLookPitchChange();
+
+		float vx = MathHelper.sqrt((float) (velocity.x * velocity.x + velocity.z * velocity.z));
+		float p = (float) -Math.atan2(velocity.y, vx);
+		p *= (float) (180.0 / Math.PI);
+
+		if (shouldClamp) {
+			p = MathHelper.clamp(p, -maxPitch, maxPitch);
+		}
+
+		return p;
+	}
+
+	public float getShootingYaw(LivingEntity target, boolean shouldClamp) {
+		Vec3d velocity = TurretEntity.TurretProjectileVelocity
+			.init((TurretEntity) this.mob)
+			.setVelocity(target)
+			.getVelocity();
+
+		float maxYaw = this.mob.getMaxHeadRotation();
+
+		float y = (float) Math.atan2(velocity.z, velocity.x);
+		y *= (float) (180.0 / Math.PI);
+
+		if (shouldClamp) {
+			y = MathHelper.clamp(y, -maxYaw, maxYaw);
+		}
+
+		return y;
+	}
+
+	/**
+	 * Checks whether the target is within the rotation limits of the turret.
+	 *
+	 * @param target The target to check.
+	 * @return {@code true} if the target is within the rotation limits of the turret, {@code false} otherwise.
+	 */
+	public boolean isWithinRotationLimit(LivingEntity target) {
+		float maxPitch = this.mob.getMaxLookPitchChange();
+		float maxYaw = this.mob.getMaxHeadRotation();
+
+		float targetPitch = this.getShootingPitch(target, false);
+		float targetYaw = this.getShootingYaw(target, false);
+
+		boolean withinPitch = targetPitch <= maxPitch && targetPitch >= -maxPitch;
+		boolean withinYaw = targetYaw <= maxYaw && targetYaw >= -maxYaw;
+
+		return withinPitch && withinYaw;
 	}
 }

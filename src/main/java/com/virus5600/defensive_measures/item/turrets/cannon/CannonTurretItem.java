@@ -29,7 +29,7 @@ public class CannonTurretItem extends TurretItem {
 	public void appendTooltip(ItemStack stack, Item.TooltipContext context, List<Text> tooltip, TooltipType type) {
 		super.appendTooltip(stack, context, tooltip, type);
 
-		for (int i = 1; i <= 2; i++) {
+		for (int i = 1; i <= 3; i++) {
 			tooltip.add(
 				Text.translatable("itemTooltip.dm.cannon_turret.line" + i)
 					.formatted(Formatting.DARK_AQUA)

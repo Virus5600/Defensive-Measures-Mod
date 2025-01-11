@@ -126,6 +126,11 @@ public class CannonTurretEntity extends TurretEntity implements GeoEntity {
 	// GETTERS AND SETTERS //
 	/////////////////////////
 
+	@Override
+	public int getMaxLookPitchChange() {
+		return 30;
+	}
+
 	@Nullable
 	@Override
 	protected SoundEvent getHurtSound(DamageSource source) {

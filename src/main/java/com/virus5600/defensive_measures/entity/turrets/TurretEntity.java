@@ -10,12 +10,15 @@ import net.minecraft.entity.ai.goal.ActiveTargetGoal;
 import net.minecraft.entity.ai.goal.LookAroundGoal;
 import net.minecraft.entity.ai.goal.LookAtEntityGoal;
 import net.minecraft.entity.attribute.DefaultAttributeContainer;
+import net.minecraft.entity.attribute.EntityAttribute;
+import net.minecraft.entity.attribute.EntityAttributeInstance;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.effect.StatusEffect;
+import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.entity.mob.Monster;
@@ -26,6 +29,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.ActionResult;
@@ -48,6 +52,7 @@ import net.minecraft.world.event.GameEvent;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * The mob base for all the <b>Turrets</b> that will be added into this mod. The
@@ -60,9 +65,26 @@ import java.util.*;
  * New custom {@code NBT}s are also added such as {@code LEVEL}
  * and {@code FROM_ITEM} to identify their level variation and whether
  * this entity is spawned from an instance of already spawned turret entity.
+ * <hr>
+ * <h2>Stationary or Mobile:</h2>
+ * {@code TurretEntity}, by default, assumes that the turret is a stationary
+ * (defined at {@link #isHeldInPlace()} method) entity that can shoot projectiles.
+ * This means that the entity will not move even if an explosion occurs near it. This
+ * behavior can be overridden by simply overriding the said method and returning {@code false}.
+ * However, this also means that the entity's resistance will not revert to {@code 0.0}.
+ * If you want the mobile turret to have a bit of resistance, set the value of the
+ * knockback resistance attributes to a value less than {@code 1.0} in {@link #getKnockbackResistanceValues()}
+ * method.
+ * <br>
+ * The reason for overwriting the {@code #getResistanceValues()} method is because
+ * the {@link #setAttributes()} method is called before any instance of {@code TurretEntity}
+ * can be created. To overwrite the default resistance values, the {@code TurretEntity} class
+ * updates the resistance values in its constructor if and only if the entity is not held in place.
+ * This call utilizes the {@link #getKnockbackResistanceValues()} method to get the resistance values and
+ * update the attributes accordingly.
  *
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
- * @since 1.0.0
+ * @since 1.0.1
  *
  * @see MobEntity
  * @see Itemable
@@ -258,7 +280,6 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 	 */
 	public TurretEntity(EntityType<? extends MobEntity> entityType, World world, TurretMaterial material, Item itemable) {
 		super(entityType, world);
-		DefensiveMeasures.LOGGER.debug("Creating a new TurretEntity called {}", entityType.getName());
 
 		this.material = material;
 		this.itemable = itemable;
@@ -267,6 +288,21 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 
 		if (this.projectile == null) {
 			this.projectile = EntityType.ARROW;
+		}
+
+		if (!this.isHeldInPlace()) {
+			List.of(
+				EntityAttributes.EXPLOSION_KNOCKBACK_RESISTANCE,
+				EntityAttributes.KNOCKBACK_RESISTANCE
+			).forEach(attr -> {
+				EntityAttributeInstance attrIns = this.getAttributeInstance(attr);
+				if (attrIns != null) {
+					attrIns.setBaseValue(
+						getKnockbackResistanceValues()
+							.getOrDefault(attr, 0.0)
+					);
+				}
+			});
 		}
 	}
 
@@ -310,12 +346,33 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 
 		// Goals
 		this.goalSelector.add(1, this.attackGoal);
-		this.goalSelector.add(2, new LookAtEntityGoal(this, MobEntity.class, 8.0F, 0.02F, true));
+		this.goalSelector.add(2, new LookAtEntityGoal(this, MobEntity.class, 8.0F, 0.02F, false));
 		this.goalSelector.add(8, new LookAroundGoal(this));
 
 		// Targets
-		this.targetSelector.add(1, new ActiveTargetGoal<>(this, MobEntity.class, 10, true, false, (entity, _) -> entity instanceof Monster));
+		this.targetSelector.add(1, new ActiveTargetGoal<>(this, MobEntity.class, 10, true, false, this::targetPredicate));
 		this.targetSelector.add(3, new TargetOtherTeamGoal(this));
+	}
+
+	/**
+	 * A predicate method to identify if an entity is a valid target for this turret. By default,
+	 * this predicate checks if the target is a {@link Monster} and if the target is within the
+	 * rotation limit of this turret by using the custom {@link ProjectileAttackGoal} class
+	 * and its {@link ProjectileAttackGoal#isWithinRotationLimit(LivingEntity) #isWithinRotationLimit(LivingEntity)}
+	 * method.
+	 * <br><br>
+	 * This method can be overridden to add more conditions to the target predicate. For example,
+	 * you can add a condition that checks if the target is not a player or if the target is not.
+	 * Furthermore, you can completely overwrite this method to create your own custom conditions
+	 * similar to what {@link AntiAirTurret#targetPredicate(LivingEntity, ServerWorld)} did; only
+	 * targets entities that are airborne.
+	 *
+	 * @param target The target to check.
+	 * @param world The server world where this entity is in.
+	 * @return {@code boolean} Returns {@code true} if the target is valid, otherwise {@code false}.
+	 */
+	protected boolean targetPredicate(LivingEntity target, ServerWorld world) {
+		return target instanceof Monster && this.attackGoal.isWithinRotationLimit(target);
 	}
 
 	@Override
@@ -359,8 +416,14 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 	 * 	<li>
 	 * 		<b>{@link EntityAttributes#KNOCKBACK_RESISTANCE}</b> - The knockback resistance of this
 	 * 		entity. This is also by design set to 1.0 to prevent the entity from being knocked back.
-	 * 		However, the turret would still be affected by knockback on some occasions. You can set
-	 * 		this to a value less than 1.0 to make the entity more susceptible to knockback.
+	 * 		You can set this to a value less than 1.0 to make the entity more susceptible to
+	 * 		knockback.
+	 * 	</li>
+	 * 	<li>
+	 * 		<b>{@link EntityAttributes#EXPLOSION_KNOCKBACK_RESISTANCE}</b> - The explosion knockback
+	 * 		resistance of this entity. This is also by design set to 1.0 to prevent the entity from
+	 * 		being knocked back by explosions. You can set this to a value less than 1.0 to make the
+	 * 		entity more susceptible to knockback from explosions.
 	 * 	</li>
 	 * </ul>
 	 *
@@ -387,11 +450,14 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 	 * @see DefaultAttributeContainer.Builder
 	 */
 	public static DefaultAttributeContainer.Builder setAttributes() {
-		return TurretEntity.createMobAttributes()
+		DefaultAttributeContainer.Builder builder = TurretEntity.createMobAttributes()
 			.add(EntityAttributes.MAX_HEALTH, TurretEntity.getTurretMaxHealth())
 			.add(EntityAttributes.FOLLOW_RANGE, 16)
 			.add(EntityAttributes.MOVEMENT_SPEED, 0)
-			.add(EntityAttributes.KNOCKBACK_RESISTANCE, 1.0);
+			.add(EntityAttributes.KNOCKBACK_RESISTANCE, 1.0)
+			.add(EntityAttributes.EXPLOSION_KNOCKBACK_RESISTANCE, 1.0);
+
+		return builder;
 	}
 
 	@Override
@@ -408,6 +474,7 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 
 		if (spawnReason == SpawnReason.SPAWN_ITEM_USE) {
 			this.setFromItem((byte) 1);
+			this.setPersistent();
 			return entityData;
 		}
 
@@ -621,25 +688,30 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 				}
 			}
 
-			// PITCHING THE HEAD TO MATCH PROJECTILE ARC
-			this.setPitch(this.dataTracker.get(SHOOTING_PITCH));
+			// Head Pitch when shooting
+			this.setPitch(this.getTrackedPitch());
 		}
 		// SERVER SIDE
 		else {
 			this.dataTracker.set(SHOOTING_PITCH, this.getPitch());
 
 			if (this.getTarget() != null) {
-				System.out.println("Current Pitch:" + this.getPitch());
 				Vec3d velocity = TurretEntity.TurretProjectileVelocity
 					.init(this)
 					.setVelocity(this.getTarget())
 					.getVelocity();
 
-				// TODO: Fix the fucking issue with pitch. It's head is reversed!
-				float p = (float) Math.atan(velocity.y / velocity.x) * ((float) (Math.PI * 180f));
+				float vx = MathHelper.sqrt((float) (velocity.x * velocity.x + velocity.z * velocity.z));
+				float p = (float) -Math.atan2(velocity.y, vx);
+				p *= (float) (180.0 / Math.PI);
+				p = MathHelper.clamp(p, -this.getMaxLookPitchChange(), this.getMaxLookPitchChange());
+
 				this.dataTracker.set(SHOOTING_PITCH, p);
-				this.setPitch(-p);
-				System.out.println("Modified Pitch:" + p + " | Applied Pitch: " + this.getPitch());
+			}
+
+			// Negates the levitation effect
+			if (this.hasStatusEffect(StatusEffects.LEVITATION) && this.isHeldInPlace()) {
+				this.removeStatusEffect(StatusEffects.LEVITATION);
 			}
 		}
 	}
@@ -748,6 +820,11 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 		return false;
 	}
 
+	@Override
+	public boolean canTarget(EntityType<?> type) {
+		return true;
+	}
+
 	public boolean isWithinRange(Entity entity, double minRange, double maxRange) {
 		return this.isWithinRange(entity.getX(), entity.getY(), entity.getZ(), minRange, maxRange);
 	}
@@ -758,13 +835,64 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 			&& squaredDistance <= maxRange * maxRange;
 	}
 
+	/**
+	 * Determines whether the entity is in close range of this turret.
+	 * <br><br>
+	 * An entity is in close range if it is within the minimum attack range
+	 * and one-third of the maximum attack range.
+	 *
+	 * @param entity The entity to check.
+	 * @return {@code boolean} Returns {@code true} if the entity is in close range, otherwise {@code false}.
+	 */
+	public boolean isInCloseRange(Entity entity) {
+		return this.isWithinRange(
+			entity,
+			this.getMinAttackRange(),
+			this.getMaxAttackRange() / 3
+		);
+	}
+
+	/**
+	 * Determines whether the entity is in mid-range of this turret.
+	 * <br><br>
+	 * An entity is in mid-range if it is within one-third of the maximum attack range
+	 * and two-thirds of the maximum attack range.
+	 *
+	 * @param entity The entity to check.
+	 * @return {@code boolean} Returns {@code true} if the entity is in mid-range, otherwise {@code false}.
+	 */
+	public boolean isInMidRange(Entity entity) {
+		return this.isWithinRange(
+			entity,
+			this.getMaxAttackRange() / 3,
+			this.getMaxAttackRange() * 2 / 3
+		);
+	}
+
+	/**
+	 * Determines whether the entity is in far range of this turret.
+	 * <br><br>
+	 * An entity is in far range if it is within two-thirds of the maximum attack range
+	 * and the maximum attack range.
+	 *
+	 * @param entity The entity to check.
+	 * @return {@code boolean} Returns {@code true} if the entity is in far range, otherwise {@code false}.
+	 */
+	public boolean isInFarRange(Entity entity) {
+		return this.isWithinRange(
+			entity,
+			this.getMaxAttackRange() * 2 / 3,
+			this.getMaxAttackRange()
+		);
+	}
+
 	/////////////////////////
 	// GETTERS AND SETTERS //
 	/////////////////////////
 
 	public static float getTurretMaxHealth() {
 		return TurretEntity.MAX_HEALTH;
-	};
+	}
 
 	public static void setTurretMaxHealth(float health) {
 		TurretEntity.MAX_HEALTH = health;
@@ -827,7 +955,7 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 
 	@Override
 	public int getMaxLookPitchChange() {
-		return 30;
+		return 90;
 	}
 
 	@Override
@@ -1250,19 +1378,56 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 			if (this.currentBarrel % this.barrels == 0)
 				this.currentBarrel = 0;
 		} catch (IllegalArgumentException | SecurityException e) {
-			e.printStackTrace(System.out);
-
-			DefensiveMeasures.LOGGER.error("");
-			DefensiveMeasures.LOGGER.error("\t {} ERROR OCCURRED\t ", DefensiveMeasures.MOD_ID.toUpperCase());
-			DefensiveMeasures.LOGGER.error("===== ERROR MSG START =====");
-			DefensiveMeasures.LOGGER.error("LOCALIZED ERROR MESSAGE:");
-			DefensiveMeasures.LOGGER.error(e.getLocalizedMessage());
-			DefensiveMeasures.LOGGER.error("");
-			DefensiveMeasures.LOGGER.error("ERROR MESSAGE:");
-			DefensiveMeasures.LOGGER.error(e.getMessage());
-			DefensiveMeasures.LOGGER.error("===== ERROR MSG END =====");
-			DefensiveMeasures.LOGGER.error("");
+			DefensiveMeasures.printErr(e);
 		}
+	}
+
+	protected final List<RegistryEntry<EntityAttribute>> resistanceKnockbackResistanceAttributes() {
+		return List.of(
+			EntityAttributes.EXPLOSION_KNOCKBACK_RESISTANCE,
+			EntityAttributes.KNOCKBACK_RESISTANCE
+		);
+	}
+
+	/**
+	 * An overridable method that defines the base attribute values of this turret
+	 * in regard to its knockback resistance. This default implementation respects
+	 * the turret's {@link #isHeldInPlace()} method, which dictates whether the turret
+	 * is held in place or not. By respecting that method, this method returns either
+	 * a set of resistance values that are either 0.0 or 1.0, depending on the turret's
+	 * state.
+	 * <br><br>
+	 * If the turret is held in place, the turret will have a resistance value of 1.0,
+	 * lest it will have a resistance value of 0.0.
+	 * <hr>
+	 * The current list of resistance attributes are:
+	 * <ul>
+	 * 	<li>{@link EntityAttributes#EXPLOSION_KNOCKBACK_RESISTANCE}</li>
+	 * 	<li>{@link EntityAttributes#KNOCKBACK_RESISTANCE}</li>
+	 * </ul>
+	 *
+	 * @return {@code Map<RegistryEntry<EntityAttribute>, Double>} The map of resistance values.
+	 */
+	protected Map<RegistryEntry<EntityAttribute>, Double> getKnockbackResistanceValues() {
+		double baseValue = this.isHeldInPlace() ? 1.0 : 0.0;
+
+		return this.resistanceKnockbackResistanceAttributes()
+			.stream()
+			.collect(Collectors.toMap(
+				attr -> attr,
+				_ -> baseValue
+			));
+	}
+
+	/**
+	 * An overridable method that determines whether this turret is held in place or not. This
+	 * dictates whether the turret will be affected by certain features such as gravity, knockback,
+	 * and other forces that would otherwise move the turret from its position.
+	 *
+	 * @return {@code boolean} Returns {@code true} if the turret is held in place, otherwise {@code false}.
+	 */
+	public boolean isHeldInPlace() {
+		return true;
 	}
 
 	///////////////////
