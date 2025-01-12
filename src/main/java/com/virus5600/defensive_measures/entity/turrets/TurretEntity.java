@@ -182,7 +182,7 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 	 * Defines the level of this turret. The higher the level, the stronger
 	 * the turret.
 	 */
-	protected int level;
+	protected int level = 1;
 	/**
 	 * The material of this turret.
 	 */
@@ -261,7 +261,9 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 	 * @see #itemable
 	 * @see EntityType
 	 */
-	public TurretEntity(EntityType<? extends MobEntity> entityType, World world, TurretMaterial material, EntityType<?> projectile, Item itemable) {
+	public TurretEntity(EntityType<? extends MobEntity> entityType, World world,
+						TurretMaterial material, EntityType<?> projectile, Item itemable
+	) {
 		this(entityType, world, material, itemable);
 		this.projectile = projectile;
 	}
@@ -278,7 +280,9 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 	 *
 	 * @see #itemable
 	 */
-	public TurretEntity(EntityType<? extends MobEntity> entityType, World world, TurretMaterial material, Item itemable) {
+	public TurretEntity(EntityType<? extends MobEntity> entityType, World world,
+						TurretMaterial material, Item itemable
+	) {
 		super(entityType, world);
 
 		this.material = material;
@@ -450,14 +454,12 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 	 * @see DefaultAttributeContainer.Builder
 	 */
 	public static DefaultAttributeContainer.Builder setAttributes() {
-		DefaultAttributeContainer.Builder builder = TurretEntity.createMobAttributes()
+		return TurretEntity.createMobAttributes()
 			.add(EntityAttributes.MAX_HEALTH, TurretEntity.getTurretMaxHealth())
 			.add(EntityAttributes.FOLLOW_RANGE, 16)
 			.add(EntityAttributes.MOVEMENT_SPEED, 0)
 			.add(EntityAttributes.KNOCKBACK_RESISTANCE, 1.0)
 			.add(EntityAttributes.EXPLOSION_KNOCKBACK_RESISTANCE, 1.0);
-
-		return builder;
 	}
 
 	@Override
@@ -1207,23 +1209,77 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 		return this.isEffectSource(item) ? this.effectSource.get(item) : List.of();
 	}
 
+	/**
+	 * Retrieves the maximum attack range of this turret. The max range is
+	 * dependent on the {@code FOLLOW_RANGE} attribute value, allowing the
+	 * turret to have a range that is within the bounds of its sight.
+	 * <br><br>
+	 * The maximum attack range is calculated with the formula:
+	 * <pre><code>
+	 * 	Math.floor(FOLLOW_RANGE) + eyeHeight
+	 * </code></pre>
+	 * The additional {@code eyeHeight} is added to the {@code FOLLOW_RANGE} value
+	 * to account for the eye displacement used by the attack goal when targeting
+	 * entities.
+	 *
+	 * @return {@code float} The maximum attack range of this turret.
+	 *
+	 * @see EntityAttributes#FOLLOW_RANGE
+	 */
 	public float getMaxAttackRange() {
-		return 16.625f;
+		return (float) Math.floor(
+			this.getAttributes()
+				.getBaseValue(EntityAttributes.FOLLOW_RANGE)
+		) + this.getStandingEyeHeight();
 	}
 
 	public float getMinAttackRange() {
 		return 0.1f;
 	}
 
+	/**
+	 * Retrieves the current barrel this turret will use to shoot.
+	 *
+	 * @param increment Whether to increment the barrel or not.
+	 *
+	 * @return {@code Vec3d} The current barrel to use for shooting.
+	 */
+	public Vec3d getCurrentBarrel(boolean increment) {
+		int currentBarrel = this.currentBarrel;
+
+		if (increment) {
+			this.currentBarrel = this.currentBarrel >= this.getTurretProjectileSpawn().size() - 1 ?
+				0 : this.currentBarrel + 1;
+		}
+
+		return this.getTurretProjectileSpawn()
+			.get(currentBarrel);
+	}
+
 	//////////////////
 	// TRACKED DATA //
 	//////////////////
 
+	/**
+	 * Retrieves the maximum level of this turret.
+	 * <br><br>
+	 * The default maximum level is 3. This can value can be changed
+	 * by overriding this method and returning a different value.
+	 * <br><br>
+	 * This method is also used by {@link #getLevel()} and {@link #setLevel(int)}
+	 * to clamp the level between 1 and the maximum level, ensuring that the
+	 * level is within the bounds of the maximum level.
+	 *
+	 * @return {@code int} The maximum level of this turret.
+	 */
+	public int getMaxLevel() {
+		return 3;
+	}
 	public int getLevel() {
-		return this.dataTracker.get(LEVEL);
+		return Math.clamp(this.dataTracker.get(LEVEL), 1, this.getMaxLevel());
 	}
 	public void setLevel(int level) {
-		this.dataTracker.set(LEVEL, level);
+		this.dataTracker.set(LEVEL, Math.clamp(level, 1, this.getMaxLevel()));
 	}
 
 	/**
@@ -1289,6 +1345,24 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 	 */
 	abstract List<Vec3d> getTurretProjectileSpawn();
 
+	/**
+	 * Determines the damage this turret's projectile will deal. This only
+	 * works for instances of {@link com.virus5600.defensive_measures.entity.projectiles.TurretProjectileEntity TurretProjectileEntity}
+	 * or its subclasses due to the overridden methods and tailored behavior.
+	 *
+	 * @return {@code double} The damage this turret's projectile will deal.
+	 */
+	public abstract double getProjectileDamage();
+
+	/**
+	 * Determines the knockback this turret's projectile will deal. This only
+	 * works for instances of {@link com.virus5600.defensive_measures.entity.projectiles.TurretProjectileEntity TurretProjectileEntity}
+	 * or its subclasses due to the overridden methods and tailored behavior.
+	 *
+	 * @return {@code byte} The projectile's pierce level.
+	 */
+	public abstract byte getProjectilePierceLevel();
+
 	// OVERRIDABLES //
 	/**
 	 * Sets the velocity of a projectile, along with the power and uncertainty of the projectile.
@@ -1334,8 +1408,8 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 
 		projectile.setVelocity(
 			vx, vy, vz,
-			velocityData.power,
-			velocityData.uncertainty
+			velocityData.getPower(),
+			velocityData.getUncertainty()
 		);
 	}
 
@@ -1363,20 +1437,13 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 				return;
 			}
 
-			Vec3d pos = this.getRelativePos(
-				this.getTurretProjectileSpawn()
-					.get(this.currentBarrel++ % this.barrels)
-			);
+			Vec3d pos = this.getRelativePos(this.getCurrentBarrel(true));
 			projectile.setPosition(pos);
 			projectile.setOwner(this);
 			this.setProjectileVelocity(projectile, velocityData);
 
 			this.playSound(this.getShootSound(), 1.0f, 1.0f / (this.getRandom().nextFloat() * 0.4f + 0.8f));
 			this.getWorld().spawnEntity(projectile);
-
-			// Resets the current barrel to 0 if it exceeds the number of barrels to prevent overflow
-			if (this.currentBarrel % this.barrels == 0)
-				this.currentBarrel = 0;
 		} catch (IllegalArgumentException | SecurityException e) {
 			DefensiveMeasures.printErr(e);
 		}
@@ -1494,6 +1561,16 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 	 * respective getters.
 	 */
 	public static class TurretProjectileVelocity {
+		/**
+		 * Holds the data of the last target position of the projectile. This is used to hold
+		 * the last position of the turret's target so when some information is updated, the
+		 * projectile velocity can be recalculated.
+		 * <br><br>
+		 * When the velocity is updated, this value is also updated to the target's position. If
+		 * the velocity update does not include a target, then this will be set to {@code null}.
+		 */
+		@Nullable
+		private Vec3d lastTargetPos;
 		/** The turret entity that will be shooting the projectile */
 		private final TurretEntity turret;
 		/** The power of the projectile's velocity */
@@ -1504,6 +1581,8 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 		private float upwardVelocityMultiplier;
 		/** The velocity of the projectile */
 		private Vec3d velocity;
+		/** A flag that determines whether the projectile's trajectory is parabolic */
+		private boolean isParabolic;
 
 		/**
 		 * Initializes the velocity data of the turret's projectile. This can only be initialized
@@ -1513,9 +1592,9 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 		 */
 		private TurretProjectileVelocity(TurretEntity turret) {
 			this.turret = turret;
-			this.power = 1.5f;
+			this.power = 1f;
 			this.uncertainty = turret.getWorld().getDifficulty().getId() * 2;
-			this.upwardVelocityMultiplier = 0.1f;
+			this.upwardVelocityMultiplier = 1f;
 			this.velocity = Vec3d.ZERO;
 		}
 
@@ -1549,13 +1628,15 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 
 		/**
 		 * Retrieves the power of the projectile's velocity.
+		 * The power scales by 1.5 times the value set as this
+		 * was the most optimal value for the projectile's velocity.
 		 *
 		 * @return float The power of the projectile's velocity
 		 *
 		 * @see #power
 		 */
 		public float getPower() {
-			return this.power;
+			return this.power * 1.5f;
 		}
 
 		/**
@@ -1599,17 +1680,25 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 
 		/**
 		 * Retrieves the multiplier for the upward velocity of the projectile.
+		 * The upward velocity multiplier scales by 0.1 times the value set as this
+		 * was the most optimal value for the projectile's velocity.
 		 *
 		 * @return float The multiplier for the upward velocity of the projectile
 		 *
 		 * @see #upwardVelocityMultiplier
 		 */
 		public float getUpwardVelocityMultiplier() {
-			return this.upwardVelocityMultiplier;
+			return this.upwardVelocityMultiplier * 0.1f;
 		}
 
 		/**
-		 * Sets the velocity of the projectile.
+		 * Sets the velocity of the projectile. When this method is used to set the velocity, the
+		 * projectile's velocity won't respect the following properties:
+		 * <ul>
+		 * 	<li>{@link #power Power}</li>
+		 * 	<li>{@link #upwardVelocityMultiplier Upward Velocity Multiplier}</li>
+		 * 	<li>{@link #isParabolic Parabolic Arc}</li>
+		 * </ul>
 		 *
 		 * @param velocity The velocity of the projectile
 		 *
@@ -1618,12 +1707,18 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 		 * @see #velocity
 		 */
 		public TurretProjectileVelocity setVelocity(Vec3d velocity) {
-			this.velocity = velocity;
+			this.calculateVelocity(velocity, false);
 			return this;
 		}
 
 		/**
-		 * Sets the velocity of the projectile.
+		 * Sets the velocity of the projectile. When this method is used to set the velocity, the
+		 * projectile's velocity won't respect the following properties:
+		 * <ul>
+		 * 	<li>{@link #power Power}</li>
+		 * 	<li>{@link #upwardVelocityMultiplier Upward Velocity Multiplier}</li>
+		 * 	<li>{@link #isParabolic Parabolic Arc}</li>
+		 * </ul>
 		 *
 		 * @param x The X-axis velocity of the projectile
 		 * @param y The Y-axis velocity of the projectile
@@ -1645,14 +1740,29 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 		 * @return {@code TurretProjectileVelocity} The instance of the {@link TurretProjectileVelocity} class
 		 */
 		public TurretProjectileVelocity setVelocity(LivingEntity target) {
-			double vx = (target.getX() - this.turret.getX()) * 1.0625;
-			double vy = target.getBodyY((double) 1 / 3) - this.turret.getY();
-			double vz = (target.getZ() - this.turret.getZ()) * 1.0625;
-			double variance = Math.sqrt(vx * vx + vz * vz);
+			return this.setVelocityFromPos(
+				target.getX(),
+				target.getBodyY((double) 1 / 3),
+				target.getZ()
+			);
+		}
 
-			vy += variance * this.upwardVelocityMultiplier;
+		/**
+		 * Sets the velocity of the projectile based from the target position given.
+		 *
+		 * @param pos The target position of the projectile
+		 *
+		 * @return {@code TurretProjectileVelocity} The instance of the {@link TurretProjectileVelocity} class
+		 *
+		 * @see #velocity
+		 */
+		public TurretProjectileVelocity setVelocityFromPos(Vec3d pos) {
+			this.calculateVelocity(pos, true);
+			return this;
+		}
 
-			return this.setVelocity(vx, vy, vz);
+		public TurretProjectileVelocity setVelocityFromPos(double x, double y, double z) {
+			return this.setVelocityFromPos(new Vec3d(x, y, z));
 		}
 
 		/**
@@ -1683,6 +1793,84 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 				.subtract(this.turret.getEyePos());
 
 			return this.setVelocity(targetRange);
+		}
+
+		/**
+		 * Sets the projectile's trajectory to be parabolic. This will make the projectile shoot in
+		 * an arc-like trajectory, allowing for the creation of mortar-like projectiles.
+		 *
+		 * @param isParabolic {@code true} if the projectile's trajectory is parabolic, otherwise {@code false}
+		 *
+		 * @return {@code TurretProjectileVelocity} The instance of the {@link TurretProjectileVelocity} class
+		 */
+		public TurretProjectileVelocity setParabolic(boolean isParabolic) {
+			this.isParabolic = isParabolic;
+			return this;
+		}
+
+		/**
+		 * Retrieves whether the projectile's trajectory is parabolic.
+		 *
+		 * @return {@code boolean} {@code true} if the projectile's trajectory is parabolic, otherwise {@code false}
+		 */
+		public boolean isParabolic() {
+			return this.isParabolic;
+		}
+
+		private void calculateVelocity(Vec3d v3d, boolean isPos) {
+			if (isPos) {
+				double vx, vy, vz;
+
+				this.lastTargetPos = v3d;
+				// TODO: Properly calculate the parabolic trajectory (low priority)
+				// Parabolic Trajectory
+				if (this.isParabolic) {
+					double barrelY = this.turret
+						.getRelativePos(this.turret.getCurrentBarrel(false))
+						.getY();
+
+					vx = (v3d.getX() - this.turret.getX()) * 1.0625;
+					vy = (v3d.getY() - barrelY);
+					vz = (v3d.getZ() - this.turret.getZ()) * 1.0625;
+
+					double d3D = Math.sqrt(vx * vx + vy * vy + vz * vz);
+
+					double minAngle = 45 * Math.PI / 180;
+					double maxAngle = 80 * Math.PI / 180;
+					double angleFactor = Math.clamp(d3D / (d3D + vy), 0.0, 1.0);
+					float theta = (float) (minAngle + angleFactor * (maxAngle - minAngle));
+					double scalingFactor = Math.tan(theta);
+					double scalingFactorSqrd = scalingFactor * scalingFactor;
+
+					vx = (vx / scalingFactorSqrd);
+					vy += (Math.abs(vy) * scalingFactor) - vy;
+					vz = (vz / scalingFactorSqrd);
+				}
+				// Straight Trajectory
+				else {
+					double barrelY = this.turret
+						.getRelativePos(this.turret.getCurrentBarrel(false))
+						.getY();
+
+					vx = (v3d.getX() - this.turret.getX()) * 1.0625;
+					vy = (v3d.getY() - barrelY);
+					vz = (v3d.getZ() - this.turret.getZ()) * 1.0625;
+
+					double variance = Math.sqrt(vx * vx + vz * vz);
+					vy += variance * this.getUpwardVelocityMultiplier();
+				}
+
+				// Applies a scale factor to make sure that when the power
+				// is applied, it will still be around its target's position.
+				Vec3d rawV = new Vec3d(vx, vy, vz);
+				double magnitude = rawV.length();
+				double scaleFactor = this.getPower() / magnitude;
+				this.velocity = rawV.multiply(scaleFactor);
+			}
+			else {
+				this.lastTargetPos = null;
+				this.velocity = v3d;
+			}
 		}
 	}
 

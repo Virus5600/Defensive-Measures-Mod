@@ -1,33 +1,26 @@
 package com.virus5600.defensive_measures.entity.projectiles;
 
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.data.DataTracker.Builder;
-import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.world.World;
 
-import software.bernie.geckolib.animatable.GeoEntity;
-import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.animation.AnimatableManager.ControllerRegistrar;
 import software.bernie.geckolib.animation.AnimationController;
 import software.bernie.geckolib.animation.AnimationState;
 import software.bernie.geckolib.animation.PlayState;
 import software.bernie.geckolib.animation.RawAnimation;
-import software.bernie.geckolib.util.GeckoLibUtil;
 
 import com.virus5600.defensive_measures.entity.ModEntities;
 
 import java.util.Map;
 
-public class BallistaArrowEntity extends TurretProjectileEntity implements GeoEntity {
+public class BallistaArrowEntity extends KineticProjectileEntity {
 	private static final Map<String, RawAnimation> ANIMATIONS;
 
-	private final AnimatableInstanceCache geoCache = GeckoLibUtil.createInstanceCache(this);
-
-	////////////////////
-	/// CONSTRUCTORS ///
-	////////////////////
+	// ////////////// //
+	//  CONSTRUCTORS  //
+	// ////////////// //
 	public BallistaArrowEntity(
 		EntityType<? extends TurretProjectileEntity> entityType,
 		World world
@@ -35,11 +28,12 @@ public class BallistaArrowEntity extends TurretProjectileEntity implements GeoEn
 		super(entityType, world);
 
 		this.setDamage(4);
-		this.setPierceLevel(this.getMaxPierceLevel());
 	}
 
 	public BallistaArrowEntity(World world, LivingEntity owner) {
 		this(ModEntities.BALLISTA_ARROW, world);
+
+		this.setPierceLevel(this.getMaxPierceLevel());
 		this.setOwner(owner);
 	}
 
@@ -64,55 +58,6 @@ public class BallistaArrowEntity extends TurretProjectileEntity implements GeoEn
 	}
 
 	@Override
-	protected void onEntityHit(EntityHitResult entityHitResult) {
-		super.onEntityHit(entityHitResult);
-
-		// Reduces the speed of the arrow when it hits an entity
-		Entity entity = entityHitResult.getEntity();
-		// For reference, max armor points is 30
-		int armor = entity instanceof LivingEntity livingEntity ? livingEntity.getArmor() : 0;
-		boolean hasHeavyArmor = armor > 15,
-			hasLightArmor = armor <= 15 && armor > 0;
-
-		if (entity instanceof LivingEntity livingEntity) {
-			double targetH = livingEntity.getHeight(),
-				arrowH = this.getHeight(),
-				variance = arrowH * 0.125; // 12.5% of the arrow's height
-
-			double arrowMin = arrowH - variance,
-				arrowMax = arrowH + variance,
-				reducedVelocity = 0.125;
-
-			// Reduce velocity and pierce level based on the side of the entity hit
-			if (this.getPierceLevel() > 0) {
-				// If the arrow is smaller than the target or has heavy armor, reduce the pierce level by 2 and velocity by 50%
-				if (targetH > arrowMax || hasHeavyArmor) {
-					this.setPierceLevel((byte) (this.getPierceLevel() - 2));
-					reducedVelocity = 0.5;
-				}
-				// If the arrow is almost the same size as the target or has a light armor, reduce the pierce level by 1 and velocity by 25%
-				else if ((targetH < arrowMax && arrowMin < targetH) || hasLightArmor) {
-					this.setPierceLevel((byte) (this.getPierceLevel() - 1));
-					reducedVelocity = 0.25;
-				}
-				// Otherwise, just reduce the velocity by 12.5% without reducing the pierce level
-			}
-
-			// Apply reduced velocity
-			this.addVelocity(
-				this.getVelocity()
-					.multiply(reducedVelocity)
-					.negate()
-			);
-		}
-
-		this.addVelocity(
-			this.getVelocity()
-				.negate()
-				.multiply(0.1)
-		);
-	}
-
 	public byte getMaxPierceLevel() {
 		return 5;
 	}
@@ -144,11 +89,6 @@ public class BallistaArrowEntity extends TurretProjectileEntity implements GeoEn
 			new AnimationController<>(this, "Idle", this::idleController),
 			new AnimationController<>(this, "OnAir", this::onAirController)
 		);
-	}
-
-	@Override
-	public AnimatableInstanceCache getAnimatableInstanceCache() {
-		return this.geoCache;
 	}
 
 	///////////////////////

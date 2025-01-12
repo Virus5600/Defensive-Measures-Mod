@@ -1,5 +1,6 @@
 package com.virus5600.defensive_measures.entity.projectiles;
 
+import com.virus5600.defensive_measures.entity.turrets.TurretEntity;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.component.DataComponentTypes;
@@ -46,11 +47,11 @@ import software.bernie.geckolib.animatable.GeoEntity;
 
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
 import java.util.Objects;
 
-import com.google.common.collect.Lists;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
+import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
+import software.bernie.geckolib.util.GeckoLibUtil;
 
 /**
  * {@code TurretProjectile} is an abstract class that acts nearly akin to {@link PersistentProjectileEntity}
@@ -67,15 +68,13 @@ public abstract class TurretProjectileEntity extends ProjectileEntity implements
 	protected static final int CRITICAL_FLAG = 1;
 	protected static final int NO_CLIP_FLAG = 2;
 
+	private final AnimatableInstanceCache geoCache = GeckoLibUtil.createInstanceCache(this);
 	/** Holds the blockstate information of the block in this projectile's position. */
 	@Nullable
 	private BlockState inBlockState;
 	/** Holds the information about the list of entities this projectile have pierced through. */
 	@Nullable
 	private IntOpenHashSet piercedEntities;
-	/** Holds the information about the list of entities this projectile have pierced through and died. */
-	@Nullable
-	private List<Entity> piercingKilledEntities;
 	/** Defines the current sound this projectile will play when it hit something */
 	private SoundEvent sound = this.getHitSound();
 	/** Defines the item stack this projectile is. Used when picking up the projectile to turn into items. */
@@ -147,6 +146,22 @@ public abstract class TurretProjectileEntity extends ProjectileEntity implements
 	// /////////////// //
 	// PROCESS METHODS //
 	// /////////////// //
+
+	/**
+	 * <h2>{@link ProjectileEntity}</h2>
+	 * {@inheritDoc}
+	 * <hr>
+	 * <h2>{@link TurretProjectileEntity}</h2>
+	 * <br><br>
+	 * This method is called when the projectile hits an entity, handling the logic
+	 * for hitting, damaging, and if applicable, piercing the entity.
+	 * <br><br>
+	 * In this implementation, the method will handle the damage calculation, the
+	 * critical damage multiplier, the pierce behavior, and the fire behavior similar
+	 * to how the {@link PersistentProjectileEntity} handles it.
+	 *
+	 * @param entityHitResult {@inheritDoc EntityHitResult}
+	 */
 	@Override
 	protected void onEntityHit(EntityHitResult entityHitResult) {
 		super.onEntityHit(entityHitResult);
@@ -159,7 +174,7 @@ public abstract class TurretProjectileEntity extends ProjectileEntity implements
 		float velocityMagnitude = (float) this.getVelocity().length();
 		double damage = this.getDamage();
 		int damageToDeal = MathHelper.ceil(
-			this.speedAffectDamage ?
+			this.speedAffectsDamage() ?
 				MathHelper.clamp(
 					(double) velocityMagnitude * damage,
 					0.0,
@@ -171,10 +186,6 @@ public abstract class TurretProjectileEntity extends ProjectileEntity implements
 		if (this.getPierceLevel() > 0) {
 			if (this.piercedEntities == null) {
 				this.piercedEntities = new IntOpenHashSet(this.getMaxPierceLevel());
-			}
-
-			if (this.piercingKilledEntities == null) {
-				this.piercingKilledEntities = Lists.newArrayListWithCapacity(this.getMaxPierceLevel());
 			}
 
 			if (this.piercedEntities.size() >= this.getPierceLevel() + 1) {
@@ -213,9 +224,6 @@ public abstract class TurretProjectileEntity extends ProjectileEntity implements
 				}
 
 				this.onHit(livingEntity);
-				if (!hitEntity.isAlive() && this.piercingKilledEntities != null) {
-					this.piercingKilledEntities.add(livingEntity);
-				}
 			}
 
 			this.playSound(this.sound , 1f, 1.2f / (this.random.nextFloat() * 0.2f + 0.9f));
@@ -359,10 +367,6 @@ public abstract class TurretProjectileEntity extends ProjectileEntity implements
 	}
 
 	protected void clearPiercingStatus() {
-		if (this.piercingKilledEntities != null) {
-			this.piercingKilledEntities.clear();
-		}
-
 		if (this.piercedEntities != null) {
 			this.piercedEntities.clear();
 		}
@@ -584,6 +588,22 @@ public abstract class TurretProjectileEntity extends ProjectileEntity implements
 		this.sound = sound;
 	}
 
+	/**
+	 * Determines whether the speed of the projectile affects the damage it deals,
+	 * similar to how {@link PersistentProjectileEntity} handles it.
+	 *
+	 * @return {@code true} if the speed affects the damage, {@code false} otherwise
+	 *
+	 * @see #speedAffectDamage
+	 */
+	public boolean speedAffectsDamage() {
+		return this.speedAffectDamage;
+	}
+
+	protected void setSpeedAffectsDamage(boolean speedAffectDamage) {
+		this.speedAffectDamage = speedAffectDamage;
+	}
+
 	@Override
 	protected double getGravity() {
 		return 0.05;
@@ -755,6 +775,26 @@ public abstract class TurretProjectileEntity extends ProjectileEntity implements
 	@Override
 	protected boolean deflectsAgainstWorldBorder() {
 		return true;
+	}
+
+	@Override
+	public void setOwner(Entity owner) {
+		super.setOwner(owner);
+
+		if (owner instanceof TurretEntity turret) {
+			this.setDamage(turret.getProjectileDamage());
+			this.setPierceLevel(turret.getProjectilePierceLevel());
+		}
+	}
+
+	// ///////////////////////// //
+	// INTERFACE IMPLEMENTATIONS //
+	// ///////////////////////// //
+
+	// GeoEntity //
+	@Override
+	public AnimatableInstanceCache getAnimatableInstanceCache() {
+		return this.geoCache;
 	}
 
 	// ///////////////////// //

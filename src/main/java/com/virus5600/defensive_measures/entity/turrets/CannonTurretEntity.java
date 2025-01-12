@@ -56,6 +56,7 @@ public class CannonTurretEntity extends TurretEntity implements GeoEntity {
 
 	private final AnimatableInstanceCache geoCache = GeckoLibUtil.createInstanceCache(this);
 	private boolean animPlayed = false;
+	private static final double[] DAMAGE;
 
 	//////////////////
 	// CONSTRUCTORS //
@@ -91,6 +92,7 @@ public class CannonTurretEntity extends TurretEntity implements GeoEntity {
 		TurretEntity.setTurretMaxHealth(50);
 
 		return TurretEntity.setAttributes()
+			.add(EntityAttributes.FOLLOW_RANGE, 24)
 			.add(EntityAttributes.ARMOR, 3)
 			.add(EntityAttributes.ARMOR_TOUGHNESS, 2);
 	}
@@ -231,11 +233,20 @@ public class CannonTurretEntity extends TurretEntity implements GeoEntity {
 		return this.geoCache;
 	}
 
-	//////////////////////////////
+	// //////////////////////// //
 	// ABSTRACT IMPLEMENTATIONS //
-	//////////////////////////////
+	// //////////////////////// //
+	// TurretEntity //
 	protected List<Vec3d> getTurretProjectileSpawn() {
 		return OFFSETS.get(Offsets.BARREL);
+	}
+
+	public double getProjectileDamage() {
+		return CannonTurretEntity.DAMAGE[this.getLevel() - 1];
+	}
+
+	public byte getProjectilePierceLevel() {
+		return 0;
 	}
 
 	/////////////////////////
@@ -250,6 +261,10 @@ public class CannonTurretEntity extends TurretEntity implements GeoEntity {
 	///////////////////////
 
 	static {
+		DAMAGE = new double[] {
+			10.0
+		};
+
 		OFFSETS = Map.of(
 			Offsets.BARREL, List.of(
 				new Vec3d(0, 0, 0.875)

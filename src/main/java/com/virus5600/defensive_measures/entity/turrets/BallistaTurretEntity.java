@@ -49,6 +49,9 @@ public class BallistaTurretEntity extends TurretEntity implements GeoEntity {
 	private static final Map<String, RawAnimation> ANIMATIONS;
 	private static final Map<Offsets, List<Vec3d>> OFFSETS;
 	private static final Map<Item, SoundEvent> HEAL_SOUNDS;
+	private static final double[] DAMAGE;
+	private static final byte[] PIERCE_LEVELS;
+
 
 	/**
 	 * Contains all the items that can heal this entity.
@@ -98,9 +101,9 @@ public class BallistaTurretEntity extends TurretEntity implements GeoEntity {
 		return TurretEntity.setAttributes();
 	}
 
-	/////////////////////
+	// /////////////// //
 	// PROCESS METHODS //
-	/////////////////////
+	// /////////////// //
 
 	@Override
 	public void shootAt(LivingEntity target, float pullProgress) {
@@ -168,9 +171,9 @@ public class BallistaTurretEntity extends TurretEntity implements GeoEntity {
 		return ModSoundEvents.TURRET_REMOVED_WOOD;
 	}
 
-	///////////////////////////
+	// ///////////////////// //
 	// ANIMATION CONTROLLERS //
-	///////////////////////////
+	// ///////////////////// //
 
 	private <E extends BallistaTurretEntity> PlayState deathController(final AnimationState<E> event) {
 		if (!this.isAlive() && !this.animPlayed) {
@@ -211,11 +214,20 @@ public class BallistaTurretEntity extends TurretEntity implements GeoEntity {
 		return this.geoCache;
 	}
 
-	//////////////////////////////
+	// //////////////////////// //
 	// ABSTRACT IMPLEMENTATIONS //
-	//////////////////////////////
+	// //////////////////////// //
+	// TurretEntity //
 	protected List<Vec3d> getTurretProjectileSpawn() {
 		return OFFSETS.get(Offsets.BOLT_HOLDER);
+	}
+
+	public double getProjectileDamage() {
+		return BallistaTurretEntity.DAMAGE[this.getLevel() - 1];
+	}
+
+	public byte getProjectilePierceLevel() {
+		return BallistaTurretEntity.PIERCE_LEVELS[this.getLevel() - 1];
 	}
 
 	/////////////////////////
@@ -230,6 +242,18 @@ public class BallistaTurretEntity extends TurretEntity implements GeoEntity {
 	///////////////////////
 
 	static {
+		DAMAGE = new double[] {
+			3.5,
+			7.0,
+			12.0
+		};
+
+		PIERCE_LEVELS = new byte[] {
+			5,
+			7,
+			10
+		};
+
 		OFFSETS = Map.of(
 			Offsets.BOLT_HOLDER, List.of(
 				new Vec3d(0, 0, 0.875)

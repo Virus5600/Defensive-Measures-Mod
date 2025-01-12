@@ -29,9 +29,10 @@
 
 	"itemTooltip.dm.generic.health" : "Health: %s / %s",
 
-	"itemTooltip.dm.cannon_turret.line1" : "Range: 3-16 blocks",
+	"itemTooltip.dm.cannon_turret.line1" : "Range: 3-24 blocks",
 	"itemTooltip.dm.cannon_turret.line2" : "Firing Arc: X: ±360° | Y: ±30°",
 	"itemTooltip.dm.cannon_turret.line3" : "Reload Time: 5 seconds",
+
 
 	"itemTooltip.dm.ballista.line1" : "Range: 16 blocks",
 	"itemTooltip.dm.ballista.line2" : "Firing Arc: X: ±360° | Y: ±25°",
