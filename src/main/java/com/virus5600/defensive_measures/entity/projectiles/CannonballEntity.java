@@ -90,6 +90,10 @@ public class CannonballEntity extends ExplosiveProjectileEntity implements GeoEn
 		return SoundEvents.ENTITY_GENERIC_EXPLODE;
 	}
 
+	protected double getGravity() {
+		return 0.10625;
+	}
+
 	// PUBLIC
 	private double radius = 0;
 	public void doDamage() {
@@ -169,6 +173,8 @@ public class CannonballEntity extends ExplosiveProjectileEntity implements GeoEn
 					)
 			);
 		}
+
+		this.applyGravity();
 	}
 
 	/////////////////////////////////

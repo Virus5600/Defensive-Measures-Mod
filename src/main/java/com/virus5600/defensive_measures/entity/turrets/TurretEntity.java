@@ -1444,6 +1444,7 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 
 			this.playSound(this.getShootSound(), 1.0f, 1.0f / (this.getRandom().nextFloat() * 0.4f + 0.8f));
 			this.getWorld().spawnEntity(projectile);
+			System.out.println("[" + projectile.getName().getString() + "] Gravity: " + projectile.getFinalGravity());
 		} catch (IllegalArgumentException | SecurityException e) {
 			DefensiveMeasures.printErr(e);
 		}
@@ -1623,6 +1624,7 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 		 */
 		public TurretProjectileVelocity setPower(float power) {
 			this.power = power;
+			this.recalculateVelocity();
 			return this;
 		}
 
@@ -1650,6 +1652,7 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 		 */
 		public TurretProjectileVelocity setUncertainty(float uncertainty) {
 			this.uncertainty = uncertainty;
+			this.recalculateVelocity();
 			return this;
 		}
 
@@ -1675,6 +1678,7 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 		 */
 		public TurretProjectileVelocity setUpwardVelocityMultiplier(float upwardVelocityMultiplier) {
 			this.upwardVelocityMultiplier = upwardVelocityMultiplier;
+			this.recalculateVelocity();
 			return this;
 		}
 
@@ -1805,6 +1809,7 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 		 */
 		public TurretProjectileVelocity setParabolic(boolean isParabolic) {
 			this.isParabolic = isParabolic;
+			this.recalculateVelocity();
 			return this;
 		}
 
@@ -1817,22 +1822,30 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 			return this.isParabolic;
 		}
 
+		/**
+		 * Recalculates the velocity of this projectile, accounting all changes.
+		 * The method checks if there is a target position set, and if there is,
+		 * it will proceed with the recalculation. Otherwise, it will just skip
+		 * and continue using the provided velocity from {@link #setVelocity(Vec3d)}.
+		 */
+		private void recalculateVelocity() {
+			if (this.lastTargetPos != null)
+				this.calculateVelocity(this.lastTargetPos, true);
+		}
+
 		private void calculateVelocity(Vec3d v3d, boolean isPos) {
 			if (isPos) {
-				double vx, vy, vz;
+				Vec3d barrel = this.turret
+					.getRelativePos(this.turret.getCurrentBarrel(false));
+
+				double vx = (v3d.getX() - barrel.getX()) * 1.0625;
+				double vy = (v3d.getY() - barrel.getY());
+				double vz = (v3d.getZ() - barrel.getZ()) * 1.0625;
 
 				this.lastTargetPos = v3d;
-				// TODO: Properly calculate the parabolic trajectory (low priority)
+				// TODO: Properly calculate the parabolic trajectory (low priority) - Apparently, it was because of the "acceleration" modifier in the "ExplosiveProjectileEntity" class. Fuck
 				// Parabolic Trajectory
 				if (this.isParabolic) {
-					double barrelY = this.turret
-						.getRelativePos(this.turret.getCurrentBarrel(false))
-						.getY();
-
-					vx = (v3d.getX() - this.turret.getX()) * 1.0625;
-					vy = (v3d.getY() - barrelY);
-					vz = (v3d.getZ() - this.turret.getZ()) * 1.0625;
-
 					double d3D = Math.sqrt(vx * vx + vy * vy + vz * vz);
 
 					double minAngle = 45 * Math.PI / 180;
@@ -1845,17 +1858,17 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 					vx = (vx / scalingFactorSqrd);
 					vy += (Math.abs(vy) * scalingFactor) - vy;
 					vz = (vz / scalingFactorSqrd);
+
+					vy *= this.power;
+					System.out.println(
+						"VY: " + vy +
+						" | Power: " + this.getPower() +
+						" | rawPower: " + this.power +
+						" | scalingFactor: " + scalingFactor
+					);
 				}
 				// Straight Trajectory
 				else {
-					double barrelY = this.turret
-						.getRelativePos(this.turret.getCurrentBarrel(false))
-						.getY();
-
-					vx = (v3d.getX() - this.turret.getX()) * 1.0625;
-					vy = (v3d.getY() - barrelY);
-					vz = (v3d.getZ() - this.turret.getZ()) * 1.0625;
-
 					double variance = Math.sqrt(vx * vx + vz * vz);
 					vy += variance * this.getUpwardVelocityMultiplier();
 				}
@@ -1864,7 +1877,7 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 				// is applied, it will still be around its target's position.
 				Vec3d rawV = new Vec3d(vx, vy, vz);
 				double magnitude = rawV.length();
-				double scaleFactor = this.getPower() / magnitude;
+				double scaleFactor = magnitude / this.getPower();
 				this.velocity = rawV.multiply(scaleFactor);
 			}
 			else {

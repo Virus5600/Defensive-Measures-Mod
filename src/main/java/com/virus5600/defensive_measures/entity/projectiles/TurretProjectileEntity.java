@@ -320,7 +320,7 @@ public abstract class TurretProjectileEntity extends ProjectileEntity implements
 
 	protected void applyDrag() {
 		Vec3d velocity = this.getVelocity();
-		float dragCoefficient = 0.99F;
+		float dragCoefficient = this.getDrag();
 
 		if (this.isTouchingWater()) {
 			dragCoefficient = this.getDragInWater();
@@ -607,6 +607,10 @@ public abstract class TurretProjectileEntity extends ProjectileEntity implements
 	@Override
 	protected double getGravity() {
 		return 0.05;
+	}
+
+	protected float getDrag() {
+		return 0.99F;
 	}
 
 	protected float getDragInWater() {
