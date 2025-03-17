@@ -2,7 +2,6 @@ package com.virus5600.defensive_measures.entity.turrets;
 
 import java.util.*;
 
-import com.virus5600.defensive_measures.entity.ModEntities;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.attribute.DefaultAttributeContainer;
@@ -30,6 +29,7 @@ import software.bernie.geckolib.animation.RawAnimation;
 import software.bernie.geckolib.animation.keyframe.event.ParticleKeyframeEvent;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
+import com.virus5600.defensive_measures.entity.ModEntities;
 import com.virus5600.defensive_measures.entity.TurretMaterial;
 import com.virus5600.defensive_measures.entity.ai.goal.ProjectileAttackGoal;
 import com.virus5600.defensive_measures.item.ModItems;
@@ -103,7 +103,13 @@ public class CannonTurretEntity extends TurretEntity implements GeoEntity {
 
 	@Override
 	public void shootAt(LivingEntity target, float pullProgress) {
-		super.shootAt(target, pullProgress);
+		float dist = (float) this.getPos().distanceTo(target.getPos());
+
+		TurretProjectileVelocity velocityData = TurretProjectileVelocity.init(this)
+			.setVelocity(target)
+			.setUpwardVelocityMultiplier(dist * 0.1625f);
+
+		super.shootAt(velocityData);
 		this.stopTriggeredAnim("FiringSequence", "charge");
 		this.triggerAnim("FiringSequence", "shoot");
 	}

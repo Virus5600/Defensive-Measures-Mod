@@ -18,8 +18,8 @@ import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.effect.StatusEffect;
-import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.effect.StatusEffectInstance;
+import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.entity.mob.Monster;
 import net.minecraft.entity.player.PlayerEntity;
@@ -1325,6 +1325,14 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 		this.shoot(target);
 	}
 
+	public void shootAt(LivingEntity target) {
+		this.shoot(target);
+	}
+
+	public void shootAt(TurretProjectileVelocity velocityData) {
+		this.shoot(velocityData);
+	}
+
 	////////////////////////////////////
 	// ABSTRACT & OVERRIDABLE METHODS //
 	////////////////////////////////////
@@ -1432,8 +1440,8 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 			);
 
 			if (projectile == null) {
-				System.err.println("Projectile is null at " + this.getName().getString());
-				DefensiveMeasures.LOGGER.info("Projectile is null at {}", this.getName().getString());
+				System.err.println("Projectile is null for " + this.getName().getString());
+				DefensiveMeasures.LOGGER.info("Projectile is null for {}", this.getName().getString());
 				return;
 			}
 

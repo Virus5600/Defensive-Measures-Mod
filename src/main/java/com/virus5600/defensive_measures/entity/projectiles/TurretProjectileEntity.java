@@ -1,6 +1,5 @@
 package com.virus5600.defensive_measures.entity.projectiles;
 
-import com.virus5600.defensive_measures.entity.turrets.TurretEntity;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.component.DataComponentTypes;
@@ -44,14 +43,15 @@ import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
 
 import software.bernie.geckolib.animatable.GeoEntity;
+import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
+import software.bernie.geckolib.util.GeckoLibUtil;
 
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
-
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
-import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
-import software.bernie.geckolib.util.GeckoLibUtil;
+
+import com.virus5600.defensive_measures.entity.turrets.TurretEntity;
 
 /**
  * {@code TurretProjectile} is an abstract class that acts nearly akin to {@link PersistentProjectileEntity}
@@ -740,6 +740,17 @@ public abstract class TurretProjectileEntity extends ProjectileEntity implements
 
 	/**
 	 * Defines this projectile's maximum allowed piercing level.
+	 * <br>
+	 * The piercing level defines the number of entities this projectile can pierce through before
+	 * it is destroyed. If the piercing level is set to 0, the projectile will not pierce through
+	 * any entity. This is the usual behavior for any {@link KineticProjectileEntity Kinetic Projectiles}.
+	 * <br>
+	 * However, when an {@link ExplosiveProjectileEntity Explosive Projectile} defines a piercing level
+	 * more than 0, it will pierce through entities and explode upon reaching the maximum piercing
+	 * level. This allows the projectile to deal damage to multiple entities before exploding, or
+	 * even allowing possibilities for chain reactions like when a projectile hits an entity, it
+	 * explodes and damages nearby entities before finally exploding itself.
+	 *
 	 * @return the maximum pierce level
 	 */
 	public abstract byte getMaxPierceLevel();
