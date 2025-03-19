@@ -62,10 +62,10 @@ public class ModEntities {
 			.trackingTickInterval(10)
 	);
 
-	public static final EntityType<BulletEntity> MG_BULLET = RegistryUtil.registerEntity(
+	public static final EntityType<MGBulletEntity> MG_BULLET = RegistryUtil.registerEntity(
 		"mg_bullet",
 		Builder
-			.<BulletEntity>create(BulletEntity::new, SpawnGroup.MISC)
+			.<MGBulletEntity>create(MGBulletEntity::new, SpawnGroup.MISC)
 			.dropsNothing()
 			.dimensions(0.125f, 0.125f)
 			.maxTrackingRange(4)

@@ -2,7 +2,6 @@ package com.virus5600.defensive_measures.entity.projectiles;
 
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.DataTracker.Builder;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
@@ -13,33 +12,33 @@ import software.bernie.geckolib.util.GeckoLibUtil;
 
 import com.virus5600.defensive_measures.entity.ModEntities;
 
-public class BulletEntity extends TurretProjectileEntity {
+public class MGBulletEntity extends TurretProjectileEntity {
 	private final AnimatableInstanceCache geoCache = GeckoLibUtil.createInstanceCache(this);
 
 	////////////////////
 	/// CONSTRUCTORS ///
 	////////////////////
-	public BulletEntity(
+	public MGBulletEntity(
 		EntityType<? extends TurretProjectileEntity> entityType,
 		World world
 	) {
 		super(entityType, world);
 	}
 
-	public BulletEntity(World world, LivingEntity owner) {
+	public MGBulletEntity(World world, LivingEntity owner) {
 		this(ModEntities.MG_BULLET, world);
 		this.setOwner(owner);
 	}
 
-	public BulletEntity(
+	public MGBulletEntity(
 		LivingEntity owner,
-		double directionX,
-		double directionY,
-		double directionZ,
+		double velocityX,
+		double velocityY,
+		double velocityZ,
 		World world
 	) {
 		this(world, owner);
-		this.setVelocity(directionX, directionY, directionZ);
+		this.setVelocity(velocityX, velocityY, velocityZ);
 	}
 
 	///////////////
@@ -57,7 +56,7 @@ public class BulletEntity extends TurretProjectileEntity {
 	}
 
 	public byte getMaxPierceLevel() {
-		return 0;
+		return 5;
 	}
 
 	@Override

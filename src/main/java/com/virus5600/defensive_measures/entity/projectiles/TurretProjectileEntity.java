@@ -42,6 +42,7 @@ import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
 
+import org.jetbrains.annotations.NotNull;
 import software.bernie.geckolib.animatable.GeoEntity;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.util.GeckoLibUtil;
@@ -125,8 +126,8 @@ public abstract class TurretProjectileEntity extends ProjectileEntity implements
 
 	protected TurretProjectileEntity(
 		EntityType<? extends TurretProjectileEntity> entityType,
-		LivingEntity owner,
-		World world,
+		@NotNull LivingEntity owner,
+		@NotNull World world,
 		@Nullable ItemStack stack
 	) {
 		this(entityType, owner.getX(), owner.getEyeY() - 0.1F, owner.getZ(), world, stack);
@@ -148,17 +149,41 @@ public abstract class TurretProjectileEntity extends ProjectileEntity implements
 	// /////////////// //
 
 	/**
-	 * <h2>{@link ProjectileEntity}</h2>
-	 * {@inheritDoc}
-	 * <hr>
-	 * <h2>{@link TurretProjectileEntity}</h2>
-	 * <br><br>
 	 * This method is called when the projectile hits an entity, handling the logic
 	 * for hitting, damaging, and if applicable, piercing the entity.
 	 * <br><br>
 	 * In this implementation, the method will handle the damage calculation, the
 	 * critical damage multiplier, the pierce behavior, and the fire behavior similar
 	 * to how the {@link PersistentProjectileEntity} handles it.
+	 * <br><br>
+	 * Furthermore, this implementation, the projectile will have the following behavior
+	 * (assuming the projectile is affected by armor points):
+	 * <table>
+	 * 	<tr>
+	 * 		<th>Armor Points</th>
+	 * 		<th>Pierce Level Reduction</th>
+	 * 		<th>Velocity Reduction</th>
+	 * 		<th>Base Damage Reduction</th>
+	 * 	</tr>
+	 * 	<tr>
+	 * 		<td>Heavy Armor</td>
+	 * 		<td>2</td>
+	 * 		<td>50%</td>
+	 * 		<td>50%</td>
+	 * 	</tr>
+	 * 	<tr>
+	 * 		<td>Light Armor</td>
+	 * 		<td>1</td>
+	 * 		<td>25%</td>
+	 * 		<td>20%</td>
+	 * 	</tr>
+	 * 	<tr>
+	 * 		<td>No Armor</td>
+	 * 		<td>N/A</td>
+	 * 		<td>12.5%</td>
+	 * 		<td>5%</td>
+	 * 	</tr>
+	 * </table>
 	 *
 	 * @param entityHitResult {@inheritDoc EntityHitResult}
 	 */
@@ -242,6 +267,54 @@ public abstract class TurretProjectileEntity extends ProjectileEntity implements
 				}
 
 				this.discard();
+			}
+		}
+
+		// Proceeds to modify some data if, and only if the pierce level is greater than 0
+		// Handles the piercing, velocity, and damage reduction behaviors
+		if (this.getPierceLevel() > 0) {
+			Entity ent = entityHitResult.getEntity();
+			LivingEntity entity = ent instanceof LivingEntity livingEntity ? livingEntity : null;
+			ArmorType armorType = ArmorType.getArmorType(entity);
+
+			// If armor affects piercing...
+			if (this.armorAffectsPiercing()) {
+				byte reduction = 0;
+
+				switch (armorType) {
+					case HEAVY -> reduction = 2;
+					case LIGHT -> reduction = 1;
+				}
+
+				this.setPierceLevel((byte) (this.getPierceLevel() - reduction));
+			}
+
+			// If armor affects velocity...
+			if (this.armorAffectsVelocity()) {
+				double reduction = 0.125;
+
+				switch (armorType) {
+					case HEAVY -> reduction = 0.5;
+					case LIGHT -> reduction = 0.25;
+				}
+
+				this.addVelocity(
+					this.getVelocity()
+						.multiply(reduction)
+						.negate()
+				);
+			}
+
+			// If armor affects damage...
+			if (this.armorAffectsDamage()) {
+				double reduction = 0.05;
+
+				switch (armorType) {
+					case HEAVY -> reduction = 0.5;
+					case LIGHT -> reduction = 0.25;
+				}
+
+				this.setDamage(this.getDamage() * (1 - reduction));
 			}
 		}
 	}
@@ -759,6 +832,33 @@ public abstract class TurretProjectileEntity extends ProjectileEntity implements
 		this.dataTracker.set(PIERCE_LEVEL, level);
 	}
 
+	/**
+	 * An overridable method that determines whether an armor point affects the
+	 * piercing of the projectile.
+	 *
+	 * @return {@code true} if the armor point affects the piercing of the projectile,
+	 * {@code false} otherwise.
+	 */
+	public abstract boolean armorAffectsPiercing();
+
+	/**
+	 * An overridable method that determines whether an armor point affects the
+	 * speed of the projectile.
+	 *
+	 * @return {@code true} if the armor point affects the piercing of the projectile,
+	 * {@code false} otherwise.
+	 */
+	public abstract boolean armorAffectsVelocity();
+
+	/**
+	 * An overridable method that determines whether an armor point affects the
+	 * damage dealt by the projectile.
+	 *
+	 * @return {@code true} if the armor point affects the piercing of the projectile,
+	 * {@code false} otherwise.
+	 */
+	public abstract boolean armorAffectsDamage();
+
 	private void setProjectileFlag(int index, boolean flag) {
 		byte projectileFlags = this.dataTracker.get(PROJECTILE_FLAGS);
 		if (flag) {
@@ -826,6 +926,48 @@ public abstract class TurretProjectileEntity extends ProjectileEntity implements
 			}
 
 			return values()[ordinal];
+		}
+	}
+
+	/**
+	 * An enumeration that defines the type of armor the entity has based on
+	 * the amount of armor points they have.
+	 */
+	public enum ArmorType {
+		/** Entity is categorized as {@code HEAVY} if the entity has more than 15 armor points. */
+		HEAVY,
+		/**
+		 * Entity is categorized as {@code LIGHT} if the entity has less than or equal to 15 armor
+		 * points, but more than 0 armor points.
+		 */
+		LIGHT,
+		/** Entity is categorized as {@code NONE} if the entity has 0 armor points. */
+		NONE;
+
+		/**
+		 * Identifies what kind of armor type the entity has based on the amount of armor points
+		 * the entity has.
+		 *
+		 * @param entity the entity to check
+		 * @return the armor type of the entity
+		 */
+		public static ArmorType getArmorType(LivingEntity entity) {
+			ArmorType toRet = NONE;
+			if (entity == null) {
+				return toRet;
+			}
+
+			// For reference, the max armor points is 30.
+			int armor = entity.getArmor();
+
+			if (armor > 15) {
+				toRet = HEAVY;
+			}
+			else if (armor <= 15 && armor > 0) {
+				toRet = LIGHT;
+			}
+
+			return toRet;
 		}
 	}
 }

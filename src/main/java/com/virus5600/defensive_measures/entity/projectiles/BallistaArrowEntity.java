@@ -15,6 +15,22 @@ import com.virus5600.defensive_measures.entity.ModEntities;
 
 import java.util.Map;
 
+/**
+ * BallistaArrowEntity
+ *
+ * <p>Represents a ballista arrow projectile entity that pierces through multiple entities.</p>
+ * <p>
+ *     The ballista arrow is a {@link KineticProjectileEntity kinetic projectile}
+ *     that is fired from a {@link com.virus5600.defensive_measures.entity.turrets.BallistaTurretEntity ballista turret}.
+ * </p>
+ * <p>
+ *     This projectile can pierce through multiple entities, dealing 4 hearts of damage to each
+ *     entity it hits. The arrow can pierce through a maximum of 5 entities before it is destroyed.
+ *     And everytime it pierces through an entity, it will reduce its pierce level its speed
+ *     depending on the armor of the entity it hit.
+ * </p>
+ * To see how the reduction mechanics work, check {@link KineticProjectileEntity}.
+ */
 public class BallistaArrowEntity extends KineticProjectileEntity {
 	private static final Map<String, RawAnimation> ANIMATIONS;
 

@@ -203,9 +203,9 @@ public class CannonballEntity extends ExplosiveProjectileEntity implements GeoEn
 		super.tick();
 	}
 
-	/////////////////////////////////
-	/// INTERFACE IMPLEMENTATIONS ///
-	/////////////////////////////////
+	// ///////////////////////// //
+	// INTERFACE IMPLEMENTATIONS //
+	// ///////////////////////// //
 
 	// GeoEntity //
 	@Override

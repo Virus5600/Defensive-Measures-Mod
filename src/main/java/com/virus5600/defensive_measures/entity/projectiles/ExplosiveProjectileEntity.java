@@ -28,6 +28,20 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * {@code ExplosiveProjectileEntity} is an abstract class that extends {@link TurretProjectileEntity}.
+ * This class is used to represent a projectile entity that explodes on impact, dealing damage to
+ * entities within a certain radius. This class is used to represent explosive projectiles, such as
+ * cannonballs, missiles, and other similar projectiles.
+ * <br><br>
+ * By default, the explosive projectile entity has the following behavior:
+ * <ul>
+ *     <li>Armor points affect the piercing of the projectile.</li>
+ *     <li>Armor points do not affect the speed of the projectile.</li>
+ *     <li>Armor points do not affect the base damage dealt by the projectile.</li>
+ *     <li>Base damage is set to 5.</li>
+ * </ul>
+ */
 public abstract class ExplosiveProjectileEntity extends TurretProjectileEntity {
 	protected ParticleEffect particleTrail;
 	public double accelerationPower = 0.1;
@@ -441,5 +455,25 @@ public abstract class ExplosiveProjectileEntity extends TurretProjectileEntity {
 		super.onSpawnPacket(packet);
 		Vec3d vec3d = new Vec3d(packet.getVelocityX(), packet.getVelocityY(), packet.getVelocityZ());
 		this.setVelocity(vec3d);
+	}
+
+	// //////////////////////// //
+	// INTERFACE IMPLEMENTATION //
+	// //////////////////////// //
+
+	// PUBLIC
+	@Override
+	public boolean armorAffectsPiercing() {
+		return true;
+	}
+
+	@Override
+	public boolean armorAffectsVelocity() {
+		return false;
+	}
+
+	@Override
+	public boolean armorAffectsDamage() {
+		return false;
 	}
 }
