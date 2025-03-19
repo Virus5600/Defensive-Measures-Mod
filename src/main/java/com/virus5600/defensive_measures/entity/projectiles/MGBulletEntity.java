@@ -12,7 +12,7 @@ import software.bernie.geckolib.util.GeckoLibUtil;
 
 import com.virus5600.defensive_measures.entity.ModEntities;
 
-public class MGBulletEntity extends TurretProjectileEntity {
+public class MGBulletEntity extends KineticProjectileEntity {
 	private final AnimatableInstanceCache geoCache = GeckoLibUtil.createInstanceCache(this);
 
 	////////////////////
