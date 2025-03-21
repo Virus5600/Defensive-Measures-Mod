@@ -44,9 +44,6 @@ loom {
 			progArgs += ["--uuid", "${userUUID}".toString()]
 		}
 
-		println("Using username: ${username}")
-		println("Using UUID: ${userUUID}")
-		println("Program Args: ${progArgs}")
 		runs {
 			client {
 				programArgs(progArgs)

@@ -1,0 +1,14 @@
+{
+	"format_version": "1.8.0",
+	"animations": {
+		"animation.mg_bullet.idle": {
+			"loop": true,
+			"bones": {
+				"arrow": {
+					"rotation": ["this", "this", "this"]
+				}
+			}
+		}
+	},
+	"geckolib_format_version": 2
+}

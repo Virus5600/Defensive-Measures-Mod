@@ -9,6 +9,13 @@ import software.bernie.geckolib.renderer.GeoEntityRenderer;
 import com.virus5600.defensive_measures.entity.projectiles.CannonballEntity;
 import com.virus5600.defensive_measures.model.projectiles.CannonballModel;
 
+/**
+ * The renderer for the {@link CannonballEntity}.
+ *
+ * @since 1.0.0
+ * @author <a href="https://github.com/Virus5600">Virus5600</a>
+ * @version 1.0.0
+ */
 @Environment(EnvType.CLIENT)
 public class CannonballRenderer extends GeoEntityRenderer<CannonballEntity> {
 	public CannonballRenderer(Context ctx) {

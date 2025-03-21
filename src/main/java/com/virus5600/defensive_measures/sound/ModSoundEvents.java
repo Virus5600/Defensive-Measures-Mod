@@ -7,6 +7,18 @@ import net.minecraft.registry.Registry;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.util.Identifier;
 
+/**
+ * Class that holds all the sound events for the mod. This is used to
+ * register the sound events that will be used by the mod.
+ * <br><br>
+ * The custom sounds themselves are registered and stored in this
+ * class as static final fields. The sound events are registered
+ * in the {@link #registerSoundEvent(String)} method.
+ *
+ * @since 1.0.0
+ * @author <a href="https://github.com/Virus5600">Virus5600</a>
+ * @version 1.0.0
+ */
 public class ModSoundEvents {
 
 	// V1.0

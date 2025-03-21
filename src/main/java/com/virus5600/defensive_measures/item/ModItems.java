@@ -23,9 +23,14 @@ import java.util.Arrays;
 
 /**
  * A class that contains all the items in the mod.
+ * <br><br>
  * This class is used to register all the items in the mod, from turrets, to equipments, to traps, block items,
  * ingredients, etc. This class is also used to register the items to their respective item groups to categorize
  * them in the creative inventory.
+ *
+ * @since 1.0.0
+ * @author <a href="https://github.com/Virus5600">Virus5600</a>
+ * @version 1.0.0
  */
 public class ModItems {
 	public final static Item[] DM_ITEMS;

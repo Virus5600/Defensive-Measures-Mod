@@ -2,21 +2,23 @@ package com.virus5600.defensive_measures.entity.projectiles;
 
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.data.DataTracker.Builder;
+import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.world.World;
 
+import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.animation.AnimatableManager.ControllerRegistrar;
 import software.bernie.geckolib.animation.AnimationController;
 import software.bernie.geckolib.animation.AnimationState;
 import software.bernie.geckolib.animation.PlayState;
 import software.bernie.geckolib.animation.RawAnimation;
+import software.bernie.geckolib.util.GeckoLibUtil;
 
 import com.virus5600.defensive_measures.entity.ModEntities;
 
 import java.util.Map;
 
 /**
- * BallistaArrowEntity
+ * The projectile used by {@link com.virus5600.defensive_measures.entity.turrets.BallistaTurretEntity Ballista Turret}.
  *
  * <p>Represents a ballista arrow projectile entity that pierces through multiple entities.</p>
  * <p>
@@ -29,10 +31,22 @@ import java.util.Map;
  *     And everytime it pierces through an entity, it will reduce its pierce level its speed
  *     depending on the armor of the entity it hit.
  * </p>
- * To see how the reduction mechanics work, check {@link KineticProjectileEntity}.
+ * <p>
+ * 		To see how the reduction mechanics work, check {@link TurretProjectileEntity#onEntityHit(EntityHitResult)} method.
+ * </p>
+ *
+ * @see KineticProjectileEntity
+ * @see TurretProjectileEntity
+ * @see TurretProjectileEntity#onEntityHit(EntityHitResult)
+ *
+ * @since 1.0.0
+ * @author <a href="https://github.com/Virus5600">Virus5600</a>
+ * @version 1.0.0
  */
 public class BallistaArrowEntity extends KineticProjectileEntity {
 	private static final Map<String, RawAnimation> ANIMATIONS;
+
+	private final AnimatableInstanceCache geoCache = GeckoLibUtil.createInstanceCache(this);
 
 	// ////////////// //
 	//  CONSTRUCTORS  //
@@ -64,23 +78,18 @@ public class BallistaArrowEntity extends KineticProjectileEntity {
 		this.setVelocity(directionX, directionY, directionZ);
 	}
 
-	///////////////
-	/// METHODS ///
-	///////////////
-	// PROTECTED
-	@Override
-	protected void initDataTracker(Builder builder) {
-		super.initDataTracker(builder);
-	}
-
+	// ///////// //
+	//  METHODS  //
+	// ///////// //
+	// PUBLIC
 	@Override
 	public byte getMaxPierceLevel() {
 		return 5;
 	}
 
-	///////////////////////////
+	// ///////////////////// //
 	// ANIMATION CONTROLLERS //
-	///////////////////////////
+	// ///////////////////// //
 
 	private <E extends BallistaArrowEntity>PlayState idleController(final AnimationState<E> event) {
 		return event.setAndContinue(ANIMATIONS.get("Idle"));
@@ -94,9 +103,9 @@ public class BallistaArrowEntity extends KineticProjectileEntity {
 		return event.setAndContinue(ANIMATIONS.get("OnAir"));
 	}
 
-	/////////////////////////////////
-	/// INTERFACE IMPLEMENTATIONS ///
-	/////////////////////////////////
+	// /////////////////////////// //
+	//  INTERFACE IMPLEMENTATIONS  //
+	// /////////////////////////// //
 
 	// GeoEntity //
 	@Override
@@ -107,9 +116,14 @@ public class BallistaArrowEntity extends KineticProjectileEntity {
 		);
 	}
 
-	///////////////////////
+	@Override
+	public AnimatableInstanceCache getAnimatableInstanceCache() {
+		return this.geoCache;
+	}
+
+	// ///////////////// //
 	// STATIC INITIALIZE //
-	///////////////////////
+	// ///////////////// //
 
 	static {
 		ANIMATIONS = Map.of(

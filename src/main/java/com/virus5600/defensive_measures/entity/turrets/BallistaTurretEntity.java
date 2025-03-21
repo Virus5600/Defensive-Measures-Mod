@@ -40,6 +40,30 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Represents the Ballista Turret entity.
+ * <br><br>
+ * A Ballista Turret is a wooden turret that shoots bolts at enemies. It has a long range and deals
+ * a good amount of damage while providing a good amount of pierce level and fire rate.
+ * <hr/>
+ * <b>Attributes:</b>
+ * <ul>
+ *     <li><b>Health:</b> 25</li>
+ *     <li><b>Base Damage:</b> 4.0</li>
+ *     <li><b>Base Pierce Level:</b> 5</li>
+ *     <li><b>Attack Cooldown:</b> 2.5 seconds</li>
+ *     <li><b>Attack Range:</b> 16 blocks</li>
+ *     <li><b>X Firing Arc:</b> ±360°</li>
+ *     <li><b>Y Firing Arc:</b> ±25°</li>
+ * </ul>
+ *
+ * @see TurretEntity
+ * @see GeoEntity
+ *
+ * @since 1.0.0
+ * @author <a href="https://github.com/Virus5600">Virus5600</a>
+ * @version 1.0.0
+ */
 public class BallistaTurretEntity extends TurretEntity implements GeoEntity {
 	/**
 	 * Defines how many seconds the cannon should wait before shooting again.
@@ -65,9 +89,9 @@ public class BallistaTurretEntity extends TurretEntity implements GeoEntity {
 	private final AnimatableInstanceCache geoCache = GeckoLibUtil.createInstanceCache(this);
 	private boolean animPlayed = false;
 
-	//////////////////
+	// //////////// //
 	// CONSTRUCTORS //
-	//////////////////
+	// //////////// //
 	public BallistaTurretEntity(EntityType<? extends MobEntity> entityType, World world) {
 		super(entityType, world, TurretMaterial.WOOD, ModEntities.BALLISTA_ARROW, ModItems.BALLISTA_TURRET);
 
@@ -77,9 +101,9 @@ public class BallistaTurretEntity extends TurretEntity implements GeoEntity {
 		this.addEffectSource(effectSource);
 	}
 
-	//////////////////
+	// //////////// //
 	// INITIALIZERS //
-	//////////////////
+	// //////////// //
 	@Override
 	protected void initGoals() {
 		// Goal instances
@@ -230,16 +254,16 @@ public class BallistaTurretEntity extends TurretEntity implements GeoEntity {
 		return BallistaTurretEntity.PIERCE_LEVELS[this.getLevel() - 1];
 	}
 
-	/////////////////////////
+	// /////////////////// //
 	// LOCAL CLASSES/ENUMS //
-	/////////////////////////
+	// /////////////////// //
 	public enum Offsets {
 		BOLT_HOLDER
 	}
 
-	///////////////////////
+	// ///////////////// //
 	// STATIC INITIALIZE //
-	///////////////////////
+	// ///////////////// //
 
 	static {
 		DAMAGE = new double[] {

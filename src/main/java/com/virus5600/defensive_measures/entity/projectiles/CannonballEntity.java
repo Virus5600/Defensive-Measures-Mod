@@ -24,7 +24,7 @@ import software.bernie.geckolib.util.GeckoLibUtil;
 import com.virus5600.defensive_measures.entity.ModEntities;
 
 /**
- * CannonballEntity
+ * The projectile used by {@link com.virus5600.defensive_measures.entity.turrets.CannonTurretEntity Cannon Turret}.
  *
  * <p>Represents a cannonball projectile entity that explodes on impact.</p>
  * <p>
@@ -61,13 +61,19 @@ import com.virus5600.defensive_measures.entity.ModEntities;
  *
  * <p>And if you want to test it, you can use the Desmos graph created by me:</p>
  * <a href="https://www.desmos.com/calculator/pdm27kw9oe">Reduction Damage Graph</a>
+ *
+ * @see ExplosiveProjectileEntity
+ *
+ * @since 1.0.0
+ * @author <a href="https://github.com/Virus5600">Virus5600</a>
+ * @version 1.0.0
  */
 public class CannonballEntity extends ExplosiveProjectileEntity implements GeoEntity {
 	private final AnimatableInstanceCache geoCache = GeckoLibUtil.createInstanceCache(this);
 
-	////////////////////
-	/// CONSTRUCTORS ///
-	////////////////////
+	// ////////////// //
+	//  CONSTRUCTORS  //
+	// ////////////// //
 	public CannonballEntity(EntityType<? extends ExplosiveProjectileEntity> entityType, World world) {
 		super(entityType, world);
 		this.setFireTicks(0);
@@ -87,9 +93,10 @@ public class CannonballEntity extends ExplosiveProjectileEntity implements GeoEn
 		this.setVelocity(directionX, directionY, directionZ);
 	}
 
-	///////////////
-	/// METHODS ///
-	///////////////
+	// ///////// //
+	//  METHODS  //
+	// ///////// //
+
 	// PROTECTED
 	@Override
 	protected void onBlockHit(BlockHitResult blockHitResult) {
@@ -129,12 +136,12 @@ public class CannonballEntity extends ExplosiveProjectileEntity implements GeoEn
 		return 0.0625;
 	}
 
+	// PUBLIC
 	@Override
 	public SoundEvent getHitSound() {
 		return SoundEvents.ENTITY_GENERIC_EXPLODE.value();
 	}
 
-	// PUBLIC
 	private double radius = 0;
 	public void doDamage() {
 		// Create damage source

@@ -34,6 +34,10 @@ import org.jetbrains.annotations.Nullable;
  * @see BaseTurretModel
  * @see BaseProjectileModel
  * @see software.bernie.geckolib.model.GeoModel
+ *
+ * @since 1.0.0
+ * @author <a href="https://github.com/Virus5600">Virus5600</a>
+ * @version 1.0.0
  */
 @Environment(EnvType.CLIENT)
 public class BaseModel<T extends Entity & GeoAnimatable> extends GeoModel<T> {

@@ -9,11 +9,10 @@
 		"Virus5600"
 	],
 	"contact": {
-		"homepage": "https://dma-guide.herokuapp.com/",
 		"sources": "https://github.com/Virus5600/Defensive-Measures-Mod"
 	},
 
-	"license": "CC0-1.0",
+	"license": "MIT",
 	"icon": "assets/dm/icon.png",
 
 	"environment": "*",
@@ -26,11 +25,11 @@
 		]
 	},
 	"depends": {
-		"fabricloader": ">=0.15.11",
-		"minecraft": "~1.21",
+		"fabricloader": ">=0.16.10",
+		"minecraft": "~1.21.4",
 		"java": ">=21",
-		"fabric-api": "*",
-		"geckolib": ">=4.5.5"
+		"fabric-api": ">=0.119.0+1.21.4",
+		"geckolib": ">=4.8.4"
 	},
 	"suggests": {
 		"another-mod": "*"

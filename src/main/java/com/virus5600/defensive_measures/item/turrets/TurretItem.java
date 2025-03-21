@@ -37,6 +37,26 @@ import net.minecraft.world.event.GameEvent;
 
 import org.jetbrains.annotations.Nullable;
 
+/**
+ * {@code TurretItem} is an abstract class that acts nearly akin
+ * to {@link SpawnEggItem} but for turrets.
+ * <br><br>
+ * The purpose of this class is to provide a common base for all
+ * placeable turret items, which are used to spawn turrets in the
+ * world.
+ * <br><br>
+ * This class is abstract and should be extended by all turret items.
+ * <br><br>
+ * For creating a regular item, use {@link Item} instead.
+ *
+ * @see Item
+ * @see SpawnEggItem
+ * @see com.virus5600.defensive_measures.entity.ModEntities ModEntities
+ *
+ * @since 1.0.0
+ * @author <a href="https://github.com/Virus5600">Virus5600</a>
+ * @version 1.0.0
+ */
 public abstract class TurretItem extends Item {
 	protected final EntityType<?> type;
 	private static final Map<EntityType<? extends MobEntity>, TurretItem> TURRETS = new HashMap<>();

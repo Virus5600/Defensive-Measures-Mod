@@ -23,9 +23,11 @@
 	<img src="https://cf.way2muchnoise.eu/versions/700629.svg" alt="CurseForge Versions">&nbsp;&nbsp;&nbsp;&nbsp;
 </div>
 
+<br>
 <div align="center" style="text-align: center">
 	<img src="https://raw.githubusercontent.com/Virus5600/Defensive-Measures-Mod/refs/heads/main/Defensive%20Measures%20Add-On%20Banner.png" alt="Defensive Measures Banner" width="100%">
 </div>
+<br>
 
 <div align="center" style="text-align: center">
 	<a href="https://fabricmc.net/">

@@ -17,6 +17,12 @@ import com.virus5600.defensive_measures.particle.ModParticles;
  * when it fires.
  * The particle shots out in a cone shape and fades out over time. The direction is
  * determined by the direction the turret is facing.
+ *
+ * @see CustomEmitter
+ *
+ * @since 1.0.0
+ * @author <a href="https://github.com/Virus5600">Virus5600</a>
+ * @version 1.0.0
  */
 @Environment(EnvType.CLIENT)
 public class CannonFlash extends CustomEmitter {

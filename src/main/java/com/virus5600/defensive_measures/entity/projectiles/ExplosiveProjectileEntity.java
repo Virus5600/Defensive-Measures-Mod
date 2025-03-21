@@ -41,6 +41,27 @@ import java.util.List;
  *     <li>Armor points do not affect the base damage dealt by the projectile.</li>
  *     <li>Base damage is set to 5.</li>
  * </ul>
+ * <hr/>
+ * <h2>Damage Mechanics</h2>
+ * The mechanics of applying damage to an entity is different from the way how
+ * vanilla minecraft explosion deals. The main differences was that the vanilla {@link net.minecraft.entity.projectile.ExplosiveProjectileEntity ExplosiveProjectileEntity}
+ * deals the full damage outright to all entities within the effective radius, while this
+ * custom implementation deals the full damage to entities within the effective radius while
+ * those within the max radius and outside the effective radius will receive exponential reduced
+ * damage based on the distance from the effective radius.
+ * <br><br>
+ * The formula used to calculate the exponential reduced damage could be seen in
+ * {@link #doDamage() doDamage} method. And to help the developers or anyone exploring this
+ * mod's source code, a Desmos graphing calculator was created to visualize the reduced damage
+ * per iterations. The graphing calculator could be found at <a href="https://www.desmos.com/calculator/pdm27kw9oe">this link</a>.
+ *
+ * @see TurretProjectileEntity
+ * @see KineticProjectileEntity
+ *
+ * @see #doDamage()
+ *
+ * @author <a href="https://github.com/Virus5600">Virus5600</a>
+ * @since 1.0.0
  */
 public abstract class ExplosiveProjectileEntity extends TurretProjectileEntity {
 	protected ParticleEffect particleTrail;
@@ -116,6 +137,35 @@ public abstract class ExplosiveProjectileEntity extends TurretProjectileEntity {
 	}
 
 	private double radius = 0;
+	/**
+	 * Applies damage to the surrounding entity.
+	 * <br><br>
+	 * The damage is applied in two stages:
+	 * <ol>
+	 *     <li>Entities within the {@link #getEffectiveRadius() effective radius} will receive the full {@link #getDamage() base damage}.</li>
+	 *     <li>Entities outside the effective radius but within the {@link #getMaxDamageRadius() max radius} will receive reduced damage based on the {@link #getDamageReduction() damage reduction} multiplier.</li>
+	 * </ol>
+	 * <hr>
+	 * <h2>Damage Calculation</h2>
+	 * The full damage is not calculated as it is applied directly to all the entities
+	 * within the {@link #getEffectiveRadius() effective radius}. However, the reduced
+	 * damage is calculated as follows:
+	 * <pre><code>
+	 * normalizedRadius = (radius - effectiveRadius) / (maxDmgRadius - effectiveRadius)
+	 * formula = (e^(-dmgReduction * normalizedRadius) - e^(-dmgReduction)) / (1 - e^(-dmgReduction))
+	 * dmg = baseDmg * formula
+	 * </code></pre>
+	 * Wherein:
+	 * <br>
+	 * <ul>
+	 *     <li>{@code effectiveRadius <= radius <= maxRadius}</li>
+	 *     <li>{@code 0.0 <= dmgReduction <= 1.0}</li>
+	 *     <li>{@code baseDmg} is the base damage dealt by the explosion.</li>
+	 *     <li>{@code normalizedRadius} is the normalized radius of the entity from the effective radius.</li>
+	 *     <li>{@code formula} is the formula used to calculate the reduced damage.</li>
+	 *     <li>{@code dmg} is the reduced damage dealt to the entity.</li>
+	 * </ul>
+	 */
 	public void doDamage() {
 		// Create the damage source
 		DamageSource dmgSrc = this.getDamageSources().explosion(
@@ -326,11 +376,6 @@ public abstract class ExplosiveProjectileEntity extends TurretProjectileEntity {
 	@Override
 	protected float getDragInWater() {
 		return 0.8F;
-	}
-
-	@Override
-	public float getBrightnessAtEyes() {
-		return 1.0F;
 	}
 
 	protected boolean isBurning() {

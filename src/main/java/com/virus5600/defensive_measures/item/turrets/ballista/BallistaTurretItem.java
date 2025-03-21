@@ -16,6 +16,13 @@ import com.virus5600.defensive_measures.item.turrets.TurretItem;
 import java.lang.reflect.Type;
 import java.util.List;
 
+/**
+ * The item that spawns the {@link BallistaTurretEntity Ballista Turret}.
+ *
+ * @since 1.0.0
+ * @author <a href="https://github.com/Virus5600">Virus5600</a>
+ * @version 1.0.0
+ */
 public class BallistaTurretItem extends TurretItem {
 	public BallistaTurretItem(EntityType<? extends MobEntity> type, Settings settings) {
 		super(

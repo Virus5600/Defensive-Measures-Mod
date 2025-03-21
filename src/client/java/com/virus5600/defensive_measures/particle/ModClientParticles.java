@@ -9,6 +9,15 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.particle.v1.ParticleFactoryRegistry;
 
+/**
+ * Client-side particle registration.
+ * <br><br>
+ * All custom particles are registered here, even if they are not used by the client.
+ *
+ * @since 1.0.0
+ * @author <a href="https://github.com/Virus5600">Virus5600</a>
+ * @version 1.0.0
+ */
 @Environment(EnvType.CLIENT)
 public class ModClientParticles {
 	public static void registerParticles() {

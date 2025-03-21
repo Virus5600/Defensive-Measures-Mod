@@ -24,6 +24,12 @@ import java.util.Optional;
  * of the turret.
  *
  * @param <T> A turret entity that extends {@link TurretEntity} and implements {@link GeoAnimatable}
+ *
+ * @see BaseModel
+ *
+ * @since 1.0.0
+ * @author <a href="https://github.com/Virus5600">Virus5600</a>
+ * @version 1.0.0
  */
 @Environment(EnvType.CLIENT)
 public class BaseTurretModel<T extends TurretEntity & GeoAnimatable> extends BaseModel<T> {
@@ -43,9 +49,9 @@ public class BaseTurretModel<T extends TurretEntity & GeoAnimatable> extends Bas
 	 */
 	private final String head;
 
-	/// //////////// ///
-	/// CONSTRUCTORS ///
-	/// //////////// ///
+	// //////////// //
+	// CONSTRUCTORS //
+	// //////////// //
 	/**
 	 * Constructs a new {@link BaseTurretModel} with the specified model path,
 	 * texture path, and animation path. These paths will be used by this model
@@ -103,9 +109,9 @@ public class BaseTurretModel<T extends TurretEntity & GeoAnimatable> extends Bas
 		this.head = boneHead;
 	}
 
-	/// ////////////// ///
-	/// CUSTOM METHODS ///
-	/// ////////////// ///
+	// ////////////// //
+	// CUSTOM METHODS //
+	// ////////////// //
 
 	/**
 	 * Sets the pitch rotation of the head.
@@ -165,9 +171,9 @@ public class BaseTurretModel<T extends TurretEntity & GeoAnimatable> extends Bas
 		return targetYRot;
 	}
 
-	/////////////////////////
-	/// INTERFACE METHODS ///
-	/////////////////////////
+	// /////////////////// //
+	//  INTERFACE METHODS  //
+	// /////////////////// //
 
 	@Override
 	public void setCustomAnimations(T animatable, long instanceId, AnimationState<T> state) {

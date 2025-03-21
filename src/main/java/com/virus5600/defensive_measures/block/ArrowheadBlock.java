@@ -16,11 +16,32 @@ import net.minecraft.world.World;
 import com.virus5600.defensive_measures.entity.damage.ModDamageSources;
 import com.virus5600.defensive_measures.entity.damage.ModDamageTypes;
 
+/**
+ * Arrowhead blocks are blocks that deal damage to entities that step on them.
+ * <br><br>
+ * Similar to how magma blocks deal damage to entities that step on them,
+ * arrowhead blocks deal damage to entities that step on them. This, however,
+ * does not discriminate against sneaking entities, meaning that sneaking
+ * entities will still take damage from arrowhead blocks unlike magma blocks.
+ * <br><br>
+ * Arrowhead blocks deal 2 damage to entities that step on them. This could
+ * be changed by any subclass of this block by simply changing the value of
+ * the {@link #damageDealt} field.
+ *
+ * @since 1.0.0
+ * @author <a href="https://github.com/Virus5600">Virus5600</a>
+ * @version 1.0.0
+ */
 public class ArrowheadBlock extends Block {
 	private static final VoxelShape BOTTOM;
 	private static final VoxelShape MIDDLE;
 	private static final VoxelShape TOP;
 	private static final VoxelShape SHAPE;
+
+	/**
+	 * Defines the amount of damage that the arrowhead block will deal to entities.
+	 */
+	protected int damageDealt = 2;
 
 	public ArrowheadBlock(Settings settings) {
 		super(settings);
@@ -40,7 +61,7 @@ public class ArrowheadBlock extends Block {
 		if (entity instanceof LivingEntity livingEntity) {
 			if (world instanceof ServerWorld serverWorld) {
 				DamageSource dmgSrc = ModDamageSources.create(world, ModDamageTypes.ARROWHEAD);
-				livingEntity.damage(serverWorld, dmgSrc, 2);
+				livingEntity.damage(serverWorld, dmgSrc, this.damageDealt);
 			}
 		}
 

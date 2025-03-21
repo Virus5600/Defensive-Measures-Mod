@@ -16,6 +16,13 @@ import com.virus5600.defensive_measures.item.turrets.TurretItem;
 import java.lang.reflect.Type;
 import java.util.List;
 
+/**
+ * The item that spawns the {@link CannonTurretEntity Cannon Turret}.
+ *
+ * @since 1.0.0
+ * @author <a href="https://github.com/Virus5600">Virus5600</a>
+ * @version 1.0.0
+ */
 public class CannonTurretItem extends TurretItem {
 	public CannonTurretItem(EntityType<? extends MobEntity> type, Settings settings) {
 		super(

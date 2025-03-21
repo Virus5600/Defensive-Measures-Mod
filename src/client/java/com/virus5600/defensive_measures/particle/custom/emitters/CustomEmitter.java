@@ -19,7 +19,10 @@ import java.util.function.Function;
  * allowing a flexible way to create emitter particles.
  *
  * @see net.minecraft.client.particle.NoRenderParticle NoRenderParticle
+ *
+ * @since 1.0.0
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
+ * @version 1.0.0
  */
 public class CustomEmitter extends NoRenderParticle {
 	// PRIVATE FIELDS

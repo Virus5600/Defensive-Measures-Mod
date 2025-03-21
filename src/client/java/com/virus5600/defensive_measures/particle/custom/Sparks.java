@@ -11,11 +11,15 @@ import net.minecraft.particle.SimpleParticleType;
  * Defines the particles emitted by certain turrets that creates sparks when they
  * shoot. This particle is the base particle for some spark-based particles such
  * as the {@link CannonFlash Cannon Flash Emitter}.
+ *
+ * @since 1.0.0
+ * @author <a href="https://github.com/Virus5600">Virus5600</a>
+ * @version 1.0.0
  */
 @Environment(EnvType.CLIENT)
 public class Sparks extends SpriteBillboardParticle {
 
-	/// CONSTRUCTORS ///
+	// CONSTRUCTORS //
 	public Sparks(ClientWorld level, double x, double y, double z, SpriteProvider spriteSet, double xd, double yd, double zd) {
 		super(level, x, y, z, xd, yd, zd);
 

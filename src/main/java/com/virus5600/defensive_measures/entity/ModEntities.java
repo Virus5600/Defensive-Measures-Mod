@@ -12,6 +12,13 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EntityType.Builder;
 import net.minecraft.entity.SpawnGroup;
 
+/**
+ * Register and store all custom entities for the mod.
+ *
+ * @since 1.0.0
+ * @author <a href="https://github.com/Virus5600">Virus5600</a>
+ * @version 1.0.0
+ */
 public class ModEntities {
 	// TURRETS //
 	// v1.0.0

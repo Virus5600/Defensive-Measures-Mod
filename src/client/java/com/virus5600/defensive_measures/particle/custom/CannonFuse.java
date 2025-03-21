@@ -20,13 +20,17 @@ import com.virus5600.defensive_measures.particle.ModParticles;
  * when charging up to fire.
  * The particle is a small flame that fades out over time, emitting from the back
  * of the cannon.
+ *
+ * @since 1.0.0
+ * @author <a href="https://github.com/Virus5600">Virus5600</a>
+ * @version 1.0.0
  */
 @Environment(EnvType.CLIENT)
 public class CannonFuse extends SpriteBillboardParticle {
 	private final Vec3d source;
 	private final float maxParticleAge = 25;
 
-	/// CONSTRUCTORS ///
+	// CONSTRUCTORS //
 	protected CannonFuse(ClientWorld level, double x, double y, double z, SpriteProvider spriteSet, double xd, double yd, double zd) {
 		super(level, x, y, z, xd, yd, zd);
 

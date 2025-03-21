@@ -1851,7 +1851,7 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 				double vz = (v3d.getZ() - barrel.getZ()) * 1.0625;
 
 				this.lastTargetPos = v3d;
-				// TODO: Properly calculate the parabolic trajectory (low priority) - Apparently, it was because of the "acceleration" modifier in the "ExplosiveProjectileEntity" class. Fuck
+
 				// Parabolic Trajectory
 				if (this.isParabolic) {
 					double d3D = Math.sqrt(vx * vx + vy * vy + vz * vz);

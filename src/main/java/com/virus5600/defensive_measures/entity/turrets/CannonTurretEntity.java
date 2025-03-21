@@ -36,6 +36,31 @@ import com.virus5600.defensive_measures.item.ModItems;
 import com.virus5600.defensive_measures.particle.ModParticles;
 import com.virus5600.defensive_measures.sound.ModSoundEvents;
 
+/**
+ * Represents the Cannon Turret entity.
+ * <br><br>
+ * A Cannon Turret is a metal turret that shoots cannonballs at enemies. It has medium range and
+ * deals a good amount of damage while dealing a good amount of damage. Albeit the longer range and
+ * higher damage, the cannon turret has a longer cooldown compared to the other turrets, but with
+ * its AoE damage, it can deal with multiple enemies at once.
+ * <hr/>
+ * <b>Attributes:</b>
+ * <ul>
+ *     <li><b>Health:</b> 50</li>
+ *     <li><b>Base Damage:</b> 10.0</li>
+ *     <li><b>Base Pierce Level:</b> 0</li>
+ *     <li><b>Attack Cooldown:</b> 5 seconds</li>
+ *     <li><b>Attack Range:</b> 24 blocks</li>
+ *     <li><b>X Firing Arc:</b> ±360°</li>
+ *     <li><b>Y Firing Arc:</b> ±30°</li>
+ *     <li><b>Armor:</b> 3</li>
+ *     <li><b>Armor Toughness:</b> 2</li>
+ * </ul>
+ *
+ * @since 1.0.0
+ * @author <a href="https://github.com/Virus5600">Virus5600</a>
+ * @version 1.0.0
+ */
 public class CannonTurretEntity extends TurretEntity implements GeoEntity {
 	/**
 	 * Defines how many seconds the cannon should wait before shooting again.
@@ -58,9 +83,9 @@ public class CannonTurretEntity extends TurretEntity implements GeoEntity {
 	private boolean animPlayed = false;
 	private static final double[] DAMAGE;
 
-	//////////////////
+	// //////////// //
 	// CONSTRUCTORS //
-	//////////////////
+	// //////////// //
 	public CannonTurretEntity(EntityType<? extends MobEntity> entityType, World world) {
 		super(entityType, world, TurretMaterial.METAL, ModEntities.CANNONBALL, ModItems.CANNON_TURRET);
 
@@ -70,9 +95,9 @@ public class CannonTurretEntity extends TurretEntity implements GeoEntity {
 		this.addEffectSource(effectSource);
 	}
 
-	//////////////////
+	// //////////// //
 	// INITIALIZERS //
-	//////////////////
+	// //////////// //
 	@Override
 	protected void initGoals() {
 		// Goal instances
@@ -97,9 +122,9 @@ public class CannonTurretEntity extends TurretEntity implements GeoEntity {
 			.add(EntityAttributes.ARMOR_TOUGHNESS, 2);
 	}
 
-	/////////////////////
+	// /////////////// //
 	// PROCESS METHODS //
-	/////////////////////
+	// /////////////// //
 
 	@Override
 	public void shootAt(LivingEntity target, float pullProgress) {
@@ -130,9 +155,9 @@ public class CannonTurretEntity extends TurretEntity implements GeoEntity {
 
 	}
 
-	/////////////////////////
+	// /////////////////// //
 	// GETTERS AND SETTERS //
-	/////////////////////////
+	// /////////////////// //
 
 	@Override
 	public int getMaxLookPitchChange() {
@@ -166,9 +191,9 @@ public class CannonTurretEntity extends TurretEntity implements GeoEntity {
 		return 3f;
 	}
 
-	///////////////////////////
+	// ///////////////////// //
 	// ANIMATION CONTROLLERS //
-	///////////////////////////
+	// ///////////////////// //
 
 	private <E extends CannonTurretEntity>PlayState deathController(final AnimationState<E> event) {
 		if (!this.isAlive() && !this.animPlayed) {
@@ -216,9 +241,9 @@ public class CannonTurretEntity extends TurretEntity implements GeoEntity {
 		}
 	}
 
-	///////////////////////////////
+	// ///////////////////////// //
 	// INTERFACE IMPLEMENTATIONS //
-	///////////////////////////////
+	// ///////////////////////// //
 
 	// GeoEntity //
 	@Override
@@ -255,16 +280,16 @@ public class CannonTurretEntity extends TurretEntity implements GeoEntity {
 		return 0;
 	}
 
-	/////////////////////////
+	// /////////////////// //
 	// LOCAL CLASSES/ENUMS //
-	/////////////////////////
+	// /////////////////// //
 	public enum Offsets {
 		BARREL, FUSE
 	}
 
-	///////////////////////
+	// ///////////////// //
 	// STATIC INITIALIZE //
-	///////////////////////
+	// ///////////////// //
 
 	static {
 		DAMAGE = new double[] {

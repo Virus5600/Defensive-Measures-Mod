@@ -61,6 +61,10 @@ import com.virus5600.defensive_measures.entity.turrets.TurretEntity;
  * <br><br>
  * For a more basic projectile entity or one that can be shot by a player, use the {@link PersistentProjectileEntity}
  * class.
+ *
+ * @since 1.0.0
+ * @author <a href="https://github.com/Virus5600">Virus5600</a>
+ * @version 1.0.0
  */
 public abstract class TurretProjectileEntity extends ProjectileEntity implements GeoEntity {
 	protected static final TrackedData<Byte> PROJECTILE_FLAGS = DataTracker.registerData(TurretProjectileEntity.class, TrackedDataHandlerRegistry.BYTE);
@@ -240,39 +244,38 @@ public abstract class TurretProjectileEntity extends ProjectileEntity implements
 		}
 
 		// Handles the application of damage to the target
-		if (this.getWorld() instanceof ServerWorld) {
-			if (hitEntity.damage((ServerWorld) this.getWorld(), dmgSrc, (float) damageToDeal)) {
-				if (isEnderman) return;
+		if (this.getWorld() instanceof ServerWorld serverWorld) {
+			hitEntity.damage(serverWorld, dmgSrc, (float) damageToDeal);
 
-				if (hitEntity instanceof LivingEntity livingEntity) {
-					if (!this.getWorld().isClient() && this.getPierceLevel() <= 0) {
-						livingEntity.setStuckArrowCount(livingEntity.getStuckArrowCount() + 1);
-					}
+			if (isEnderman) return;
 
-					this.onHit(livingEntity);
+			if (hitEntity instanceof LivingEntity livingEntity) {
+				if (!this.getWorld().isClient() && this.getPierceLevel() <= 0) {
+					livingEntity.setStuckArrowCount(livingEntity.getStuckArrowCount() + 1);
 				}
 
-				this.playSound(this.sound , 1f, 1.2f / (this.random.nextFloat() * 0.2f + 0.9f));
-				if (this.getPierceLevel() <= 0) {
-					this.discard();
-				}
+				this.onHit(livingEntity);
 			}
-			else {
-				hitEntity.setFireTicks(fireTime);
-				this.deflect(ProjectileDeflection.SIMPLE, hitEntity, owner, false);
-				this.setVelocity(this.getVelocity().multiply(0.2));
 
-				if (this.getWorld() instanceof ServerWorld serverWorld && this.getVelocity().lengthSquared() < 1.0E-7) {
-					if (this.pickupType == PickupPermission.ALLOWED && this.stack != null) {
-						this.dropStack(serverWorld, this.asItemStack(), 0.1f);
-					}
-
-					this.discard();
-				}
+			this.playSound(this.sound , 1f, 1.2f / (this.random.nextFloat() * 0.2f + 0.9f));
+			if (this.getPierceLevel() <= 0) {
+				this.discard();
 			}
 		}
 		else {
 			hitEntity.clientDamage(dmgSrc);
+
+			hitEntity.setFireTicks(fireTime);
+			this.deflect(ProjectileDeflection.SIMPLE, hitEntity, owner, false);
+			this.setVelocity(this.getVelocity().multiply(0.2));
+
+			if (this.getWorld() instanceof ServerWorld serverWorld && this.getVelocity().lengthSquared() < 1.0E-7) {
+				if (this.pickupType == PickupPermission.ALLOWED && this.stack != null) {
+					this.dropStack(serverWorld, this.asItemStack(), 0.1f);
+				}
+
+				this.discard();
+			}
 		}
 
 		// Proceeds to modify some data if, and only if the pierce level is greater than 0
