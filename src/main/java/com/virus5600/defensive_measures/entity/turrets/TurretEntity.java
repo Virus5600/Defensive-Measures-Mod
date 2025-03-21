@@ -1452,7 +1452,7 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 
 			this.playSound(this.getShootSound(), 1.0f, 1.0f / (this.getRandom().nextFloat() * 0.4f + 0.8f));
 			this.getWorld().spawnEntity(projectile);
-			System.out.println("[" + projectile.getName().getString() + "] Gravity: " + projectile.getFinalGravity());
+//			System.out.println("[" + projectile.getName().getString() + "] Gravity: " + projectile.getFinalGravity());
 		} catch (IllegalArgumentException | SecurityException e) {
 			DefensiveMeasures.printErr(e);
 		}

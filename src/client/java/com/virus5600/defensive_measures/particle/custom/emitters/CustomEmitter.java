@@ -214,14 +214,14 @@ public class CustomEmitter extends NoRenderParticle {
 		// Default emitter code
 		else {
 			for (int i = 0; i < 16; i++) {
-				double d = this.random.nextFloat() * 2.0F - 1.0F;
-				double e = this.random.nextFloat() * 2.0F - 1.0F;
-				double f = this.random.nextFloat() * 2.0F - 1.0F;
-				if (!(d * d + e * e + f * f > 1.0) && this.entity != null) {
-					double g = this.entity.offsetX(d / 4.0);
-					double h = this.entity.getBodyY(0.5 + e / 4.0);
-					double j = this.entity.offsetZ(f / 4.0);
-					this.world.addParticle(this.particle, false, g, h, j, d, e + 0.2, f);
+				double xVel = this.random.nextFloat() * 2.0F - 1.0F;
+				double yVel = this.random.nextFloat() * 2.0F - 1.0F;
+				double zVel = this.random.nextFloat() * 2.0F - 1.0F;
+				if (!(xVel * xVel + yVel * yVel + zVel * zVel > 1.0) && this.entity != null) {
+					double xPos = this.entity.getBodyX(xVel / 4.0);
+					double yPos = this.entity.getBodyY(0.5 + yVel / 4.0);
+					double zPos = this.entity.getBodyZ(zVel / 4.0);
+					this.world.addParticle(this.particle, xPos, yPos, zPos, xVel, yVel + 0.2, zVel);
 				}
 			}
 		}

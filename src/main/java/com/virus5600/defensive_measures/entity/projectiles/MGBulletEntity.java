@@ -2,7 +2,6 @@ package com.virus5600.defensive_measures.entity.projectiles;
 
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.data.DataTracker.Builder;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 
@@ -15,9 +14,9 @@ import com.virus5600.defensive_measures.entity.ModEntities;
 public class MGBulletEntity extends KineticProjectileEntity {
 	private final AnimatableInstanceCache geoCache = GeckoLibUtil.createInstanceCache(this);
 
-	////////////////////
-	/// CONSTRUCTORS ///
-	////////////////////
+	// ////////////// //
+	//  CONSTRUCTORS  //
+	// ////////////// //
 	public MGBulletEntity(
 		EntityType<? extends TurretProjectileEntity> entityType,
 		World world
@@ -28,6 +27,8 @@ public class MGBulletEntity extends KineticProjectileEntity {
 	public MGBulletEntity(World world, LivingEntity owner) {
 		this(ModEntities.MG_BULLET, world);
 		this.setOwner(owner);
+
+		this.setPierceLevel((byte) 5);
 	}
 
 	public MGBulletEntity(
@@ -41,15 +42,9 @@ public class MGBulletEntity extends KineticProjectileEntity {
 		this.setVelocity(velocityX, velocityY, velocityZ);
 	}
 
-	///////////////
-	/// METHODS ///
-	///////////////
-	@Override
-	protected void initDataTracker(Builder builder) {
-		super.initDataTracker(builder);
-
-		builder.add(PIERCE_LEVEL, (byte) 5);
-	}
+	// ///////// //
+	//  METHODS  //
+	// ///////// //
 
 	protected final void setPierceLevel(byte pierceLevel) {
 		this.dataTracker.set(PIERCE_LEVEL, pierceLevel);
@@ -64,13 +59,14 @@ public class MGBulletEntity extends KineticProjectileEntity {
 		return null;
 	}
 
-	////////////////////////////////
-	/// INTERFACE IMPLEMENTATION ///
-	////////////////////////////////
+	// ////////////////////////// //
+	//  INTERFACE IMPLEMENTATION  //
+	// ////////////////////////// //
 
 	// GeoEntity //
 	@Override
-	public void registerControllers(final AnimatableManager.ControllerRegistrar controllers) { }
+	public void registerControllers(final AnimatableManager.ControllerRegistrar controllers) {
+	}
 
 	@Override
 	public AnimatableInstanceCache getAnimatableInstanceCache() {

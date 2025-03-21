@@ -240,34 +240,39 @@ public abstract class TurretProjectileEntity extends ProjectileEntity implements
 		}
 
 		// Handles the application of damage to the target
-		if (hitEntity.sidedDamage(dmgSrc, (float) damageToDeal)) {
-			if (isEnderman) return;
+		if (this.getWorld() instanceof ServerWorld) {
+			if (hitEntity.damage((ServerWorld) this.getWorld(), dmgSrc, (float) damageToDeal)) {
+				if (isEnderman) return;
 
-			if (hitEntity instanceof LivingEntity livingEntity) {
-				if (!this.getWorld().isClient() && this.getPierceLevel() <= 0) {
-					livingEntity.setStuckArrowCount(livingEntity.getStuckArrowCount() + 1);
+				if (hitEntity instanceof LivingEntity livingEntity) {
+					if (!this.getWorld().isClient() && this.getPierceLevel() <= 0) {
+						livingEntity.setStuckArrowCount(livingEntity.getStuckArrowCount() + 1);
+					}
+
+					this.onHit(livingEntity);
 				}
 
-				this.onHit(livingEntity);
+				this.playSound(this.sound , 1f, 1.2f / (this.random.nextFloat() * 0.2f + 0.9f));
+				if (this.getPierceLevel() <= 0) {
+					this.discard();
+				}
 			}
+			else {
+				hitEntity.setFireTicks(fireTime);
+				this.deflect(ProjectileDeflection.SIMPLE, hitEntity, owner, false);
+				this.setVelocity(this.getVelocity().multiply(0.2));
 
-			this.playSound(this.sound , 1f, 1.2f / (this.random.nextFloat() * 0.2f + 0.9f));
-			if (this.getPierceLevel() <= 0) {
-				this.discard();
+				if (this.getWorld() instanceof ServerWorld serverWorld && this.getVelocity().lengthSquared() < 1.0E-7) {
+					if (this.pickupType == PickupPermission.ALLOWED && this.stack != null) {
+						this.dropStack(serverWorld, this.asItemStack(), 0.1f);
+					}
+
+					this.discard();
+				}
 			}
 		}
 		else {
-			hitEntity.setFireTicks(fireTime);
-			this.deflect(ProjectileDeflection.SIMPLE, hitEntity, owner, false);
-			this.setVelocity(this.getVelocity().multiply(0.2));
-
-			if (this.getWorld() instanceof ServerWorld serverWorld && this.getVelocity().lengthSquared() < 1.0E-7) {
-				if (this.pickupType == PickupPermission.ALLOWED && this.stack != null) {
-					this.dropStack(serverWorld, this.asItemStack(), 0.1f);
-				}
-
-				this.discard();
-			}
+			hitEntity.clientDamage(dmgSrc);
 		}
 
 		// Proceeds to modify some data if, and only if the pierce level is greater than 0

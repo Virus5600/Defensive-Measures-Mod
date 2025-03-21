@@ -78,5 +78,9 @@
 	"subtitles.turret.anti_air.destroyed" : "Anti-air Turret destroyed",
 	"subtitles.turret.anti_air.shoot.begin" : "Anti-air Turret begins shooting",
 	"subtitles.turret.anti_air.shoot" : "Anti-air Turret shoots",
-	"subtitles.turret.anti_air.shoot.end" : "Anti-air Turret finished shooting"
+	"subtitles.turret.anti_air.shoot.end" : "Anti-air Turret finished shooting",
+
+	"tag.item.dm.turret_remover_repairable" : "Turret Remover Repairable",
+	"tag.item.dm.turret_removers" : "Turret Removers",
+	"tag.item.dm.turrets" : "Turrets"
 }

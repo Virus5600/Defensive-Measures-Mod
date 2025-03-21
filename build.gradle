@@ -34,6 +34,25 @@ loom {
 			sourceSet sourceSets.client
 		}
 	}
+
+	String username = project.hasProperty("username") ? "${project.username}".toString() : ""
+	if (username.length() > 0) {
+		def progArgs = ["--username", "${username}".toString()]
+
+		String userUUID = project.hasProperty("user_uuid") ? "${project.user_uuid}".toString() : ""
+		if (userUUID.length() > 0) {
+			progArgs += ["--uuid", "${userUUID}".toString()]
+		}
+
+		println("Using username: ${username}")
+		println("Using UUID: ${userUUID}")
+		println("Program Args: ${progArgs}")
+		runs {
+			client {
+				programArgs(progArgs)
+			}
+		}
+	}
 }
 
 dependencies {
