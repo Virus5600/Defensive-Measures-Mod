@@ -45,6 +45,7 @@ public class ModSoundEvents {
 	public static final SoundEvent BULLET_IMPACT_DIRT = ModSoundEvents.registerSoundEvent("generic.impact.bullet.dirt");
 	public static final SoundEvent BULLET_IMPACT_FLESH = ModSoundEvents.registerSoundEvent("generic.impact.bullet.flesh");
 	public static final SoundEvent BULLET_IMPACT_GLASS = ModSoundEvents.registerSoundEvent("generic.impact.bullet.glass");
+	public static final SoundEvent BULLET_IMPACT_GRAINY = ModSoundEvents.registerSoundEvent("generic.impact.bullet.grainy");
 	public static final SoundEvent BULLET_IMPACT_METAL = ModSoundEvents.registerSoundEvent("generic.impact.bullet.metal");
 	public static final SoundEvent BULLET_IMPACT_STONE = ModSoundEvents.registerSoundEvent("generic.impact.bullet.stone");
 	public static final SoundEvent BULLET_IMPACT_WOOD = ModSoundEvents.registerSoundEvent("generic.impact.bullet.wood");

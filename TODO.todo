@@ -17,6 +17,7 @@ TODO: MG Bullet
 	- onBlockHit
 		- Fix hit sound
 
-TODO: Mod
-- Add an entity utility helper class (in response to checking stuff
-	like in MG Bullet's hit sound issue).
+TODO: BlockUtil
+- Implement the `VANILLA_DIRT` constant.
+- Implement the `VANILLA_OTHER` constant for the `BlockCategory.OTHERS`.
+- For reference, see `https://www.gamergeeks.net/apps/minecraft/list-of/stone-blocks`.

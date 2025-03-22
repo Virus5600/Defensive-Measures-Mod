@@ -23,6 +23,13 @@
 		],
 		"subtitle": "subtitles.generic.impact.bullet.glass"
 	},
+	"generic.impact.bullet.grainy": {
+		"sounds": [
+			"dm:turrets/bullet_impacts/bullet_impact_grainy1",
+			"dm:turrets/bullet_impacts/bullet_impact_grainy2"
+		],
+		"subtitle": "subtitles.generic.impact.bullet.grainy"
+	},
 	"generic.impact.bullet.metal": {
 		"sounds": [
 			"dm:turrets/bullet_impacts/bullet_impact_metal1",

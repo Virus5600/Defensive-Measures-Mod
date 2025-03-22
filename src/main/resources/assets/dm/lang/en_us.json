@@ -59,6 +59,7 @@
 	"subtitles.generic.impact.bullet.dirt" : "Bullet impacted on dirt",
 	"subtitles.generic.impact.bullet.flesh" : "Bullet hit an entity",
 	"subtitles.generic.impact.bullet.glass" : "Bullet impacted on glass",
+	"subtitles.generic.impact.bullet.grainy" : "Bullet impacted on a grainy block",
 	"subtitles.generic.impact.bullet.metal" : "Bullet impacted on metal",
 	"subtitles.generic.impact.bullet.stone" : "Bullet impacted on stone",
 	"subtitles.generic.impact.bullet.wood" : "Bullet impacted on wood",

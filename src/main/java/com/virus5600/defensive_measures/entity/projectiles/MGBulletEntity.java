@@ -1,11 +1,9 @@
 package com.virus5600.defensive_measures.entity.projectiles;
 
-import com.virus5600.defensive_measures.sound.ModSoundEvents;
 import net.minecraft.block.Block;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.passive.IronGolemEntity;
-import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
@@ -17,9 +15,12 @@ import software.bernie.geckolib.animation.AnimationController;
 import software.bernie.geckolib.animation.AnimationState;
 import software.bernie.geckolib.animation.PlayState;
 import software.bernie.geckolib.animation.RawAnimation;
+import software.bernie.geckolib.util.GeckoLibUtil;
 
 import com.virus5600.defensive_measures.entity.ModEntities;
-import software.bernie.geckolib.util.GeckoLibUtil;
+import com.virus5600.defensive_measures.sound.ModSoundEvents;
+import com.virus5600.defensive_measures.util.BlockUtil;
+import com.virus5600.defensive_measures.util.BlockUtil.BlockCategory;
 
 import java.util.Map;
 
@@ -103,6 +104,19 @@ public class MGBulletEntity extends KineticProjectileEntity {
 	@Override
 	protected void onBlockHit(BlockHitResult blockHitResult) {
 		this.setSound(ModSoundEvents.BULLET_IMPACT_DIRT);
+		Block block = this.getWorld()
+			.getBlockState(blockHitResult.getBlockPos())
+			.getBlock();
+
+		switch (BlockUtil.getBlockCategory(block)) {
+			case BlockCategory.GLASS -> this.setSound(ModSoundEvents.BULLET_IMPACT_GLASS);
+			case BlockCategory.GRAINY -> this.setSound(ModSoundEvents.BULLET_IMPACT_GRAINY);
+			case BlockCategory.METAL -> this.setSound(ModSoundEvents.BULLET_IMPACT_METAL);
+			case BlockCategory.STONE -> this.setSound(ModSoundEvents.BULLET_IMPACT_STONE);
+			case BlockCategory.WOOD -> this.setSound(ModSoundEvents.BULLET_IMPACT_WOOD);
+			// Default also includes BlockCategory.DIRT, BlockCategory.GREENERY, BlockCategory.OTHERS
+			default -> this.setSound(ModSoundEvents.BULLET_IMPACT_DIRT);
+		}
 
 		this.discard();
 	}
