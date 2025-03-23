@@ -1,11 +1,11 @@
 {
-	"generic.impact.bullet.dirt": {
+	"generic.impact.bullet.default": {
 		"sounds": [
-			"dm:turrets/bullet_impacts/bullet_impact_dirt1",
-			"dm:turrets/bullet_impacts/bullet_impact_dirt2",
-			"dm:turrets/bullet_impacts/bullet_impact_dirt3"
+			"dm:turrets/bullet_impacts/bullet_impact_default1",
+			"dm:turrets/bullet_impacts/bullet_impact_default2",
+			"dm:turrets/bullet_impacts/bullet_impact_default3"
 		],
-		"subtitle": "subtitles.generic.impact.bullet.dirt"
+		"subtitle": "subtitles.generic.impact.bullet.default"
 	},
 	"generic.impact.bullet.flesh": {
 		"sounds": [
@@ -26,7 +26,8 @@
 	"generic.impact.bullet.grainy": {
 		"sounds": [
 			"dm:turrets/bullet_impacts/bullet_impact_grainy1",
-			"dm:turrets/bullet_impacts/bullet_impact_grainy2"
+			"dm:turrets/bullet_impacts/bullet_impact_grainy2",
+			"dm:turrets/bullet_impacts/bullet_impact_grainy3"
 		],
 		"subtitle": "subtitles.generic.impact.bullet.grainy"
 	},
@@ -39,7 +40,9 @@
 	},
 	"generic.impact.bullet.stone": {
 		"sounds": [
-			"dm:turrets/bullet_impacts/bullet_impact_stone1"
+			"dm:turrets/bullet_impacts/bullet_impact_stone1",
+			"dm:turrets/bullet_impacts/bullet_impact_stone2",
+			"dm:turrets/bullet_impacts/bullet_impact_stone3"
 		],
 		"subtitle": "subtitles.generic.impact.bullet.stone"
 	},

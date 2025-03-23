@@ -5,6 +5,8 @@ import net.minecraft.block.Blocks;
 
 import com.google.common.collect.ImmutableList;
 
+import com.virus5600.defensive_measures.entity.projectiles.MGBulletEntity;
+
 import java.util.List;
 
 /**
@@ -420,14 +422,85 @@ public class BlockUtil {
 	// //////////// //
 	// CUSTOM ENUMS //
 	// //////////// //
+
+	/**
+	 * This enum provides a way to identify the category of blocks based
+	 * on their composition and appearance, allowing for easier classification
+	 * of blocks when needed by the mod, such as the use of dynamic bullet hit
+	 * sound from {@link MGBulletEntity MG Bullet's}
+	 * hit sound.
+	 * <br><br>
+	 * As of <b>Version 1.1.x-beta-1.21.4</b>, the currently defined block
+	 * categories are:
+	 * <ul>
+	 *     <li>{@link #DIRT Dirt} blocks</li>
+	 *     <li>{@link #GLASS Glass} blocks</li>
+	 *     <li>{@link #GRAINY Grainy} blocks</li>
+	 *     <li>{@link #GREENERY Greenery} blocks</li>
+	 *     <li>{@link #METAL Metal} blocks</li>
+	 *     <li>{@link #STONE Stone} blocks</li>
+	 *     <li>{@link #WOOD Wood} blocks</li>
+	 *     <li>{@link #OTHERS Other} blocks</li>
+	 * </ul>
+	 * For more information on the block categories, see their
+	 * respective documentation.
+	 *
+	 * @since 1.0.0
+	 * @author <a href="https://github.com/Virus5600">Virus5600</a>
+	 * @version 1.0.0
+	 */
 	public enum BlockCategory {
+		/**
+		 * Represents the blocks that are classified as dirt blocks such
+		 * as Dirt, Coarse Dirt, Grass Block, Mycelium, Podzol,
+		 * even Muds and other dirt-like blocks.
+		 */
 		DIRT,
+		/**
+		 * Represents the blocks that are classified as glass blocks or
+		 * basically, fragile blocks that can be broken easily such as
+		 * Glass, Glass Panes, Stained Glass, Stained Glass Panes,
+		 * and some light sources like Glowstone, Redstone Lamp, and Sea
+		 * Lantern.
+		 */
 		GLASS,
+		/**
+		 * Represents the blocks that are classified as grainy blocks such
+		 * as Gravel, Sand, Soul Sand, Soul Soil, Suspicious Gravel,
+		 * Suspicious Sand, and Concrete Powder blocks.
+		 */
 		GRAINY,
+		/**
+		 * These are basically the shrubs and plants. This includes the tree
+		 * leaves, grass, flowers, and other botanical transparent blocks.
+		 */
 		GREENERY,
+		/**
+		 * Represents the blocks that are classified as metal blocks such
+		 * as the metal blocks and its craftable variants like doors, trapdoors,
+		 * and other metal blocks.
+		 */
 		METAL,
+		/**
+		 * Blocks that are often found in caves and mountains. Aside from those,
+		 * craftable blocks like bricks, cobblestones, and other stone-like
+		 * blocks are also included in this category.
+		 */
 		STONE,
+		/**
+		 * All wood type blocks are defined in this category. This includes
+		 * the entire log and plank types, their craftable counterparts such
+		 * as doors and trapdoors, and other wood-like blocks.
+		 * <br><br>
+		 * This, however, excludes the transparent wood blocks like (normal)
+		 * signs, item frames, and other transparent wood blocks.
+		 */
 		WOOD,
+		/**
+		 * All other blocks that do not fit in any of the categories above are
+		 * classified under this category. This includes blocks like pots,
+		 * beds, carpets, and other miscellaneous blocks.
+		 */
 		OTHERS
 	}
 

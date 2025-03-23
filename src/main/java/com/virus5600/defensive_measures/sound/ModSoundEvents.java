@@ -42,7 +42,7 @@ public class ModSoundEvents {
 	public final static SoundEvent TURRET_MG_SHOOT = ModSoundEvents.registerSoundEvent("turret.mg_turret.shoot");
 
 	// v1.1.0-beta
-	public static final SoundEvent BULLET_IMPACT_DIRT = ModSoundEvents.registerSoundEvent("generic.impact.bullet.dirt");
+	public static final SoundEvent BULLET_IMPACT_DEFAULT = ModSoundEvents.registerSoundEvent("generic.impact.bullet.default");
 	public static final SoundEvent BULLET_IMPACT_FLESH = ModSoundEvents.registerSoundEvent("generic.impact.bullet.flesh");
 	public static final SoundEvent BULLET_IMPACT_GLASS = ModSoundEvents.registerSoundEvent("generic.impact.bullet.glass");
 	public static final SoundEvent BULLET_IMPACT_GRAINY = ModSoundEvents.registerSoundEvent("generic.impact.bullet.grainy");

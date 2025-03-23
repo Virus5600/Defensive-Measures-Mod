@@ -56,7 +56,7 @@
 	"subtitles.turret.bow.repair" : "Repaired Bow Turret",
 	"subtitles.turret.wood.repair" : "Repaired Wooden Turret",
 
-	"subtitles.generic.impact.bullet.dirt" : "Bullet impacted on dirt",
+	"subtitles.generic.impact.bullet.default" : "Bullet impacted",
 	"subtitles.generic.impact.bullet.flesh" : "Bullet hit an entity",
 	"subtitles.generic.impact.bullet.glass" : "Bullet impacted on glass",
 	"subtitles.generic.impact.bullet.grainy" : "Bullet impacted on a grainy block",

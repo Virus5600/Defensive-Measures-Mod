@@ -92,33 +92,76 @@ public class MGBulletEntity extends KineticProjectileEntity {
 	// PROTECTED
 	@Override
 	protected void onEntityHit(EntityHitResult entityHitResult) {
-		super.onEntityHit(entityHitResult);
-
 		SoundEvent sound = ModSoundEvents.BULLET_IMPACT_FLESH;
 		if (entityHitResult.getEntity() instanceof IronGolemEntity) {
 			sound = ModSoundEvents.BULLET_IMPACT_METAL;
 		}
 
 		this.setSound(sound);
+
+		super.onEntityHit(entityHitResult);
 	}
+
+	/**
+	 * The MG bullet's behavior when it hits a block is similar to other
+	 * {@link KineticProjectileEntity kinetic projectiles}. However, the sound
+	 * that is played when the bullet hits a block is different, thus the need
+	 * to override this method.
+	 * <br><br>
+	 * The sound that is played when the bullet hits a block is determined by
+	 * the {@link BlockCategory category} of the block that the bullet hit.
+	 * <br><br>
+	 * So far, the currently defined block categories are:
+	 * <ul>
+	 *     <li>
+	 *         <b>Version 1.1.x-beta-1.21.4:</b>
+	 *         <ul>
+	 *             <li>{@link BlockCategory#GLASS Glass} blocks</li>
+	 *             <li>{@link BlockCategory#GRAINY Grainy} blocks</li>
+	 *             <li>{@link BlockCategory#METAL Metal} blocks</li>
+	 *             <li>{@link BlockCategory#STONE Stone} blocks</li>
+	 *             <li>{@link BlockCategory#WOOD Wood} blocks</li>
+	 *             <li>{@link BlockCategory#DIRT Dirt} blocks</li>
+	 *             <li>{@link BlockCategory#GREENERY Greenery} blocks</li>
+	 *         </ul>
+	 *     </li>
+	 * </ul>
+	 * Each category has a different sound that is played when the bullet hits,
+	 * aside from the following categories:
+	 * <ul>
+	 *     <li>{@link BlockCategory#DIRT Dirt} blocks</li>
+	 *     <li>{@link BlockCategory#GREENERY Greenery} blocks</li>
+	 *     <li>{@link BlockCategory#OTHERS Other} blocks</li>
+	 * </ul>
+	 *
+	 * @param blockHitResult The block hit result
+	 *
+	 * @see BlockUtil#getBlockCategory(Block)
+	 * @see BlockCategory
+	 */
 	@Override
 	protected void onBlockHit(BlockHitResult blockHitResult) {
-		this.setSound(ModSoundEvents.BULLET_IMPACT_DIRT);
+		// Default sound == Dirt, Greenery, Others
+		this.setSound(ModSoundEvents.BULLET_IMPACT_DEFAULT);
+
+
 		Block block = this.getWorld()
 			.getBlockState(blockHitResult.getBlockPos())
 			.getBlock();
-
 		switch (BlockUtil.getBlockCategory(block)) {
 			case BlockCategory.GLASS -> this.setSound(ModSoundEvents.BULLET_IMPACT_GLASS);
 			case BlockCategory.GRAINY -> this.setSound(ModSoundEvents.BULLET_IMPACT_GRAINY);
 			case BlockCategory.METAL -> this.setSound(ModSoundEvents.BULLET_IMPACT_METAL);
 			case BlockCategory.STONE -> this.setSound(ModSoundEvents.BULLET_IMPACT_STONE);
 			case BlockCategory.WOOD -> this.setSound(ModSoundEvents.BULLET_IMPACT_WOOD);
-			// Default also includes BlockCategory.DIRT, BlockCategory.GREENERY, BlockCategory.OTHERS
-			default -> this.setSound(ModSoundEvents.BULLET_IMPACT_DIRT);
+			default -> this.setSound(ModSoundEvents.BULLET_IMPACT_DEFAULT);
 		}
 
-		this.discard();
+		super.onBlockHit(blockHitResult);
+
+		if (this.isAlive() || this.isRemoved() || this.isInGround() || this.isOnGround()) {
+			this.discard();
+		}
 	}
 
 	@Override
