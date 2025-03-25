@@ -4,7 +4,7 @@
 		"animation.mg_bullet.idle": {
 			"loop": true,
 			"bones": {
-				"arrow": {
+				"body": {
 					"rotation": ["this", "this", "this"]
 				}
 			}

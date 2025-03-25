@@ -514,11 +514,15 @@ public class BlockUtil {
 		// /////////// //
 		VANILLA_DIRT = ImmutableList.of(
 			// Dirt Blocks
-			Blocks.DIRT,
 			Blocks.COARSE_DIRT,
+			Blocks.DIRT,
+			Blocks.DIRT_PATH,
+			Blocks.FARMLAND,
 			Blocks.GRASS_BLOCK,
+			Blocks.MUD,
 			Blocks.MYCELIUM,
-			Blocks.PODZOL
+			Blocks.PODZOL,
+			Blocks.ROOTED_DIRT
 		);
 
 		// Returns a copy of the vanilla dirt list, allowing for modifications.
@@ -617,6 +621,90 @@ public class BlockUtil {
 		// GREENERY BLOCKS //
 		// /////////////// //
 		VANILLA_GREENERY = ImmutableList.of(
+			Blocks.ACACIA_LEAVES,
+			Blocks.ACACIA_SAPLING,
+			Blocks.ALLIUM,
+			Blocks.ATTACHED_MELON_STEM,
+			Blocks.AZALEA_LEAVES,
+			Blocks.AZURE_BLUET,
+			Blocks.BEETROOTS,
+			Blocks.BIG_DRIPLEAF,
+			Blocks.BIG_DRIPLEAF_STEM,
+			Blocks.BIRCH_LEAVES,
+			Blocks.BIRCH_SAPLING,
+			Blocks.BLUE_ORCHID,
+			Blocks.CACTUS,
+			Blocks.CARROTS,
+			Blocks.CARVED_PUMPKIN,
+			Blocks.CAVE_VINES,
+			Blocks.CAVE_VINES_PLANT,
+			Blocks.CHERRY_LEAVES,
+			Blocks.CHERRY_SAPLING,
+			Blocks.CHORUS_FLOWER,
+			Blocks.CHORUS_PLANT,
+			Blocks.CLOSED_EYEBLOSSOM,
+			Blocks.COCOA,
+			Blocks.CORNFLOWER,
+			Blocks.DANDELION,
+			Blocks.DARK_OAK_LEAVES,
+			Blocks.DARK_OAK_SAPLING,
+			Blocks.DEAD_BUSH,
+			Blocks.FERN,
+			Blocks.FLOWERING_AZALEA_LEAVES,
+			Blocks.GLOW_LICHEN,
+			Blocks.HANGING_ROOTS,
+			Blocks.JUNGLE_LEAVES,
+			Blocks.JUNGLE_SAPLING,
+			Blocks.KELP,
+			Blocks.LARGE_FERN,
+			Blocks.LILAC,
+			Blocks.LILY_OF_THE_VALLEY,
+			Blocks.LILY_PAD,
+			Blocks.MANGROVE_LEAVES,
+			Blocks.MANGROVE_PROPAGULE,
+			Blocks.MANGROVE_ROOTS,
+			Blocks.MELON,
+			Blocks.MELON_STEM,
+			Blocks.MOSS_BLOCK,
+			Blocks.MOSS_CARPET,
+			Blocks.MUDDY_MANGROVE_ROOTS,
+			Blocks.OAK_LEAVES,
+			Blocks.OPEN_EYEBLOSSOM,
+			Blocks.ORANGE_TULIP,
+			Blocks.OXEYE_DAISY,
+			Blocks.PALE_HANGING_MOSS,
+			Blocks.PALE_MOSS_BLOCK,
+			Blocks.PALE_MOSS_CARPET,
+			Blocks.PALE_OAK_LEAVES,
+			Blocks.PEONY,
+			Blocks.PINK_PETALS,
+			Blocks.PINK_TULIP,
+			Blocks.PITCHER_CROP,
+			Blocks.PITCHER_PLANT,
+			Blocks.POTATOES,
+			Blocks.PUMPKIN,
+			Blocks.PUMPKIN_STEM,
+			Blocks.RED_TULIP,
+			Blocks.ROSE_BUSH,
+			Blocks.SEAGRASS,
+			Blocks.SHORT_GRASS,
+			Blocks.SMALL_DRIPLEAF,
+			Blocks.SPORE_BLOSSOM,
+			Blocks.SPRUCE_LEAVES,
+			Blocks.SUGAR_CANE,
+			Blocks.SUNFLOWER,
+			Blocks.SWEET_BERRY_BUSH,
+			Blocks.TALL_GRASS,
+			Blocks.TALL_SEAGRASS,
+			Blocks.TORCHFLOWER,
+			Blocks.TORCHFLOWER_CROP,
+			Blocks.TWISTING_VINES,
+			Blocks.TWISTING_VINES_PLANT,
+			Blocks.VINE,
+			Blocks.WEEPING_VINES,
+			Blocks.WEEPING_VINES_PLANT,
+			Blocks.WHEAT,
+			Blocks.WITHER_ROSE
 		);
 
 		// Returns a copy of the vanilla greenery list, allowing for modifications.
@@ -741,11 +829,18 @@ public class BlockUtil {
 			Blocks.NETHERITE_BLOCK,
 
 			// Other Metal Blocks
+			Blocks.CAULDRON,
 			Blocks.HEAVY_CORE,
+			Blocks.LANTERN,
+			Blocks.LAVA_CAULDRON,
 			Blocks.LIGHTNING_ROD,
+			Blocks.POWDER_SNOW_CAULDRON,
+			Blocks.SOUL_LANTERN,
+			Blocks.SMITHING_TABLE,
 			Blocks.SPAWNER,
 			Blocks.TRIAL_SPAWNER,
-			Blocks.VAULT
+			Blocks.VAULT,
+			Blocks.WATER_CAULDRON
 		);
 
 		// Returns a copy of the vanilla metal list, allowing for modifications.
@@ -843,6 +938,7 @@ public class BlockUtil {
 			Blocks.DEEPSLATE_TILE_SLAB,
 			Blocks.DEEPSLATE_TILE_STAIRS,
 			Blocks.DEEPSLATE_TILE_WALL,
+			Blocks.INFESTED_DEEPSLATE,
 			Blocks.POLISHED_DEEPSLATE,
 			Blocks.POLISHED_DEEPSLATE_SLAB,
 			Blocks.POLISHED_DEEPSLATE_STAIRS,
@@ -861,6 +957,13 @@ public class BlockUtil {
 			// Dripstone Blocks
 			Blocks.DRIPSTONE_BLOCK,
 			Blocks.POINTED_DRIPSTONE,
+
+			// Endstone Blocks
+			Blocks.END_STONE,
+			Blocks.END_STONE_BRICKS,
+			Blocks.END_STONE_BRICK_SLAB,
+			Blocks.END_STONE_BRICK_STAIRS,
+			Blocks.END_STONE_BRICK_WALL,
 
 			// Glazed Terracotta Blocks
 			Blocks.BLACK_GLAZED_TERRACOTTA,
@@ -949,9 +1052,23 @@ public class BlockUtil {
 			Blocks.PURPUR_SLAB,
 			Blocks.PURPUR_STAIRS,
 
+			// Sandstone Blocks
+			Blocks.CHISELED_SANDSTONE,
+			Blocks.CUT_SANDSTONE,
+			Blocks.CUT_SANDSTONE_SLAB,
+			Blocks.SANDSTONE,
+			Blocks.SANDSTONE_SLAB,
+			Blocks.SANDSTONE_STAIRS,
+			Blocks.SMOOTH_SANDSTONE,
+			Blocks.SMOOTH_SANDSTONE_SLAB,
+			Blocks.SMOOTH_SANDSTONE_STAIRS,
+
 			// Stone Blocks
 			Blocks.CHISELED_STONE_BRICKS,
 			Blocks.CRACKED_STONE_BRICKS,
+			Blocks.INFESTED_CHISELED_STONE_BRICKS,
+			Blocks.INFESTED_CRACKED_STONE_BRICKS,
+			Blocks.INFESTED_MOSSY_STONE_BRICKS,
 			Blocks.INFESTED_STONE,
 			Blocks.INFESTED_STONE_BRICKS,
 			Blocks.MOSSY_STONE_BRICKS,
@@ -1008,6 +1125,7 @@ public class BlockUtil {
 			Blocks.BASALT,
 			Blocks.CALCITE,
 			Blocks.MAGMA_BLOCK,
+			Blocks.OBSIDIAN,
 			Blocks.POLISHED_BASALT,
 			Blocks.QUARTZ_BLOCK,
 			Blocks.QUARTZ_BRICKS,
@@ -1026,8 +1144,9 @@ public class BlockUtil {
 			Blocks.COMPARATOR,
 			Blocks.DISPENSER,
 			Blocks.DROPPER,
-			Blocks.END_PORTAL_FRAME,
 			Blocks.ENCHANTING_TABLE,
+			Blocks.ENDER_CHEST,
+			Blocks.END_PORTAL_FRAME,
 			Blocks.FURNACE,
 			Blocks.GRINDSTONE,
 			Blocks.LODESTONE,
@@ -1036,6 +1155,8 @@ public class BlockUtil {
 			Blocks.REPEATER,
 			Blocks.REPEATING_COMMAND_BLOCK,
 			Blocks.RESPAWN_ANCHOR,
+			Blocks.SMOKER,
+			Blocks.STICKY_PISTON,
 			Blocks.STONECUTTER
 		);
 
@@ -1228,12 +1349,20 @@ public class BlockUtil {
 
 			// Other Wood Blocks
 			Blocks.BEEHIVE,
+			Blocks.BEE_NEST,
 			Blocks.BOOKSHELF,
-
+			Blocks.SCAFFOLDING,
 
 			// Interactive Blocks
+			Blocks.BARREL,
+			Blocks.CAMPFIRE,
+			Blocks.DAYLIGHT_DETECTOR,
+			Blocks.FLETCHING_TABLE,
+			Blocks.JUKEBOX,
+			Blocks.LADDER,
+			Blocks.LOOM,
 			Blocks.NOTE_BLOCK,
-			Blocks.JUKEBOX
+			Blocks.SOUL_CAMPFIRE
 		);
 
 		// Returns a copy of the vanilla wood list, allowing for modifications.

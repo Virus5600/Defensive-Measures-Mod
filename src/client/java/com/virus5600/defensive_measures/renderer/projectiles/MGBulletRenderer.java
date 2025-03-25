@@ -22,7 +22,7 @@ import com.virus5600.defensive_measures.model.projectiles.MGBulletModel;
 
 /**
  * The renderer for the {@link MGBulletEntity}.
- * 
+ *
  * @since 1.0.0
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
  * @version 1.0.0
