@@ -101,6 +101,7 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 	 */
 	private static final TrackedData<Byte> FROM_ITEM;
 	private static final TrackedData<Float> SHOOTING_PITCH;
+	private static final TrackedData<Boolean> USE_BURST;
 
 	/**
 	 * Tracks the direction where this turret is attached to.
@@ -119,18 +120,42 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 	 */
 	protected static final TrackedData<Float> Z;
 	/**
+	 * Tracks the amount of projectile to shoot in a burst.
+	 */
+	protected static final TrackedData<Integer> BURST_COUNT;
+	/**
+	 * Tracks the amount of projectiles currently fired in a burst.
+	 */
+	protected static final TrackedData<Integer> BURST_PROJECTILE_FIRED;
+	/**
+	 * Tracks the delay between each shot projectile in a burst.
+	 */
+	protected static final TrackedData<Integer> BURST_DELAY;
+	/**
 	 * The maximum health of this turret entity. Change this value using the {@link #setTurretMaxHealth(float)}
 	 * method before calling the {@link TurretEntity#setAttributes()} method to set the max health
 	 * of this entity properly.
 	 *
 	 * @see TurretEntity#setTurretMaxHealth(float)
 	 * @see TurretEntity#setAttributes()
+	 * @see EntityAttributes#MAX_HEALTH
 	 */
 	protected static float MAX_HEALTH = 20.0F;
 
-	////////////////////////
+	/**
+	 * The maximum health of this turret entity. Change this value using the {@link #setTurretMaxRange(float)}
+	 * method before calling the {@link TurretEntity#setAttributes()} method to set the max range
+	 * of this entity properly.
+	 *
+	 * @see TurretEntity#setTurretMaxRange(float)
+	 * @see TurretEntity#setAttributes()
+	 * @see EntityAttributes#FOLLOW_RANGE
+	 */
+	protected static float MAX_RANGE = 16.0F;
+
+	// ////////////////// //
 	// INSTANCE VARIABLES //
-	////////////////////////
+	// ////////////////// //
 	/**
 	 * Acts as a storage for the turret's world position, allowing the turret to snap in place.
 	 */
@@ -151,6 +176,11 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 	 * </code></pre>
 	 */
 	private Map<Item, List<Object[]>> effectSource;
+	/**
+	 * Used by the {@link #tick() tick} method to keep track of the
+	 * delay between each shot from a burst.
+	 */
+	private int burstDelayTimer = 0;
 
 	/**
 	 * The sound the turret makes when it is being healed.
@@ -244,9 +274,9 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 		Items.STRIPPED_WARPED_STEM
 	);
 
-	//////////////////
+	// //////////// //
 	// CONSTRUCTORS //
-	//////////////////
+	// //////////// //
 
 	/**
 	 * Constructs a new {@code TurretEntity} with the given {@code EntityType}, {@code World},
@@ -310,9 +340,9 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 		}
 	}
 
-	//////////////////
+	// //////////// //
 	// INITIALIZERS //
-	//////////////////
+	// //////////// //
 
 	/**
 	 * {@inheritDoc}
@@ -392,7 +422,14 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 			.add(ATTACHED_FACE, Direction.DOWN)
 			.add(X, 0f)
 			.add(Y, 0f)
-			.add(Z, 0f);
+			.add(Z, 0f)
+
+		// Shooting related tracking
+			.add(USE_BURST, false)
+			.add(BURST_COUNT, 0)
+			.add(BURST_PROJECTILE_FIRED, 0)
+			.add(BURST_DELAY, 0)
+		;
 	}
 
 	/**
@@ -456,7 +493,7 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 	public static DefaultAttributeContainer.Builder setAttributes() {
 		return TurretEntity.createMobAttributes()
 			.add(EntityAttributes.MAX_HEALTH, TurretEntity.getTurretMaxHealth())
-			.add(EntityAttributes.FOLLOW_RANGE, 16)
+			.add(EntityAttributes.FOLLOW_RANGE, TurretEntity.getTurretMaxRange())
 			.add(EntityAttributes.MOVEMENT_SPEED, 0)
 			.add(EntityAttributes.KNOCKBACK_RESISTANCE, 1.0)
 			.add(EntityAttributes.EXPLOSION_KNOCKBACK_RESISTANCE, 1.0);
@@ -484,9 +521,9 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 		return super.initialize(world, difficulty, spawnReason, entityData);
 	}
 
-	/////////////////////
+	// /////////////// //
 	// PROCESS METHODS //
-	/////////////////////
+	// /////////////// //
 
 	/**
 	 * Attempts to attach this entity to a block or fall if there is no block to attach to
@@ -697,6 +734,7 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 		else {
 			this.dataTracker.set(SHOOTING_PITCH, this.getPitch());
 
+			// Adjusts the pitch when shooting
 			if (this.getTarget() != null) {
 				Vec3d velocity = TurretEntity.TurretProjectileVelocity
 					.init(this)
@@ -715,6 +753,40 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 			if (this.hasStatusEffect(StatusEffects.LEVITATION) && this.isHeldInPlace()) {
 				this.removeStatusEffect(StatusEffects.LEVITATION);
 			}
+
+			// When using the burst attack
+			if (this.dataTracker.get(USE_BURST)) {
+				if (this.getTarget() == null) {
+					this.resetBurst();
+				}
+				else {
+					// Set the burst data into vars
+					int burstCount = this.dataTracker.get(BURST_COUNT);
+					int burstFired = this.dataTracker.get(BURST_PROJECTILE_FIRED);
+					int burstDelay = this.dataTracker.get(BURST_DELAY);
+
+					// Once the burst delay is done...
+					if (--this.burstDelayTimer <= 0) {
+
+						// ... shoot the projectile
+						this.shoot(this.getTarget());
+						burstFired++;
+
+						// ... check if the fired projectile is equal to the burst count
+						if (burstFired >= burstCount) {
+							// If it is, reset the burst data
+							this.resetBurst();
+						}
+						// Otherwise, update tracked data from vars
+						else {
+							this.burstDelayTimer = burstDelay;
+
+							this.dataTracker.set(BURST_COUNT, burstCount);
+							this.dataTracker.set(BURST_PROJECTILE_FIRED, burstFired);
+						}
+					}
+				}
+			}
 		}
 	}
 
@@ -729,9 +801,31 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 		}
 	}
 
-	//////////////////////////////////////
+	/**
+	 * Resets the burst attack data.
+	 * <br><br>
+	 * When burst attacking, turrets will tend to stop mid-way if the
+	 * target does not exist or is out of range anymore. This results to
+	 * dirty data which may potentially carry over to the next attack.
+	 * <br><br>
+	 * This method serves as a cleaner for that issue (unless you wanted
+	 * that behavior to happen), resetting tracked data and timers to
+	 * its default state.
+	 * <br><br>
+	 * Lastly, this method is made {@code public} to allow other classes
+	 * to call it if needed.
+	 */
+	public void resetBurst() {
+		this.dataTracker.set(USE_BURST, false);
+		this.dataTracker.set(BURST_COUNT, 0);
+		this.dataTracker.set(BURST_PROJECTILE_FIRED, 0);
+		this.dataTracker.set(BURST_DELAY, 0);
+		this.burstDelayTimer = 0;
+	}
+
+	// //////////////////////////////// //
 	// QUESTION METHODS (True or False) //
-	//////////////////////////////////////
+	// //////////////////////////////// //
 
 	/**
 	 * Determines whether this turret can stay on the given position or not.
@@ -888,9 +982,9 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 		);
 	}
 
-	/////////////////////////
+	// /////////////////// //
 	// GETTERS AND SETTERS //
-	/////////////////////////
+	// /////////////////// //
 
 	public static float getTurretMaxHealth() {
 		return TurretEntity.MAX_HEALTH;
@@ -898,6 +992,14 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 
 	public static void setTurretMaxHealth(float health) {
 		TurretEntity.MAX_HEALTH = health;
+	}
+
+	public static float getTurretMaxRange() {
+		return TurretEntity.MAX_RANGE;
+	}
+
+	public static void setTurretMaxRange(float range) {
+		TurretEntity.MAX_RANGE = range;
 	}
 
 	@Override
@@ -1256,9 +1358,9 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 			.get(currentBarrel);
 	}
 
-	//////////////////
+	// //////////// //
 	// TRACKED DATA //
-	//////////////////
+	// //////////// //
 
 	/**
 	 * Retrieves the maximum level of this turret.
@@ -1297,9 +1399,9 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 		this.dataTracker.set(ATTACHED_FACE, dir);
 	}
 
-	///////////////////////////////
+	// ///////////////////////// //
 	// INTERFACE IMPLEMENTATIONS //
-	///////////////////////////////
+	// ///////////////////////// //
 
 	@Override
 	public byte isFromItem() {
@@ -1333,9 +1435,9 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 		this.shoot(velocityData);
 	}
 
-	////////////////////////////////////
+	// ////////////////////////////// //
 	// ABSTRACT & OVERRIDABLE METHODS //
-	////////////////////////////////////
+	// ////////////////////////////// //
 
 	// ABSTRACTS //
 	/**
@@ -1372,6 +1474,7 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 	public abstract byte getProjectilePierceLevel();
 
 	// OVERRIDABLES //
+
 	/**
 	 * Sets the velocity of a projectile, along with the power and uncertainty of the projectile.
 	 * <br><br>
@@ -1430,6 +1533,47 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 			TurretProjectileVelocity.init(this)
 				.setVelocity(target)
 		);
+	}
+
+	/**
+	 * Shoots a burst of projectiles with a specified count and delay between each shot.
+	 * <br><br>
+	 * This method is used when a turret is set to shoot multiple projectiles in a single attack,
+	 * allowing for a burst of projectiles to be fired in quick succession. The {@code count} parameter
+	 * determines how many projectiles will be fired in the burst, while the {@code delay} parameter
+	 * determines the delay between each shot.
+	 *
+	 * @param count The number of projectiles to shoot in the burst.
+	 * @param delay The delay between each shot in ticks.
+	 */
+	protected void shootBurst(int count, int delay) {
+		this.dataTracker.set(BURST_COUNT, count);
+		this.dataTracker.set(BURST_DELAY, delay);
+		this.dataTracker.set(USE_BURST, true);
+
+		if (!this.getWorld().isClient) {
+			this.burstDelayTimer = delay;
+		}
+	}
+
+	/**
+	 * Shoots a burst of projectiles with a specified count and delay between each shot.
+	 * <br><br>
+	 * This method is used when a turret is set to shoot multiple projectiles in a single attack,
+	 * allowing for a burst of projectiles to be fired in quick succession. The {@code count} parameter
+	 * determines how many projectiles will be fired in the burst, while the {@code delay} parameter
+	 * determines the delay between each shot.
+	 * <br><br>
+	 * In this overloaded version, the target of the burst attack is also specified, allowing for
+	 * the burst to target a specific entity.
+	 *
+	 * @param count The number of projectiles to shoot in the burst.
+	 * @param delay The delay between each shot in ticks.
+	 * @param target The target of the burst attack.
+	 */
+	protected void shootBurst(int count, int delay, LivingEntity target) {
+		this.shootBurst(count, delay);
+		this.setTarget(target);
 	}
 
 	protected void shoot(TurretProjectileVelocity velocityData) {
@@ -1506,9 +1650,9 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 		return true;
 	}
 
-	///////////////////
+	// ///////////// //
 	// LOCAL CLASSES //
-	///////////////////
+	// ///////////// //
 
 	static class TurretBodyControl extends BodyControl {
 		public TurretBodyControl(MobEntity entity) {
@@ -1895,18 +2039,23 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 		}
 	}
 
-	///////////////////////
+	// ///////////////// //
 	// STATIC INITIALIZE //
-	///////////////////////
+	// ///////////////// //
 
 	static {
 		LEVEL = DataTracker.registerData(TurretEntity.class, TrackedDataHandlerRegistry.INTEGER);
 		FROM_ITEM = DataTracker.registerData(TurretEntity.class, TrackedDataHandlerRegistry.BYTE);
 		SHOOTING_PITCH = DataTracker.registerData(TurretEntity.class, TrackedDataHandlerRegistry.FLOAT);
+		USE_BURST = DataTracker.registerData(TurretEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
 
 		ATTACHED_FACE = DataTracker.registerData(TurretEntity.class, TrackedDataHandlerRegistry.FACING);
 		X = DataTracker.registerData(TurretEntity.class, TrackedDataHandlerRegistry.FLOAT);
 		Y = DataTracker.registerData(TurretEntity.class, TrackedDataHandlerRegistry.FLOAT);
 		Z = DataTracker.registerData(TurretEntity.class, TrackedDataHandlerRegistry.FLOAT);
+
+		BURST_COUNT = DataTracker.registerData(TurretEntity.class, TrackedDataHandlerRegistry.INTEGER);
+		BURST_PROJECTILE_FIRED = DataTracker.registerData(TurretEntity.class, TrackedDataHandlerRegistry.INTEGER);
+		BURST_DELAY = DataTracker.registerData(TurretEntity.class, TrackedDataHandlerRegistry.INTEGER);
 	}
 }

@@ -9,6 +9,7 @@ import com.virus5600.defensive_measures.item.interfaces.FuelItem;
 import com.virus5600.defensive_measures.item.turrets.TurretItem;
 import com.virus5600.defensive_measures.item.turrets.ballista.*;
 import com.virus5600.defensive_measures.item.turrets.cannon.*;
+import com.virus5600.defensive_measures.item.turrets.mg_turret.MGTurretItem;
 import com.virus5600.defensive_measures.util.RegistryUtil;
 
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
@@ -39,9 +40,9 @@ public class ModItems {
 	public final static Item[] DM_TURRETS;
 	public final static Item[] FUEL_ITEMS;
 
-	/////////////
+	// /////// //
 	// TURRETS //
-	/////////////
+	// /////// //
 
 	// CANNON
 	public final static Item CANNON_TURRET = registerItem("cannon_turret", ModEntities.CANNON_TURRET, CannonTurretItem::new);
@@ -59,7 +60,7 @@ public class ModItems {
 	public final static Item BALLISTA_BOW = registerItem("ballista_bow", BallistaBowItem::new);
 
 	// MACHINE GUN
-//	public final static Item MG_TURRET = new MachineGunTurretItem(ModEntities.MG_TURRET, SETTING_DMT);
+	public final static Item MG_TURRET = registerItem("mg_turret", ModEntities.MG_TURRET, MGTurretItem::new);
 //	public final static Item AMMO_CASE = new AmmoCaseItem(SETTING_DMI);
 //	public final static Item AMMO_ROUNDS = new AmmoRoundsItem(SETTING_DMI);
 //	public final static Item MACHINE_GUN_BASE = new MachineGunBaseItem(SETTING_DMI);
@@ -192,7 +193,7 @@ public class ModItems {
 		DM_TURRETS = new Item[] {
 			CANNON_TURRET,
 			BALLISTA_TURRET,
-//			MG_TURRET
+			MG_TURRET
 		};
 
 		FUEL_ITEMS = new Item[] {
@@ -205,6 +206,8 @@ public class ModItems {
 			BALLISTA_BASE,
 			BALLISTA_BASE_WITH_STAND,
 			BALLISTA_BOW
+
+			// MACHINE GUN
 		};
 	}
 }

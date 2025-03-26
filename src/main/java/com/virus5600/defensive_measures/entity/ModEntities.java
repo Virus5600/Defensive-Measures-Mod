@@ -37,15 +37,14 @@ public class ModEntities {
 			.dimensions(1F, 1F)
 			.eyeHeight(0.75F)
 	);
-//
-//	public static final EntityType<MGTurretEntity> MG_TURRET = Registry.register(
-//		Registries.ENTITY_TYPE,
-//		Identifier.of(DefensiveMeasures.MOD_ID, "mg_turret"),
-//		Builder
-//			.create(MGTurretEntity::new, SpawnGroup.MISC)
-//			.dimensions(1F, 1F)
-//			.build()
-//	);
+
+	public static final EntityType<MGTurretEntity> MG_TURRET = RegistryUtil.registerEntity(
+		"mg_turret",
+		Builder
+			.create(MGTurretEntity::new, SpawnGroup.MISC)
+			.dimensions(1F, 0.625F)
+			.eyeHeight(0.4275F)
+	);
 
 	// PROJECTILES //
 	// v1.0.0
@@ -87,6 +86,6 @@ public class ModEntities {
 		// v1.0.0
 		FabricDefaultAttributeRegistry.register(ModEntities.CANNON_TURRET, CannonTurretEntity.setAttributes());
 		FabricDefaultAttributeRegistry.register(ModEntities.BALLISTA_TURRET, BallistaTurretEntity.setAttributes());
-//		FabricDefaultAttributeRegistry.register(ModEntities.MG_TURRET, MGTurretEntity.setAttributes());
+		FabricDefaultAttributeRegistry.register(ModEntities.MG_TURRET, MGTurretEntity.setAttributes());
 	}
 }

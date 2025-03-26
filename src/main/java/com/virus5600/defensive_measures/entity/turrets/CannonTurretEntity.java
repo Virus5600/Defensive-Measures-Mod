@@ -69,7 +69,8 @@ public class CannonTurretEntity extends TurretEntity implements GeoEntity {
 	private static final int TOTAL_ATT_COOLDOWN = 20 * 5;
 	private static final Map<String, RawAnimation> ANIMATIONS;
 	private static final Map<Offsets, List<Vec3d>> OFFSETS;
-
+	private static final double[] DAMAGE;
+	private static final byte[] PIERCE_LEVELS;
 	/**
 	 * Contains all the items that can heal this entity.
 	 */
@@ -81,7 +82,6 @@ public class CannonTurretEntity extends TurretEntity implements GeoEntity {
 
 	private final AnimatableInstanceCache geoCache = GeckoLibUtil.createInstanceCache(this);
 	private boolean animPlayed = false;
-	private static final double[] DAMAGE;
 
 	// //////////// //
 	// CONSTRUCTORS //
@@ -115,9 +115,9 @@ public class CannonTurretEntity extends TurretEntity implements GeoEntity {
 
 	public static DefaultAttributeContainer.Builder setAttributes() {
 		TurretEntity.setTurretMaxHealth(50);
+		TurretEntity.setTurretMaxRange(24);
 
 		return TurretEntity.setAttributes()
-			.add(EntityAttributes.FOLLOW_RANGE, 24)
 			.add(EntityAttributes.ARMOR, 3)
 			.add(EntityAttributes.ARMOR_TOUGHNESS, 2);
 	}
@@ -146,13 +146,12 @@ public class CannonTurretEntity extends TurretEntity implements GeoEntity {
 		if (!this.getWorld().isClient) {
 			int updateCountdownTicks = this.attackGoal.getUpdateCountdownTicks(),
 				afterAttackTick = 5,
-				beforeAttackTick = CannonTurretEntity.TOTAL_ATT_COOLDOWN - afterAttackTick;
+				beforeAttackTick = TOTAL_ATT_COOLDOWN - afterAttackTick;
 
 			if (updateCountdownTicks > afterAttackTick && updateCountdownTicks < beforeAttackTick ) {
 				this.triggerAnim("FiringSequence", "charge");
 			}
 		}
-
 	}
 
 	// /////////////////// //
@@ -217,7 +216,6 @@ public class CannonTurretEntity extends TurretEntity implements GeoEntity {
 		final String LOCATOR = state.getKeyframeData()
 			.getLocator();
 
-
 		if (LOCATOR.equals("barrel")) {
 			Vec3d barrelPos = this.getRelativePos(this.getTurretProjectileSpawn().getFirst()),
 				velocityModifier = this.getRelativePos(0, 0, 1.5).subtract(this.getEyePos());
@@ -267,17 +265,18 @@ public class CannonTurretEntity extends TurretEntity implements GeoEntity {
 	// //////////////////////// //
 	// ABSTRACT IMPLEMENTATIONS //
 	// //////////////////////// //
+
 	// TurretEntity //
 	protected List<Vec3d> getTurretProjectileSpawn() {
 		return OFFSETS.get(Offsets.BARREL);
 	}
 
 	public double getProjectileDamage() {
-		return CannonTurretEntity.DAMAGE[this.getLevel() - 1];
+		return DAMAGE[this.getLevel() - 1];
 	}
 
 	public byte getProjectilePierceLevel() {
-		return 0;
+		return PIERCE_LEVELS[this.getLevel() - 1];
 	}
 
 	// /////////////////// //
@@ -293,7 +292,15 @@ public class CannonTurretEntity extends TurretEntity implements GeoEntity {
 
 	static {
 		DAMAGE = new double[] {
-			10.0
+			10.0,
+			15.0,
+			20.0
+		};
+
+		PIERCE_LEVELS = new byte[] {
+			0,
+			1,
+			2
 		};
 
 		OFFSETS = Map.of(

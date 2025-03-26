@@ -4,28 +4,22 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.attribute.DefaultAttributeContainer.Builder;
-import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.mob.MobEntity;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.particle.ParticleTypes;
 import net.minecraft.sound.SoundEvent;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
 import software.bernie.geckolib.animatable.GeoEntity;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
-import software.bernie.geckolib.animation.AnimatableManager.ControllerRegistrar;
-import software.bernie.geckolib.animation.AnimationController;
-import software.bernie.geckolib.animation.AnimationState;
-import software.bernie.geckolib.animation.PlayState;
-import software.bernie.geckolib.animation.RawAnimation;
+import software.bernie.geckolib.animation.*;
+import software.bernie.geckolib.animation.keyframe.event.ParticleKeyframeEvent;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
 import org.jetbrains.annotations.Nullable;
@@ -36,26 +30,26 @@ import com.virus5600.defensive_measures.entity.ai.goal.ProjectileAttackGoal;
 import com.virus5600.defensive_measures.item.ModItems;
 import com.virus5600.defensive_measures.sound.ModSoundEvents;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 /**
- * Represents the Ballista Turret entity.
+ * Represents the Machine Gun Turret entity.
  * <br><br>
- * A Ballista Turret is a wooden turret that shoots bolts at enemies. It has a long range and deals
- * a fair amount of damage while providing a good amount of pierce level and fire rate.
+ * A Machine Gun Turret, or in short MG Turret, is a metal turret that shoots bullets at enemies.
+ * It has a long range and deals a good amount of damage while providing a superb amount of fire
+ * rate, shooting 5 bullets per burst, with a 0.15 seconds cooldown between each bullet in a burst
+ * and a 3.75 seconds cooldown between each burst.
  * <hr/>
  * <b>Attributes:</b>
  * <ul>
  *     <li><b>Health:</b> 25</li>
- *     <li><b>Base Damage:</b> 4.0</li>
+ *     <li><b>Base Damage:</b> 5.0</li>
  *     <li><b>Base Pierce Level:</b> 5</li>
- *     <li><b>Attack Cooldown:</b> 2.5 seconds</li>
- *     <li><b>Attack Range:</b> 16 blocks</li>
+ *     <li><b>Attack Cooldown:</b> 0.1 seconds per bullets / 3.75 seconds per burst</li>
+ *     <li><b>Attack Range:</b> 20 blocks</li>
  *     <li><b>X Firing Arc:</b> ±360°</li>
- *     <li><b>Y Firing Arc:</b> ±25°</li>
+ *     <li><b>Y Firing Arc:</b> ±27.5°</li>
  * </ul>
  *
  * @see TurretEntity
@@ -65,18 +59,20 @@ import java.util.Map;
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
  * @version 1.0.0
  */
-public class BallistaTurretEntity extends TurretEntity implements GeoEntity {
+public class MGTurretEntity extends TurretEntity implements GeoEntity {
 	/**
-	 * Defines how many seconds the ballista should wait before shooting again.
-	 * The time is calculated in ticks and by default, it's 2.5 seconds <b>(20 ticks times 2.5 seconds)</b>.
+	 * Defines how many seconds the machine gun should wait before shooting again.
+	 * The time is calculated in ticks and by default, it's 3.75 seconds <b>(20 ticks times 3.75 seconds)</b>.
+	 * <br><br>
+	 * Though, this cooldown is for its burst attack. The machine gun will, however, shoot 5 bullets
+	 * per burst with a 0.15 seconds cooldown between each bullet. This part is not included in the
+	 * cooldown attribute and will be handled by the {@link #tick() tick()} method.
 	 */
-	private static final int TOTAL_ATT_COOLDOWN = (int) (20 * 2.5);
+	private static final int TOTAL_ATT_COOLDOWN = (int) (20 * 3.75);
 	private static final Map<String, RawAnimation> ANIMATIONS;
 	private static final Map<Offsets, List<Vec3d>> OFFSETS;
-	private static final Map<Item, SoundEvent> HEAL_SOUNDS;
 	private static final double[] DAMAGE;
 	private static final byte[] PIERCE_LEVELS;
-
 
 	/**
 	 * Contains all the items that can heal this entity.
@@ -93,11 +89,11 @@ public class BallistaTurretEntity extends TurretEntity implements GeoEntity {
 	// //////////// //
 	// CONSTRUCTORS //
 	// //////////// //
-	public BallistaTurretEntity(EntityType<? extends MobEntity> entityType, World world) {
-		super(entityType, world, TurretMaterial.WOOD, ModEntities.BALLISTA_ARROW, ModItems.BALLISTA_TURRET);
+	public MGTurretEntity(EntityType<? extends MobEntity> entityType, World world) {
+		super(entityType, world, TurretMaterial.METAL, ModEntities.MG_BULLET, ModItems.MG_TURRET);
 
-		this.setShootSound(ModSoundEvents.TURRET_BALLISTA_SHOOT);
-		this.setHealSound(ModSoundEvents.TURRET_REPAIR_WOOD);
+		this.setShootSound(ModSoundEvents.TURRET_MG_SHOOT);
+		this.setHealSound(ModSoundEvents.TURRET_REPAIR_METAL);
 		this.addHealables(healables);
 		this.addEffectSource(effectSource);
 	}
@@ -122,6 +118,7 @@ public class BallistaTurretEntity extends TurretEntity implements GeoEntity {
 
 	public static Builder setAttributes() {
 		TurretEntity.setTurretMaxHealth(25);
+		TurretEntity.setTurretMaxHealth(20);
 
 		return TurretEntity.setAttributes();
 	}
@@ -133,7 +130,8 @@ public class BallistaTurretEntity extends TurretEntity implements GeoEntity {
 	@Override
 	public void shootAt(LivingEntity target, float pullProgress) {
 		this.triggerAnim("Attack", "shoot");
-		super.shootAt(target, pullProgress);
+
+		super.shootBurst(5, 3, target);
 	}
 
 	@Override
@@ -150,19 +148,18 @@ public class BallistaTurretEntity extends TurretEntity implements GeoEntity {
 	}
 
 	@Override
-	public ActionResult interactMob(PlayerEntity player, Hand hand) {
-		Item usedItem = player.getStackInHand(hand).getItem();
-
-		if (this.isHealableItem(usedItem) && this.getHealSound() != ModSoundEvents.TURRET_REPAIR_WOOD) {
-			this.setHealSound(HEAL_SOUNDS.get(usedItem));
-		}
-
-		return super.interactMob(player, hand);
-	}
-
-	@Override
 	public void tick() {
 		super.tick();
+
+		if (!this.getWorld().isClient && this.getTarget() != null) {
+			int updateCountdownTicks = this.attackGoal.getUpdateCountdownTicks(),
+				afterAttackTick = 1,
+				beforeAttackTick = TOTAL_ATT_COOLDOWN - afterAttackTick;
+
+			if (updateCountdownTicks < afterAttackTick || updateCountdownTicks > beforeAttackTick) {
+				this.triggerAnim("FiringSequence", "shoot");
+			}
+		}
 	}
 
 	// /////////////////// //
@@ -171,36 +168,36 @@ public class BallistaTurretEntity extends TurretEntity implements GeoEntity {
 
 	@Override
 	public int getMaxLookPitchChange() {
-		return 25;
+		return 27;
 	}
 
 	@Nullable
 	@Override
 	protected SoundEvent getHurtSound(DamageSource source) {
-		return ModSoundEvents.TURRET_BALLISTA_HURT;
+		return ModSoundEvents.TURRET_MG_HURT;
 	}
 
 	@Nullable
 	@Override
 	protected SoundEvent getDeathSound() {
-		return ModSoundEvents.TURRET_BALLISTA_DESTROYED;
+		return ModSoundEvents.TURRET_MG_DESTROYED;
 	}
 
 	@Override
 	public ItemStack getEntityItem() {
-		return new ItemStack(ModItems.BALLISTA_TURRET);
+		return new ItemStack(ModItems.MG_TURRET);
 	}
 
 	@Override
 	public SoundEvent getEntityRemoveSound() {
-		return ModSoundEvents.TURRET_REMOVED_WOOD;
+		return ModSoundEvents.TURRET_REMOVED_METAL;
 	}
 
 	// ///////////////////// //
 	// ANIMATION CONTROLLERS //
 	// ///////////////////// //
 
-	private <E extends BallistaTurretEntity> PlayState deathController(final AnimationState<E> event) {
+	private <E extends MGTurretEntity> PlayState deathController(final AnimationState<E> event) {
 		if (!this.isAlive() && !this.animPlayed) {
 			this.animPlayed = true;
 			event.setAnimation(ANIMATIONS.get("Death"));
@@ -209,13 +206,29 @@ public class BallistaTurretEntity extends TurretEntity implements GeoEntity {
 		return PlayState.CONTINUE;
 	}
 
-	private <E extends BallistaTurretEntity>PlayState idleController(final AnimationState<E> event) {
+	private <E extends MGTurretEntity>PlayState idleController(final AnimationState<E> event) {
 		return event
 			.setAndContinue(ANIMATIONS.get("Idle"));
 	}
 
-	private <E extends BallistaTurretEntity>PlayState shootController(final AnimationState<E> event) {
+	private <E extends MGTurretEntity>PlayState shootController(final AnimationState<E> event) {
 		return PlayState.STOP;
+	}
+
+	private void shootKeyframeHandler(ParticleKeyframeEvent<MGTurretEntity> state) {
+		final String LOCATOR = state.getKeyframeData()
+			.getLocator();
+
+		if (LOCATOR.equals("barrel")) {
+			Vec3d barrelPos = this.getRelativePos(this.getTurretProjectileSpawn().getFirst()),
+				velocityModifier = this.getRelativePos(0, 0, 0).subtract(this.getEyePos());
+
+			this.getWorld().addParticle(
+				ParticleTypes.ELECTRIC_SPARK,
+				barrelPos.getX(), barrelPos.getY(), barrelPos.getZ(),
+				velocityModifier.getX(), velocityModifier.getY(), velocityModifier.getZ()
+			);
+		}
 	}
 
 	// ///////////////////////// //
@@ -224,13 +237,14 @@ public class BallistaTurretEntity extends TurretEntity implements GeoEntity {
 
 	// GeoEntity //
 	@Override
-	public void registerControllers(final ControllerRegistrar controllers) {
+	public void registerControllers(final AnimatableManager.ControllerRegistrar controllers) {
 		controllers
 			.add(
 				new AnimationController<>(this, "Death", this::deathController),
 				new AnimationController<>(this, "Idle", this::idleController),
-				new AnimationController<>(this, "Attack", this::shootController)
+				new AnimationController<>(this, "FiringSequence", this::shootController)
 					.triggerableAnim("shoot", ANIMATIONS.get("Shoot"))
+					.setParticleKeyframeHandler(this::shootKeyframeHandler)
 			);
 	}
 
@@ -245,7 +259,7 @@ public class BallistaTurretEntity extends TurretEntity implements GeoEntity {
 
 	// TurretEntity //
 	protected List<Vec3d> getTurretProjectileSpawn() {
-		return OFFSETS.get(Offsets.BOLT_HOLDER);
+		return OFFSETS.get(Offsets.BARREL);
 	}
 
 	public double getProjectileDamage() {
@@ -260,7 +274,7 @@ public class BallistaTurretEntity extends TurretEntity implements GeoEntity {
 	// LOCAL CLASSES/ENUMS //
 	// /////////////////// //
 	public enum Offsets {
-		BOLT_HOLDER
+		BARREL
 	}
 
 	// ///////////////// //
@@ -269,63 +283,42 @@ public class BallistaTurretEntity extends TurretEntity implements GeoEntity {
 
 	static {
 		DAMAGE = new double[] {
-			3.5,
-			7.0,
-			12.0
+			5.0,
+			6.25,
+			7.5
 		};
 
 		PIERCE_LEVELS = new byte[] {
 			5,
-			7,
-			10
+			5,
+			6
 		};
 
 		OFFSETS = Map.of(
-			Offsets.BOLT_HOLDER, List.of(
-				new Vec3d(0, 0, 0.875)
+			Offsets.BARREL, List.of(
+				new Vec3d(0.0, 0.0, 0.4875)
 			)
 		);
 
 		ANIMATIONS = Map.of(
 			"Death", RawAnimation.begin()
-				.thenPlayAndHold("animation.ballista.death"),
+				.thenPlayAndHold("animation.machine_gun_turret.death"),
 			"Idle", RawAnimation.begin()
-				.thenLoop("animation.ballista.setup"),
+				.thenLoop("animation.machine_gun_turret.setup"),
 			"Shoot", RawAnimation.begin()
-				.thenPlay("animation.ballista.shoot")
+				.thenPlay("animation.machine_gun_turret.shoot")
 		);
 
-		HEAL_SOUNDS = new HashMap<>() {
-			{
-				put(Items.STICK, ModSoundEvents.TURRET_REPAIR_WOOD);
-				put(Items.STRING, ModSoundEvents.TURRET_REPAIR_BOW);
+		healables = Map.of(
+			Items.IRON_NUGGET, 1f,
+			Items.IRON_INGOT, 10f,
+			Items.IRON_BLOCK, 100f
+		);
 
-				final List<Item> WOODS = new ArrayList<>(TurretEntity.PLANKS.stream().toList());
-				WOODS.addAll(TurretEntity.LOGS);
-				WOODS.forEach(item -> put(item, ModSoundEvents.TURRET_REPAIR_WOOD));
-			}
-		};
-
-		healables = new HashMap<>() {
-			{
-				put(Items.STICK, 1.0f);
-				put(Items.STRING, 1.0f);
-
-				TurretEntity.PLANKS.forEach(item -> put(item, 3.0f));
-				TurretEntity.LOGS.forEach(item -> put(item, 25.0f));
-			}
-		};
-
-		effectSource = new HashMap<>() {
-			{
-				for (Item item : TurretEntity.LOGS) {
-					put(item, new ArrayList<>() {
-						{
-							add(new Object[] {StatusEffects.ABSORPTION, 60, 2});
-						}
-					});
-				}
-			}
-		};
+		effectSource = Map.of(
+			Items.IRON_BLOCK, List.<Object[]>of(
+				new Object[] { StatusEffects.RESISTANCE, 60, 2 }
+			)
+		);
 	}
 }

@@ -29,6 +29,7 @@ public class ModEntityRenderer {
 		// v1.0.0
 		EntityRendererRegistry.register(ModEntities.CANNON_TURRET, CannonTurretRenderer::new);
 		EntityRendererRegistry.register(ModEntities.BALLISTA_TURRET, BallistaTurretRenderer::new);
+		EntityRendererRegistry.register(ModEntities.MG_TURRET, MGTurretRenderer::new);
 
 		/////////////////
 		// PROJECTILES //

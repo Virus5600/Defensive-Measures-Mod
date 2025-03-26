@@ -10,3 +10,9 @@ TODO: TurretEntity
 - Method
 	- calculateVelocity
 		- Properly calculate the parabolic trajectory (low priority) - Apparently, it was because of the "acceleration" modifier in the "ExplosiveProjectileEntity" class. Fuck.
+
+TODO: MG Turret
+- Implement MG Turret items
+- Implement MG Barrel Flash
+- Align eye level to barrel
+- Align barrel to model's barrel

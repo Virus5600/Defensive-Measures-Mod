@@ -58,5 +58,8 @@ public class BallistaArrowRenderer extends GeoEntityRenderer<BallistaArrowEntity
 
 		poseStack.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(newYaw));
 		poseStack.multiply(RotationAxis.POSITIVE_X.rotationDegrees(-newPitch));
+
+		super.preRender(poseStack, animatable, model, bufferSource, buffer, isReRender,
+			partialTick, packedLight, packedOverlay, renderColor);
 	}
 }

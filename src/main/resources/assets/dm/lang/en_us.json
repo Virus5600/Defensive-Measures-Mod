@@ -37,6 +37,10 @@
 	"itemTooltip.dm.ballista.line2" : "Firing Arc: X: ±360° | Y: ±25°",
 	"itemTooltip.dm.ballista.line3" : "Reload Time: 2.5 seconds",
 
+	"itemTooltip.dm.mg_turret.line1" : "Range: 20 blocks",
+	"itemTooltip.dm.mg_turret.line2" : "Firing Arc: X: ±360° | Y: ±27.5°",
+	"itemTooltip.dm.mg_turret.line3" : "Reload Time: 0.15 seconds (burst) | 3.75 seconds (cooldown)",
+
 	"entity.dm.cannon_turret" : "Cannon Turret",
 	"entity.dm.cannonball" : "Cannon ball",
 
