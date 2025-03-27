@@ -20,6 +20,7 @@ import net.minecraft.util.Identifier;
 public class ModParticles {
 	// PARTICLES
 	public static final SimpleParticleType SPARKS = register("sparks", false);
+	public static final SimpleParticleType SUSPENDED_SPARKS = register("suspended_sparks", false);
 	public static final SimpleParticleType CANNON_FUSE = register("cannon_fuse", true);
 
 	// EMITTERS

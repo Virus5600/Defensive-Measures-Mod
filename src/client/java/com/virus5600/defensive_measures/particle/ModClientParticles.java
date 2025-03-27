@@ -28,6 +28,7 @@ public class ModClientParticles {
 		// PARTICLES
 		registry.register(ModParticles.CANNON_FUSE, CannonFuse.Factory::new);
 		registry.register(ModParticles.SPARKS, Sparks.Factory::new);
+		registry.register(ModParticles.SUSPENDED_SPARKS, Sparks.SuspendedFactory::new);
 
 		// EMITTERS
 		registry.register(ModParticles.CANNON_FLASH, new CannonFlash.Factory());

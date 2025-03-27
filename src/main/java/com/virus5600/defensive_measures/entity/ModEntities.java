@@ -53,7 +53,7 @@ public class ModEntities {
 		Builder
 			.<CannonballEntity>create(CannonballEntity::new, SpawnGroup.MISC)
 			.dropsNothing()
-			.dimensions(0.125f, 0.125f)
+			.dimensions(0.5f, 0.5f)
 			.maxTrackingRange(4)
 			.trackingTickInterval(10)
 	);

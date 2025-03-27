@@ -217,7 +217,7 @@ public class CannonTurretEntity extends TurretEntity implements GeoEntity {
 			.getLocator();
 
 		if (LOCATOR.equals("barrel")) {
-			Vec3d barrelPos = this.getRelativePos(this.getTurretProjectileSpawn().getFirst()),
+			Vec3d barrelPos = this.getRelativePos(this.getCurrentBarrel(false)),
 				velocityModifier = this.getRelativePos(0, 0, 1.5).subtract(this.getEyePos());
 
 			this.getWorld().addParticle(
@@ -323,24 +323,16 @@ public class CannonTurretEntity extends TurretEntity implements GeoEntity {
 				.thenPlay("animation.cannon_turret.shoot")
 		);
 
-		healables = new HashMap<>() {
-			{
-				for (Item item : TurretEntity.PLANKS)
-					put(item, 1.0f);
-				put(Items.IRON_NUGGET, 1f);
-				put(Items.IRON_INGOT, 10f);
-				put(Items.IRON_BLOCK, 100f);
-			}
-		};
+		healables = Map.of(
+			Items.IRON_NUGGET, 1f,
+			Items.IRON_INGOT, 10f,
+			Items.IRON_BLOCK, 100f
+		);
 
-		effectSource = new HashMap<>() {
-			{
-				put(Items.IRON_BLOCK, new ArrayList<>() {
-					{
-						add(new Object[] {StatusEffects.ABSORPTION, 60, 2});
-					}
-				});
-			}
-		};
+		effectSource = Map.of(
+			Items.IRON_BLOCK, List.<Object[]>of(
+				new Object[] { StatusEffects.RESISTANCE, 60, 2 }
+			)
+		);
 	}
 }

@@ -1,5 +1,6 @@
 package com.virus5600.defensive_measures.entity.turrets;
 
+import com.virus5600.defensive_measures.particle.ModParticles;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -11,7 +12,6 @@ import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.particle.ParticleTypes;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
@@ -129,7 +129,7 @@ public class MGTurretEntity extends TurretEntity implements GeoEntity {
 
 	@Override
 	public void shootAt(LivingEntity target, float pullProgress) {
-		this.triggerAnim("Attack", "shoot");
+		this.triggerAnim("FiringSequence", "shoot");
 
 		super.shootBurst(5, 3, target);
 	}
@@ -145,21 +145,6 @@ public class MGTurretEntity extends TurretEntity implements GeoEntity {
 		}
 
 		super.onRemove(reason);
-	}
-
-	@Override
-	public void tick() {
-		super.tick();
-
-		if (!this.getWorld().isClient && this.getTarget() != null) {
-			int updateCountdownTicks = this.attackGoal.getUpdateCountdownTicks(),
-				afterAttackTick = 1,
-				beforeAttackTick = TOTAL_ATT_COOLDOWN - afterAttackTick;
-
-			if (updateCountdownTicks < afterAttackTick || updateCountdownTicks > beforeAttackTick) {
-				this.triggerAnim("FiringSequence", "shoot");
-			}
-		}
 	}
 
 	// /////////////////// //
@@ -220,11 +205,11 @@ public class MGTurretEntity extends TurretEntity implements GeoEntity {
 			.getLocator();
 
 		if (LOCATOR.equals("barrel")) {
-			Vec3d barrelPos = this.getRelativePos(this.getTurretProjectileSpawn().getFirst()),
+			Vec3d barrelPos = this.getRelativePos(this.getCurrentBarrel(false)),
 				velocityModifier = this.getRelativePos(0, 0, 0).subtract(this.getEyePos());
 
 			this.getWorld().addParticle(
-				ParticleTypes.ELECTRIC_SPARK,
+				ModParticles.SUSPENDED_SPARKS,
 				barrelPos.getX(), barrelPos.getY(), barrelPos.getZ(),
 				velocityModifier.getX(), velocityModifier.getY(), velocityModifier.getZ()
 			);
@@ -296,7 +281,7 @@ public class MGTurretEntity extends TurretEntity implements GeoEntity {
 
 		OFFSETS = Map.of(
 			Offsets.BARREL, List.of(
-				new Vec3d(0.0, 0.0, 0.4875)
+				new Vec3d(0.0, 0.0, 0.5)
 			)
 		);
 

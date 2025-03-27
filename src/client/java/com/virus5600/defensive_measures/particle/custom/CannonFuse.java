@@ -119,6 +119,8 @@ public class CannonFuse extends SpriteBillboardParticle {
         }
 	}
 
+	// FACTORIES //
+
 	@Environment(EnvType.CLIENT)
 	public static class Factory implements ParticleFactory<SimpleParticleType> {
 		private final SpriteProvider sprites;
