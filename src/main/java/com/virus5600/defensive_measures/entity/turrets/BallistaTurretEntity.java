@@ -122,6 +122,7 @@ public class BallistaTurretEntity extends TurretEntity implements GeoEntity {
 
 	public static Builder setAttributes() {
 		TurretEntity.setTurretMaxHealth(25);
+		TurretEntity.setTurretMaxRange(TurretEntity.getTurretMaxRange() + ModEntities.BALLISTA_TURRET.getDimensions().eyeHeight());
 
 		return TurretEntity.setAttributes();
 	}
@@ -132,8 +133,15 @@ public class BallistaTurretEntity extends TurretEntity implements GeoEntity {
 
 	@Override
 	public void shootAt(LivingEntity target, float pullProgress) {
+		float dist = (float) this.getPos().distanceTo(target.getPos());
+
+		TurretProjectileVelocity velocityData = TurretProjectileVelocity.init(this)
+			.setVelocity(target)
+			.setUpwardVelocityMultiplier(dist * 0.125f);
+
+		super.shootAt(velocityData);
+
 		this.triggerAnim("Attack", "shoot");
-		super.shootAt(target, pullProgress);
 	}
 
 	@Override

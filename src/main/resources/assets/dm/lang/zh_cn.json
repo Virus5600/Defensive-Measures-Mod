@@ -20,11 +20,11 @@
 	"item.dm.ballista_arrow" : "弩箭",
 	"item.dm.ballista" : "设置弩箭塔",
 
-	"item.dm.ammo_case" : "弹匣",
-	"item.dm.ammo_rounds" : "弹链",
-	"item.dm.machine_gun_base" : "机枪塔底座",
-	"item.dm.machine_gun_head" : "机枪",
-	"item.dm.machine_gun_stand" : "机枪支架",
+	"item.dm.mg_ammo_case" : "弹匣",
+	"item.dm.mg_ammo_rounds" : "弹链",
+	"item.dm.mg_base" : "机枪塔底座",
+	"item.dm.mg_head" : "机枪",
+	"item.dm.mg_stand" : "机枪支架",
 	"item.dm.mg_turret" : "设置机枪塔",
 
 	"entity.dm.cannon_turret" : "炮塔",

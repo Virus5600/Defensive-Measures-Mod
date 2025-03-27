@@ -1,6 +1,6 @@
 {
 	"model": {
 		"type": "minecraft:model",
-		"model": "dm:item/ammo_case"
+		"model": "dm:item/mg_stand"
 	}
 }

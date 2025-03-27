@@ -20,11 +20,11 @@
 	"item.dm.ballista_arrow" : "Ballista Arrow",
 	"item.dm.ballista" : "Place Ballista",
 
-	"item.dm.ammo_case" : "Ammo Case",
-	"item.dm.ammo_rounds" : "Ammo Rounds",
-	"item.dm.machine_gun_base" : "MG Base",
-	"item.dm.machine_gun_head" : "MG Head",
-	"item.dm.machine_gun_stand" : "MG Stand",
+	"item.dm.mg_ammo_case" : "Ammo Case",
+	"item.dm.mg_ammo_rounds" : "Ammo Rounds",
+	"item.dm.mg_base" : "MG Base",
+	"item.dm.mg_head" : "MG Head",
+	"item.dm.mg_stand" : "MG Stand",
 	"item.dm.mg_turret" : "Place MG Turret",
 
 	"itemTooltip.dm.generic.health" : "Health: %s / %s",

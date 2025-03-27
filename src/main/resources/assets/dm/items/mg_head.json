@@ -1,6 +1,6 @@
 {
 	"model": {
 		"type": "minecraft:model",
-		"model": "dm:item/ammo_rounds"
+		"model": "dm:item/mg_head"
 	}
 }

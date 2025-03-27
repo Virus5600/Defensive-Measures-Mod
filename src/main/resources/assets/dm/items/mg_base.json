@@ -1,6 +1,6 @@
 {
 	"model": {
 		"type": "minecraft:model",
-		"model": "dm:item/machine_gun_base"
+		"model": "dm:item/mg_base"
 	}
 }

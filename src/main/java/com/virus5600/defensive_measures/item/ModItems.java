@@ -9,7 +9,7 @@ import com.virus5600.defensive_measures.item.interfaces.FuelItem;
 import com.virus5600.defensive_measures.item.turrets.TurretItem;
 import com.virus5600.defensive_measures.item.turrets.ballista.*;
 import com.virus5600.defensive_measures.item.turrets.cannon.*;
-import com.virus5600.defensive_measures.item.turrets.mg_turret.MGTurretItem;
+import com.virus5600.defensive_measures.item.turrets.mg_turret.*;
 import com.virus5600.defensive_measures.util.RegistryUtil;
 
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
@@ -61,22 +61,22 @@ public class ModItems {
 
 	// MACHINE GUN
 	public final static Item MG_TURRET = registerItem("mg_turret", ModEntities.MG_TURRET, MGTurretItem::new);
-//	public final static Item AMMO_CASE = new AmmoCaseItem(SETTING_DMI);
-//	public final static Item AMMO_ROUNDS = new AmmoRoundsItem(SETTING_DMI);
-//	public final static Item MACHINE_GUN_BASE = new MachineGunBaseItem(SETTING_DMI);
-//	public final static Item MACHINE_GUN_HEAD = new MachineGunHeadItem(SETTING_DMI);
-//	public final static Item MACHINE_GUN_STAND = new MachineGunStandItem(SETTING_DMI);
+	public final static Item MG_AMMO_CASE = registerItem("mg_ammo_case", MGAmmoCaseItem::new);
+	public final static Item MG_AMMO_ROUNDS = registerItem("mg_ammo_rounds", MGAmmoRoundsItem::new);
+	public final static Item MG_BASE = registerItem("mg_base", MGBaseItem::new);
+	public final static Item MG_HEAD = registerItem("mg_head", MGHeadItem::new);
+	public final static Item MG_STAND = registerItem("mg_stand", MGStandItem::new);
 
-	////////////////
+	// ////////// //
 	// EQUIPMENTS //
-	////////////////
+	// ////////// //
 
 	// TURRET REMOVER
 	public final static Item TURRET_REMOVER = registerItem("turret_remover", TurretRemoverItem::new);
 
-	//////////////////////////////
+	// //////////////////////// //
 	// REGISTRY RELATED METHODS //
-	//////////////////////////////
+	// //////////////////////// //
 
 	/**
 	 * Registers a turret item which spawns a turret entity.
@@ -175,11 +175,11 @@ public class ModItems {
 			BALLISTA_BOW,
 
 			// MACHINE GUN
-//			AMMO_CASE,
-//			AMMO_ROUNDS,
-//			MACHINE_GUN_BASE,
-//			MACHINE_GUN_HEAD,
-//			MACHINE_GUN_STAND
+			MG_AMMO_CASE,
+			MG_AMMO_ROUNDS,
+			MG_BASE,
+			MG_HEAD,
+			MG_STAND
 		};
 
 		DM_EQUIPMENTS = new Item[] {
@@ -205,9 +205,7 @@ public class ModItems {
 			BALLISTA_ARROW,
 			BALLISTA_BASE,
 			BALLISTA_BASE_WITH_STAND,
-			BALLISTA_BOW
-
-			// MACHINE GUN
+			BALLISTA_BOW,
 		};
 	}
 }

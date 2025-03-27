@@ -115,7 +115,7 @@ public class CannonTurretEntity extends TurretEntity implements GeoEntity {
 
 	public static DefaultAttributeContainer.Builder setAttributes() {
 		TurretEntity.setTurretMaxHealth(50);
-		TurretEntity.setTurretMaxRange(24);
+		TurretEntity.setTurretMaxRange(24 + ModEntities.CANNON_TURRET.getDimensions().eyeHeight());
 
 		return TurretEntity.setAttributes()
 			.add(EntityAttributes.ARMOR, 3)

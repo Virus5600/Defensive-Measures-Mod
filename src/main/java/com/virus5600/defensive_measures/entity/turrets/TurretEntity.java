@@ -181,6 +181,7 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 	 * delay between each shot from a burst.
 	 */
 	private int burstDelayTimer = 0;
+	private TurretProjectileVelocity velocityData = null;
 
 	/**
 	 * The sound the turret makes when it is being healed.
@@ -769,7 +770,12 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 					if (--this.burstDelayTimer <= 0) {
 
 						// ... shoot the projectile
-						this.shoot(this.getTarget());
+						if (this.velocityData == null) {
+							this.shoot(this.getTarget());
+						}
+						else {
+							this.shoot(this.velocityData);
+						}
 						burstFired++;
 
 						// ... check if the fired projectile is equal to the burst count
@@ -821,6 +827,7 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 		this.dataTracker.set(BURST_PROJECTILE_FIRED, 0);
 		this.dataTracker.set(BURST_DELAY, 0);
 		this.burstDelayTimer = 0;
+		this.velocityData = null;
 	}
 
 	// //////////////////////////////// //
@@ -1574,6 +1581,14 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 	protected void shootBurst(int count, int delay, LivingEntity target) {
 		this.shootBurst(count, delay);
 		this.setTarget(target);
+	}
+
+	protected void shootBurst(int count, int delay, TurretProjectileVelocity velocityData) {
+		this.shootBurst(count, delay);
+
+		if (!this.getWorld().isClient) {
+			this.velocityData = velocityData;
+		}
 	}
 
 	protected void shoot(TurretProjectileVelocity velocityData) {

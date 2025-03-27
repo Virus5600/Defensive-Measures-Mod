@@ -113,12 +113,12 @@ public class MGTurretEntity extends TurretEntity implements GeoEntity {
 	@Override
 	protected void initDataTracker(DataTracker.Builder builder) {
 		// Initialize standard data trackers
-		super.initDataTracker(builder);
+	super.initDataTracker(builder);
 	}
 
 	public static Builder setAttributes() {
 		TurretEntity.setTurretMaxHealth(25);
-		TurretEntity.setTurretMaxHealth(20);
+		TurretEntity.setTurretMaxRange(20 + ModEntities.MG_TURRET.getDimensions().eyeHeight());
 
 		return TurretEntity.setAttributes();
 	}
@@ -131,7 +131,13 @@ public class MGTurretEntity extends TurretEntity implements GeoEntity {
 	public void shootAt(LivingEntity target, float pullProgress) {
 		this.triggerAnim("FiringSequence", "shoot");
 
-		super.shootBurst(5, 3, target);
+		float dist = (float) this.getPos().distanceTo(target.getPos());
+
+		TurretProjectileVelocity velocityData = TurretProjectileVelocity.init(this)
+			.setVelocity(target)
+			.setUpwardVelocityMultiplier(dist * 0.125f);
+
+		super.shootBurst(5, 3, velocityData);
 	}
 
 	@Override
