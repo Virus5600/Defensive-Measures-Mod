@@ -1,10 +1,10 @@
 package com.virus5600.defensive_measures.item;
 
 import net.minecraft.block.Block;
+import net.minecraft.item.Item;
 import net.minecraft.item.ToolMaterial;
-import net.minecraft.registry.RegistryKeys;
+import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.registry.tag.TagKey;
-import net.minecraft.util.Identifier;
 
 /**
  * An enum representing the materials that a modded tool can be made of.
@@ -16,60 +16,25 @@ import net.minecraft.util.Identifier;
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
  * @version 1.0.0
  */
- public enum ModToolMaterials {
-	TURRET_REMOVER(100, 1.0F, 0.0F, null, 15, "turret_remover_repairable");;
+public final class ModToolMaterials {
+	public static final ToolMaterial TURRET_REMOVER;
 
-	private final int itemDurability;
-	private final float miningSpeed;
-	private final float attackDamageBonus;
-	private final TagKey<Block> incorrectBlocksForDrops;
-	private final int enchantability;
-	private final String repairIngredientsItemTag;
-	private final ToolMaterial toolMaterialInstance;
-
-	ModToolMaterials(int itemDurability, float miningSpeed, float attackDamageBonus, TagKey<Block> incorrectBlocksForDrops, int enchantability, String repairIngredientsItemTag) {
-		this.itemDurability = itemDurability;
-		this.miningSpeed = miningSpeed;
-		this.attackDamageBonus = attackDamageBonus;
-		this.incorrectBlocksForDrops = incorrectBlocksForDrops;
-		this.enchantability = enchantability;
-		this.repairIngredientsItemTag = repairIngredientsItemTag;
-
-		this.toolMaterialInstance = new ToolMaterial(
-			this.incorrectBlocksForDrops,
-			this.itemDurability,
-			this.miningSpeed,
-			this.attackDamageBonus,
-			this.enchantability,
-			TagKey.of(RegistryKeys.ITEM, Identifier.of(repairIngredientsItemTag))
+	public static ToolMaterial createMaterial(TagKey<Block> incorrectBlockForDrops, int durability, float speed, float attackDmgBonus, int enchantmentValue, TagKey<Item> repairItems) {
+		return new ToolMaterial(
+			incorrectBlockForDrops,
+			durability,
+			speed,
+			attackDmgBonus,
+			enchantmentValue,
+			repairItems
 		);
 	}
 
-	public int getDurability() {
-		return this.itemDurability;
-	}
-
-	public float getMiningSpeedMultiplier() {
-		return this.miningSpeed;
-	}
-
-	public float getAttackDamageBonus() {
-		return this.attackDamageBonus;
-	}
-
-	public TagKey<Block> getIncorrectBlocksForDrops() {
-		return this.incorrectBlocksForDrops;
-	}
-
-	public int getEnchantability() {
-		return this.enchantability;
-	}
-
-	public String getRepairIngredientsItemTag() {
-		return this.repairIngredientsItemTag;
-	}
-
-	public ToolMaterial getToolMaterialInstance() {
-		return this.toolMaterialInstance;
+	static {
+		TURRET_REMOVER = ModToolMaterials.createMaterial(
+			BlockTags.INCORRECT_FOR_WOODEN_TOOL,
+			100, 1.0f, 0.0f,  15,
+			ModItemTags.TURRET_REMOVER_REPAIRABLE
+		);
 	}
 }

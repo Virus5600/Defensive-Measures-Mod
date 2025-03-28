@@ -1,0 +1,18 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"category": "turret",
+	"group": "dm:cannon_turret",
+	"pattern": [
+		"shs",
+		" b "
+	],
+	"key": {
+		"s": "dm:cannon_stand",
+		"h": "dm:cannon_head",
+		"b": "dm:cannon_base"
+	},
+	"result": {
+		"id": "dm:cannon_turret",
+		"count": 1
+	}
+}

@@ -582,8 +582,9 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 
 		// Turret Remover Interaction
 		if (item.getItem().equals(ModItems.TURRET_REMOVER)) {
-			if (isSurvival)
+			if (isSurvival) {
 				item.damage(1, player);
+			}
 
 			return Itemable.tryItem(player, hand, this, item.getItem(), this.itemable)
 				.orElse(super.interactMob(player, hand));

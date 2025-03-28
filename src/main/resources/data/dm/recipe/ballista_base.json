@@ -1,17 +1,16 @@
 {
 	"type": "minecraft:crafting_shaped",
+	"category": "misc",
 	"pattern": [
 		" s ",
 		"sss",
 		" s "
 	],
 	"key": {
-		"s": {
-			"tag": "minecraft:wooden_slabs"
-		}
+		"s": "#minecraft:wooden_slabs"
 	},
 	"result": {
-		"item": "dm:ballista_base",
+		"id": "dm:ballista_base",
 		"count": 1
 	}
 }

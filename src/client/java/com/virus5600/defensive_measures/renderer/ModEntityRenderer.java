@@ -22,18 +22,18 @@ public class ModEntityRenderer {
 	public static void registerEntityRenderers() {
 		DefensiveMeasures.LOGGER.info("REGISTERING ENTITY RENDERERS FOR {}...", DefensiveMeasures.MOD_NAME);
 
-		/////////////
+		// /////// //
 		// TURRETS //
-		/////////////
+		// /////// //
 
 		// v1.0.0
 		EntityRendererRegistry.register(ModEntities.CANNON_TURRET, CannonTurretRenderer::new);
 		EntityRendererRegistry.register(ModEntities.BALLISTA_TURRET, BallistaTurretRenderer::new);
 		EntityRendererRegistry.register(ModEntities.MG_TURRET, MGTurretRenderer::new);
 
-		/////////////////
+		// /////////// //
 		// PROJECTILES //
-		/////////////////
+		// /////////// //
 
 		// v1.0.0
 		EntityRendererRegistry.register(ModEntities.CANNONBALL, CannonballRenderer::new);

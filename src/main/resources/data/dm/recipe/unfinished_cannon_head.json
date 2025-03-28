@@ -1,0 +1,18 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"category": "misc",
+	"pattern": [
+		"ibi",
+		"bgi",
+		"ibi"
+	],
+	"key": {
+		"b": "minecraft:iron_block",
+		"i": "minecraft:iron_ingot",
+		"g": "minecraft:gunpowder"
+	},
+	"result": {
+		"id": "dm:unfinished_cannon_head",
+		"count": 1
+	}
+}

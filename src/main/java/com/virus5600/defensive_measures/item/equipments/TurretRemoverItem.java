@@ -3,6 +3,9 @@ package com.virus5600.defensive_measures.item.equipments;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
+import net.minecraft.item.MiningToolItem;
+import net.minecraft.item.ToolMaterial;
+import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.util.Rarity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -26,11 +29,14 @@ import net.minecraft.world.World;
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
  * @version 1.0.0
  */
-public class TurretRemoverItem extends Item {
+public class TurretRemoverItem extends MiningToolItem {
 
-	public TurretRemoverItem(Settings settings) {
+	public TurretRemoverItem(ToolMaterial material, float attackDamage, float attackSpeed, Item.Settings settings) {
 		super(
-			// RARITY
+			material,
+			BlockTags.AIR,
+			attackDamage,
+			attackSpeed,
 			settings.rarity(Rarity.COMMON)
 		);
 	}

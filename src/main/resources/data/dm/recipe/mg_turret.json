@@ -1,0 +1,18 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"category": "turret",
+	"pattern": [
+		"h",
+		"s",
+		"b"
+	],
+	"key": {
+		"h": "dm:mg_head",
+		"s": "dm:mg_stand",
+		"b": "dm:mg_base"
+	},
+	"result": {
+		"id": "dm:mg_turret",
+		"count": 1
+	}
+}

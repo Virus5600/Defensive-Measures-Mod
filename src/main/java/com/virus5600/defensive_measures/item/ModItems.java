@@ -21,6 +21,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.Item.Settings;
 
 import java.util.Arrays;
+import java.util.function.Function;
 
 /**
  * A class that contains all the items in the mod.
@@ -72,7 +73,7 @@ public class ModItems {
 	// ////////// //
 
 	// TURRET REMOVER
-	public final static Item TURRET_REMOVER = registerItem("turret_remover", TurretRemoverItem::new);
+	public final static Item TURRET_REMOVER = registerToolItem("turret_remover", (settings) -> new TurretRemoverItem(ModToolMaterials.TURRET_REMOVER, 0.0f, 0.0f, settings));
 
 	// //////////////////////// //
 	// REGISTRY RELATED METHODS //
@@ -94,7 +95,22 @@ public class ModItems {
 	}
 
 	/**
-	 * Registers a normal item such as ingredients, tools, etc.
+	 * Registers a tool item such as shovels and weapons.
+	 *
+	 * @param name The name of the item. (e.g. "turret_remover")
+	 * @param factory The factory method to create the item. Usually a lambda expression like {@code (Function) ((settings) -> new TurretRemoverItem(settings, ...))}.
+	 *
+	 * @return The registered item.
+	 */
+	private static Item registerToolItem(String name, Function<Item.Settings, Item> factory) {
+		return RegistryUtil.registerItem(
+			name,
+			factory
+		);
+	}
+
+	/**
+	 * Registers a normal item such as ingredients, etc.
 	 * @param name The name of the item. (e.g. "cannon_base")
 	 * @param factory The factory method to create the item. Usually a lambda expression like {@code CannonBaseItem::new}.
 	 * @return The registered item.

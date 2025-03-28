@@ -1,0 +1,16 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"category": "misc",
+	"pattern": [
+		"f",
+		"s"
+	],
+	"key": {
+		"f": "#minecraft:wooden_fences",
+		"s": "dm:ballista_base"
+	},
+	"result": {
+		"id": "dm:ballista_base_with_stand",
+		"count": 1
+	}
+}
