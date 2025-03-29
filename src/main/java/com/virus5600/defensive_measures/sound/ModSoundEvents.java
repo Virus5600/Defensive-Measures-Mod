@@ -21,7 +21,7 @@ import net.minecraft.util.Identifier;
  */
 public class ModSoundEvents {
 
-	// V1.0
+	// V1.0.0-beta
 	public final static SoundEvent TURRET_REMOVED_METAL = ModSoundEvents.registerSoundEvent("turret.remove.metal");
 	public final static SoundEvent TURRET_REMOVED_WOOD = ModSoundEvents.registerSoundEvent("turret.remove.wood");
 	public final static SoundEvent TURRET_REPAIR_METAL = ModSoundEvents.registerSoundEvent("turret.repair.metal");
@@ -41,7 +41,7 @@ public class ModSoundEvents {
 	public final static SoundEvent TURRET_MG_DESTROYED = ModSoundEvents.registerSoundEvent("turret.mg_turret.destroyed");
 	public final static SoundEvent TURRET_MG_SHOOT = ModSoundEvents.registerSoundEvent("turret.mg_turret.shoot");
 
-	// v1.1.0-beta
+	// v1.0.1-beta
 	public static final SoundEvent BULLET_IMPACT_DEFAULT = ModSoundEvents.registerSoundEvent("generic.impact.bullet.default");
 	public static final SoundEvent BULLET_IMPACT_FLESH = ModSoundEvents.registerSoundEvent("generic.impact.bullet.flesh");
 	public static final SoundEvent BULLET_IMPACT_GLASS = ModSoundEvents.registerSoundEvent("generic.impact.bullet.glass");
