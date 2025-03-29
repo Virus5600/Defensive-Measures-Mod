@@ -6,19 +6,22 @@
 			"entries": [
 				{
 					"type": "minecraft:item",
-					"weight": 35,
-					"name": "dm:ballista_bow",
+					"weight": 40,
+					"name": "minecraft:iron_nugget",
 					"functions": [
 						{
 							"function": "minecraft:set_count",
-							"count": 1
+							"count": {
+								"min": 5,
+								"max": 9
+							}
 						}
 					]
 				},
 				{
 					"type": "minecraft:item",
-					"weight": 65,
-					"name": "minecraft:string",
+					"weight": 30,
+					"name": "minecraft:iron_ingot",
 					"functions": [
 						{
 							"function": "minecraft:set_count",

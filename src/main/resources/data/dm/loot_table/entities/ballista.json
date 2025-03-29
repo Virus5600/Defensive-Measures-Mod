@@ -7,12 +7,12 @@
 				{
 					"type": "minecraft:loot_table",
 					"weight": 20,
-					"name": "dm:entities/ballista/head_1"
+					"value": "dm:entities/ballista/head_1"
 				},
 				{
 					"type": "minecraft:loot_table",
 					"weight": 40,
-					"name": "dm:entities/ballista/head_2"
+					"value": "dm:entities/ballista/head_2"
 				}
 			]
 		},

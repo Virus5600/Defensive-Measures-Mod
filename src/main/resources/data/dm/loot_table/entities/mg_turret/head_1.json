@@ -7,7 +7,7 @@
 				{
 					"type": "minecraft:item",
 					"weight": 20,
-					"name": "dm:cannon_head",
+					"name": "dm:mg_head",
 					"functions": [
 						{
 							"function": "minecraft:set_count",
@@ -18,7 +18,7 @@
 				{
 					"type": "minecraft:item",
 					"weight": 50,
-					"name": "dm:unfinished_cannon_head",
+					"name": "dm:mg_stand",
 					"functions": [
 						{
 							"function": "minecraft:set_count",

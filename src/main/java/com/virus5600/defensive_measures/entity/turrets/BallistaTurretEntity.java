@@ -122,7 +122,7 @@ public class BallistaTurretEntity extends TurretEntity implements GeoEntity {
 
 	public static Builder setAttributes() {
 		TurretEntity.setTurretMaxHealth(25);
-		TurretEntity.setTurretMaxRange(TurretEntity.getTurretMaxRange() + ModEntities.BALLISTA_TURRET.getDimensions().eyeHeight());
+		TurretEntity.setTurretMaxRange(16 + ModEntities.BALLISTA_TURRET.getDimensions().eyeHeight());
 
 		return TurretEntity.setAttributes();
 	}
