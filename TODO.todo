@@ -10,6 +10,3 @@ TODO: TurretEntity
 - Method
 	- calculateVelocity
 		- Properly calculate the parabolic trajectory (low priority) - Apparently, it was because of the "acceleration" modifier in the "ExplosiveProjectileEntity" class. Fuck.
-
-TODO: Mob Loot
-- Update/Refactor the loot tables to allow the turrets to drop items on death.

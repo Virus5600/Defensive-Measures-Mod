@@ -4,9 +4,12 @@ import net.minecraft.block.Block;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.passive.IronGolemEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.GameRules;
 import net.minecraft.world.World;
 
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
@@ -148,7 +151,9 @@ public class MGBulletEntity extends KineticProjectileEntity {
 		Block block = this.getWorld()
 			.getBlockState(blockHitResult.getBlockPos())
 			.getBlock();
-		switch (BlockUtil.getBlockCategory(block)) {
+		BlockCategory blockCat = BlockUtil.getBlockCategory(block);
+
+		switch (blockCat) {
 			case BlockCategory.GLASS -> this.setSound(ModSoundEvents.BULLET_IMPACT_GLASS);
 			case BlockCategory.GRAINY -> this.setSound(ModSoundEvents.BULLET_IMPACT_GRAINY);
 			case BlockCategory.METAL -> this.setSound(ModSoundEvents.BULLET_IMPACT_METAL);
@@ -158,6 +163,19 @@ public class MGBulletEntity extends KineticProjectileEntity {
 		}
 
 		super.onBlockHit(blockHitResult);
+
+		if (this.getWorld() instanceof ServerWorld serverWorld) {
+			if (serverWorld.getGameRules().getBoolean(GameRules.DO_MOB_GRIEFING)
+				&& blockCat == BlockCategory.GLASS
+			) {
+				this.getWorld().breakBlock(
+					blockHitResult.getBlockPos(),
+					false,
+					this.getOwner(),
+					2
+				);
+			}
+		}
 
 		if (this.isAlive() || this.isRemoved() || this.isInGround() || this.isOnGround()) {
 			this.discard();

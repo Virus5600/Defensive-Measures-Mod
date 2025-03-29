@@ -1,10 +1,9 @@
 package com.virus5600.defensive_measures.entity.turrets;
 
-import com.virus5600.defensive_measures.particle.ModParticles;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.attribute.DefaultAttributeContainer.Builder;
+import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.effect.StatusEffects;
@@ -28,6 +27,7 @@ import com.virus5600.defensive_measures.entity.ModEntities;
 import com.virus5600.defensive_measures.entity.TurretMaterial;
 import com.virus5600.defensive_measures.entity.ai.goal.ProjectileAttackGoal;
 import com.virus5600.defensive_measures.item.ModItems;
+import com.virus5600.defensive_measures.particle.ModParticles;
 import com.virus5600.defensive_measures.sound.ModSoundEvents;
 
 import java.util.List;
@@ -120,7 +120,9 @@ public class MGTurretEntity extends TurretEntity implements GeoEntity {
 		TurretEntity.setTurretMaxHealth(25);
 		TurretEntity.setTurretMaxRange(20 + ModEntities.MG_TURRET.getDimensions().eyeHeight());
 
-		return TurretEntity.setAttributes();
+		return TurretEntity.setAttributes()
+			.add(EntityAttributes.ARMOR, 2)
+			.add(EntityAttributes.ARMOR_TOUGHNESS, 1);
 	}
 
 	// /////////////// //
@@ -138,19 +140,6 @@ public class MGTurretEntity extends TurretEntity implements GeoEntity {
 			.setUpwardVelocityMultiplier(dist * 0.125f);
 
 		super.shootBurst(5, 3, velocityData);
-	}
-
-	@Override
-	public void onRemove(Entity.RemovalReason reason) {
-		if (this.isDead()) {
-			this.shoot(
-				TurretEntity.TurretProjectileVelocity
-					.init(this)
-					.setDirectionalVelocity(0.5f)
-			);
-		}
-
-		super.onRemove(reason);
 	}
 
 	// /////////////////// //

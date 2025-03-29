@@ -120,6 +120,7 @@
 		],
 		"subtitle": "subtitles.turret.wood.repair"
 	},
+
 	"turret.cannon.hurt": {
 		"sounds": [
 			"dm:turrets/hurt/metal_hurt1",
@@ -150,13 +151,13 @@
 			"mob/zombie/wood3",
 			"mob/zombie/wood4"
 		],
-		"subtitles": "subtitles.turret.ballista.hurt"
+		"subtitle": "subtitles.turret.ballista.hurt"
 	},
 	"turret.ballista.destroyed": {
 		"sounds": [
 			"mob/zombie/woodbreak"
 		],
-		"subtitles": "subtitles.turret.ballista.destroyed"
+		"subtitle": "subtitles.turret.ballista.destroyed"
 	},
 	"turret.ballista.shoot": {
 		"sounds": [
@@ -200,7 +201,7 @@
 				"volume": 0.9
 			}
 		],
-		"subtitles": "subtitles.turret.ballista.shoot"
+		"subtitle": "subtitles.turret.ballista.shoot"
 	},
 
 	"turret.mg_turret.hurt": {
@@ -208,14 +209,14 @@
 			"dm:turrets/hurt/metal_hurt1",
 			"dm:turrets/hurt/metal_hurt2"
 		],
-		"subtitles": "subtitles.turret.mg_turret.hurt"
+		"subtitle": "subtitles.turret.mg_turret.hurt"
 	},
 	"turret.mg_turret.destroyed": {
 		"sounds": [
 			"dm:turrets/crumbling_turrets/metal_crumbling1",
 			"dm:turrets/crumbling_turrets/metal_crumbling2"
 		],
-		"subtitles": "subtitles.turret.mg_turret.destroyed"
+		"subtitle": "subtitles.turret.mg_turret.destroyed"
 	},
 	"turret.mg_turret.shoot": {
 		"sounds": [
@@ -229,7 +230,7 @@
 				"volume": 0.9
 			}
 		],
-		"subtitles": "subtitles.turret.mg_turret.shoot"
+		"subtitle": "subtitles.turret.mg_turret.shoot"
 	},
 
 	"turret.anti_air_turret.hurt": {
@@ -237,31 +238,31 @@
 			"dm:turrets/hurt/metal_hurt1",
 			"dm:turrets/hurt/metal_hurt2"
 		],
-		"subtitles": "subtitles.anti_air_turret.hurt"
+		"subtitle": "subtitles.anti_air_turret.hurt"
 	},
 	"turret.anti_air_turret.destroyed": {
 		"sounds": [
 			"dm:turrets/crumbling_turrets/metal_crumbling1",
 			"dm:turrets/crumbling_turrets/metal_crumbling2"
 		],
-		"subtitles": "subtitles.anti_air_turret.destroyed"
+		"subtitle": "subtitles.anti_air_turret.destroyed"
 	},
 	"turret.anti_air_turret.shoot.begin": {
 		"sounds": [
 			"dm:anti_air_turret/shoot_begin1"
 		],
-		"subtitles": "subtitles.anti_air_turret.turret.shoot.begin"
+		"subtitle": "subtitles.anti_air_turret.turret.shoot.begin"
 	},
 	"turret.anti_air_turret.shoot": {
 		"sounds": [
 			"dm:anti_air_turret/shoot1"
 		],
-		"subtitles": "subtitles.anti_air_turret.turret.shoot"
+		"subtitle": "subtitles.anti_air_turret.turret.shoot"
 	},
 	"turret.anti_air_turret.shoot.end": {
 		"sounds": [
 			"dm:anti_air_turret/shoot_end1"
 		],
-		"subtitles": "subtitles.anti_air_turret.turret.shoot.end"
+		"subtitle": "subtitles.anti_air_turret.turret.shoot.end"
 	}
 }
