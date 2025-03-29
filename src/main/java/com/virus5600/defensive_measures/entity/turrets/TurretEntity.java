@@ -399,7 +399,7 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 	 * This method can be overridden to add more conditions to the target predicate. For example,
 	 * you can add a condition that checks if the target is not a player or if the target is not.
 	 * Furthermore, you can completely overwrite this method to create your own custom conditions
-	 * similar to what {@link AntiAirTurret#targetPredicate(LivingEntity, ServerWorld)} did; only
+	 * similar to what {@code AntiAirTurret#targetPredicate(LivingEntity, ServerWorld)} did; only
 	 * targets entities that are airborne.
 	 *
 	 * @param target The target to check.
@@ -1651,7 +1651,7 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 			.stream()
 			.collect(Collectors.toMap(
 				attr -> attr,
-				_ -> baseValue
+				attr -> baseValue
 			));
 	}
 

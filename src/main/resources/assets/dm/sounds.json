@@ -208,14 +208,14 @@
 			"dm:turrets/hurt/metal_hurt1",
 			"dm:turrets/hurt/metal_hurt2"
 		],
-		"subtitles": "subtitles.mg_turret.hurt"
+		"subtitles": "subtitles.turret.mg_turret.hurt"
 	},
 	"turret.mg_turret.destroyed": {
 		"sounds": [
 			"dm:turrets/crumbling_turrets/metal_crumbling1",
 			"dm:turrets/crumbling_turrets/metal_crumbling2"
 		],
-		"subtitles": "subtitles.mg_turret.destroyed"
+		"subtitles": "subtitles.turret.mg_turret.destroyed"
 	},
 	"turret.mg_turret.shoot": {
 		"sounds": [
@@ -228,7 +228,8 @@
 				"name": "dm:mg_turret/shot1",
 				"volume": 0.9
 			}
-		]
+		],
+		"subtitles": "subtitles.turret.mg_turret.shoot"
 	},
 
 	"turret.anti_air_turret.hurt": {

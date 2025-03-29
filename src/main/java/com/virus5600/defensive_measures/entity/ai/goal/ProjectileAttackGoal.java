@@ -32,19 +32,19 @@ import java.util.EnumSet;
  * 		This method is modified to also check if the target is within the rotation limits of the turret.
  * 	</li>
  *
- * 	<li><strike>
- * 		{@link #getShootingPitch(LivingEntity)} to calculate the initial pitch angle in degrees for
+ * 	<li><s>
+ * 		{@code getShootingPitch(LivingEntity)} to calculate the initial pitch angle in degrees for
  * 		the shooter to aim at the target.<br>
  * 		This is due to the use of {@link TurretEntity.TurretProjectileVelocity} class to calculate
  * 		the projectile velocity based on the target's position and the turret's position.
- * 	</strike></li>
+ * 	</s></li>
  *
- * 	<li><strike>
- * 		{@link #getShootingYaw(LivingEntity)} to calculate the initial yaw angle in degrees for
+ * 	<li><s>
+ * 		{@code getShootingYaw(LivingEntity)} to calculate the initial yaw angle in degrees for
  * 		the shooter to aim at the target.<br>
  * 		This is due to the use of {@link TurretEntity.TurretProjectileVelocity} class to calculate
  * 		the projectile velocity based on the target's position and the turret's position.
- * 	</strike></li>
+ * 	</s></li>
  *
  * 	<li>
  * 		{@link #isWithinRotationLimit(LivingEntity)} to determine if the target is within the
@@ -54,9 +54,9 @@ import java.util.EnumSet;
  * 	</li>
  * </ul>
  *
- * @see net.minecraft.entity.ai.goal.ProjectileAttackGoal ProjectileAttackGoal
- * @implNote {@code getShootingPitch(LivingEntity)} and {@code getShootingYaw(LivingEntity)} are
+ * <b>NOTE:</b> {@code getShootingPitch(LivingEntity)} and {@code getShootingYaw(LivingEntity)} are
  * 			yet to be implemented as they are not yet needed.
+ * @see net.minecraft.entity.ai.goal.ProjectileAttackGoal ProjectileAttackGoal
  *
  * @since 1.0.0
  * @author <a href="https://github.com/Virus5600">Virus5600</a>

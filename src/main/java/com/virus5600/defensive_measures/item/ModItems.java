@@ -159,7 +159,7 @@ public class ModItems {
 			)
 		);
 
-		Arrays.stream(FUEL_ITEMS).iterator().forEachRemaining((item) -> FuelRegistryEvents.BUILD.register((builder, _) -> {
+		Arrays.stream(FUEL_ITEMS).iterator().forEachRemaining((item) -> FuelRegistryEvents.BUILD.register((builder, ctx) -> {
 			// Verifies whether the item is a valid fuel item. Ignores the item if it is not.
 			if (item instanceof FuelItem)
 				builder.add(item, ((FuelItem) item).getFuelTime());

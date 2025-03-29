@@ -24,5 +24,5 @@ public interface FuelItem {
 	 *
 	 * @return the burn time of the item in ticks.
 	 */
-	public int getFuelTime();
+	int getFuelTime();
 }

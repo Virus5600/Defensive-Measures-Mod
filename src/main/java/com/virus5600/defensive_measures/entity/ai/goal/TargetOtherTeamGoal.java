@@ -19,7 +19,7 @@ import com.virus5600.defensive_measures.entity.turrets.TurretEntity;
  */
 public class TargetOtherTeamGoal extends ActiveTargetGoal<LivingEntity> {
 	public TargetOtherTeamGoal(TurretEntity turret) {
-		super(turret, LivingEntity.class, 10, true, false, (entity, _) -> entity instanceof LivingEntity);
+		super(turret, LivingEntity.class, 10, true, false, (entity, serverWorld) -> entity instanceof LivingEntity);
 	}
 
 	public boolean canStart() {
