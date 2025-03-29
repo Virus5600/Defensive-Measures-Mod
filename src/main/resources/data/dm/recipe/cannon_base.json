@@ -1,0 +1,16 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"category": "misc",
+	"pattern": [
+		"ppp",
+		"sss"
+	],
+	"key": {
+		"p": "#minecraft:wooden_slabs",
+		"s": "minecraft:smooth_stone_slab"
+	},
+	"result": {
+		"id": "dm:cannon_base",
+		"count": 1
+	}
+}

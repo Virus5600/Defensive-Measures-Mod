@@ -1,0 +1,15 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"category": "misc",
+	"pattern": [
+		" f ",
+		"fff"
+	],
+	"key": {
+		"f": "minecraft:flint"
+	},
+	"result": {
+		"id": "dm:arrowhead",
+		"count": 1
+	}
+}

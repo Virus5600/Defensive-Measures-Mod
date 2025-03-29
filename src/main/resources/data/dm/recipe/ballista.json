@@ -1,0 +1,17 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"category": "turret",
+	"pattern": [
+		"ah",
+		" b"
+	],
+	"key": {
+		"h": "dm:ballista_bow",
+		"a": "dm:ballista_arrow",
+		"b": "dm:ballista_base_with_stand"
+	},
+	"result": {
+		"id": "dm:ballista",
+		"count": 1
+	}
+}

@@ -1,6 +1,0 @@
-{
-	"parent": "item/generated",
-	"textures": {
-		"layer0": "dm:item/machine_gun/ammo_case"
-	}
-}

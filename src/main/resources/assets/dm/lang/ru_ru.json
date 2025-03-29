@@ -20,11 +20,11 @@
 	"item.dm.ballista_arrow" : "Стрела для баллисты",
 	"item.dm.ballista" : "Место для баллисты",
 
-	"item.dm.ammo_case" : "Коробка для боеприпасов",
-	"item.dm.ammo_rounds" : "Боеприпасы",
-	"item.dm.machine_gun_base" : "Основание пулемётной турели",
-	"item.dm.machine_gun_head" : "Пулемётный механизм",
-	"item.dm.machine_gun_stand" : "Крепление для пулемётной турели",
+	"item.dm.mg_ammo_case" : "Коробка для боеприпасов",
+	"item.dm.mg_ammo_rounds" : "Боеприпасы",
+	"item.dm.mg_base" : "Основание пулемётной турели",
+	"item.dm.mg_head" : "Пулемётный механизм",
+	"item.dm.mg_stand" : "Крепление для пулемётной турели",
 	"item.dm.mg_turret" : "Место для пулемётной турели",
 
 	"entity.dm.cannon_turret" : "Турельная башня",

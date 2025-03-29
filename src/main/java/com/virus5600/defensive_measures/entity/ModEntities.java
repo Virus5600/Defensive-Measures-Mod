@@ -12,6 +12,13 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EntityType.Builder;
 import net.minecraft.entity.SpawnGroup;
 
+/**
+ * Register and store all custom entities for the mod.
+ *
+ * @since 1.0.0
+ * @author <a href="https://github.com/Virus5600">Virus5600</a>
+ * @version 1.0.0
+ */
 public class ModEntities {
 	// TURRETS //
 	// v1.0.0
@@ -30,15 +37,14 @@ public class ModEntities {
 			.dimensions(1F, 1F)
 			.eyeHeight(0.75F)
 	);
-//
-//	public static final EntityType<MGTurretEntity> MG_TURRET = Registry.register(
-//		Registries.ENTITY_TYPE,
-//		Identifier.of(DefensiveMeasures.MOD_ID, "mg_turret"),
-//		Builder
-//			.create(MGTurretEntity::new, SpawnGroup.MISC)
-//			.dimensions(1F, 1F)
-//			.build()
-//	);
+
+	public static final EntityType<MGTurretEntity> MG_TURRET = RegistryUtil.registerEntity(
+		"mg_turret",
+		Builder
+			.create(MGTurretEntity::new, SpawnGroup.MISC)
+			.dimensions(1F, 0.625F)
+			.eyeHeight(0.4275F)
+	);
 
 	// PROJECTILES //
 	// v1.0.0
@@ -47,7 +53,7 @@ public class ModEntities {
 		Builder
 			.<CannonballEntity>create(CannonballEntity::new, SpawnGroup.MISC)
 			.dropsNothing()
-			.dimensions(0.125f, 0.125f)
+			.dimensions(0.5f, 0.5f)
 			.maxTrackingRange(4)
 			.trackingTickInterval(10)
 	);
@@ -62,14 +68,15 @@ public class ModEntities {
 			.trackingTickInterval(10)
 	);
 
-//	public static final EntityType<MGBulletEntity> MG_BULLET = Registry.register(
-//		Registries.ENTITY_TYPE,
-//		Identifier.of(DefensiveMeasures.MOD_ID, "mg_bullet"),
-//		Builder
-//			.create(MGBulletEntity::new, SpawnGroup.MISC)
-//			.dimensions(EntityDimensions.fixed(0.125f, 0.125f))
-//			.build()
-//	);
+	public static final EntityType<MGBulletEntity> MG_BULLET = RegistryUtil.registerEntity(
+		"mg_bullet",
+		Builder
+			.<MGBulletEntity>create(MGBulletEntity::new, SpawnGroup.MISC)
+			.dropsNothing()
+			.dimensions(0.125f, 0.125f)
+			.maxTrackingRange(4)
+			.trackingTickInterval(10)
+	);
 
 	// REGISTRY //
 	public static void registerModEntityAttributes() {
@@ -79,6 +86,6 @@ public class ModEntities {
 		// v1.0.0
 		FabricDefaultAttributeRegistry.register(ModEntities.CANNON_TURRET, CannonTurretEntity.setAttributes());
 		FabricDefaultAttributeRegistry.register(ModEntities.BALLISTA_TURRET, BallistaTurretEntity.setAttributes());
-//		FabricDefaultAttributeRegistry.register(ModEntities.MG_TURRET, MGTurretEntity.setAttributes());
+		FabricDefaultAttributeRegistry.register(ModEntities.MG_TURRET, MGTurretEntity.setAttributes());
 	}
 }

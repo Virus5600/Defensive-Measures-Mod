@@ -1,0 +1,12 @@
+TODO: TurretItemRetrievedCriterion
+- Class
+	- Change implementation. Make this criterion an advancement trigger for creating its first turret.
+
+TODO: TargetPlayerGoal
+- Class
+	- Fully implement this class after implementing a UI for the turrets.
+
+TODO: TurretEntity
+- Method
+	- calculateVelocity
+		- Properly calculate the parabolic trajectory (low priority) - Apparently, it was because of the "acceleration" modifier in the "ExplosiveProjectileEntity" class. Fuck.

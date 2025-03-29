@@ -16,9 +16,13 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Main entry point of the mod.
- *
+ * <br><br>
  * This class holds the Mod ID, name, and Logger instances, along with common initialization processes and
  * utility methods that can be used throughout the mod's development.
+ *
+ * @since 1.0.0
+ * @author <a href="https://github.com/Virus5600">Virus5600</a>
+ * @version 1.0.0
  */
 public class DefensiveMeasures implements ModInitializer {
 	/**
@@ -53,8 +57,26 @@ public class DefensiveMeasures implements ModInitializer {
 		ModEntities.registerModEntityAttributes();
 		ModParticles.registerParticles();
 
-		// Networking part
-
 		LOGGER.info("{} MAIN ENTRY POINT INITIALIZED.", MOD_NAME);
+	}
+
+	/**
+	 * Utility method to print an error message to the console and log file.
+	 *
+	 * @param e The exception that was thrown.
+	 */
+	public static void printErr(Exception e) {
+		e.printStackTrace(System.out);
+
+		DefensiveMeasures.LOGGER.error("");
+		DefensiveMeasures.LOGGER.error("\t {} ERROR OCCURRED\t ", DefensiveMeasures.MOD_ID.toUpperCase());
+		DefensiveMeasures.LOGGER.error("===== ERROR MSG START =====");
+		DefensiveMeasures.LOGGER.error("LOCALIZED ERROR MESSAGE:");
+		DefensiveMeasures.LOGGER.error(e.getLocalizedMessage());
+		DefensiveMeasures.LOGGER.error("");
+		DefensiveMeasures.LOGGER.error("ERROR MESSAGE:");
+		DefensiveMeasures.LOGGER.error(e.getMessage());
+		DefensiveMeasures.LOGGER.error("===== ERROR MSG END =====");
+		DefensiveMeasures.LOGGER.error("");
 	}
 }

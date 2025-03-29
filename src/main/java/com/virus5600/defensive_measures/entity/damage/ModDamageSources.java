@@ -10,6 +10,14 @@ import net.minecraft.world.World;
 
 import java.util.Optional;
 
+/**
+ * A utility class for creating {@link DamageSource Damage Sources} from
+ * {@link RegistryKey<DamageType> DamageTypes}.
+ *
+ * @since 1.0.0
+ * @author <a href="https://github.com/Virus5600">Virus5600</a>
+ * @version 1.0.0
+ */
 public class ModDamageSources {
 	/**
 	 * Creates a {@link DamageSource} from a {@link RegistryKey<DamageType>} and a {@link World}

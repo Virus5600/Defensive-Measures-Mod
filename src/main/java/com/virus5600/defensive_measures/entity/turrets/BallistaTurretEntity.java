@@ -3,7 +3,8 @@ package com.virus5600.defensive_measures.entity.turrets;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.attribute.DefaultAttributeContainer;
+import net.minecraft.entity.attribute.DefaultAttributeContainer.Builder;
+import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.effect.StatusEffects;
@@ -40,15 +41,42 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Represents the Ballista Turret entity.
+ * <br><br>
+ * A Ballista Turret is a wooden turret that shoots bolts at enemies. It has a long range and deals
+ * a fair amount of damage while providing a good amount of pierce level and fire rate.
+ * <hr/>
+ * <b>Attributes:</b>
+ * <ul>
+ *     <li><b>Health:</b> 25</li>
+ *     <li><b>Base Damage:</b> 4.0</li>
+ *     <li><b>Base Pierce Level:</b> 5</li>
+ *     <li><b>Attack Cooldown:</b> 2.5 seconds</li>
+ *     <li><b>Attack Range:</b> 16 blocks</li>
+ *     <li><b>X Firing Arc:</b> ±360°</li>
+ *     <li><b>Y Firing Arc:</b> ±25°</li>
+ * </ul>
+ *
+ * @see TurretEntity
+ * @see GeoEntity
+ *
+ * @since 1.0.0
+ * @author <a href="https://github.com/Virus5600">Virus5600</a>
+ * @version 1.0.0
+ */
 public class BallistaTurretEntity extends TurretEntity implements GeoEntity {
 	/**
-	 * Defines how many seconds the cannon should wait before shooting again.
+	 * Defines how many seconds the ballista should wait before shooting again.
 	 * The time is calculated in ticks and by default, it's 2.5 seconds <b>(20 ticks times 2.5 seconds)</b>.
 	 */
 	private static final int TOTAL_ATT_COOLDOWN = (int) (20 * 2.5);
 	private static final Map<String, RawAnimation> ANIMATIONS;
 	private static final Map<Offsets, List<Vec3d>> OFFSETS;
 	private static final Map<Item, SoundEvent> HEAL_SOUNDS;
+	private static final double[] DAMAGE;
+	private static final byte[] PIERCE_LEVELS;
+
 
 	/**
 	 * Contains all the items that can heal this entity.
@@ -62,9 +90,9 @@ public class BallistaTurretEntity extends TurretEntity implements GeoEntity {
 	private final AnimatableInstanceCache geoCache = GeckoLibUtil.createInstanceCache(this);
 	private boolean animPlayed = false;
 
-	//////////////////
+	// //////////// //
 	// CONSTRUCTORS //
-	//////////////////
+	// //////////// //
 	public BallistaTurretEntity(EntityType<? extends MobEntity> entityType, World world) {
 		super(entityType, world, TurretMaterial.WOOD, ModEntities.BALLISTA_ARROW, ModItems.BALLISTA_TURRET);
 
@@ -74,9 +102,9 @@ public class BallistaTurretEntity extends TurretEntity implements GeoEntity {
 		this.addEffectSource(effectSource);
 	}
 
-	//////////////////
+	// //////////// //
 	// INITIALIZERS //
-	//////////////////
+	// //////////// //
 	@Override
 	protected void initGoals() {
 		// Goal instances
@@ -92,20 +120,28 @@ public class BallistaTurretEntity extends TurretEntity implements GeoEntity {
 		super.initDataTracker(builder);
 	}
 
-	public static DefaultAttributeContainer.Builder setAttributes() {
+	public static Builder setAttributes() {
 		TurretEntity.setTurretMaxHealth(25);
+		TurretEntity.setTurretMaxRange(16 + ModEntities.BALLISTA_TURRET.getDimensions().eyeHeight());
 
 		return TurretEntity.setAttributes();
 	}
 
-	/////////////////////
+	// /////////////// //
 	// PROCESS METHODS //
-	/////////////////////
+	// /////////////// //
 
 	@Override
 	public void shootAt(LivingEntity target, float pullProgress) {
+		float dist = (float) this.getPos().distanceTo(target.getPos());
+
+		TurretProjectileVelocity velocityData = TurretProjectileVelocity.init(this)
+			.setVelocity(target)
+			.setUpwardVelocityMultiplier(dist * 0.125f);
+
+		super.shootAt(velocityData);
+
 		this.triggerAnim("Attack", "shoot");
-		super.shootAt(target, pullProgress);
 	}
 
 	@Override
@@ -137,9 +173,14 @@ public class BallistaTurretEntity extends TurretEntity implements GeoEntity {
 		super.tick();
 	}
 
-	/////////////////////////
+	// /////////////////// //
 	// GETTERS AND SETTERS //
-	/////////////////////////
+	// /////////////////// //
+
+	@Override
+	public int getMaxLookPitchChange() {
+		return 25;
+	}
 
 	@Nullable
 	@Override
@@ -163,9 +204,9 @@ public class BallistaTurretEntity extends TurretEntity implements GeoEntity {
 		return ModSoundEvents.TURRET_REMOVED_WOOD;
 	}
 
-	///////////////////////////
+	// ///////////////////// //
 	// ANIMATION CONTROLLERS //
-	///////////////////////////
+	// ///////////////////// //
 
 	private <E extends BallistaTurretEntity> PlayState deathController(final AnimationState<E> event) {
 		if (!this.isAlive() && !this.animPlayed) {
@@ -185,9 +226,9 @@ public class BallistaTurretEntity extends TurretEntity implements GeoEntity {
 		return PlayState.STOP;
 	}
 
-	///////////////////////////////
+	// ///////////////////////// //
 	// INTERFACE IMPLEMENTATIONS //
-	///////////////////////////////
+	// ///////////////////////// //
 
 	// GeoEntity //
 	@Override
@@ -206,25 +247,47 @@ public class BallistaTurretEntity extends TurretEntity implements GeoEntity {
 		return this.geoCache;
 	}
 
-	//////////////////////////////
+	// //////////////////////// //
 	// ABSTRACT IMPLEMENTATIONS //
-	//////////////////////////////
+	// //////////////////////// //
+
+	// TurretEntity //
 	protected List<Vec3d> getTurretProjectileSpawn() {
 		return OFFSETS.get(Offsets.BOLT_HOLDER);
 	}
 
-	/////////////////////////
+	public double getProjectileDamage() {
+		return DAMAGE[this.getLevel() - 1];
+	}
+
+	public byte getProjectilePierceLevel() {
+		return PIERCE_LEVELS[this.getLevel() - 1];
+	}
+
+	// /////////////////// //
 	// LOCAL CLASSES/ENUMS //
-	/////////////////////////
+	// /////////////////// //
 	public enum Offsets {
 		BOLT_HOLDER
 	}
 
-	///////////////////////
+	// ///////////////// //
 	// STATIC INITIALIZE //
-	///////////////////////
+	// ///////////////// //
 
 	static {
+		DAMAGE = new double[] {
+			3.5,
+			7.0,
+			12.0
+		};
+
+		PIERCE_LEVELS = new byte[] {
+			5,
+			7,
+			10
+		};
+
 		OFFSETS = Map.of(
 			Offsets.BOLT_HOLDER, List.of(
 				new Vec3d(0, 0, 0.875)

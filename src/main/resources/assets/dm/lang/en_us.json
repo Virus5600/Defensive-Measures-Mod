@@ -20,20 +20,26 @@
 	"item.dm.ballista_arrow" : "Ballista Arrow",
 	"item.dm.ballista" : "Place Ballista",
 
-	"item.dm.ammo_case" : "Ammo Case",
-	"item.dm.ammo_rounds" : "Ammo Rounds",
-	"item.dm.machine_gun_base" : "MG Base",
-	"item.dm.machine_gun_head" : "MG Head",
-	"item.dm.machine_gun_stand" : "MG Stand",
+	"item.dm.mg_ammo_case" : "Ammo Case",
+	"item.dm.mg_ammo_rounds" : "Ammo Rounds",
+	"item.dm.mg_base" : "MG Base",
+	"item.dm.mg_head" : "MG Head",
+	"item.dm.mg_stand" : "MG Stand",
 	"item.dm.mg_turret" : "Place MG Turret",
 
 	"itemTooltip.dm.generic.health" : "Health: %s / %s",
 
-	"itemTooltip.dm.cannon_turret.line1" : "Range: 3-16 blocks",
+	"itemTooltip.dm.cannon_turret.line1" : "Range: 3-24 blocks",
+	"itemTooltip.dm.cannon_turret.line2" : "Firing Arc: X: ±360° | Y: ±30°",
 	"itemTooltip.dm.cannon_turret.line3" : "Reload Time: 5 seconds",
 
 	"itemTooltip.dm.ballista.line1" : "Range: 16 blocks",
+	"itemTooltip.dm.ballista.line2" : "Firing Arc: X: ±360° | Y: ±25°",
 	"itemTooltip.dm.ballista.line3" : "Reload Time: 2.5 seconds",
+
+	"itemTooltip.dm.mg_turret.line1" : "Range: 20 blocks",
+	"itemTooltip.dm.mg_turret.line2" : "Firing Arc: X: ±360° | Y: ±27.5°",
+	"itemTooltip.dm.mg_turret.line3" : "Reload Time: 0.15 seconds (burst) | 3.75 seconds (cooldown)",
 
 	"entity.dm.cannon_turret" : "Cannon Turret",
 	"entity.dm.cannonball" : "Cannon ball",
@@ -54,9 +60,10 @@
 	"subtitles.turret.bow.repair" : "Repaired Bow Turret",
 	"subtitles.turret.wood.repair" : "Repaired Wooden Turret",
 
-	"subtitles.generic.impact.bullet.dirt" : "Bullet impacted on dirt",
+	"subtitles.generic.impact.bullet.default" : "Bullet impacted",
 	"subtitles.generic.impact.bullet.flesh" : "Bullet hit an entity",
 	"subtitles.generic.impact.bullet.glass" : "Bullet impacted on glass",
+	"subtitles.generic.impact.bullet.grainy" : "Bullet impacted on a grainy block",
 	"subtitles.generic.impact.bullet.metal" : "Bullet impacted on metal",
 	"subtitles.generic.impact.bullet.stone" : "Bullet impacted on stone",
 	"subtitles.generic.impact.bullet.wood" : "Bullet impacted on wood",
@@ -75,5 +82,9 @@
 	"subtitles.turret.anti_air.destroyed" : "Anti-air Turret destroyed",
 	"subtitles.turret.anti_air.shoot.begin" : "Anti-air Turret begins shooting",
 	"subtitles.turret.anti_air.shoot" : "Anti-air Turret shoots",
-	"subtitles.turret.anti_air.shoot.end" : "Anti-air Turret finished shooting"
+	"subtitles.turret.anti_air.shoot.end" : "Anti-air Turret finished shooting",
+
+	"tag.item.dm.turret_remover_repairable" : "Turret Remover Repairable",
+	"tag.item.dm.turret_removers" : "Turret Removers",
+	"tag.item.dm.turrets" : "Turrets"
 }

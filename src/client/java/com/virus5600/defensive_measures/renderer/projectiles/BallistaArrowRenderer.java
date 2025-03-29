@@ -2,29 +2,31 @@ package com.virus5600.defensive_measures.renderer.projectiles;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.EntityRendererFactory.Context;
-
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RotationAxis;
+
 import org.jetbrains.annotations.Nullable;
-import org.joml.Matrix4f;
-import org.joml.Vector3f;
-import software.bernie.geckolib.animation.AnimationState;
+
 import software.bernie.geckolib.cache.object.BakedGeoModel;
-import software.bernie.geckolib.constant.DataTickets;
-import software.bernie.geckolib.model.data.EntityModelData;
 import software.bernie.geckolib.renderer.GeoEntityRenderer;
 
 import com.virus5600.defensive_measures.entity.projectiles.BallistaArrowEntity;
 import com.virus5600.defensive_measures.model.projectiles.BallistaArrowModel;
-import software.bernie.geckolib.renderer.GeoRenderer;
-import software.bernie.geckolib.util.RenderUtil;
 
+/**
+ * The renderer for the {@link BallistaArrowEntity}.
+ *
+ * @since 1.0.0
+ * @author <a href="https://github.com/Virus5600">Virus5600</a>
+ * @version 1.0.0
+ */
 @Environment(EnvType.CLIENT)
 public class BallistaArrowRenderer extends GeoEntityRenderer<BallistaArrowEntity> {
 	public BallistaArrowRenderer(Context ctx) {
@@ -56,5 +58,8 @@ public class BallistaArrowRenderer extends GeoEntityRenderer<BallistaArrowEntity
 
 		poseStack.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(newYaw));
 		poseStack.multiply(RotationAxis.POSITIVE_X.rotationDegrees(-newPitch));
+
+		super.preRender(poseStack, animatable, model, bufferSource, buffer, isReRender,
+			partialTick, packedLight, packedOverlay, renderColor);
 	}
 }

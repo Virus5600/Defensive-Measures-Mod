@@ -1,21 +1,31 @@
 package com.virus5600.defensive_measures.particle.custom;
 
-import com.virus5600.defensive_measures.particle.custom.emitters.CannonFlash;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.particle.*;
+import net.minecraft.client.particle.Particle;
+import net.minecraft.client.particle.ParticleFactory;
+import net.minecraft.client.particle.ParticleTextureSheet;
+import net.minecraft.client.particle.SpriteBillboardParticle;
+import net.minecraft.client.particle.SpriteProvider;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.particle.SimpleParticleType;
+
+import com.virus5600.defensive_measures.particle.custom.emitters.CannonFlash;
 
 /**
  * Defines the particles emitted by certain turrets that creates sparks when they
  * shoot. This particle is the base particle for some spark-based particles such
  * as the {@link CannonFlash Cannon Flash Emitter}.
+ *
+ * @since 1.0.0
+ * @author <a href="https://github.com/Virus5600">Virus5600</a>
+ * @version 1.0.0
  */
 @Environment(EnvType.CLIENT)
 public class Sparks extends SpriteBillboardParticle {
+	protected boolean isSuspended = false;
 
-	/// CONSTRUCTORS ///
+	// CONSTRUCTORS //
 	public Sparks(ClientWorld level, double x, double y, double z, SpriteProvider spriteSet, double xd, double yd, double zd) {
 		super(level, x, y, z, xd, yd, zd);
 
@@ -61,6 +71,13 @@ public class Sparks extends SpriteBillboardParticle {
 	}
 
 	@Override
+	public void move(double dx, double dy, double dz) {
+		if (!this.isSuspended) {
+			super.move(dx, dy, dz);
+		}
+	}
+
+	@Override
     public int getBrightness(float tint) {
         int i = super.getBrightness(tint);
         int k = i >> 16 & 0xFF;
@@ -85,6 +102,8 @@ public class Sparks extends SpriteBillboardParticle {
 		this.fadeOut();
 	}
 
+	// FACTORIES //
+
 	@Environment(EnvType.CLIENT)
 	public static class Factory implements ParticleFactory<SimpleParticleType> {
 		private final SpriteProvider sprites;
@@ -95,6 +114,22 @@ public class Sparks extends SpriteBillboardParticle {
 
 		public Particle createParticle(SimpleParticleType type, ClientWorld level, double x, double y, double z, double xd, double yd, double zd) {
 			return new Sparks(level, x, y, z, this.sprites, xd, yd, zd);
+		}
+	}
+
+	@Environment(EnvType.CLIENT)
+	public static class SuspendedFactory implements ParticleFactory<SimpleParticleType> {
+		private final SpriteProvider sprites;
+
+		public SuspendedFactory(SpriteProvider sprites) {
+			this.sprites = sprites;
+		}
+
+		public Particle createParticle(SimpleParticleType type, ClientWorld level, double x, double y, double z, double xd, double yd, double zd) {
+			Sparks particle = new Sparks(level, x, y, z, this.sprites, xd, yd, zd);
+			particle.isSuspended = true;
+			particle.gravityStrength = 0.0f;
+			return particle;
 		}
 	}
 }

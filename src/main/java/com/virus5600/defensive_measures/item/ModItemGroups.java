@@ -11,6 +11,17 @@ import net.minecraft.registry.RegistryKey;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
+/**
+ * A class that contains all the item groups in the mod.
+ * <br><br>
+ * This class is used to register all the item groups in the mod, from items, to equipments, to
+ * traps, turrets, etc. This class is also used to register the item groups to the registry so
+ * that they can be used in the creative inventory.
+ *
+ * @since 1.0.0
+ * @author <a href="https://github.com/Virus5600">Virus5600</a>
+ * @version 1.0.0
+ */
 public class ModItemGroups {
 	public static final RegistryKey<ItemGroup> DMI_KEY = RegistryKey.of(Registries.ITEM_GROUP.getKey(), Identifier.of(DefensiveMeasures.MOD_ID, "defensive_measures_items"));
 	public static final ItemGroup DEFENSIVE_MEASURES_ITEMS = FabricItemGroup.builder()

@@ -1,0 +1,16 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"category": "misc",
+	"pattern": [
+		"h",
+		"s",
+		"s"
+	],
+	"key": {
+		"h": "dm:arrowhead",
+		"s": "minecraft:stick"
+	},
+	"result": {
+		"id": "dm:ballista_arrow"
+	}
+}

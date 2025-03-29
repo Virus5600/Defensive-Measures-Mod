@@ -8,9 +8,19 @@ import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.util.Identifier;
 
+/**
+ * Class containing all the particle types used by the mod. This is
+ * usually used register the particles defined in the client-side
+ * of the mod.
+ *
+ * @since 1.0.0
+ * @author <a href="https://github.com/Virus5600">Virus5600</a>
+ * @version 1.0.0
+ */
 public class ModParticles {
 	// PARTICLES
 	public static final SimpleParticleType SPARKS = register("sparks", false);
+	public static final SimpleParticleType SUSPENDED_SPARKS = register("suspended_sparks", false);
 	public static final SimpleParticleType CANNON_FUSE = register("cannon_fuse", true);
 
 	// EMITTERS

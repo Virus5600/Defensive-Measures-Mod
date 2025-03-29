@@ -2,7 +2,6 @@ package com.virus5600.defensive_measures.entity.turrets;
 
 import java.util.*;
 
-import com.virus5600.defensive_measures.entity.ModEntities;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.attribute.DefaultAttributeContainer;
@@ -30,12 +29,38 @@ import software.bernie.geckolib.animation.RawAnimation;
 import software.bernie.geckolib.animation.keyframe.event.ParticleKeyframeEvent;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
+import com.virus5600.defensive_measures.entity.ModEntities;
 import com.virus5600.defensive_measures.entity.TurretMaterial;
 import com.virus5600.defensive_measures.entity.ai.goal.ProjectileAttackGoal;
 import com.virus5600.defensive_measures.item.ModItems;
 import com.virus5600.defensive_measures.particle.ModParticles;
 import com.virus5600.defensive_measures.sound.ModSoundEvents;
 
+/**
+ * Represents the Cannon Turret entity.
+ * <br><br>
+ * A Cannon Turret is a metal turret that shoots cannonballs at enemies. It has medium range and
+ * deals a good amount of damage while dealing a good amount of damage. Albeit the longer range and
+ * higher damage, the cannon turret has a longer cooldown compared to the other turrets, but with
+ * its AoE damage, it can deal with multiple enemies at once.
+ * <hr/>
+ * <b>Attributes:</b>
+ * <ul>
+ *     <li><b>Health:</b> 50</li>
+ *     <li><b>Base Damage:</b> 10.0</li>
+ *     <li><b>Base Pierce Level:</b> 0</li>
+ *     <li><b>Attack Cooldown:</b> 5 seconds</li>
+ *     <li><b>Attack Range:</b> 24 blocks</li>
+ *     <li><b>X Firing Arc:</b> ±360°</li>
+ *     <li><b>Y Firing Arc:</b> ±30°</li>
+ *     <li><b>Armor:</b> 3</li>
+ *     <li><b>Armor Toughness:</b> 2</li>
+ * </ul>
+ *
+ * @since 1.0.0
+ * @author <a href="https://github.com/Virus5600">Virus5600</a>
+ * @version 1.0.0
+ */
 public class CannonTurretEntity extends TurretEntity implements GeoEntity {
 	/**
 	 * Defines how many seconds the cannon should wait before shooting again.
@@ -44,7 +69,8 @@ public class CannonTurretEntity extends TurretEntity implements GeoEntity {
 	private static final int TOTAL_ATT_COOLDOWN = 20 * 5;
 	private static final Map<String, RawAnimation> ANIMATIONS;
 	private static final Map<Offsets, List<Vec3d>> OFFSETS;
-
+	private static final double[] DAMAGE;
+	private static final byte[] PIERCE_LEVELS;
 	/**
 	 * Contains all the items that can heal this entity.
 	 */
@@ -57,9 +83,9 @@ public class CannonTurretEntity extends TurretEntity implements GeoEntity {
 	private final AnimatableInstanceCache geoCache = GeckoLibUtil.createInstanceCache(this);
 	private boolean animPlayed = false;
 
-	//////////////////
+	// //////////// //
 	// CONSTRUCTORS //
-	//////////////////
+	// //////////// //
 	public CannonTurretEntity(EntityType<? extends MobEntity> entityType, World world) {
 		super(entityType, world, TurretMaterial.METAL, ModEntities.CANNONBALL, ModItems.CANNON_TURRET);
 
@@ -69,9 +95,9 @@ public class CannonTurretEntity extends TurretEntity implements GeoEntity {
 		this.addEffectSource(effectSource);
 	}
 
-	//////////////////
+	// //////////// //
 	// INITIALIZERS //
-	//////////////////
+	// //////////// //
 	@Override
 	protected void initGoals() {
 		// Goal instances
@@ -89,19 +115,26 @@ public class CannonTurretEntity extends TurretEntity implements GeoEntity {
 
 	public static DefaultAttributeContainer.Builder setAttributes() {
 		TurretEntity.setTurretMaxHealth(50);
+		TurretEntity.setTurretMaxRange(24 + ModEntities.CANNON_TURRET.getDimensions().eyeHeight());
 
 		return TurretEntity.setAttributes()
 			.add(EntityAttributes.ARMOR, 3)
 			.add(EntityAttributes.ARMOR_TOUGHNESS, 2);
 	}
 
-	/////////////////////
+	// /////////////// //
 	// PROCESS METHODS //
-	/////////////////////
+	// /////////////// //
 
 	@Override
 	public void shootAt(LivingEntity target, float pullProgress) {
-		super.shootAt(target, pullProgress);
+		float dist = (float) this.getPos().distanceTo(target.getPos());
+
+		TurretProjectileVelocity velocityData = TurretProjectileVelocity.init(this)
+			.setVelocity(target)
+			.setUpwardVelocityMultiplier(dist * 0.1625f);
+
+		super.shootAt(velocityData);
 		this.stopTriggeredAnim("FiringSequence", "charge");
 		this.triggerAnim("FiringSequence", "shoot");
 	}
@@ -113,16 +146,22 @@ public class CannonTurretEntity extends TurretEntity implements GeoEntity {
 		if (!this.getWorld().isClient) {
 			int updateCountdownTicks = this.attackGoal.getUpdateCountdownTicks(),
 				afterAttackTick = 5,
-				beforeAttackTick = CannonTurretEntity.TOTAL_ATT_COOLDOWN - afterAttackTick;
+				beforeAttackTick = TOTAL_ATT_COOLDOWN - afterAttackTick;
+
 			if (updateCountdownTicks > afterAttackTick && updateCountdownTicks < beforeAttackTick ) {
 				this.triggerAnim("FiringSequence", "charge");
 			}
 		}
 	}
 
-	/////////////////////////
+	// /////////////////// //
 	// GETTERS AND SETTERS //
-	/////////////////////////
+	// /////////////////// //
+
+	@Override
+	public int getMaxLookPitchChange() {
+		return 30;
+	}
 
 	@Nullable
 	@Override
@@ -151,9 +190,9 @@ public class CannonTurretEntity extends TurretEntity implements GeoEntity {
 		return 3f;
 	}
 
-	///////////////////////////
+	// ///////////////////// //
 	// ANIMATION CONTROLLERS //
-	///////////////////////////
+	// ///////////////////// //
 
 	private <E extends CannonTurretEntity>PlayState deathController(final AnimationState<E> event) {
 		if (!this.isAlive() && !this.animPlayed) {
@@ -177,9 +216,8 @@ public class CannonTurretEntity extends TurretEntity implements GeoEntity {
 		final String LOCATOR = state.getKeyframeData()
 			.getLocator();
 
-
 		if (LOCATOR.equals("barrel")) {
-			Vec3d barrelPos = this.getRelativePos(this.getTurretProjectileSpawn().getFirst()),
+			Vec3d barrelPos = this.getRelativePos(this.getCurrentBarrel(false)),
 				velocityModifier = this.getRelativePos(0, 0, 1.5).subtract(this.getEyePos());
 
 			this.getWorld().addParticle(
@@ -201,9 +239,9 @@ public class CannonTurretEntity extends TurretEntity implements GeoEntity {
 		}
 	}
 
-	///////////////////////////////
+	// ///////////////////////// //
 	// INTERFACE IMPLEMENTATIONS //
-	///////////////////////////////
+	// ///////////////////////// //
 
 	// GeoEntity //
 	@Override
@@ -224,25 +262,47 @@ public class CannonTurretEntity extends TurretEntity implements GeoEntity {
 		return this.geoCache;
 	}
 
-	//////////////////////////////
+	// //////////////////////// //
 	// ABSTRACT IMPLEMENTATIONS //
-	//////////////////////////////
+	// //////////////////////// //
+
+	// TurretEntity //
 	protected List<Vec3d> getTurretProjectileSpawn() {
 		return OFFSETS.get(Offsets.BARREL);
 	}
 
-	/////////////////////////
+	public double getProjectileDamage() {
+		return DAMAGE[this.getLevel() - 1];
+	}
+
+	public byte getProjectilePierceLevel() {
+		return PIERCE_LEVELS[this.getLevel() - 1];
+	}
+
+	// /////////////////// //
 	// LOCAL CLASSES/ENUMS //
-	/////////////////////////
+	// /////////////////// //
 	public enum Offsets {
 		BARREL, FUSE
 	}
 
-	///////////////////////
+	// ///////////////// //
 	// STATIC INITIALIZE //
-	///////////////////////
+	// ///////////////// //
 
 	static {
+		DAMAGE = new double[] {
+			10.0,
+			15.0,
+			20.0
+		};
+
+		PIERCE_LEVELS = new byte[] {
+			0,
+			1,
+			2
+		};
+
 		OFFSETS = Map.of(
 			Offsets.BARREL, List.of(
 				new Vec3d(0, 0, 0.875)
@@ -263,24 +323,16 @@ public class CannonTurretEntity extends TurretEntity implements GeoEntity {
 				.thenPlay("animation.cannon_turret.shoot")
 		);
 
-		healables = new HashMap<>() {
-			{
-				for (Item item : TurretEntity.PLANKS)
-					put(item, 1.0f);
-				put(Items.IRON_NUGGET, 1f);
-				put(Items.IRON_INGOT, 10f);
-				put(Items.IRON_BLOCK, 100f);
-			}
-		};
+		healables = Map.of(
+			Items.IRON_NUGGET, 1f,
+			Items.IRON_INGOT, 10f,
+			Items.IRON_BLOCK, 100f
+		);
 
-		effectSource = new HashMap<>() {
-			{
-				put(Items.IRON_BLOCK, new ArrayList<>() {
-					{
-						add(new Object[] {StatusEffects.ABSORPTION, 60, 2});
-					}
-				});
-			}
-		};
+		effectSource = Map.of(
+			Items.IRON_BLOCK, List.<Object[]>of(
+				new Object[] { StatusEffects.RESISTANCE, 60, 2 }
+			)
+		);
 	}
 }

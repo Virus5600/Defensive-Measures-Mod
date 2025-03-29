@@ -1,0 +1,16 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"category": "misc",
+	"pattern": [
+		"ii ",
+		"i i",
+		"iii"
+	],
+	"key": {
+		"i": "minecraft:iron_ingot"
+	},
+	"result": {
+		"id": "dm:mg_ammo_case",
+		"count": 1
+	}
+}

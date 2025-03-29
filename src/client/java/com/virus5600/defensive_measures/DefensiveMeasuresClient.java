@@ -6,9 +6,13 @@ import net.fabricmc.api.ClientModInitializer;
 
 /**
  * The second main entry point of the mod.
- *
+ * <br><br>
  * This class holds the client-specific initialization processes
- * along with the needed C2S packet registrations.
+ * along with the needed C2S packet registrations, if there are any.
+ *
+ * @since 1.0.0
+ * @author <a href="https://github.com/Virus5600">Virus5600</a>
+ * @version 1.0.0
  */
 public class DefensiveMeasuresClient implements ClientModInitializer {
 

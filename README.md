@@ -20,9 +20,31 @@
 <br>
 
 <div align="center" style="text-align: center">
-	<img src="https://raw.githubusercontent.com/Virus5600/Defensive-Measures-Mod/refs/heads/main/Defensive%20Measures%20Add-On%20Banner.png" alt="Defensive Measures Banner" width="100%">
+	<img src="https://cf.way2muchnoise.eu/versions/700629.svg" alt="CurseForge Versions">&nbsp;&nbsp;&nbsp;&nbsp;
 </div>
 
+<br>
+<div align="center" style="text-align: center">
+	<img src="https://raw.githubusercontent.com/Virus5600/Defensive-Measures-Mod/refs/heads/main/Defensive%20Measures%20Add-On%20Banner.png" alt="Defensive Measures Banner" width="100%">
+</div>
+<br>
+
+<div align="center" style="text-align: center">
+	<a href="https://fabricmc.net/">
+		<img
+			src="https://cdn.jsdelivr.net/npm/@intergrav/devins-badges@3/assets/cozy/supported/fabric_64h.png"
+			alt="Available on Fabric"
+			width="200">
+	</a>
+	<a href="https://quiltmc.org/">
+		<img
+			src="https://cdn.jsdelivr.net/npm/@intergrav/devins-badges@3/assets/cozy/supported/quilt_64h.png"
+			alt="Available on Quilt"
+			width="200">
+	</a>
+</div>
+
+<hr>
 
 # Defensive-Measures
 

@@ -9,6 +9,7 @@ import com.virus5600.defensive_measures.item.interfaces.FuelItem;
 import com.virus5600.defensive_measures.item.turrets.TurretItem;
 import com.virus5600.defensive_measures.item.turrets.ballista.*;
 import com.virus5600.defensive_measures.item.turrets.cannon.*;
+import com.virus5600.defensive_measures.item.turrets.mg_turret.*;
 import com.virus5600.defensive_measures.util.RegistryUtil;
 
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
@@ -20,12 +21,18 @@ import net.minecraft.item.Item;
 import net.minecraft.item.Item.Settings;
 
 import java.util.Arrays;
+import java.util.function.Function;
 
 /**
  * A class that contains all the items in the mod.
+ * <br><br>
  * This class is used to register all the items in the mod, from turrets, to equipments, to traps, block items,
  * ingredients, etc. This class is also used to register the items to their respective item groups to categorize
  * them in the creative inventory.
+ *
+ * @since 1.0.0
+ * @author <a href="https://github.com/Virus5600">Virus5600</a>
+ * @version 1.0.0
  */
 public class ModItems {
 	public final static Item[] DM_ITEMS;
@@ -34,9 +41,9 @@ public class ModItems {
 	public final static Item[] DM_TURRETS;
 	public final static Item[] FUEL_ITEMS;
 
-	/////////////
+	// /////// //
 	// TURRETS //
-	/////////////
+	// /////// //
 
 	// CANNON
 	public final static Item CANNON_TURRET = registerItem("cannon_turret", ModEntities.CANNON_TURRET, CannonTurretItem::new);
@@ -54,23 +61,23 @@ public class ModItems {
 	public final static Item BALLISTA_BOW = registerItem("ballista_bow", BallistaBowItem::new);
 
 	// MACHINE GUN
-//	public final static Item MG_TURRET = new MachineGunTurretItem(ModEntities.MG_TURRET, SETTING_DMT);
-//	public final static Item AMMO_CASE = new AmmoCaseItem(SETTING_DMI);
-//	public final static Item AMMO_ROUNDS = new AmmoRoundsItem(SETTING_DMI);
-//	public final static Item MACHINE_GUN_BASE = new MachineGunBaseItem(SETTING_DMI);
-//	public final static Item MACHINE_GUN_HEAD = new MachineGunHeadItem(SETTING_DMI);
-//	public final static Item MACHINE_GUN_STAND = new MachineGunStandItem(SETTING_DMI);
+	public final static Item MG_TURRET = registerItem("mg_turret", ModEntities.MG_TURRET, MGTurretItem::new);
+	public final static Item MG_AMMO_CASE = registerItem("mg_ammo_case", MGAmmoCaseItem::new);
+	public final static Item MG_AMMO_ROUNDS = registerItem("mg_ammo_rounds", MGAmmoRoundsItem::new);
+	public final static Item MG_BASE = registerItem("mg_base", MGBaseItem::new);
+	public final static Item MG_HEAD = registerItem("mg_head", MGHeadItem::new);
+	public final static Item MG_STAND = registerItem("mg_stand", MGStandItem::new);
 
-	////////////////
+	// ////////// //
 	// EQUIPMENTS //
-	////////////////
+	// ////////// //
 
 	// TURRET REMOVER
-	public final static Item TURRET_REMOVER = registerItem("turret_remover", TurretRemoverItem::new);
+	public final static Item TURRET_REMOVER = registerToolItem("turret_remover", (settings) -> new TurretRemoverItem(ModToolMaterials.TURRET_REMOVER, 0.0f, 0.0f, settings));
 
-	//////////////////////////////
+	// //////////////////////// //
 	// REGISTRY RELATED METHODS //
-	//////////////////////////////
+	// //////////////////////// //
 
 	/**
 	 * Registers a turret item which spawns a turret entity.
@@ -88,7 +95,22 @@ public class ModItems {
 	}
 
 	/**
-	 * Registers a normal item such as ingredients, tools, etc.
+	 * Registers a tool item such as shovels and weapons.
+	 *
+	 * @param name The name of the item. (e.g. "turret_remover")
+	 * @param factory The factory method to create the item. Usually a lambda expression like {@code (Function) ((settings) -> new TurretRemoverItem(settings, ...))}.
+	 *
+	 * @return The registered item.
+	 */
+	private static Item registerToolItem(String name, Function<Item.Settings, Item> factory) {
+		return RegistryUtil.registerItem(
+			name,
+			factory
+		);
+	}
+
+	/**
+	 * Registers a normal item such as ingredients, etc.
 	 * @param name The name of the item. (e.g. "cannon_base")
 	 * @param factory The factory method to create the item. Usually a lambda expression like {@code CannonBaseItem::new}.
 	 * @return The registered item.
@@ -137,7 +159,7 @@ public class ModItems {
 			)
 		);
 
-		Arrays.stream(FUEL_ITEMS).iterator().forEachRemaining((item) -> FuelRegistryEvents.BUILD.register((builder, _) -> {
+		Arrays.stream(FUEL_ITEMS).iterator().forEachRemaining((item) -> FuelRegistryEvents.BUILD.register((builder, ctx) -> {
 			// Verifies whether the item is a valid fuel item. Ignores the item if it is not.
 			if (item instanceof FuelItem)
 				builder.add(item, ((FuelItem) item).getFuelTime());
@@ -169,11 +191,11 @@ public class ModItems {
 			BALLISTA_BOW,
 
 			// MACHINE GUN
-//			AMMO_CASE,
-//			AMMO_ROUNDS,
-//			MACHINE_GUN_BASE,
-//			MACHINE_GUN_HEAD,
-//			MACHINE_GUN_STAND
+			MG_AMMO_CASE,
+			MG_AMMO_ROUNDS,
+			MG_BASE,
+			MG_HEAD,
+			MG_STAND
 		};
 
 		DM_EQUIPMENTS = new Item[] {
@@ -187,19 +209,19 @@ public class ModItems {
 		DM_TURRETS = new Item[] {
 			CANNON_TURRET,
 			BALLISTA_TURRET,
-//			MG_TURRET
+			MG_TURRET
 		};
 
 		FUEL_ITEMS = new Item[] {
 			// CANNON
 			CANNON_STAND,
-			CANNON_HEAD,
+			CANNON_BASE,
 
 			// BALLISTA
 			BALLISTA_ARROW,
 			BALLISTA_BASE,
 			BALLISTA_BASE_WITH_STAND,
-			BALLISTA_BOW
+			BALLISTA_BOW,
 		};
 	}
 }

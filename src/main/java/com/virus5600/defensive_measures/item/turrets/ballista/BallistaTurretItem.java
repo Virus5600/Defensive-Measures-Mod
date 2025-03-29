@@ -1,6 +1,5 @@
 package com.virus5600.defensive_measures.item.turrets.ballista;
 
-import com.virus5600.defensive_measures.entity.turrets.TurretEntity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.item.Item;
@@ -10,11 +9,20 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Rarity;
 
+import com.virus5600.defensive_measures.entity.turrets.BallistaTurretEntity;
+import com.virus5600.defensive_measures.entity.turrets.TurretEntity;
 import com.virus5600.defensive_measures.item.turrets.TurretItem;
 
 import java.lang.reflect.Type;
 import java.util.List;
 
+/**
+ * The item that spawns the {@link BallistaTurretEntity Ballista Turret}.
+ *
+ * @since 1.0.0
+ * @author <a href="https://github.com/Virus5600">Virus5600</a>
+ * @version 1.0.0
+ */
 public class BallistaTurretItem extends TurretItem {
 	public BallistaTurretItem(EntityType<? extends MobEntity> type, Settings settings) {
 		super(
@@ -29,7 +37,7 @@ public class BallistaTurretItem extends TurretItem {
 	public void appendTooltip(ItemStack stack, Item.TooltipContext context, List<Text> tooltip, TooltipType type) {
 		super.appendTooltip(stack, context, tooltip, type);
 
-		for (int i = 1; i <= 2; i++) {
+		for (int i = 1; i <= 3; i++) {
 			tooltip.add(
 				Text.translatable("itemTooltip.dm.ballista.line" + i)
 					.formatted(Formatting.DARK_AQUA)
@@ -39,9 +47,10 @@ public class BallistaTurretItem extends TurretItem {
 
 	public float getTurretMaxHealth() {
 		float maxHealth = 0;
+
 		Type superClass = this.type.getClass().getGenericSuperclass();
 		if (superClass instanceof TurretEntity) {
-			maxHealth = ((TurretEntity) superClass).getMaxHealth();
+			maxHealth = ((BallistaTurretEntity) superClass).getMaxHealth();
 		}
 
 		return maxHealth;

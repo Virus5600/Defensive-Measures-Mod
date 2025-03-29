@@ -14,10 +14,9 @@ jobs:
         java: [
           22  # Current Java LTS & minimum supported by Minecraft
         ]
-        # Run on both Linux and Windows
+        # Run on both Linux
         os:
           - ubuntu-latest
-          - windows-latest
 
     runs-on: ${{ matrix.os }}
     steps:

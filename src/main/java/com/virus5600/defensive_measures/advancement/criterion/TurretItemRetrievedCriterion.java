@@ -2,7 +2,6 @@ package com.virus5600.defensive_measures.advancement.criterion;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import com.virus5600.defensive_measures.DefensiveMeasures;
 
 import net.minecraft.advancement.AdvancementCriterion;
 import net.minecraft.advancement.criterion.AbstractCriterion;

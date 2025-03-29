@@ -1,21 +1,10 @@
 package com.virus5600.defensive_measures.entity.projectiles;
 
-import com.virus5600.defensive_measures.item.ModItems;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.data.DataTracker;
-import net.minecraft.entity.data.DataTracker.Builder;
-import net.minecraft.entity.data.TrackedData;
-import net.minecraft.entity.data.TrackedDataHandlerRegistry;
-import net.minecraft.entity.projectile.PersistentProjectileEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.world.World;
 
-import software.bernie.geckolib.animatable.GeoAnimatable;
-import software.bernie.geckolib.animatable.GeoEntity;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.animation.AnimatableManager.ControllerRegistrar;
 import software.bernie.geckolib.animation.AnimationController;
@@ -28,25 +17,53 @@ import com.virus5600.defensive_measures.entity.ModEntities;
 
 import java.util.Map;
 
-public class BallistaArrowEntity extends PersistentProjectileEntity implements GeoEntity {
-	private static final TrackedData<Byte> PIERCE_LEVEL = DataTracker.registerData(BallistaArrowEntity.class, TrackedDataHandlerRegistry.BYTE);
+/**
+ * The projectile used by {@link com.virus5600.defensive_measures.entity.turrets.BallistaTurretEntity Ballista Turret}.
+ *
+ * <p>Represents a ballista arrow projectile entity that pierces through multiple entities.</p>
+ * <p>
+ *     The ballista arrow is a {@link KineticProjectileEntity kinetic projectile}
+ *     that is fired from a {@link com.virus5600.defensive_measures.entity.turrets.BallistaTurretEntity ballista turret}.
+ * </p>
+ * <p>
+ *     This projectile can pierce through multiple entities, dealing 4 hearts of damage to each
+ *     entity it hits. The arrow can pierce through a maximum of 5 entities before it is destroyed.
+ *     And everytime it pierces through an entity, it will reduce its pierce level its speed
+ *     depending on the armor of the entity it hit.
+ * </p>
+ * <p>
+ * 		To see how the reduction mechanics work, check {@link TurretProjectileEntity#onEntityHit(EntityHitResult)} method.
+ * </p>
+ *
+ * @see KineticProjectileEntity
+ * @see TurretProjectileEntity
+ * @see TurretProjectileEntity#onEntityHit(EntityHitResult)
+ *
+ * @since 1.0.0
+ * @author <a href="https://github.com/Virus5600">Virus5600</a>
+ * @version 1.0.0
+ */
+public class BallistaArrowEntity extends KineticProjectileEntity {
 	private static final Map<String, RawAnimation> ANIMATIONS;
 
 	private final AnimatableInstanceCache geoCache = GeckoLibUtil.createInstanceCache(this);
 
-	////////////////////
-	/// CONSTRUCTORS ///
-	////////////////////
+	// ////////////// //
+	//  CONSTRUCTORS  //
+	// ////////////// //
 	public BallistaArrowEntity(
-		EntityType<? extends PersistentProjectileEntity> entityType,
+		EntityType<? extends TurretProjectileEntity> entityType,
 		World world
 	) {
 		super(entityType, world);
 
+		this.setDamage(4);
 	}
 
 	public BallistaArrowEntity(World world, LivingEntity owner) {
 		this(ModEntities.BALLISTA_ARROW, world);
+
+		this.setPierceLevel(this.getMaxPierceLevel());
 		this.setOwner(owner);
 	}
 
@@ -61,84 +78,18 @@ public class BallistaArrowEntity extends PersistentProjectileEntity implements G
 		this.setVelocity(directionX, directionY, directionZ);
 	}
 
-	///////////////
-	/// METHODS ///
-	///////////////
-	// PROTECTED
+	// ///////// //
+	//  METHODS  //
+	// ///////// //
+	// PUBLIC
 	@Override
-	protected void initDataTracker(Builder builder) {
-		super.initDataTracker(builder);
-
-		builder.add(PIERCE_LEVEL, (byte) 5);
+	public byte getMaxPierceLevel() {
+		return 5;
 	}
 
-	protected void setPierceLevel(byte pierceLevel) {
-		this.dataTracker.set(PIERCE_LEVEL, pierceLevel);
-	}
-
-	@Override
-	protected void onEntityHit(EntityHitResult entityHitResult) {
-		super.onEntityHit(entityHitResult);
-
-		// Reduces the speed of the arrow when it hits an entity
-		Entity entity = entityHitResult.getEntity();
-		// For reference, max armor points is 30
-		int armor = entity instanceof LivingEntity livingEntity ? livingEntity.getArmor() : 0;
-		boolean hasHeavyArmor = armor > 15,
-			hasLightArmor = armor <= 15 && armor > 0;
-
-		if (entity instanceof LivingEntity livingEntity) {
-			double targetH = livingEntity.getHeight(),
-				arrowH = this.getHeight(),
-				variance = arrowH * 0.125; // 12.5% of the arrow's height
-
-			double arrowMin = arrowH - variance,
-				arrowMax = arrowH + variance,
-				reducedVelocity = 0.125;
-
-			// Reduce velocity and pierce level based on the side of the entity hit
-			if (this.getPierceLevel() > 0) {
-				// If the arrow is smaller than the target or has heavy armor, reduce the pierce level by 2 and velocity by 50%
-				if (targetH > arrowMax || hasHeavyArmor) {
-					this.setPierceLevel((byte) (this.getPierceLevel() - 2));
-					reducedVelocity = 0.5;
-				}
-				// If the arrow is almost the same size as the target or has a light armor, reduce the pierce level by 1 and velocity by 25%
-				else if ((targetH < arrowMax && arrowMin < targetH) || hasLightArmor) {
-					this.setPierceLevel((byte) (this.getPierceLevel() - 1));
-					reducedVelocity = 0.25;
-				}
-				// Otherwise, just reduce the velocity by 12.5% without reducing the pierce level
-			}
-
-			// Apply reduced velocity
-			this.addVelocity(
-				this.getVelocity()
-					.multiply(reducedVelocity)
-					.negate()
-			);
-		}
-
-		this.addVelocity(
-			this.getVelocity()
-				.negate()
-				.multiply(0.1)
-		);
-	}
-
-	@Override
-	protected ItemStack asItemStack() {
-		return null;
-	}
-
-	@Override
-	public byte getPierceLevel() {
-		return this.dataTracker.get(PIERCE_LEVEL);
-	}
-
-	///////////////////////////
+	// ///////////////////// //
 	// ANIMATION CONTROLLERS //
-	///////////////////////////
+	// ///////////////////// //
 
 	private <E extends BallistaArrowEntity>PlayState idleController(final AnimationState<E> event) {
 		return event.setAndContinue(ANIMATIONS.get("Idle"));
@@ -152,15 +103,9 @@ public class BallistaArrowEntity extends PersistentProjectileEntity implements G
 		return event.setAndContinue(ANIMATIONS.get("OnAir"));
 	}
 
-	/////////////////////////////////
-	/// INTERFACE IMPLEMENTATIONS ///
-	/////////////////////////////////
-
-	// PersistentProjectileEntity //
-	@Override
-	protected ItemStack getDefaultItemStack() {
-		return new ItemStack(Items.ARROW);
-	}
+	// /////////////////////////// //
+	//  INTERFACE IMPLEMENTATIONS  //
+	// /////////////////////////// //
 
 	// GeoEntity //
 	@Override
@@ -176,9 +121,9 @@ public class BallistaArrowEntity extends PersistentProjectileEntity implements G
 		return this.geoCache;
 	}
 
-	///////////////////////
+	// ///////////////// //
 	// STATIC INITIALIZE //
-	///////////////////////
+	// ///////////////// //
 
 	static {
 		ANIMATIONS = Map.of(

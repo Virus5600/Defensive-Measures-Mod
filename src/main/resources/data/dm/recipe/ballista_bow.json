@@ -1,0 +1,19 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"category": "misc",
+	"pattern": [
+		"tst",
+		"sbt",
+		"wst"
+	],
+	"key": {
+		"t": "minecraft:stick",
+		"s": "minecraft:string",
+		"b": "#minecraft:wooden_buttons",
+		"w": "#minecraft:wooden_slabs"
+	},
+	"result": {
+		"id": "dm:ballista_bow",
+		"count": 1
+	}
+}

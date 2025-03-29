@@ -1,6 +1,5 @@
 package com.virus5600.defensive_measures.util;
 
-import com.virus5600.defensive_measures.DefensiveMeasures;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
@@ -13,7 +12,10 @@ import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
+import net.minecraft.registry.tag.TagKey;
 import net.minecraft.util.Identifier;
+
+import com.virus5600.defensive_measures.DefensiveMeasures;
 
 import java.util.function.Function;
 
@@ -26,6 +28,8 @@ import java.util.function.Function;
  * to easily maintain the codes and update them when needed.
  *
  * @see <a href="https://github.com/Khazoda/basic-weapons/blob/latest-stable/src/main/java/com/seacroak/basicweapons/util/Reggie.java">Reggie.java 「(c) Khazoda」</a>
+ *
+ * @since 1.0.0
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
  * @version 1.0.0
  */
@@ -49,11 +53,16 @@ public class RegistryUtil {
 	}
 
 	public static Item registerItem(String path, Function<Item.Settings, Item> factory) {
-		return Items.register(createItemKey(path), factory);
+		return Items.register(createItemKey(path), factory, new Item.Settings());
 	}
 
 	public static Item registerItem(Block block) {
 		return Items.register(block);
+	}
+
+	// Item Tag Registry
+	public static TagKey<Item> createItemTagKey(String path) {
+		return TagKey.of(RegistryKeys.ITEM, Identifier.of(DefensiveMeasures.MOD_ID, path));
 	}
 
 	// Entity Registry
