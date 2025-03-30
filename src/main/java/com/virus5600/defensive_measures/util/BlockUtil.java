@@ -367,6 +367,63 @@ public class BlockUtil {
 	}
 
 	/**
+	 * Sets the category of the provided {@code block} to the specified {@code category}.
+	 * This method is used to easily add a block to a specific category without
+	 * having to modify the lists directly.
+	 * <br><br>
+	 * This method allows the custom modded blocks to be added to the category
+	 * lists defined in this class, proving to be useful for compatibility with
+	 * other mods and for the mod itself.
+	 *
+	 * @param block `Block` in question.
+	 * @param category `BlockCategory` to set.
+	 *
+	 * @see BlockCategory
+	 * @see com.virus5600.defensive_measures.block.ModBlocks
+	 * @see BlockCategory
+	 */
+	public static void addBlockToCategory(Block block, BlockCategory category) {
+		switch (category) {
+			case DIRT -> {
+				if (DIRT.contains(block)) {
+					DIRT.add(block);
+				}
+			}
+			case GLASS -> {
+				if (GLASS.contains(block)) {
+					GLASS.add(block);
+				}
+			}
+			case GRAINY -> {
+				if (GRAINY.contains(block)) {
+					GRAINY.add(block);
+				}
+			}
+			case GREENERY -> {
+				if (GREENERY.contains(block)) {
+					GREENERY.add(block);
+				}
+			}
+			case METAL -> {
+				if (METAL.contains(block)) {
+					METAL.add(block);
+				}
+			}
+			case STONE -> {
+				if (STONE.contains(block)) {
+					STONE.add(block);
+				}
+			}
+			case WOOD -> {
+				if (WOOD.contains(block)) {
+					WOOD.add(block);
+				}
+			}
+			default -> {}
+		}
+	}
+
+	/**
 	 * Identifies the category of the provided {@code block} based on the lists defined in this
 	 * class. The category is determined by the type of block it is, such as dirt, glass, grainy,
 	 * greenery, metal, stone, wood, or others.
@@ -501,7 +558,7 @@ public class BlockUtil {
 		 * classified under this category. This includes blocks like pots,
 		 * beds, carpets, and other miscellaneous blocks.
 		 */
-		OTHERS
+		OTHERS;
 	}
 
 	// /////////////////// //
@@ -611,7 +668,10 @@ public class BlockUtil {
 			Blocks.PURPLE_CONCRETE_POWDER,
 			Blocks.RED_CONCRETE_POWDER,
 			Blocks.WHITE_CONCRETE_POWDER,
-			Blocks.YELLOW_CONCRETE_POWDER
+			Blocks.YELLOW_CONCRETE_POWDER,
+
+			// Other Blocks
+			Blocks.REDSTONE_WIRE
 		);
 
 		// Returns a copy of the vanilla grainy list, allowing for modifications.
@@ -829,6 +889,7 @@ public class BlockUtil {
 			Blocks.NETHERITE_BLOCK,
 
 			// Other Metal Blocks
+			Blocks.BREWING_STAND,
 			Blocks.CAULDRON,
 			Blocks.HEAVY_CORE,
 			Blocks.LANTERN,
@@ -945,6 +1006,11 @@ public class BlockUtil {
 			Blocks.POLISHED_DEEPSLATE_WALL,
 			Blocks.REINFORCED_DEEPSLATE,
 
+			// Diamond Blocks
+			Blocks.DIAMOND_BLOCK,
+			Blocks.DEEPSLATE_DIAMOND_ORE,
+			Blocks.DIAMOND_ORE,
+
 			// Diorite Blocks
 			Blocks.DIORITE,
 			Blocks.DIORITE_SLAB,
@@ -957,6 +1023,11 @@ public class BlockUtil {
 			// Dripstone Blocks
 			Blocks.DRIPSTONE_BLOCK,
 			Blocks.POINTED_DRIPSTONE,
+
+			// Emerald Blocks
+			Blocks.EMERALD_BLOCK,
+			Blocks.DEEPSLATE_EMERALD_ORE,
+			Blocks.EMERALD_ORE,
 
 			// Endstone Blocks
 			Blocks.END_STONE,
@@ -1052,6 +1123,10 @@ public class BlockUtil {
 			Blocks.PURPUR_SLAB,
 			Blocks.PURPUR_STAIRS,
 
+			// Redstone Blocks
+			Blocks.REDSTONE_BLOCK,
+			Blocks.REDSTONE_ORE,
+
 			// Sandstone Blocks
 			Blocks.CHISELED_SANDSTONE,
 			Blocks.CUT_SANDSTONE,
@@ -1142,6 +1217,7 @@ public class BlockUtil {
 			Blocks.CHAIN_COMMAND_BLOCK,
 			Blocks.COMMAND_BLOCK,
 			Blocks.COMPARATOR,
+			Blocks.CRAFTER,
 			Blocks.DISPENSER,
 			Blocks.DROPPER,
 			Blocks.ENCHANTING_TABLE,
@@ -1198,6 +1274,7 @@ public class BlockUtil {
 			Blocks.BAMBOO_MOSAIC_STAIRS,
 			Blocks.BAMBOO_PLANKS,
 			Blocks.BAMBOO_PRESSURE_PLATE,
+			Blocks.BAMBOO_SIGN,
 			Blocks.BAMBOO_SLAB,
 			Blocks.BAMBOO_STAIRS,
 			Blocks.BAMBOO_TRAPDOOR,
@@ -1316,6 +1393,7 @@ public class BlockUtil {
 			Blocks.STRIPPED_OAK_WOOD,
 
 			// Pale Oak Blocks
+			Blocks.CREAKING_HEART,
 			Blocks.PALE_OAK_BUTTON,
 			Blocks.PALE_OAK_DOOR,
 			Blocks.PALE_OAK_FENCE,
@@ -1356,7 +1434,12 @@ public class BlockUtil {
 			// Interactive Blocks
 			Blocks.BARREL,
 			Blocks.CAMPFIRE,
+			Blocks.CARTOGRAPHY_TABLE,
+			Blocks.CHEST,
+			Blocks.COMPOSTER,
+			Blocks.CRAFTING_TABLE,
 			Blocks.DAYLIGHT_DETECTOR,
+			Blocks.FLETCHING_TABLE,
 			Blocks.FLETCHING_TABLE,
 			Blocks.JUKEBOX,
 			Blocks.LADDER,

@@ -56,9 +56,9 @@
 	"subtitles.turret.remove.metal" : "Metallic Turret Removed",
 	"subtitles.turret.remove.wood" : "Wooden Turret Removed",
 
-	"subtitles.turret.iron.repair" : "Repaired Iron Turret",
-	"subtitles.turret.bow.repair" : "Repaired Bow Turret",
-	"subtitles.turret.wood.repair" : "Repaired Wooden Turret",
+	"subtitles.turret.repair.bow" : "Repaired Bow Turret",
+	"subtitles.turret.repair.metal" : "Repaired Metal Turret",
+	"subtitles.turret.repair.wood" : "Repaired Wooden Turret",
 
 	"subtitles.generic.impact.bullet.default" : "Bullet impacted",
 	"subtitles.generic.impact.bullet.flesh" : "Bullet hit an entity",

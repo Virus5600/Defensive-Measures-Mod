@@ -39,8 +39,10 @@ public class RegistryUtil {
 		return RegistryKey.of(RegistryKeys.BLOCK, Identifier.of(DefensiveMeasures.MOD_ID, name));
 	}
 
-	public static Block registerBlock(String path, Function<AbstractBlock.Settings, Block> function, AbstractBlock.Settings settings) {
-		return Blocks.register(createBlockKey(path), function, settings);
+	public static Block registerBlock(String path, Function<AbstractBlock.Settings, Block> function, AbstractBlock.Settings settings, BlockUtil.BlockCategory blockCategory) {
+		Block block = Blocks.register(createBlockKey(path), function, settings);
+		BlockUtil.addBlockToCategory(block, blockCategory);
+		return block;
 	}
 
 	// Item Registry

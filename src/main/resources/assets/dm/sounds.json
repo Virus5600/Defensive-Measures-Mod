@@ -104,21 +104,21 @@
 				"pitch": 0.8
 			}
 		],
-		"subtitle": "subtitles.turret.iron.repair"
+		"subtitle": "subtitles.turret.repair.metal"
 	},
 	"turret.repair.bow": {
 		"sounds": [
 			"block/fletching_table/fletching_table1",
 			"block/fletching_table/fletching_table2"
 		],
-		"subtitle": "subtitles.turret.bow.repair"
+		"subtitle": "subtitles.turret.repair.bow"
 	},
 	"turret.repair.wood": {
 		"sounds": [
 			"dm:turrets/repair/wood_repair1",
 			"dm:turrets/repair/wood_repair2"
 		],
-		"subtitle": "subtitles.turret.wood.repair"
+		"subtitle": "subtitles.turret.repair.wood"
 	},
 
 	"turret.cannon.hurt": {
