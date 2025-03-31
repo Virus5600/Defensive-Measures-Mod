@@ -120,13 +120,6 @@ public class ModSoundEventsTest {
 
 		// Check if the sound event is not null
 		this.assertSoundEventExists(soundEvent);
-
-		String successMsg = "Sound event \"%s\" exists and has a subtitle: %s%n";
-		System.out.printf(
-			successMsg,
-			soundEventId,
-			LANG.get(subtitleKey)
-		);
 	}
 
 	private void assertSoundEventExists(@NotNull SoundEvent soundEvent) {

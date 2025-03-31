@@ -1,6 +1,7 @@
 package com.virus5600.defensive_measures.util;
 
 import net.minecraft.item.Item;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Contains all utility methods that can be used for the {@link net.minecraft.item.Item Item class}
@@ -31,6 +32,7 @@ public class ItemUtil {
 	 * @param item Item in question
 	 * @return An instance provided on the parameter {@code type}
 	 */
+	@Nullable
 	public static <T> T getObjectInstance(Class<? extends T> type, Item item) {
 		if (ItemUtil.isTypeMatch(type, item))
 			return type.cast(item);

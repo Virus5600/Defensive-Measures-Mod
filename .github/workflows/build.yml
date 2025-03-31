@@ -12,7 +12,8 @@ jobs:
       matrix:
         # Use these Java versions
         java: [
-          22  # Current Java LTS & minimum supported by Minecraft
+          21  # Minimum supported by Minecraft
+          22  # Current Java LTS
         ]
         # Run on both Linux
         os:
@@ -29,8 +30,11 @@ jobs:
           java: ${{ matrix.java }}
           os: ${{ matrix.os }}
 
+      - name: Run Test
+        uses: ./.github/actions/run_test
+
       - name: Capture Build Artifacts
-        if: ${{ runner.os == 'Linux' && matrix.java == '22' }} # Only upload artifacts built from latest java on one OS
+        if: ${{ runner.os == 'Linux' }} # Only upload artifacts built from latest java on one OS
         uses: actions/upload-artifact@v4
         with:
           name: Artifacts
