@@ -324,14 +324,13 @@ public class BallistaTurretEntity extends TurretEntity implements GeoEntity {
 			}
 		};
 
-		effectSource = new HashMap<>() {
+		effectSource = new HashMap<Item, List<Object[]>>() {
 			{
 				for (Item item : TurretEntity.LOGS) {
-					put(item, new ArrayList<>() {
-						{
-							add(new Object[] {StatusEffects.ABSORPTION, 60, 2});
-						}
-					});
+					put(item, List.<Object[]>of(
+						new Object[] { StatusEffects.ABSORPTION, 60, 2 },
+						new Object[] { StatusEffects.RESISTANCE, 60, 2 }
+					));
 				}
 			}
 		};

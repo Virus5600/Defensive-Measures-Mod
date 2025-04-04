@@ -331,6 +331,7 @@ public class CannonTurretEntity extends TurretEntity implements GeoEntity {
 
 		effectSource = Map.of(
 			Items.IRON_BLOCK, List.<Object[]>of(
+				new Object[] { StatusEffects.ABSORPTION, 60, 2 },
 				new Object[] { StatusEffects.RESISTANCE, 60, 2 }
 			)
 		);

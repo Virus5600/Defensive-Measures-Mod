@@ -746,7 +746,7 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 				float vx = MathHelper.sqrt((float) (velocity.x * velocity.x + velocity.z * velocity.z));
 				float p = (float) -Math.atan2(velocity.y, vx);
 				p *= (float) (180.0 / Math.PI);
-				p = MathHelper.clamp(p, -this.getMaxLookPitchChange(), this.getMaxLookPitchChange());
+				p = MathHelper.clamp(p, this.getMinLookPitchChange(), this.getMaxLookPitchChange());
 
 				this.dataTracker.set(SHOOTING_PITCH, p);
 			}
@@ -1068,6 +1068,10 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 	@Override
 	public int getMaxLookPitchChange() {
 		return 90;
+	}
+
+	public int getMinLookPitchChange() {
+		return -this.getMaxLookPitchChange();
 	}
 
 	@Override

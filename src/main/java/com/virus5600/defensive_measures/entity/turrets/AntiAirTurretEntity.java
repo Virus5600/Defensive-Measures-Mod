@@ -1,5 +1,11 @@
 package com.virus5600.defensive_measures.entity.turrets;
 
+import com.virus5600.defensive_measures.entity.ModEntities;
+import com.virus5600.defensive_measures.entity.TurretMaterial;
+import com.virus5600.defensive_measures.entity.ai.goal.ProjectileAttackGoal;
+import com.virus5600.defensive_measures.item.ModItems;
+import com.virus5600.defensive_measures.particle.ModParticles;
+import com.virus5600.defensive_measures.sound.ModSoundEvents;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.attribute.DefaultAttributeContainer.Builder;
@@ -7,59 +13,52 @@ import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.effect.StatusEffects;
+import net.minecraft.entity.mob.FlyingEntity;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-
+import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib.animatable.GeoEntity;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.animation.*;
 import software.bernie.geckolib.animation.keyframe.event.ParticleKeyframeEvent;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
-import org.jetbrains.annotations.Nullable;
-
-import com.virus5600.defensive_measures.entity.ModEntities;
-import com.virus5600.defensive_measures.entity.TurretMaterial;
-import com.virus5600.defensive_measures.entity.ai.goal.ProjectileAttackGoal;
-import com.virus5600.defensive_measures.item.ModItems;
-import com.virus5600.defensive_measures.particle.ModParticles;
-import com.virus5600.defensive_measures.sound.ModSoundEvents;
-
 import java.util.List;
 import java.util.Map;
 
 /**
- * Represents the Machine Gun Turret entity.
+ * Represents the Anti-Air (AA) Turret entity.
  * <br><br>
- * A Machine Gun Turret, or in short MG Turret, is a metal turret that shoots bullets at enemies.
- * It has a long range and deals a good amount of damage while providing a superb amount of fire
- * rate, shooting 5 bullets per burst, with a 0.15 seconds cooldown between each bullet in a burst
- * and a 3.75 seconds cooldown between each burst.
+ * An Anti-Air Turret, or in short AA Turret, is a metal turret that shoots bullets at flying enemies.
+ * It has an extremely long range and deals a fair amount of damage while providing a superb amount
+ * of fire rate, shooting 7 bullets per burst, with a 0.15 seconds cooldown between each bullet in a burst
+ * and a 5 seconds cooldown between each burst.
  * <hr/>
  * <b>Attributes:</b>
  * <ul>
- *     <li><b>Health:</b> 25</li>
- *     <li><b>Base Damage:</b> 5.0</li>
+ *     <li><b>Health:</b> 20</li>
+ *     <li><b>Base Damage:</b> 2</li>
  *     <li><b>Base Pierce Level:</b> 5</li>
- *     <li><b>Attack Cooldown:</b> 0.1 seconds per bullets / 3.75 seconds per burst</li>
- *     <li><b>Attack Range:</b> 20 blocks</li>
+ *     <li><b>Attack Cooldown:</b> 0.15 seconds per bullets / 5 seconds per burst</li>
+ *     <li><b>Attack Range:</b> 8 - 64 blocks</li>
  *     <li><b>X Firing Arc:</b> ±360°</li>
- *     <li><b>Y Firing Arc:</b> ±27.5°</li>
+ *     <li><b>Y Firing Arc:</b> -25° - +90°</li>
  * </ul>
  *
  * @see TurretEntity
  * @see GeoEntity
  *
- * @since 1.0.0
+ * @since 1.1.0
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
  * @version 1.0.0
  */
-public class MGTurretEntity extends TurretEntity implements GeoEntity {
+public class AntiAirTurretEntity extends TurretEntity implements GeoEntity {
 	/**
 	 * Defines how many seconds the machine gun should wait before shooting again.
 	 * The time is calculated in ticks and by default, it's 3.75 seconds <b>(20 ticks times 3.75 seconds)</b>.
@@ -68,7 +67,7 @@ public class MGTurretEntity extends TurretEntity implements GeoEntity {
 	 * per burst with a 0.15 seconds cooldown between each bullet. This part is not included in the
 	 * cooldown attribute and will be handled by the {@link #tick() tick()} method.
 	 */
-	private static final int TOTAL_ATT_COOLDOWN = (int) (20 * 3.75);
+	private static final int TOTAL_ATT_COOLDOWN = 20;
 	private static final Map<String, RawAnimation> ANIMATIONS;
 	private static final Map<Offsets, List<Vec3d>> OFFSETS;
 	private static final double[] DAMAGE;
@@ -89,10 +88,10 @@ public class MGTurretEntity extends TurretEntity implements GeoEntity {
 	// //////////// //
 	// CONSTRUCTORS //
 	// //////////// //
-	public MGTurretEntity(EntityType<? extends MobEntity> entityType, World world) {
+	public AntiAirTurretEntity(EntityType<? extends MobEntity> entityType, World world) {
 		super(entityType, world, TurretMaterial.METAL, ModEntities.MG_BULLET, ModItems.MG_TURRET);
 
-		this.setShootSound(ModSoundEvents.TURRET_MG_SHOOT);
+		this.setShootSound(ModSoundEvents.TURRET_ANTI_AIR_SHOOT);
 		this.setHealSound(ModSoundEvents.TURRET_REPAIR_METAL);
 		this.addHealables(healables);
 		this.addEffectSource(effectSource);
@@ -117,8 +116,8 @@ public class MGTurretEntity extends TurretEntity implements GeoEntity {
 	}
 
 	public static Builder setAttributes() {
-		TurretEntity.setTurretMaxHealth(25);
-		TurretEntity.setTurretMaxRange(20 + ModEntities.MG_TURRET.getDimensions().eyeHeight());
+		TurretEntity.setTurretMaxHealth(20);
+		TurretEntity.setTurretMaxRange(64 + ModEntities.MG_TURRET.getDimensions().eyeHeight());
 
 		return TurretEntity.setAttributes()
 			.add(EntityAttributes.ARMOR, 2)
@@ -142,13 +141,19 @@ public class MGTurretEntity extends TurretEntity implements GeoEntity {
 		super.shootBurst(5, 3, velocityData);
 	}
 
+	@Override
+	protected boolean targetPredicate(LivingEntity target, ServerWorld world) {
+		boolean isValid = super.targetPredicate(target, world);
+		return isValid && target instanceof FlyingEntity;
+	}
+
 	// /////////////////// //
 	// GETTERS AND SETTERS //
 	// /////////////////// //
 
 	@Override
-	public int getMaxLookPitchChange() {
-		return 27;
+	public int getMinLookPitchChange() {
+		return -25;
 	}
 
 	@Nullable
@@ -177,7 +182,7 @@ public class MGTurretEntity extends TurretEntity implements GeoEntity {
 	// ANIMATION CONTROLLERS //
 	// ///////////////////// //
 
-	private <E extends MGTurretEntity> PlayState deathController(final AnimationState<E> event) {
+	private <E extends AntiAirTurretEntity> PlayState deathController(final AnimationState<E> event) {
 		if (!this.isAlive() && !this.animPlayed) {
 			this.animPlayed = true;
 			event.setAnimation(ANIMATIONS.get("Death"));
@@ -186,16 +191,16 @@ public class MGTurretEntity extends TurretEntity implements GeoEntity {
 		return PlayState.CONTINUE;
 	}
 
-	private <E extends MGTurretEntity>PlayState idleController(final AnimationState<E> event) {
+	private <E extends AntiAirTurretEntity>PlayState idleController(final AnimationState<E> event) {
 		return event
 			.setAndContinue(ANIMATIONS.get("Idle"));
 	}
 
-	private <E extends MGTurretEntity>PlayState shootController(final AnimationState<E> event) {
+	private <E extends AntiAirTurretEntity>PlayState shootController(final AnimationState<E> event) {
 		return PlayState.STOP;
 	}
 
-	private void shootKeyframeHandler(ParticleKeyframeEvent<MGTurretEntity> state) {
+	private void shootKeyframeHandler(ParticleKeyframeEvent<AntiAirTurretEntity> state) {
 		final String LOCATOR = state.getKeyframeData()
 			.getLocator();
 

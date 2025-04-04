@@ -46,6 +46,15 @@ public class ModEntities {
 			.eyeHeight(0.4275F)
 	);
 
+	// v1.1.0
+	public static final EntityType<AntiAirTurretEntity> ANTI_AIR_TURRET = RegistryUtil.registerEntity(
+		"anti_air_turret",
+		Builder
+			.create(AntiAirTurretEntity::new, SpawnGroup.MISC)
+			.dimensions(1F, 1F)
+			.eyeHeight(0.51F)
+	);
+
 	// PROJECTILES //
 	// v1.0.0
 	public static final EntityType<CannonballEntity> CANNONBALL = RegistryUtil.registerEntity(
