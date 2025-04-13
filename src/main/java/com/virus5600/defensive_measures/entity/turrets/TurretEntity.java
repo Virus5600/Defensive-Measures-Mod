@@ -43,6 +43,7 @@ import net.minecraft.world.World;
 import com.virus5600.defensive_measures.DefensiveMeasures;
 import com.virus5600.defensive_measures.entity.TurretMaterial;
 import com.virus5600.defensive_measures.entity.ai.goal.ProjectileAttackGoal;
+import com.virus5600.defensive_measures.entity.ai.goal.ProjectileAttackGoal.AttackPhase;
 import com.virus5600.defensive_measures.entity.ai.goal.TargetOtherTeamGoal;
 import com.virus5600.defensive_measures.entity.turrets.interfaces.Itemable;
 import com.virus5600.defensive_measures.item.ModItems;
@@ -707,6 +708,14 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 	@Override
 	public void tick() {
 		super.tick();
+
+		if (this.attackGoal != null) {
+			AttackPhase attackPhase = this.attackGoal.getAttackPhase();
+
+			if (attackPhase == AttackPhase.ATTACK_END) {
+				this.attackGoal.stop();
+			}
+		}
 
 		// CLIENT SIDE
 		if (this.getWorld().isClient()) {
@@ -1588,6 +1597,21 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 		this.setTarget(target);
 	}
 
+	/**
+	 * Shoots a burst of projectiles with a specified count and delay between each shot.
+	 * <br><br>
+	 * This method is used when a turret is set to shoot multiple projectiles in a single attack,
+	 * allowing for a burst of projectiles to be fired in quick succession. The {@code count} parameter
+	 * determines how many projectiles will be fired in the burst, while the {@code delay} parameter
+	 * determines the delay between each shot.
+	 * <br><br>
+	 * In this overloaded version, the velocity data of the burst attack is also specified, allowing
+	 * the turret to shoot projectiles in a pre-defined direction or with a specific velocity.
+	 *
+	 * @param count The number of projectiles to shoot in the burst.
+	 * @param delay The delay between each shot in ticks.
+	 * @param velocityData The data that will be used to set the velocity of the projectile.
+	 */
 	protected void shootBurst(int count, int delay, TurretProjectileVelocity velocityData) {
 		this.shootBurst(count, delay);
 

@@ -21,7 +21,7 @@ import net.minecraft.entity.SpawnGroup;
  */
 public class ModEntities {
 	// TURRETS //
-	// v1.0.0
+	// v1.0.0-beta
 	public static final EntityType<CannonTurretEntity> CANNON_TURRET = RegistryUtil.registerEntity(
 		"cannon_turret",
 		Builder
@@ -46,17 +46,17 @@ public class ModEntities {
 			.eyeHeight(0.4275F)
 	);
 
-	// v1.1.0
-	public static final EntityType<AntiAirTurretEntity> ANTI_AIR_TURRET = RegistryUtil.registerEntity(
-		"anti_air_turret",
+	// v1.1.0-beta
+	public static final EntityType<AATurretEntity> AA_TURRET = RegistryUtil.registerEntity(
+		"aa_turret",
 		Builder
-			.create(AntiAirTurretEntity::new, SpawnGroup.MISC)
+			.create(AATurretEntity::new, SpawnGroup.MISC)
 			.dimensions(1F, 1F)
 			.eyeHeight(0.51F)
 	);
 
 	// PROJECTILES //
-	// v1.0.0
+	// v1.0.0-beta
 	public static final EntityType<CannonballEntity> CANNONBALL = RegistryUtil.registerEntity(
 		"cannonball",
 		Builder
@@ -92,9 +92,12 @@ public class ModEntities {
 		DefensiveMeasures.LOGGER.info("REGISTERING ENTITY ATTRIBUTES FOR {}...", DefensiveMeasures.MOD_NAME);
 
 		// TURRETS //
-		// v1.0.0
+		// v1.0.0-beta
 		FabricDefaultAttributeRegistry.register(ModEntities.CANNON_TURRET, CannonTurretEntity.setAttributes());
 		FabricDefaultAttributeRegistry.register(ModEntities.BALLISTA_TURRET, BallistaTurretEntity.setAttributes());
 		FabricDefaultAttributeRegistry.register(ModEntities.MG_TURRET, MGTurretEntity.setAttributes());
+
+		// v1.1.0-beta
+		FabricDefaultAttributeRegistry.register(ModEntities.AA_TURRET, AATurretEntity.setAttributes());
 	}
 }

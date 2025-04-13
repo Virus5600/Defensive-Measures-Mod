@@ -38,14 +38,14 @@ import java.util.Map;
  * An Anti-Air Turret, or in short AA Turret, is a metal turret that shoots bullets at flying enemies.
  * It has an extremely long range and deals a fair amount of damage while providing a superb amount
  * of fire rate, shooting 7 bullets per burst, with a 0.15 seconds cooldown between each bullet in a burst
- * and a 5 seconds cooldown between each burst.
+ * and a 1-second cooldown between each burst.
  * <hr/>
  * <b>Attributes:</b>
  * <ul>
  *     <li><b>Health:</b> 20</li>
  *     <li><b>Base Damage:</b> 2</li>
  *     <li><b>Base Pierce Level:</b> 5</li>
- *     <li><b>Attack Cooldown:</b> 0.15 seconds per bullets / 5 seconds per burst</li>
+ *     <li><b>Attack Cooldown:</b> 0.15 seconds per bullets / 1 seconds per burst</li>
  *     <li><b>Attack Range:</b> 8 - 64 blocks</li>
  *     <li><b>X Firing Arc:</b> ±360°</li>
  *     <li><b>Y Firing Arc:</b> -25° - +90°</li>
@@ -58,10 +58,10 @@ import java.util.Map;
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
  * @version 1.0.0
  */
-public class AntiAirTurretEntity extends TurretEntity implements GeoEntity {
+public class AATurretEntity extends TurretEntity implements GeoEntity {
 	/**
 	 * Defines how many seconds the machine gun should wait before shooting again.
-	 * The time is calculated in ticks and by default, it's 3.75 seconds <b>(20 ticks times 3.75 seconds)</b>.
+	 * The time is calculated in ticks and by default, it's 1 second <b>(20 ticks times 1 second)</b>.
 	 * <br><br>
 	 * Though, this cooldown is for its burst attack. The machine gun will, however, shoot 5 bullets
 	 * per burst with a 0.15 seconds cooldown between each bullet. This part is not included in the
@@ -88,10 +88,10 @@ public class AntiAirTurretEntity extends TurretEntity implements GeoEntity {
 	// //////////// //
 	// CONSTRUCTORS //
 	// //////////// //
-	public AntiAirTurretEntity(EntityType<? extends MobEntity> entityType, World world) {
-		super(entityType, world, TurretMaterial.METAL, ModEntities.MG_BULLET, ModItems.MG_TURRET);
+	public AATurretEntity(EntityType<? extends MobEntity> entityType, World world) {
+		super(entityType, world, TurretMaterial.METAL, ModEntities.MG_BULLET, ModItems.AA_TURRET);
 
-		this.setShootSound(ModSoundEvents.TURRET_ANTI_AIR_SHOOT);
+		this.setShootSound(ModSoundEvents.TURRET_AA_SHOOT);
 		this.setHealSound(ModSoundEvents.TURRET_REPAIR_METAL);
 		this.addHealables(healables);
 		this.addEffectSource(effectSource);
@@ -105,6 +105,14 @@ public class AntiAirTurretEntity extends TurretEntity implements GeoEntity {
 		// Goal instances
 		this.attackGoal = new ProjectileAttackGoal(this, 0, TOTAL_ATT_COOLDOWN, this.getMaxAttackRange(), this.getMinAttackRange());
 
+		this.attackGoal.setStartCallback((mob) -> {
+			mob.playSound(ModSoundEvents.TURRET_AA_BEGIN_SHOOT);
+		});
+		this.attackGoal.setStopCallback((mob) -> {
+			((AATurretEntity) mob).stopTriggeredAnim("FiringSequence", "shoot");
+			mob.playSound(ModSoundEvents.TURRET_AA_END_SHOOT);
+		});
+
 		// Set the standard goals
 		super.initGoals();
 	}
@@ -112,12 +120,12 @@ public class AntiAirTurretEntity extends TurretEntity implements GeoEntity {
 	@Override
 	protected void initDataTracker(DataTracker.Builder builder) {
 		// Initialize standard data trackers
-	super.initDataTracker(builder);
+		super.initDataTracker(builder);
 	}
 
 	public static Builder setAttributes() {
 		TurretEntity.setTurretMaxHealth(20);
-		TurretEntity.setTurretMaxRange(64 + ModEntities.MG_TURRET.getDimensions().eyeHeight());
+		TurretEntity.setTurretMaxRange(64 + ModEntities.AA_TURRET.getDimensions().eyeHeight());
 
 		return TurretEntity.setAttributes()
 			.add(EntityAttributes.ARMOR, 2)
@@ -136,9 +144,10 @@ public class AntiAirTurretEntity extends TurretEntity implements GeoEntity {
 
 		TurretProjectileVelocity velocityData = TurretProjectileVelocity.init(this)
 			.setVelocity(target)
+			.setPower(1.5f)
 			.setUpwardVelocityMultiplier(dist * 0.125f);
 
-		super.shootBurst(5, 3, velocityData);
+		super.shootBurst(7, 3, velocityData);
 	}
 
 	@Override
@@ -152,8 +161,13 @@ public class AntiAirTurretEntity extends TurretEntity implements GeoEntity {
 	// /////////////////// //
 
 	@Override
+	public int getMaxLookPitchChange() {
+		return 25;
+	}
+
+	@Override
 	public int getMinLookPitchChange() {
-		return -25;
+		return -90;
 	}
 
 	@Nullable
@@ -182,7 +196,7 @@ public class AntiAirTurretEntity extends TurretEntity implements GeoEntity {
 	// ANIMATION CONTROLLERS //
 	// ///////////////////// //
 
-	private <E extends AntiAirTurretEntity> PlayState deathController(final AnimationState<E> event) {
+	private <E extends AATurretEntity> PlayState deathController(final AnimationState<E> event) {
 		if (!this.isAlive() && !this.animPlayed) {
 			this.animPlayed = true;
 			event.setAnimation(ANIMATIONS.get("Death"));
@@ -191,16 +205,16 @@ public class AntiAirTurretEntity extends TurretEntity implements GeoEntity {
 		return PlayState.CONTINUE;
 	}
 
-	private <E extends AntiAirTurretEntity>PlayState idleController(final AnimationState<E> event) {
+	private <E extends AATurretEntity>PlayState idleController(final AnimationState<E> event) {
 		return event
 			.setAndContinue(ANIMATIONS.get("Idle"));
 	}
 
-	private <E extends AntiAirTurretEntity>PlayState shootController(final AnimationState<E> event) {
+	private <E extends AATurretEntity>PlayState shootController(final AnimationState<E> event) {
 		return PlayState.STOP;
 	}
 
-	private void shootKeyframeHandler(ParticleKeyframeEvent<AntiAirTurretEntity> state) {
+	private void shootKeyframeHandler(ParticleKeyframeEvent<AATurretEntity> state) {
 		final String LOCATOR = state.getKeyframeData()
 			.getLocator();
 
@@ -281,17 +295,17 @@ public class AntiAirTurretEntity extends TurretEntity implements GeoEntity {
 
 		OFFSETS = Map.of(
 			Offsets.BARREL, List.of(
-				new Vec3d(0.0, 0.0, 0.5)
+				new Vec3d(0.0, 0.0, 0.75)
 			)
 		);
 
 		ANIMATIONS = Map.of(
 			"Death", RawAnimation.begin()
-				.thenPlayAndHold("animation.machine_gun_turret.death"),
+				.thenPlayAndHold("animation.aa_turret.death"),
 			"Idle", RawAnimation.begin()
-				.thenLoop("animation.machine_gun_turret.setup"),
+				.thenLoop("animation.aa_turret.setup"),
 			"Shoot", RawAnimation.begin()
-				.thenPlay("animation.machine_gun_turret.shoot")
+				.thenPlay("animation.aa_turret.shoot")
 		);
 
 		healables = Map.of(

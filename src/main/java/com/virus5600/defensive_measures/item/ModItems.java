@@ -7,10 +7,12 @@ import com.virus5600.defensive_measures.entity.ModEntities;
 import com.virus5600.defensive_measures.item.equipments.TurretRemoverItem;
 import com.virus5600.defensive_measures.item.interfaces.FuelItem;
 import com.virus5600.defensive_measures.item.turrets.TurretItem;
+import com.virus5600.defensive_measures.util.RegistryUtil;
+
 import com.virus5600.defensive_measures.item.turrets.ballista.*;
 import com.virus5600.defensive_measures.item.turrets.cannon.*;
 import com.virus5600.defensive_measures.item.turrets.mg_turret.*;
-import com.virus5600.defensive_measures.util.RegistryUtil;
+import com.virus5600.defensive_measures.item.turrets.aa_turret.*;
 
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.fabricmc.fabric.api.registry.FuelRegistryEvents;
@@ -67,6 +69,9 @@ public class ModItems {
 	public final static Item MG_BASE = registerItem("mg_base", MGBaseItem::new);
 	public final static Item MG_HEAD = registerItem("mg_head", MGHeadItem::new);
 	public final static Item MG_STAND = registerItem("mg_stand", MGStandItem::new);
+
+	// ANTI-AIR
+	public final static Item AA_TURRET = registerItem("aa_turret", ModEntities.AA_TURRET, AATurretItem::new);
 
 	// ////////// //
 	// EQUIPMENTS //
@@ -196,6 +201,8 @@ public class ModItems {
 			MG_BASE,
 			MG_HEAD,
 			MG_STAND
+
+			// ANTI-AIR
 		};
 
 		DM_EQUIPMENTS = new Item[] {
@@ -209,7 +216,8 @@ public class ModItems {
 		DM_TURRETS = new Item[] {
 			CANNON_TURRET,
 			BALLISTA_TURRET,
-			MG_TURRET
+			MG_TURRET,
+			AA_TURRET
 		};
 
 		FUEL_ITEMS = new Item[] {

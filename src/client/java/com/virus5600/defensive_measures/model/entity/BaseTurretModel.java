@@ -144,10 +144,12 @@ public class BaseTurretModel<T extends TurretEntity & GeoAnimatable> extends Bas
 	protected float getLookPitch(T animatable, AnimationState<T> state) {
 		EntityModelData extraData = (EntityModelData) state.getExtraData()
 			.get(DataTickets.ENTITY_MODEL_DATA);
+
+		float minPitchChange = animatable.getMinLookPitchChange();
 		float maxPitchChange = animatable.getMaxLookPitchChange();
 
 		float targetXRot = (extraData.headPitch() * ((float) Math.PI / 180F));
-		targetXRot = Math.clamp(targetXRot, -maxPitchChange, maxPitchChange);
+		targetXRot = Math.clamp(targetXRot, minPitchChange, maxPitchChange);
 
 		return targetXRot;
 	}

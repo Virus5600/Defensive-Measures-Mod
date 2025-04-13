@@ -12,5 +12,5 @@ TODO: TurretEntity
 		- Properly calculate the parabolic trajectory (low priority) - Apparently, it was because of the "acceleration" modifier in the "ExplosiveProjectileEntity" class. Fuck.
 
 TODO: Anti-Air Turret
-- Implement client-side codes.
-- Implement resources such as animations and models.
+- Implement dynamic sound.
+	- Add a "spinning barrel" sound that has no shooting.

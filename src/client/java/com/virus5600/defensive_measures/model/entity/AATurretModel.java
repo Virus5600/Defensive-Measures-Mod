@@ -1,12 +1,12 @@
 package com.virus5600.defensive_measures.model.entity;
 
 import com.virus5600.defensive_measures.DefensiveMeasures;
-import com.virus5600.defensive_measures.entity.turrets.MGTurretEntity;
+import com.virus5600.defensive_measures.entity.turrets.AATurretEntity;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
 /**
- * Machine Gun Turret Model.
+ * Anti Air Turret Model.
  *
  * @see BaseTurretModel
  *
@@ -15,15 +15,15 @@ import net.fabricmc.api.Environment;
  * @version 1.0.0
  */
 @Environment(EnvType.CLIENT)
-public class MGTurretModel extends BaseTurretModel<MGTurretEntity> {
-	public MGTurretModel() {
+public class AATurretModel extends BaseTurretModel<AATurretEntity> {
+	public AATurretModel() {
 		super(
 			DefensiveMeasures.MOD_ID,
-			"geo/machine_gun_turret.geo.json",
-			"textures/entity/mg_turret/machine_gun_turret.png",
-			"animations/machine_gun_turret.animation.json",
+			"geo/anti_air_turret.geo.json",
+			"textures/entity/aa_turret/anti_air_turret.png",
+			"animations/anti_air_turret.animation.json",
 			"base",
-			"body",
+			"stand",
 			"head"
 		);
 	}

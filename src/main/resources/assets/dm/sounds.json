@@ -54,6 +54,7 @@
 		],
 		"subtitle": "subtitles.generic.impact.bullet.wood"
 	},
+
 	"turret.remove.metal": {
 		"sounds": [
 			{
@@ -233,36 +234,39 @@
 		"subtitle": "subtitles.turret.mg_turret.shoot"
 	},
 
-	"turret.anti_air_turret.hurt": {
+	"turret.aa_turret.hurt": {
 		"sounds": [
 			"dm:turrets/hurt/metal_hurt1",
 			"dm:turrets/hurt/metal_hurt2"
 		],
-		"subtitle": "subtitles.anti_air_turret.hurt"
+		"subtitle": "subtitles.turret.anti_air_turret.hurt"
 	},
-	"turret.anti_air_turret.destroyed": {
+	"turret.aa_turret.destroyed": {
 		"sounds": [
 			"dm:turrets/crumbling_turrets/metal_crumbling1",
 			"dm:turrets/crumbling_turrets/metal_crumbling2"
 		],
-		"subtitle": "subtitles.anti_air_turret.destroyed"
+		"subtitle": "subtitles.turret.aa_turret.destroyed"
 	},
-	"turret.anti_air_turret.shoot.begin": {
+	"turret.aa_turret.shoot.begin": {
 		"sounds": [
-			"dm:anti_air_turret/shoot_begin1"
+			"dm:aa_turret/shoot_begin1"
 		],
-		"subtitle": "subtitles.anti_air_turret.turret.shoot.begin"
+		"volume": 0.25,
+		"subtitle": "subtitles.turret.aa_turret.shoot.begin"
 	},
-	"turret.anti_air_turret.shoot": {
+	"turret.aa_turret.shoot": {
 		"sounds": [
-			"dm:anti_air_turret/shoot1"
+			"dm:aa_turret/shoot1"
 		],
-		"subtitle": "subtitles.anti_air_turret.turret.shoot"
+		"volume": 0.25,
+		"subtitle": "subtitles.turret.aa_turret.shoot"
 	},
-	"turret.anti_air_turret.shoot.end": {
+	"turret.aa_turret.shoot.end": {
 		"sounds": [
-			"dm:anti_air_turret/shoot_end1"
+			"dm:aa_turret/shoot_end1"
 		],
-		"subtitle": "subtitles.anti_air_turret.turret.shoot.end"
+		"volume":  0.25,
+		"subtitle": "subtitles.turret.aa_turret.shoot.end"
 	}
 }
