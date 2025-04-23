@@ -87,6 +87,7 @@
 	"subtitles.turret.aa_turret.hurt" : "AA Turret damaged",
 	"subtitles.turret.aa_turret.destroyed" : "AA Turret destroyed",
 	"subtitles.turret.aa_turret.shoot.begin" : "AA Turret begins shooting",
+	"subtitles.turret.aa_turret.shoot.loop" : "AA Turret attacking",
 	"subtitles.turret.aa_turret.shoot" : "AA Turret shoots",
 	"subtitles.turret.aa_turret.shoot.end" : "AA Turret finished shooting",
 

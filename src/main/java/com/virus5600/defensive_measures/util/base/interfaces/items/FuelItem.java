@@ -1,4 +1,4 @@
-package com.virus5600.defensive_measures.item.interfaces;
+package com.virus5600.defensive_measures.util.base.interfaces.items;
 
 /**
  * An interface that <b>should</b> be used by any items that can

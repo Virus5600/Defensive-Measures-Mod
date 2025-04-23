@@ -255,6 +255,13 @@
 		"volume": 0.25,
 		"subtitle": "subtitles.turret.aa_turret.shoot.begin"
 	},
+	"turret.aa_turret.shoot.loop": {
+		"sounds": [
+			"dm:aa_turret/shoot_loop1"
+		],
+		"volume": 0.01,
+		"subtitle": "subtitles.turret.aa_turret.shoot.loop"
+	},
 	"turret.aa_turret.shoot": {
 		"sounds": [
 			"dm:aa_turret/shoot1"

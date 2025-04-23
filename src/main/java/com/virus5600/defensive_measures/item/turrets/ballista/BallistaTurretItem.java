@@ -10,8 +10,8 @@ import net.minecraft.util.Formatting;
 import net.minecraft.util.Rarity;
 
 import com.virus5600.defensive_measures.entity.turrets.BallistaTurretEntity;
-import com.virus5600.defensive_measures.entity.turrets.TurretEntity;
-import com.virus5600.defensive_measures.item.turrets.TurretItem;
+import com.virus5600.defensive_measures.util.base.superclasses.entity.TurretEntity;
+import com.virus5600.defensive_measures.util.base.superclasses.item.TurretItem;
 
 import java.lang.reflect.Type;
 import java.util.List;

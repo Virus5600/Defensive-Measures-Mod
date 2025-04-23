@@ -9,8 +9,8 @@ import software.bernie.geckolib.cache.object.GeoBone;
 import software.bernie.geckolib.constant.DataTickets;
 import software.bernie.geckolib.model.data.EntityModelData;
 
-import com.virus5600.defensive_measures.entity.turrets.TurretEntity;
-import com.virus5600.defensive_measures.model.BaseModel;
+import com.virus5600.defensive_measures.util.base.superclasses.entity.TurretEntity;
+import com.virus5600.defensive_measures.util.base.superclasses.model.BaseModel;
 
 import org.jetbrains.annotations.Nullable;
 

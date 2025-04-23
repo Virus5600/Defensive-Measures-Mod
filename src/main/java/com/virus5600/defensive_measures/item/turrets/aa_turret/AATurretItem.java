@@ -1,8 +1,8 @@
 package com.virus5600.defensive_measures.item.turrets.aa_turret;
 
 import com.virus5600.defensive_measures.entity.turrets.AATurretEntity;
-import com.virus5600.defensive_measures.entity.turrets.TurretEntity;
-import com.virus5600.defensive_measures.item.turrets.TurretItem;
+import com.virus5600.defensive_measures.util.base.superclasses.entity.TurretEntity;
+import com.virus5600.defensive_measures.util.base.superclasses.item.TurretItem;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.item.ItemStack;

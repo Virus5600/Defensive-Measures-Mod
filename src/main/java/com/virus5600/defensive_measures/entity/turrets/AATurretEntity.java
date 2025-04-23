@@ -6,6 +6,7 @@ import com.virus5600.defensive_measures.entity.ai.goal.ProjectileAttackGoal;
 import com.virus5600.defensive_measures.item.ModItems;
 import com.virus5600.defensive_measures.particle.ModParticles;
 import com.virus5600.defensive_measures.sound.ModSoundEvents;
+import com.virus5600.defensive_measures.util.base.superclasses.entity.TurretEntity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.attribute.DefaultAttributeContainer.Builder;
@@ -83,7 +84,9 @@ public class AATurretEntity extends TurretEntity implements GeoEntity {
 	protected static final Map<Item, List<Object[]>> effectSource;
 
 	private final AnimatableInstanceCache geoCache = GeckoLibUtil.createInstanceCache(this);
+	private int muzzleFlashCount = 0;
 	private boolean animPlayed = false;
+	protected boolean attacking = false;
 
 	// //////////// //
 	// CONSTRUCTORS //
@@ -105,12 +108,47 @@ public class AATurretEntity extends TurretEntity implements GeoEntity {
 		// Goal instances
 		this.attackGoal = new ProjectileAttackGoal(this, 0, TOTAL_ATT_COOLDOWN, this.getMaxAttackRange(), this.getMinAttackRange());
 
+		// Attack Goal Callbacks
 		this.attackGoal.setStartCallback((mob) -> {
-			mob.playSound(ModSoundEvents.TURRET_AA_BEGIN_SHOOT);
+			if (!this.isSilent()) {
+				this.playSound(
+					ModSoundEvents.TURRET_AA_BEGIN_SHOOT,
+					0.125f,
+					1.0f
+				);
+			}
 		});
+
+		this.attackGoal.setPreShootCallback((mob) -> {
+			// Disable loop sound.
+			if (this.attacking) {
+				this.attacking = false;
+			}
+		});
+
+		this.attackGoal.setPostShootCallback((mob) -> {
+			// Enable loop sound.
+			if (!this.attacking) {
+				this.attacking = true;
+			}
+		});
+
 		this.attackGoal.setStopCallback((mob) -> {
-			((AATurretEntity) mob).stopTriggeredAnim("FiringSequence", "shoot");
-			mob.playSound(ModSoundEvents.TURRET_AA_END_SHOOT);
+			// Stops the animation
+			this.stopTriggeredAnim("FiringSequence", "shoot");
+
+			// Try to stop sound server-side before playing the end sound
+			this.attacking = false;
+			this.setSilent(true);
+			this.setSilent(false);
+
+			if (!this.isSilent()) {
+				this.playSound(
+					ModSoundEvents.TURRET_AA_END_SHOOT,
+					0.125f,
+					1.0f
+				);
+			}
 		});
 
 		// Set the standard goals
@@ -154,6 +192,47 @@ public class AATurretEntity extends TurretEntity implements GeoEntity {
 	protected boolean targetPredicate(LivingEntity target, ServerWorld world) {
 		boolean isValid = super.targetPredicate(target, world);
 		return isValid && target instanceof FlyingEntity;
+	}
+
+	@Override
+	protected void shoot(TurretProjectileVelocity velocityData) {
+		if (this.getWorld().isClient) {
+			System.out.println("Triggering shootPFX");
+		}
+		this.triggerAnim("ShootFX", "shootPFX");
+
+		super.shoot(velocityData);
+	}
+
+	@Override
+	public void tick() {
+		super.tick();
+
+		// TODO: Finish muzzle flash particle
+		if (this.muzzleFlashCount > 0 && this.getWorld().isClient) {
+			this.triggerAnim("FiringSequence", "shootPFX");
+			--this.muzzleFlashCount;
+		}
+
+		// Plays the loop sound when attacking
+		if (this.attacking) {
+			if (this.attackGoal != null && this.attackGoal.isLockedButNotAttacking() && !this.isSilent()) {
+				this.playSound(
+					ModSoundEvents.TURRET_AA_ATTACK_SHOOT,
+					0.125f,
+					1.0f
+				);
+			}
+		}
+	}
+
+	@Override
+	public void triggerShootSound() {
+		this.playSound(
+			this.getShootSound(),
+			0.25f,
+			1.0f / (this.getRandom().nextFloat() * 0.4f + 0.8f)
+		);
 	}
 
 	// /////////////////// //
@@ -218,6 +297,7 @@ public class AATurretEntity extends TurretEntity implements GeoEntity {
 		final String LOCATOR = state.getKeyframeData()
 			.getLocator();
 
+		System.out.println("Keyframe: " + LOCATOR);
 		if (LOCATOR.equals("barrel")) {
 			Vec3d barrelPos = this.getRelativePos(this.getCurrentBarrel(false)),
 				velocityModifier = this.getRelativePos(0, 0, 0).subtract(this.getEyePos());
@@ -243,6 +323,7 @@ public class AATurretEntity extends TurretEntity implements GeoEntity {
 				new AnimationController<>(this, "Idle", this::idleController),
 				new AnimationController<>(this, "FiringSequence", this::shootController)
 					.triggerableAnim("shoot", ANIMATIONS.get("Shoot"))
+					.triggerableAnim("shootPFX", ANIMATIONS.get("ShootPFX"))
 					.setParticleKeyframeHandler(this::shootKeyframeHandler)
 			);
 	}
@@ -305,7 +386,9 @@ public class AATurretEntity extends TurretEntity implements GeoEntity {
 			"Idle", RawAnimation.begin()
 				.thenLoop("animation.aa_turret.setup"),
 			"Shoot", RawAnimation.begin()
-				.thenPlay("animation.aa_turret.shoot")
+				.thenPlay("animation.aa_turret.shoot"),
+			"ShootPFX", RawAnimation.begin()
+				.thenPlay("animation.aa_turret.shoot_pfx")
 		);
 
 		healables = Map.of(

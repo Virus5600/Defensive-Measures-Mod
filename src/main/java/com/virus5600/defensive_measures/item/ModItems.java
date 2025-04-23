@@ -5,8 +5,8 @@ import com.virus5600.defensive_measures.DefensiveMeasures;
 import com.virus5600.defensive_measures.block.ModBlocks;
 import com.virus5600.defensive_measures.entity.ModEntities;
 import com.virus5600.defensive_measures.item.equipments.TurretRemoverItem;
-import com.virus5600.defensive_measures.item.interfaces.FuelItem;
-import com.virus5600.defensive_measures.item.turrets.TurretItem;
+import com.virus5600.defensive_measures.util.base.interfaces.items.FuelItem;
+import com.virus5600.defensive_measures.util.base.superclasses.item.TurretItem;
 import com.virus5600.defensive_measures.util.RegistryUtil;
 
 import com.virus5600.defensive_measures.item.turrets.ballista.*;

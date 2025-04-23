@@ -9,7 +9,7 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import org.jetbrains.annotations.Nullable;
 
-import com.virus5600.defensive_measures.entity.turrets.TurretEntity;
+import com.virus5600.defensive_measures.util.base.superclasses.entity.TurretEntity;
 
 import java.util.EnumSet;
 import java.util.function.Consumer;
@@ -70,6 +70,8 @@ public class ProjectileAttackGoal extends net.minecraft.entity.ai.goal.Projectil
 	private int seenTargetTicks;
 	private AttackPhase attackPhase = AttackPhase.IDLE;
 	private Consumer<LivingEntity> startCallback;
+	private Consumer<LivingEntity> preShootCallback;
+	private Consumer<LivingEntity> postShootCallback;
 	private Consumer<LivingEntity> stopCallback;
 
 	private final MobEntity mob;
@@ -129,6 +131,36 @@ public class ProjectileAttackGoal extends net.minecraft.entity.ai.goal.Projectil
 	}
 
 	/**
+	 * Sets the callback to be called before sending the shoot signal.
+	 * This allows for custom behavior to be executed before the shoot
+	 * signal is sent, such as playing a sound or animation.
+	 * <br><br>
+	 * The callback's parameter is a {@link LivingEntity} that represents
+	 * the entity that is shooting. This can be used to access its
+	 * attributes, such as health, position, and rotation.
+	 *
+	 * @param preShootCallback The callback to be called before the shoot signal is sent.
+	 */
+	public void setPreShootCallback(Consumer<LivingEntity> preShootCallback) {
+		this.preShootCallback = preShootCallback;
+	}
+
+	/**
+	 * Sets the callback to be called after sending the shoot signal.
+	 * This allows for custom behavior to be executed after the shoot
+	 * signal is sent, such as playing a sound or animation.
+	 * <br><br>
+	 * The callback's parameter is a {@link LivingEntity} that represents
+	 * the entity that is shooting. This can be used to access its
+	 * attributes, such as health, position, and rotation.
+	 *
+	 * @param postShootCallback The callback to be called after the shoot signal is sent.
+	 */
+	public void setPostShootCallback(Consumer<LivingEntity> postShootCallback) {
+		this.postShootCallback = postShootCallback;
+	}
+
+	/**
 	 * Sets the callback to be called when the attack stops. This allows for
 	 * custom behavior to be executed when the attack stops, such as playing
 	 * a sound or animation.
@@ -160,7 +192,10 @@ public class ProjectileAttackGoal extends net.minecraft.entity.ai.goal.Projectil
 			// Idle -> Start
 			if (this.attackPhase == AttackPhase.IDLE) {
 				this.attackPhase = AttackPhase.ATTACK_START;
-				this.startCallback.accept(this.mob);
+
+				if (this.startCallback != null) {
+					this.startCallback.accept(this.mob);
+				}
 			}
 			// Start -> Attacking
 			else if (this.attackPhase == AttackPhase.ATTACK_START) {
@@ -186,7 +221,10 @@ public class ProjectileAttackGoal extends net.minecraft.entity.ai.goal.Projectil
 		// !(End && Idle) -> End
 		if (this.attackPhase != AttackPhase.ATTACK_END && this.attackPhase != AttackPhase.IDLE) {
 			this.attackPhase = AttackPhase.ATTACK_END;
-			this.stopCallback.accept(this.mob);
+
+			if (this.stopCallback != null) {
+				this.stopCallback.accept(this.mob);
+			}
 		}
 		// End -> Idle
 		else if (this.attackPhase == AttackPhase.ATTACK_END) {
@@ -225,7 +263,14 @@ public class ProjectileAttackGoal extends net.minecraft.entity.ai.goal.Projectil
 				float nextShotScaler = (float) Math.sqrt(squaredDistance) / this.maxShootRange;
 				float pullProgress = MathHelper.clamp(nextShotScaler, 0.1F, 1.0F);
 
+				if (this.preShootCallback != null) {
+					this.preShootCallback.accept(this.mob);
+				}
 				this.owner.shootAt(this.target, pullProgress);
+				if (this.postShootCallback != null) {
+					this.postShootCallback.accept(this.mob);
+				}
+
 				this.updateCountdownTicks = MathHelper.floor(nextShotScaler * (float) (this.maxIntervalTicks - this.minIntervalTicks) + (float) this.minIntervalTicks);
 			} else if (this.updateCountdownTicks < 0) {
 				this.updateCountdownTicks = MathHelper.floor(
@@ -370,9 +415,60 @@ public class ProjectileAttackGoal extends net.minecraft.entity.ai.goal.Projectil
 	 * Enum representing the different phases of the attack.
 	 */
 	public enum AttackPhase {
-		IDLE,
-		ATTACK_START,
-		ATTACKING,
-		ATTACK_END,
+		/**
+		 * The phase where the turret is not attacking. It
+		 * basically has no targets.
+		 */
+		IDLE((byte) 0),
+		/**
+		 * The {@code ATTACK_START} phase is a phase where the turret
+		 * has acquired a target and now preparing its first attack.
+		 */
+		ATTACK_START((byte) 1),
+		/**
+		 * This particular phase is the actual phase where the turret
+		 * shoots its projectile. When the turret is a burst attacker,
+		 * the {@code ATTACKING} phase will stay on until the turret stops
+		 * like how it would behave on non-burst turrets.
+		 */
+		ATTACKING((byte) 2),
+		/**
+		 * This phase is the last phase of the attack wherein it finally
+		 * either kill or lost its lock on a target and now returning to
+		 * its {@code IDLE} phase.
+		 */
+		ATTACK_END((byte) 3)
+		;
+
+		private final byte ID;
+
+		AttackPhase(byte id) {
+			this.ID = id;
+		}
+
+		/**
+		 * Gets the ID of the attack phase.
+		 * @return The ID of the attack phase in byte.
+		 */
+		public byte getID() {
+			return this.ID;
+		}
+
+		/**
+		 * Gets the associated attack phase from the given ID.
+		 *
+		 * @param id The ID of the attack phase.
+		 *
+		 * @return The attack phase associated with the given ID.
+		 */
+		@Nullable
+		public static AttackPhase fromID(byte id) {
+			for (AttackPhase phase : AttackPhase.values()) {
+				if (phase.ID == id) {
+					return phase;
+				}
+			}
+			return null;
+		}
 	}
 }

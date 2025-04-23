@@ -7,6 +7,7 @@ import com.virus5600.defensive_measures.entity.damage.ModDamageSources;
 import com.virus5600.defensive_measures.entity.damage.ModDamageTypes;
 import com.virus5600.defensive_measures.item.ModItemGroups;
 import com.virus5600.defensive_measures.item.ModItems;
+import com.virus5600.defensive_measures.networking.ModPackets;
 import com.virus5600.defensive_measures.particle.ModParticles;
 import com.virus5600.defensive_measures.sound.ModSoundEvents;
 import net.fabricmc.api.ModInitializer;
@@ -47,7 +48,7 @@ public class DefensiveMeasures implements ModInitializer {
 
 		// Use https://github.com/Khazoda/basic-weapons/blob/latest-stable/src/main/java/com/seacroak/basicweapons/util/Reggie.java as a reference
 
-		// Modded Stuff's Registration
+		// Modded Stuff's Registration - Server Side
 		ModDamageTypes.registerDamageTypes();
 		ModItemGroups.registerModItemGroups();
 		ModItems.registerModItems();
@@ -56,6 +57,7 @@ public class DefensiveMeasures implements ModInitializer {
 		ModCriterion.registerModCriterion();
 		ModEntities.registerModEntityAttributes();
 		ModParticles.registerParticles();
+		ModPackets.registerHandlers();
 
 		LOGGER.info("{} MAIN ENTRY POINT INITIALIZED.", MOD_NAME);
 	}

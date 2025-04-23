@@ -2,7 +2,7 @@ package com.virus5600.defensive_measures.renderer.entity;
 
 import com.virus5600.defensive_measures.entity.turrets.AATurretEntity;
 import com.virus5600.defensive_measures.model.entity.AATurretModel;
-import com.virus5600.defensive_measures.renderer.BaseTurretRenderer;
+import com.virus5600.defensive_measures.util.base.superclasses.renderer.BaseTurretRenderer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.render.VertexConsumer;

@@ -5,7 +5,7 @@ import net.minecraft.entity.ai.goal.ActiveTargetGoal;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
 
-import com.virus5600.defensive_measures.entity.turrets.TurretEntity;
+import com.virus5600.defensive_measures.util.base.superclasses.entity.TurretEntity;
 
 /**
  * A goal that targets entities that are not in the same team as the turret.

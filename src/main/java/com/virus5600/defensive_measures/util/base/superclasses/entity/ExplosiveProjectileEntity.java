@@ -1,4 +1,4 @@
-package com.virus5600.defensive_measures.entity.projectiles;
+package com.virus5600.defensive_measures.util.base.superclasses.entity;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;

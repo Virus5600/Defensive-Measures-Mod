@@ -13,4 +13,4 @@ TODO: TurretEntity
 
 TODO: Anti-Air Turret
 - Implement dynamic sound.
-	- Add a "spinning barrel" sound that has no shooting.
+	- Implement a new way to add particle effect when shooting only.

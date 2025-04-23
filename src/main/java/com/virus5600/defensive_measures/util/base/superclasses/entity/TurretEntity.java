@@ -1,5 +1,6 @@
-package com.virus5600.defensive_measures.entity.turrets;
+package com.virus5600.defensive_measures.util.base.superclasses.entity;
 
+import com.virus5600.defensive_measures.entity.turrets.AATurretEntity;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.*;
@@ -30,6 +31,7 @@ import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.ActionResult;
@@ -45,9 +47,9 @@ import com.virus5600.defensive_measures.entity.TurretMaterial;
 import com.virus5600.defensive_measures.entity.ai.goal.ProjectileAttackGoal;
 import com.virus5600.defensive_measures.entity.ai.goal.ProjectileAttackGoal.AttackPhase;
 import com.virus5600.defensive_measures.entity.ai.goal.TargetOtherTeamGoal;
-import com.virus5600.defensive_measures.entity.turrets.interfaces.Itemable;
+import com.virus5600.defensive_measures.util.base.interfaces.entity.Itemable;
 import com.virus5600.defensive_measures.item.ModItems;
-import com.virus5600.defensive_measures.item.turrets.TurretItem;
+import com.virus5600.defensive_measures.util.base.superclasses.item.TurretItem;
 
 import net.minecraft.world.event.GameEvent;
 import org.jetbrains.annotations.Nullable;
@@ -1474,11 +1476,11 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 	 *
 	 * @return {@code List<Vec3d>} The list of projectile spawn points.
 	 */
-	abstract List<Vec3d> getTurretProjectileSpawn();
+	protected abstract List<Vec3d> getTurretProjectileSpawn();
 
 	/**
 	 * Determines the damage this turret's projectile will deal. This only
-	 * works for instances of {@link com.virus5600.defensive_measures.entity.projectiles.TurretProjectileEntity TurretProjectileEntity}
+	 * works for instances of {@link TurretProjectileEntity TurretProjectileEntity}
 	 * or its subclasses due to the overridden methods and tailored behavior.
 	 *
 	 * @return {@code double} The damage this turret's projectile will deal.
@@ -1487,7 +1489,7 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 
 	/**
 	 * Determines the knockback this turret's projectile will deal. This only
-	 * works for instances of {@link com.virus5600.defensive_measures.entity.projectiles.TurretProjectileEntity TurretProjectileEntity}
+	 * works for instances of {@link TurretProjectileEntity TurretProjectileEntity}
 	 * or its subclasses due to the overridden methods and tailored behavior.
 	 *
 	 * @return {@code byte} The projectile's pierce level.
@@ -1621,6 +1623,11 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 	}
 
 	protected void shoot(TurretProjectileVelocity velocityData) {
+		if (this.getTarget() != null) {
+			velocityData.setVelocityFromPos(this.getTarget().getPos());
+			velocityData.recalculateVelocity();
+		}
+
 		try {
 			ProjectileEntity projectile = (ProjectileEntity) this.projectile.create(
 				this.getWorld(),
@@ -1638,7 +1645,7 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 			projectile.setOwner(this);
 			this.setProjectileVelocity(projectile, velocityData);
 
-			this.playSound(this.getShootSound(), 1.0f, 1.0f / (this.getRandom().nextFloat() * 0.4f + 0.8f));
+			this.triggerShootSound();
 			this.getWorld().spawnEntity(projectile);
 //			System.out.println("[" + projectile.getName().getString() + "] Gravity: " + projectile.getFinalGravity());
 		} catch (IllegalArgumentException | SecurityException e) {
@@ -1692,6 +1699,43 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 	 */
 	public boolean isHeldInPlace() {
 		return true;
+	}
+
+	/**
+	 * A dedicated attack sound trigger method that plays the shooting sound
+	 * of the turret by default. This could be overridden to use a custom
+	 * logic on how to call the sound, or could be converted into a
+	 * networking method that calls a client-side method to play the sound.
+	 * <br><br>
+	 * The main difference between this and the {@link #triggerShootSound() shoot sound}
+	 * is that the latter method literally triggers the
+	 * {@link #getShootSound() shooting} sound of the turret whereas this
+	 * is a more generic method that plays the ambient attacking sound of a
+	 * turret such as its "whirring" sound (for the {@link AATurretEntity}
+	 * for example).
+	 *
+	 * @see #getShootSound()
+	 * @see #triggerShootSound()
+	 */
+	public void triggerAttackSound() {
+		this.triggerShootSound();
+	}
+
+	/**
+	 * A dedicated method that only plays the shooting sound of the turret.
+	 * Overridable to allow other turrets to set a custom shoot sound.
+	 * <br><br>
+	 * For a more detailed explanation between the difference between this
+	 * method and {@code triggerAttackSound()}, see the
+	 * {@link #triggerAttackSound()} method.
+	 *
+	 * @see #triggerAttackSound()
+	 */
+	public void triggerShootSound() {
+		this.playSound(
+			this.getShootSound(),
+			0.5f, 1.0f / (this.getRandom().nextFloat() * 0.4f + 0.8f)
+		);
 	}
 
 	// ///////////// //

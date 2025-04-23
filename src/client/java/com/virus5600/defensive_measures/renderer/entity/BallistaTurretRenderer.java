@@ -6,7 +6,7 @@ import net.minecraft.client.render.entity.EntityRendererFactory.Context;
 
 import com.virus5600.defensive_measures.entity.turrets.BallistaTurretEntity;
 import com.virus5600.defensive_measures.model.entity.BallistaTurretModel;
-import com.virus5600.defensive_measures.renderer.BaseTurretRenderer;
+import com.virus5600.defensive_measures.util.base.superclasses.renderer.BaseTurretRenderer;
 
 /**
  * Ballista Turret's renderer.

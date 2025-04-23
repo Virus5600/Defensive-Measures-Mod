@@ -1,14 +1,12 @@
 package com.virus5600.defensive_measures.util;
 
 import com.virus5600.defensive_measures.item.ModItems;
-import com.virus5600.defensive_measures.item.turrets.TurretItem;
+import com.virus5600.defensive_measures.util.base.superclasses.item.TurretItem;
 import net.minecraft.Bootstrap;
 import net.minecraft.SharedConstants;
 
 import net.minecraft.item.Items;
 import org.junit.jupiter.api.*;
-
-import java.util.List;
 
 public class ItemUtilTest {
 	private boolean isTypeMatchWorking = false;

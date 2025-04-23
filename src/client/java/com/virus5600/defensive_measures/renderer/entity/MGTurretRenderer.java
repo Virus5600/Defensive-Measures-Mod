@@ -14,7 +14,7 @@ import org.jetbrains.annotations.Nullable;
 
 import com.virus5600.defensive_measures.entity.turrets.MGTurretEntity;
 import com.virus5600.defensive_measures.model.entity.MGTurretModel;
-import com.virus5600.defensive_measures.renderer.BaseTurretRenderer;
+import com.virus5600.defensive_measures.util.base.superclasses.renderer.BaseTurretRenderer;
 
 /**
  * Machine Gun (MG) Turret's Renderer.

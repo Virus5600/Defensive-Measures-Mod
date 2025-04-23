@@ -1,6 +1,6 @@
 package com.virus5600.defensive_measures.item.turrets.ballista;
 
-import com.virus5600.defensive_measures.item.interfaces.FuelItem;
+import com.virus5600.defensive_measures.util.base.interfaces.items.FuelItem;
 import net.minecraft.item.Item;
 import net.minecraft.util.Rarity;
 

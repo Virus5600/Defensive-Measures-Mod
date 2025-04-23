@@ -1,5 +1,7 @@
 package com.virus5600.defensive_measures.entity.projectiles;
 
+import com.virus5600.defensive_measures.util.base.superclasses.entity.KineticProjectileEntity;
+import com.virus5600.defensive_measures.util.base.superclasses.entity.TurretProjectileEntity;
 import net.minecraft.block.Block;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -8,7 +10,6 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.World;
 
