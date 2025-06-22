@@ -36,7 +36,7 @@ public class TurretItemRetrievedCriterion extends AbstractCriterion<TurretItemRe
 				.apply(instance, TurretItemRetrievedCriterion.Conditions::new)
 		);
 
-		public static AdvancementCriterion<Conditions> create(ItemPredicate.Builder item) {
+		public static AdvancementCriterion<com.virus5600.defensive_measures.advancement.criterion.TurretItemRetrievedCriterion.Conditions> create(ItemPredicate.Builder item) {
 			return ModCriterion.TURRET_ITEM_RETRIEVED_CRITERION
 				.create(
 					new TurretItemRetrievedCriterion.Conditions(

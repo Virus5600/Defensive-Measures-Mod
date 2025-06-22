@@ -94,7 +94,7 @@ public class CannonFuse extends SpriteBillboardParticle {
 
 		if (this.age < this.maxAge) {
             if (MathHelper.nextInt(this.random, 0, 100) > 90) {
-                this.world.addParticle(
+                this.world.addParticleClient(
 					ParticleTypes.SMOKE,
 					this.source.x,
 					this.source.y,
@@ -106,7 +106,7 @@ public class CannonFuse extends SpriteBillboardParticle {
             }
 
 			if (MathHelper.nextInt(this.random, 0, 100) > 25) {
-				this.world.addParticle(
+				this.world.addParticleClient(
 					ModParticles.SPARKS,
 					this.source.x,
 					this.source.y,

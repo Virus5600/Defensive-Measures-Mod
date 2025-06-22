@@ -18,7 +18,7 @@ import net.minecraft.world.explosion.ExplosionBehavior;
 
 import software.bernie.geckolib.animatable.GeoEntity;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
-import software.bernie.geckolib.animation.AnimatableManager.ControllerRegistrar;
+import software.bernie.geckolib.animatable.manager.AnimatableManager.ControllerRegistrar;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
 import com.virus5600.defensive_measures.entity.ModEntities;

@@ -270,7 +270,7 @@ public abstract class ExplosiveProjectileEntity extends TurretProjectileEntity {
 	 */
 	protected void addParticles(Vec3d pos, ParticleEffect particleEffect) {
 		if (particleEffect != null) {
-			this.getWorld().addParticle(
+			this.getWorld().addParticleClient(
 				particleEffect,
 				pos.x, pos.y, pos.z,
 				0.0, 0.0, 0.0
@@ -343,16 +343,17 @@ public abstract class ExplosiveProjectileEntity extends TurretProjectileEntity {
 	}
 
 	@Override
-	public void writeCustomDataToNbt(NbtCompound nbt) {
-		super.writeCustomDataToNbt(nbt);
+	public void writeCustomData(NbtCompound nbt) {
+		super.writeCustomData(nbt);
 		nbt.putDouble("acceleration_power", this.accelerationPower);
 	}
 
 	@Override
-	public void readCustomDataFromNbt(NbtCompound nbt) {
-		super.readCustomDataFromNbt(nbt);
-		if (nbt.contains("acceleration_power", NbtElement.DOUBLE_TYPE)) {
-			this.accelerationPower = nbt.getDouble("acceleration_power");
+	public void readCustomData(NbtCompound nbt) {
+		super.readCustomData(nbt);
+		if (nbt.contains("acceleration_power")) {
+			this.accelerationPower = nbt.getDouble("acceleration_power")
+				.orElse(0d);
 		}
 	}
 

@@ -20,9 +20,9 @@ public class CannonTurretModel extends BaseTurretModel<CannonTurretEntity> {
 	public CannonTurretModel() {
 		super(
 			DefensiveMeasures.MOD_ID,
-			"geo/cannon_turret.geo.json",
+			"geckolib/models/cannon_turret.geo.json",
 			"textures/entity/cannon_turret/cannon_turret.png",
-			"animations/cannon_turret.animation.json",
+			"geckolib/animations/cannon_turret.animation.json",
 			"base",
 			"stand",
 			"head"

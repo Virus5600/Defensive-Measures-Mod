@@ -32,6 +32,7 @@ import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.storage.ReadView;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.*;
@@ -508,8 +509,8 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 	@Nullable
 	@Override
 	public EntityData initialize(ServerWorldAccess world, LocalDifficulty difficulty, SpawnReason spawnReason, @Nullable EntityData entityData) {
-		this.headYaw = this.prevHeadYaw;
-		this.prevBodyYaw = 0.0f;
+		this.headYaw = this.lastHeadYaw;
+		this.lastBodyYaw = 0.0f;
 		this.resetPosition();
 
 		if (spawnReason == SpawnReason.SPAWN_ITEM_USE) {
@@ -635,10 +636,10 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 	}
 
 	@Override
-	public void readCustomDataFromNbt(NbtCompound nbt) {
-		super.readCustomDataFromNbt(nbt);
-		this.setLevel(nbt.getInt("Level"));
-		this.setFromItem(nbt.getByte("FromItem"));
+	public void readCustomData(ReadView view) {
+		super.readCustomData(view);
+		this.setLevel(view.getInt("Level", this.level));
+		this.setFromItem(view.getByte("FromItem", this.isFromItem()));
 	}
 
 	@Override
@@ -659,7 +660,7 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 			this.prevAttachedBlock = this.getBlockPos();
 		}
 
-		this.prevBodyYaw = 0.0f;
+		this.lastBodyYaw = 0.0f;
 		this.bodyYaw = 0.0f;
 	}
 
@@ -915,11 +916,6 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 	}
 
 	@Override
-	public boolean isCollidable() {
-		return this.isAlive();
-	}
-
-	@Override
 	public boolean isPushable() {
 		return false;
 	}
@@ -1073,11 +1069,6 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 	@Override
 	public int getMaxHeadRotation() {
 		return 360;
-	}
-
-	@Override
-	public boolean handleFallDamage(float fallDistance, float damageMultiplier, DamageSource damageSource) {
-		return false;
 	}
 
 	@Override

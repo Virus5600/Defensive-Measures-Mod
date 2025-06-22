@@ -2,7 +2,6 @@ package com.virus5600.defensive_measures.entity.projectiles;
 
 import net.minecraft.entity.data.DataTracker.Builder;
 import net.minecraft.entity.EntityType;
-import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.world.World;
 
 /**

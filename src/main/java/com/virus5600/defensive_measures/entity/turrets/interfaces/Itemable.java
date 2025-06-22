@@ -31,13 +31,13 @@ import java.util.Random;
 public interface Itemable {
 	/**
 	 * Determines whether this entity is from an item.
-	 * @return {@link byte}
+	 * @return {@code byte}
 	 */
 	byte isFromItem();
 
 	/**
 	 * Sets the value that identifies whether this entity is from an item.
-	 * @param fromItem {@link byte} A `1` or `0` value.
+	 * @param fromItem {@code byte} A `1` or `0` value.
 	 */
 	void setFromItem(byte fromItem);
 
@@ -85,7 +85,10 @@ public interface Itemable {
 		nbtCompound.putBoolean("Invulnerable", entity.isInvulnerable());
 		nbtCompound.putFloat("Health", entity.getHealth());
 		nbtCompound.putFloat("MaxHealth", entity.getMaxHealth());
-		nbtCompound.putUuid("UUID", entity.getUuid());
+
+		// UUID Handling...
+		nbtCompound.putLong("UUIDLeast", entity.getUuid().getLeastSignificantBits());
+		nbtCompound.putLong("UUIDMost", entity.getUuid().getMostSignificantBits());
 
 		stack.set(DataComponentTypes.CUSTOM_DATA, NbtComponent.of(nbtCompound));
 	}

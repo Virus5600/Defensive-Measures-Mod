@@ -23,7 +23,7 @@ import java.util.List;
  * @version 1.0.0
  */
 public class MGTurretItem extends TurretItem {
-	public MGTurretItem(EntityType<? extends MobEntity> type, Settings settings) {
+	public MGTurretItem(EntityType<? extends MobEntity> type, net.minecraft.item.Item.Settings settings) {
 		super(
 			type,
 			settings

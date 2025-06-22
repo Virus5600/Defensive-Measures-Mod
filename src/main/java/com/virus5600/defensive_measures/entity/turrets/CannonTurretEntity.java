@@ -21,12 +21,13 @@ import org.jetbrains.annotations.Nullable;
 
 import software.bernie.geckolib.animatable.GeoEntity;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
-import software.bernie.geckolib.animation.AnimatableManager.ControllerRegistrar;
-import software.bernie.geckolib.animation.AnimationController;
-import software.bernie.geckolib.animation.AnimationState;
+import software.bernie.geckolib.animatable.manager.AnimatableManager.ControllerRegistrar;
+import software.bernie.geckolib.animatable.processing.AnimationController;
+import software.bernie.geckolib.animatable.processing.AnimationTest;
 import software.bernie.geckolib.animation.PlayState;
 import software.bernie.geckolib.animation.RawAnimation;
-import software.bernie.geckolib.animation.keyframe.event.ParticleKeyframeEvent;
+import software.bernie.geckolib.animation.keyframe.event.KeyFrameEvent;
+import software.bernie.geckolib.animation.keyframe.event.data.ParticleKeyframeData;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
 import com.virus5600.defensive_measures.entity.ModEntities;
@@ -194,33 +195,33 @@ public class CannonTurretEntity extends TurretEntity implements GeoEntity {
 	// ANIMATION CONTROLLERS //
 	// ///////////////////// //
 
-	private <E extends CannonTurretEntity>PlayState deathController(final AnimationState<E> event) {
+	private PlayState deathController(final AnimationTest<CannonTurretEntity> state) {
 		if (!this.isAlive() && !this.animPlayed) {
 			this.animPlayed = true;
-			event.setAnimation(ANIMATIONS.get("Death"));
+			state.setAnimation(ANIMATIONS.get("Death"));
 			return PlayState.STOP;
 		}
 		return PlayState.CONTINUE;
 	}
 
-	private <E extends CannonTurretEntity>PlayState idleController(final AnimationState<E> event) {
-		return event
+	private PlayState idleController(final AnimationTest<CannonTurretEntity> state) {
+		return state
 			.setAndContinue(ANIMATIONS.get("Idle"));
 	}
 
-	private <E extends CannonTurretEntity>PlayState firingSequenceController(final AnimationState<E> event) {
+	private PlayState firingSequenceController(final AnimationTest<CannonTurretEntity> state) {
 		return PlayState.STOP;
 	}
 
-	private void firingSequenceKeyframeHandler(ParticleKeyframeEvent<CannonTurretEntity> state) {
-		final String LOCATOR = state.getKeyframeData()
+	private void firingSequenceKeyframeHandler(KeyFrameEvent<CannonTurretEntity, ParticleKeyframeData> event) {
+		final String LOCATOR = event.keyframeData()
 			.getLocator();
 
 		if (LOCATOR.equals("barrel")) {
 			Vec3d barrelPos = this.getRelativePos(this.getCurrentBarrel(false)),
 				velocityModifier = this.getRelativePos(0, 0, 1.5).subtract(this.getEyePos());
 
-			this.getWorld().addParticle(
+			this.getWorld().addParticleClient(
 				ModParticles.CANNON_FLASH,
 				barrelPos.getX(), barrelPos.getY(), barrelPos.getZ(),
 				velocityModifier.getX(), velocityModifier.getY(), velocityModifier.getZ()
@@ -231,7 +232,7 @@ public class CannonTurretEntity extends TurretEntity implements GeoEntity {
 				OFFSETS.get(Offsets.FUSE).getFirst()
 			);
 
-			this.getWorld().addParticle(
+			this.getWorld().addParticleClient(
 				ModParticles.CANNON_FUSE,
 				fusePos.getX(), fusePos.getY(), fusePos.getZ(),
 				0, 0.225, -0.50
@@ -248,9 +249,9 @@ public class CannonTurretEntity extends TurretEntity implements GeoEntity {
 	public void registerControllers(final ControllerRegistrar controllers) {
 		controllers
 			.add(
-				new AnimationController<>(this, "Death", this::deathController),
-				new AnimationController<>(this, "Idle", this::idleController),
-				new AnimationController<>(this, "FiringSequence", this::firingSequenceController)
+				new AnimationController<>("Death", 10, this::deathController),
+				new AnimationController<>("Idle", 10, this::idleController),
+				new AnimationController<>("FiringSequence", 10, this::firingSequenceController)
 					.triggerableAnim("charge", ANIMATIONS.get("Charge"))
 					.triggerableAnim("shoot", ANIMATIONS.get("Shoot"))
 					.setParticleKeyframeHandler(this::firingSequenceKeyframeHandler)

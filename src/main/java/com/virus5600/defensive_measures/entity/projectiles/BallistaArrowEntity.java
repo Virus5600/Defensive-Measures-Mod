@@ -6,9 +6,9 @@ import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.world.World;
 
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
-import software.bernie.geckolib.animation.AnimatableManager.ControllerRegistrar;
-import software.bernie.geckolib.animation.AnimationController;
-import software.bernie.geckolib.animation.AnimationState;
+import software.bernie.geckolib.animatable.manager.AnimatableManager.ControllerRegistrar;
+import software.bernie.geckolib.animatable.processing.AnimationController;
+import software.bernie.geckolib.animatable.processing.AnimationTest;
 import software.bernie.geckolib.animation.PlayState;
 import software.bernie.geckolib.animation.RawAnimation;
 import software.bernie.geckolib.util.GeckoLibUtil;
@@ -91,16 +91,16 @@ public class BallistaArrowEntity extends KineticProjectileEntity {
 	// ANIMATION CONTROLLERS //
 	// ///////////////////// //
 
-	private <E extends BallistaArrowEntity>PlayState idleController(final AnimationState<E> event) {
-		return event.setAndContinue(ANIMATIONS.get("Idle"));
+	private PlayState idleController(final AnimationTest<BallistaArrowEntity> state) {
+		return state.setAndContinue(ANIMATIONS.get("Idle"));
 	}
 
-	private <E extends BallistaArrowEntity>PlayState onAirController(final AnimationState<E> event) {
+	private PlayState onAirController(final AnimationTest<BallistaArrowEntity> state) {
 		if (this.isInGround() || this.isOnGround()) {
 			return PlayState.STOP;
 		}
 
-		return event.setAndContinue(ANIMATIONS.get("OnAir"));
+		return state.setAndContinue(ANIMATIONS.get("OnAir"));
 	}
 
 	// /////////////////////////// //
@@ -111,8 +111,8 @@ public class BallistaArrowEntity extends KineticProjectileEntity {
 	@Override
 	public void registerControllers(final ControllerRegistrar controllers) {
 		controllers.add(
-			new AnimationController<>(this, "Idle", this::idleController),
-			new AnimationController<>(this, "OnAir", this::onAirController)
+			new AnimationController<>("Idle", 10, this::idleController),
+			new AnimationController<>("OnAir", 10, this::onAirController)
 		);
 	}
 

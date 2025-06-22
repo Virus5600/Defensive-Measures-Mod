@@ -24,7 +24,7 @@ import java.util.List;
  * @version 1.0.0
  */
 public class CannonTurretItem extends TurretItem {
-	public CannonTurretItem(EntityType<? extends MobEntity> type, Settings settings) {
+	public CannonTurretItem(EntityType<? extends MobEntity> type, net.minecraft.item.Item.Settings settings) {
 		super(
 			type,
 			settings

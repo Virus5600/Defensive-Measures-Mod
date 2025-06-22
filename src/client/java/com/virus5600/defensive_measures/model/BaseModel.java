@@ -7,12 +7,11 @@ import net.minecraft.util.Identifier;
 
 import software.bernie.geckolib.animatable.GeoAnimatable;
 import software.bernie.geckolib.model.GeoModel;
-import software.bernie.geckolib.renderer.GeoRenderer;
 
 import com.virus5600.defensive_measures.model.entity.BaseTurretModel;
 import com.virus5600.defensive_measures.model.projectiles.BaseProjectileModel;
 
-import org.jetbrains.annotations.Nullable;
+import software.bernie.geckolib.renderer.base.GeoRenderState;
 
 /**
  * This class serves as the base model for all models in the mod. It extends
@@ -48,9 +47,9 @@ public class BaseModel<T extends Entity & GeoAnimatable> extends GeoModel<T> {
 	/** Determines the path of the animation this model will use. (i.e.: {@code "animations/cannon_turret.animation.json"}) */
 	protected Identifier animationPath;
 
-	/// //////////// ///
-	/// CONSTRUCTORS ///
-	/// //////////// ///
+	// //////////// //
+	// CONSTRUCTORS //
+	// //////////// //
 
 	/**
 	 * Constructs a new {@link BaseModel} with the specified model path,
@@ -70,17 +69,17 @@ public class BaseModel<T extends Entity & GeoAnimatable> extends GeoModel<T> {
 		this.animationPath = animationPath != null ? Identifier.of(modID, animationPath) : null;
 	}
 
-	/////////////////////////
-	/// INTERFACE METHODS ///
-	/////////////////////////
+	// /////////////////// //
+	//  INTERFACE METHODS  //
+	// /////////////////// //
 
 	@Override
-	public Identifier getModelResource(T animatable, @Nullable GeoRenderer<T> geoRenderer) {
+	public Identifier getModelResource(GeoRenderState renderState) {
 		return this.modelPath;
 	}
 
 	@Override
-	public Identifier getTextureResource(T animatable, @Nullable GeoRenderer<T> geoRenderer) {
+	public Identifier getTextureResource(GeoRenderState renderState) {
 		return this.texturePath;
 	}
 

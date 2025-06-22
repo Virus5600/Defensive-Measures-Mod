@@ -62,7 +62,7 @@ public abstract class TurretItem extends Item {
 	private static final Map<EntityType<? extends MobEntity>, TurretItem> TURRETS = new HashMap<>();
 
 
-	public TurretItem(EntityType<? extends MobEntity> type, Settings settings) {
+	public TurretItem(EntityType<? extends MobEntity> type, net.minecraft.item.Item.Settings settings) {
 		super(
 			settings.translationKey(type.getTranslationKey())
 		);
@@ -128,7 +128,7 @@ public abstract class TurretItem extends Item {
         if (!(world.getBlockState(blockPos).getBlock() instanceof FluidBlock)) {
             return ActionResult.PASS;
         }
-        if (!world.canPlayerModifyAt(user, blockPos) || !user.canPlaceOn(blockPos, hitResult.getSide(), itemStack)) {
+        if (!world.canEntityModifyAt(user, blockPos) || !user.canPlaceOn(blockPos, hitResult.getSide(), itemStack)) {
             return ActionResult.FAIL;
         }
 

@@ -20,9 +20,9 @@ public class BallistaArrowModel extends BaseProjectileModel<BallistaArrowEntity>
 	public BallistaArrowModel() {
 		super(
 			DefensiveMeasures.MOD_ID,
-			"geo/projectiles/ballista_arrow.geo.json",
+			"geckolib/models/projectiles/ballista_arrow.geo.json",
 			"textures/entity/ballista/ballista_arrow.png",
-			"animations/projectiles/ballista_arrow.animation.json"
+			"geckolib/animations/projectiles/ballista_arrow.animation.json"
 		);
 	}
 }

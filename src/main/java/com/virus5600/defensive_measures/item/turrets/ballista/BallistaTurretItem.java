@@ -24,7 +24,7 @@ import java.util.List;
  * @version 1.0.0
  */
 public class BallistaTurretItem extends TurretItem {
-	public BallistaTurretItem(EntityType<? extends MobEntity> type, Settings settings) {
+	public BallistaTurretItem(EntityType<? extends MobEntity> type, net.minecraft.item.Item.Settings settings) {
 		super(
 			type,
 			settings

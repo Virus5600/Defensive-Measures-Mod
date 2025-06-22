@@ -415,7 +415,7 @@ public abstract class TurretProjectileEntity extends ProjectileEntity implements
 
 		for (int i = 0; i < 4; i++) {
 			float radius = 0.25F;
-			this.getWorld().addParticle(
+			this.getWorld().addParticleClient(
 				ParticleTypes.BUBBLE,
 				pos.x - velocity.x * radius,
 				pos.y - velocity.y * radius,
@@ -480,8 +480,8 @@ public abstract class TurretProjectileEntity extends ProjectileEntity implements
 	}
 
 	@Override
-	public void writeCustomDataToNbt(NbtCompound nbt) {
-		super.writeCustomDataToNbt(nbt);
+	public void writeCustomData(NbtCompound nbt) {
+		super.writeCustomData(nbt);
 
 		nbt.putShort("life", (short) this.life);
 		nbt.putByte("shake", (byte)this.shake);
@@ -506,8 +506,8 @@ public abstract class TurretProjectileEntity extends ProjectileEntity implements
 	}
 
 	@Override
-	public void readCustomDataFromNbt(NbtCompound nbt) {
-		super.readCustomDataFromNbt(nbt);
+	public void readCustomData(NbtCompound nbt) {
+		super.readCustomData(nbt);
 
 		this.life = nbt.getShort("life");
 		this.shake = nbt.getByte("shake");
@@ -602,7 +602,7 @@ public abstract class TurretProjectileEntity extends ProjectileEntity implements
 			if (this.isCritical()) {
 				for (int i = 0; i < 4; i++) {
 					this.getWorld()
-						.addParticle(
+						.addParticleClient(
 							ParticleTypes.CRIT,
 							pos.x + velocity.x * (double)i / 4.0,
 							pos.y + velocity.y * (double)i / 4.0,

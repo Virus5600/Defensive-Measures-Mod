@@ -203,7 +203,7 @@ public class MGTurretEntity extends TurretEntity implements GeoEntity {
 			Vec3d barrelPos = this.getRelativePos(this.getCurrentBarrel(false)),
 				velocityModifier = this.getRelativePos(0, 0, 0).subtract(this.getEyePos());
 
-			this.getWorld().addParticle(
+			this.getWorld().addParticleClient(
 				ModParticles.SUSPENDED_SPARKS,
 				barrelPos.getX(), barrelPos.getY(), barrelPos.getZ(),
 				velocityModifier.getX(), velocityModifier.getY(), velocityModifier.getZ()

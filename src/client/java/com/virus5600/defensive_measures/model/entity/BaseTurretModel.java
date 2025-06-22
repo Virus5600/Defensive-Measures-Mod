@@ -4,10 +4,9 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
 import software.bernie.geckolib.animatable.GeoAnimatable;
-import software.bernie.geckolib.animation.AnimationState;
+import software.bernie.geckolib.animatable.processing.AnimationState;
 import software.bernie.geckolib.cache.object.GeoBone;
 import software.bernie.geckolib.constant.DataTickets;
-import software.bernie.geckolib.model.data.EntityModelData;
 
 import com.virus5600.defensive_measures.entity.turrets.TurretEntity;
 import com.virus5600.defensive_measures.model.BaseModel;
@@ -142,11 +141,11 @@ public class BaseTurretModel<T extends TurretEntity & GeoAnimatable> extends Bas
 	 * @return The pitch rotation of the head
 	 */
 	protected float getLookPitch(T animatable, AnimationState<T> state) {
-		EntityModelData extraData = (EntityModelData) state.getExtraData()
-			.get(DataTickets.ENTITY_MODEL_DATA);
 		float maxPitchChange = animatable.getMaxLookPitchChange();
+		float headPitch = Optional.ofNullable(state.getData(DataTickets.ENTITY_PITCH))
+			.orElse(0f);
 
-		float targetXRot = (extraData.headPitch() * ((float) Math.PI / 180F));
+		float targetXRot = (headPitch * ((float) Math.PI / 180F));
 		targetXRot = Math.clamp(targetXRot, -maxPitchChange, maxPitchChange);
 
 		return targetXRot;
@@ -161,11 +160,11 @@ public class BaseTurretModel<T extends TurretEntity & GeoAnimatable> extends Bas
 	 * @return The yaw rotation of the head
 	 */
 	protected float getLookYaw(T animatable, AnimationState<T> state) {
-		EntityModelData extraData = (EntityModelData) state.getExtraData()
-			.get(DataTickets.ENTITY_MODEL_DATA);
 		float maxYawChange = animatable.getMaxHeadRotation();
+		float headYaw = Optional.ofNullable(state.getData(DataTickets.ENTITY_YAW))
+			.orElse(0f);
 
-		float targetYRot = (extraData.netHeadYaw() * ((float) Math.PI / 180F));
+		float targetYRot = (headYaw * ((float) Math.PI / 180F));
 			targetYRot = Math.clamp(targetYRot, -maxYawChange, maxYawChange);
 
 		return targetYRot;
@@ -176,24 +175,26 @@ public class BaseTurretModel<T extends TurretEntity & GeoAnimatable> extends Bas
 	// /////////////////// //
 
 	@Override
-	public void setCustomAnimations(T animatable, long instanceId, AnimationState<T> state) {
-		super.setCustomAnimations(animatable, instanceId, state);
+	public void setCustomAnimations(AnimationState<T> state) {
+		super.setCustomAnimations(state);
 
 		Optional<GeoBone> base = this.getBone(this.base);
 		Optional<GeoBone> neck = this.getBone(this.neck);
 		Optional<GeoBone> head = this.getBone(this.head);
 
 		if (neck.isPresent()) {
-			float targetYRot = this.getLookYaw(animatable, state);
+			float targetYRot = Optional.ofNullable(state.getData(DataTickets.ENTITY_YAW))
+				.orElse(0f);
 			this.setLookYaw(neck.get(), targetYRot);
 
 			if (head.isPresent()) {
-				float targetXRot = this.getLookPitch(animatable, state);
+				float targetXRot = Optional.ofNullable(state.getData(DataTickets.ENTITY_PITCH))
+					.orElse(0f);
 				this.setLookPitch(head.get(), targetXRot);
 			}
 		}
 
-		animatable.setBodyYaw(0);
+		state.setData(DataTickets.ENTITY_BODY_YAW, 0f);
 		base.ifPresent(bone -> bone.setRotY(0));
 	}
 }

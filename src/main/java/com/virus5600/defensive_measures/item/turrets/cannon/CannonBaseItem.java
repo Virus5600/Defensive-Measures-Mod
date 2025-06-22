@@ -13,7 +13,7 @@ import net.minecraft.util.Rarity;
  * @version 1.0.0
  */
 public class CannonBaseItem extends Item implements FuelItem {
-	public CannonBaseItem(Settings settings) {
+	public CannonBaseItem(net.minecraft.item.Item.Settings settings) {
 		super(
 			settings
 				.maxCount(16)			// MAX STACK SIZE

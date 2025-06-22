@@ -12,7 +12,7 @@ import net.minecraft.util.Rarity;
  * @version 1.0.0
  */
 public class BallistaBaseWithStandItem extends Item implements FuelItem {
-	public BallistaBaseWithStandItem(Settings settings) {
+	public BallistaBaseWithStandItem(net.minecraft.item.Item.Settings settings) {
 		super(
 			settings
 				.maxCount(16)			// MAX STACK SIZE

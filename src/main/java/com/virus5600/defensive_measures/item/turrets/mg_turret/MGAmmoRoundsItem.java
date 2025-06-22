@@ -4,7 +4,7 @@ import net.minecraft.item.Item;
 import net.minecraft.util.Rarity;
 
 public class MGAmmoRoundsItem extends Item {
-	public MGAmmoRoundsItem(final Settings settings) {
+	public MGAmmoRoundsItem(final net.minecraft.item.Item.Settings settings) {
 		super(
 			settings
 				.maxCount(32)

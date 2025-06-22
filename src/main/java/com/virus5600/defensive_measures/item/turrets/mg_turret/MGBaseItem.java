@@ -4,7 +4,7 @@ import net.minecraft.item.Item;
 import net.minecraft.util.Rarity;
 
 public class MGBaseItem extends Item {
-	public MGBaseItem(final Settings settings) {
+	public MGBaseItem(final net.minecraft.item.Item.Settings settings) {
 		super(
 			settings
 				.maxCount(16)

@@ -57,7 +57,7 @@ public class CannonFlash extends CustomEmitter {
 					maxZ = this.velocityZ + variance;
 
 				for (int i = 0; i < MathHelper.nextInt(this.random, 10, 25); i++) {
-					this.world.addParticle(
+					this.world.addParticleClient(
 						particle,
 						this.getPosSource().x,
 						this.getPosSource().y,
@@ -72,7 +72,7 @@ public class CannonFlash extends CustomEmitter {
 			// Smoke
 			if (this.age >= this.maxAge) {
 				for (int i = 0; i < MathHelper.nextInt(this.random, 1, 3); i++) {
-					this.world.addParticle(
+					this.world.addParticleClient(
 						ParticleTypes.CAMPFIRE_COSY_SMOKE,
 						this.getPosSource().x,
 						this.getPosSource().y,

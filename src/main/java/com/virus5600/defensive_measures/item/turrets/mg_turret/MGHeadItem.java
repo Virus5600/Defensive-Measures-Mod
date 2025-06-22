@@ -4,7 +4,7 @@ import net.minecraft.item.Item;
 import net.minecraft.util.Rarity;
 
 public class MGHeadItem extends Item {
-	public MGHeadItem(final Settings settings) {
+	public MGHeadItem(final net.minecraft.item.Item.Settings settings) {
 		super(
 			settings
 				.maxCount(16)

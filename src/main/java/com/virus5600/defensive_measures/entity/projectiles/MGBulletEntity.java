@@ -8,14 +8,13 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.World;
 
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
-import software.bernie.geckolib.animation.AnimatableManager.ControllerRegistrar;
-import software.bernie.geckolib.animation.AnimationController;
-import software.bernie.geckolib.animation.AnimationState;
+import software.bernie.geckolib.animatable.manager.AnimatableManager.ControllerRegistrar;
+import software.bernie.geckolib.animatable.processing.AnimationController;
+import software.bernie.geckolib.animatable.processing.AnimationTest;
 import software.bernie.geckolib.animation.PlayState;
 import software.bernie.geckolib.animation.RawAnimation;
 import software.bernie.geckolib.util.GeckoLibUtil;
@@ -200,8 +199,8 @@ public class MGBulletEntity extends KineticProjectileEntity {
 	// ANIMATION CONTROLLERS //
 	// ///////////////////// //
 
-	private <E extends MGBulletEntity> PlayState idleController(final AnimationState<E> event) {
-		return event.setAndContinue(ANIMATIONS.get("Idle"));
+	private PlayState idleController(final AnimationTest<MGBulletEntity> state) {
+		return state.setAndContinue(ANIMATIONS.get("Idle"));
 	}
 
 	// ////////////////////////// //
@@ -212,7 +211,7 @@ public class MGBulletEntity extends KineticProjectileEntity {
 	@Override
 	public void registerControllers(final ControllerRegistrar controllers) {
 		controllers.add(
-			new AnimationController<>(this, "Idle", this::idleController)
+			new AnimationController<>("Idle", 10, this::idleController)
 		);
 	}
 

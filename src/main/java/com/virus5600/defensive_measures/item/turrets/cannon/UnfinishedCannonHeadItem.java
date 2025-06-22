@@ -11,7 +11,7 @@ import net.minecraft.util.Rarity;
  * @version 1.0.0
  */
 public class UnfinishedCannonHeadItem extends Item {
-	public UnfinishedCannonHeadItem(Settings settings) {
+	public UnfinishedCannonHeadItem(net.minecraft.item.Item.Settings settings) {
 		super(
 			settings
 				.maxCount(1)			// MAX STACK SIZE

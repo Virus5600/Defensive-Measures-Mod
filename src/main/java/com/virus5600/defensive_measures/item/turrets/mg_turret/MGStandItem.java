@@ -4,7 +4,7 @@ import net.minecraft.item.Item;
 import net.minecraft.util.Rarity;
 
 public class MGStandItem extends Item {
-	public MGStandItem(final Settings settings) {
+	public MGStandItem(final net.minecraft.item.Item.Settings settings) {
 		super(
 			settings
 				.maxCount(16)

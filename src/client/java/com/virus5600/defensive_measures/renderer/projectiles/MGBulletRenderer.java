@@ -7,18 +7,22 @@ import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.EntityRendererFactory.Context;
+import net.minecraft.client.render.entity.state.EntityRenderState;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RotationAxis;
 
 import org.jetbrains.annotations.Nullable;
 
 import software.bernie.geckolib.cache.object.BakedGeoModel;
+import software.bernie.geckolib.constant.DataTickets;
 import software.bernie.geckolib.renderer.GeoEntityRenderer;
+import software.bernie.geckolib.renderer.base.GeoRenderState;
 
 import com.virus5600.defensive_measures.entity.projectiles.MGBulletEntity;
 import com.virus5600.defensive_measures.model.projectiles.MGBulletModel;
+
+import java.util.Optional;
 
 /**
  * The renderer for the {@link MGBulletEntity}.
@@ -28,38 +32,39 @@ import com.virus5600.defensive_measures.model.projectiles.MGBulletModel;
  * @version 1.0.0
  */
 @Environment(EnvType.CLIENT)
-public class MGBulletRenderer extends GeoEntityRenderer<MGBulletEntity> {
+public class MGBulletRenderer<
+	R extends EntityRenderState & GeoRenderState
+> extends GeoEntityRenderer<MGBulletEntity, R> {
 	public MGBulletRenderer(Context ctx) {
 		super(ctx, new MGBulletModel());
 	}
 
 	@Override
-	protected float getDeathMaxRotation(MGBulletEntity animatable, float partialTick) {
+	protected float getDeathMaxRotation(GeoRenderState renderState) {
 		return 0.0f;
 	}
 
 	@Override
-	public RenderLayer getRenderType(MGBulletEntity animatable, Identifier texture,
-		@Nullable VertexConsumerProvider bufferSource, float partialTick
-	) {
+	public RenderLayer getRenderType(R renderState, Identifier texture) {
 		return RenderLayer.getEntityTranslucent(
-			this.getTextureLocation(animatable)
+			this.getTextureLocation(renderState)
 		);
 	}
 
 	@Override
-	public void preRender(MatrixStack poseStack, MGBulletEntity animatable,
-		 BakedGeoModel model, @Nullable VertexConsumerProvider bufferSource,
-		 @Nullable VertexConsumer buffer, boolean isReRender, float partialTick, int packedLight,
-		 int packedOverlay, int renderColor
+	public void preRender(R renderState, MatrixStack poseStack, BakedGeoModel model,
+		@Nullable VertexConsumerProvider bufferSource, @Nullable VertexConsumer buffer,
+		boolean isReRender, int packedLight, int packedOverlay, int renderColor
 	) {
-		float newYaw = MathHelper.lerp(partialTick, animatable.prevYaw, animatable.getYaw()),
-			newPitch = MathHelper.lerp(partialTick, animatable.prevPitch, animatable.getPitch());
+		float newYaw = Optional.ofNullable(renderState.getGeckolibData(DataTickets.ENTITY_YAW))
+			.orElse(0f);
+		float newPitch = Optional.ofNullable(renderState.getGeckolibData(DataTickets.ENTITY_PITCH))
+			.orElse(0f);
 
 		poseStack.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(newYaw));
 		poseStack.multiply(RotationAxis.POSITIVE_X.rotationDegrees(-newPitch));
 
-		super.preRender(poseStack, animatable, model, bufferSource, buffer, isReRender,
-			partialTick, packedLight, packedOverlay, renderColor);
+		super.preRender(renderState, poseStack, model, bufferSource, buffer, isReRender,
+			packedLight, packedOverlay, renderColor);
 	}
 }

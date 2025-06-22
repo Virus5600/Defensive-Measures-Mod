@@ -224,7 +224,11 @@ public class CustomEmitter extends NoRenderParticle {
 					double xPos = this.entity.getBodyX(xVel / 4.0);
 					double yPos = this.entity.getBodyY(0.5 + yVel / 4.0);
 					double zPos = this.entity.getBodyZ(zVel / 4.0);
-					this.world.addParticle(this.particle, xPos, yPos, zPos, xVel, yVel + 0.2, zVel);
+					this.world.addParticleClient(
+						this.particle,
+						xPos, yPos, zPos,
+						xVel, yVel + 0.2, zVel
+					);
 				}
 			}
 		}

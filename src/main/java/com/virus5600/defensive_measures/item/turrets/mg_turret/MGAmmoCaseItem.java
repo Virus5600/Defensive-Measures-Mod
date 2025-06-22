@@ -4,7 +4,7 @@ import net.minecraft.item.Item;
 import net.minecraft.util.Rarity;
 
 public class MGAmmoCaseItem extends Item {
-	public MGAmmoCaseItem(final Settings settings) {
+	public MGAmmoCaseItem(final net.minecraft.item.Item.Settings settings) {
 		super(
 			settings
 				.maxCount(16)

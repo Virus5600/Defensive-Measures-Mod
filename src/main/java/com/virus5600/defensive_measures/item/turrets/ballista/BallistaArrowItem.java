@@ -12,7 +12,7 @@ import net.minecraft.util.Rarity;
  * @version 1.0.0
  */
 public class BallistaArrowItem extends Item implements FuelItem {
-	public BallistaArrowItem(Settings settings) {
+	public BallistaArrowItem(net.minecraft.item.Item.Settings settings) {
 		super(
 			settings
 				.maxCount(64)			// MAX STACK SIZE
