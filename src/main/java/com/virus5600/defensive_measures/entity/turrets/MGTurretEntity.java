@@ -17,8 +17,15 @@ import net.minecraft.world.World;
 
 import software.bernie.geckolib.animatable.GeoEntity;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
-import software.bernie.geckolib.animation.*;
-import software.bernie.geckolib.animation.keyframe.event.ParticleKeyframeEvent;
+import software.bernie.geckolib.animatable.manager.AnimatableManager.ControllerRegistrar;
+import software.bernie.geckolib.animatable.processing.AnimationController;
+import software.bernie.geckolib.animatable.processing.AnimationTest;
+import software.bernie.geckolib.animation.PlayState;
+import software.bernie.geckolib.animation.RawAnimation;
+import software.bernie.geckolib.animation.keyframe.event.KeyFrameEvent;
+import software.bernie.geckolib.animation.keyframe.event.data.ParticleKeyframeData;
+import software.bernie.geckolib.util.GeckoLibUtil;
+
 import software.bernie.geckolib.util.GeckoLibUtil;
 
 import org.jetbrains.annotations.Nullable;
@@ -177,7 +184,7 @@ public class MGTurretEntity extends TurretEntity implements GeoEntity {
 	// ANIMATION CONTROLLERS //
 	// ///////////////////// //
 
-	private <E extends MGTurretEntity> PlayState deathController(final AnimationState<E> event) {
+	private PlayState deathController(final AnimationTest<MGTurretEntity> event) {
 		if (!this.isAlive() && !this.animPlayed) {
 			this.animPlayed = true;
 			event.setAnimation(ANIMATIONS.get("Death"));
@@ -186,17 +193,17 @@ public class MGTurretEntity extends TurretEntity implements GeoEntity {
 		return PlayState.CONTINUE;
 	}
 
-	private <E extends MGTurretEntity>PlayState idleController(final AnimationState<E> event) {
+	private PlayState idleController(final AnimationTest<MGTurretEntity> event) {
 		return event
 			.setAndContinue(ANIMATIONS.get("Idle"));
 	}
 
-	private <E extends MGTurretEntity>PlayState shootController(final AnimationState<E> event) {
+	private PlayState shootController(final AnimationTest<MGTurretEntity> event) {
 		return PlayState.STOP;
 	}
 
-	private void shootKeyframeHandler(ParticleKeyframeEvent<MGTurretEntity> state) {
-		final String LOCATOR = state.getKeyframeData()
+	private void shootKeyframeHandler(KeyFrameEvent<MGTurretEntity, ParticleKeyframeData> event) {
+		final String LOCATOR = event.keyframeData()
 			.getLocator();
 
 		if (LOCATOR.equals("barrel")) {
@@ -217,12 +224,12 @@ public class MGTurretEntity extends TurretEntity implements GeoEntity {
 
 	// GeoEntity //
 	@Override
-	public void registerControllers(final AnimatableManager.ControllerRegistrar controllers) {
+	public void registerControllers(final ControllerRegistrar controllers) {
 		controllers
 			.add(
-				new AnimationController<>(this, "Death", this::deathController),
-				new AnimationController<>(this, "Idle", this::idleController),
-				new AnimationController<>(this, "FiringSequence", this::shootController)
+				new AnimationController<>("Death", 10, this::deathController),
+				new AnimationController<>("Idle", 10, this::idleController),
+				new AnimationController<>("FiringSequence", 10, this::shootController)
 					.triggerableAnim("shoot", ANIMATIONS.get("Shoot"))
 					.setParticleKeyframeHandler(this::shootKeyframeHandler)
 			);
