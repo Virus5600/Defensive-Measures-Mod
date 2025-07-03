@@ -1,5 +1,6 @@
 package com.virus5600.defensive_measures.item.turrets.ballista;
 
+import net.minecraft.component.type.TooltipDisplayComponent;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.item.Item;
@@ -15,6 +16,7 @@ import com.virus5600.defensive_measures.item.turrets.TurretItem;
 
 import java.lang.reflect.Type;
 import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * The item that spawns the {@link BallistaTurretEntity Ballista Turret}.
@@ -34,11 +36,11 @@ public class BallistaTurretItem extends TurretItem {
 	}
 
 	@Override
-	public void appendTooltip(ItemStack stack, Item.TooltipContext context, List<Text> tooltip, TooltipType type) {
-		super.appendTooltip(stack, context, tooltip, type);
+	public void appendTooltip(ItemStack stack, TooltipContext context, TooltipDisplayComponent displayComponent, Consumer<Text> textConsumer, TooltipType type) {
+		super.appendTooltip(stack, context, displayComponent, textConsumer, type);
 
 		for (int i = 1; i <= 3; i++) {
-			tooltip.add(
+			textConsumer.accept(
 				Text.translatable("itemTooltip.dm.ballista.line" + i)
 					.formatted(Formatting.DARK_AQUA)
 			);

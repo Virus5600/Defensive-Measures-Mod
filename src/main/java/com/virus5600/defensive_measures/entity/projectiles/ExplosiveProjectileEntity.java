@@ -6,14 +6,14 @@ import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.data.DataTracker.Builder;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.projectile.ProjectileUtil;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtElement;
 import net.minecraft.network.listener.ClientPlayPacketListener;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket;
 import net.minecraft.particle.ParticleEffect;
 import net.minecraft.server.network.EntityTrackerEntry;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.storage.ReadView;
+import net.minecraft.storage.WriteView;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
@@ -343,18 +343,17 @@ public abstract class ExplosiveProjectileEntity extends TurretProjectileEntity {
 	}
 
 	@Override
-	public void writeCustomData(NbtCompound nbt) {
-		super.writeCustomData(nbt);
-		nbt.putDouble("acceleration_power", this.accelerationPower);
+	public void writeCustomData(WriteView view) {
+		super.writeCustomData(view);
+
+		view.putDouble("acceleration_power", this.accelerationPower);
 	}
 
 	@Override
-	public void readCustomData(NbtCompound nbt) {
-		super.readCustomData(nbt);
-		if (nbt.contains("acceleration_power")) {
-			this.accelerationPower = nbt.getDouble("acceleration_power")
-				.orElse(0d);
-		}
+	public void readCustomData(ReadView view) {
+		super.readCustomData(view);
+
+		this.accelerationPower = view.getDouble("acceleration_power", 0d);
 	}
 
 	// //////////////////////////// //

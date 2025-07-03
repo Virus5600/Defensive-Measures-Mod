@@ -1,14 +1,15 @@
 package com.virus5600.defensive_measures.item.turrets;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Consumer;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.block.FluidBlock;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.NbtComponent;
+import net.minecraft.component.type.TooltipDisplayComponent;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnReason;
@@ -20,7 +21,6 @@ import net.minecraft.item.ItemUsageContext;
 import net.minecraft.item.SpawnEggItem;
 import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtElement;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.stat.Stats;
 import net.minecraft.text.Text;
@@ -163,10 +163,15 @@ public abstract class TurretItem extends Item {
 	}
 
 	public EntityType<?> getEntityType(@Nullable NbtCompound nbt) {
-		if (nbt != null && nbt.contains("EntityTag", NbtElement.COMPOUND_TYPE)) {
-			NbtCompound nbtCompound = nbt.getCompound("EntityTag");
-			if (nbtCompound.contains("id", NbtElement.STRING_TYPE)) {
-				return EntityType.get(nbtCompound.getString("id")).orElse(this.type);
+		if (nbt != null && nbt.contains("EntityTag")) {
+			NbtCompound nbtCompound = nbt.getCompound("EntityTag")
+				.orElse(null);
+
+			if (nbtCompound != null && nbtCompound.contains("id")) {
+				String id = nbtCompound.getString("id")
+					.orElse(null);
+
+				return id != null ? EntityType.get(id).orElse(this.type) : this.type;
 			}
 		}
 
@@ -174,7 +179,7 @@ public abstract class TurretItem extends Item {
 	}
 
 	@Override
-	public void appendTooltip(ItemStack stack, Item.TooltipContext context, List<Text> tooltip, TooltipType type) {
+	public void appendTooltip(ItemStack stack, TooltipContext context, TooltipDisplayComponent displayComponent, Consumer<Text> textConsumer, TooltipType type) {
 		int maxHealth = (int) this.getTurretMaxHealth();
 		int currentHealth = maxHealth;
 
@@ -183,17 +188,17 @@ public abstract class TurretItem extends Item {
 		if (nbtComponent != null) {
 			nbt = nbtComponent.copyNbt();
 
-			if (nbt.contains("Health", NbtElement.FLOAT_TYPE)) {
-				currentHealth = (int) nbt.getFloat("Health");
+			if (nbt.contains("Health")) {
+				currentHealth = (int) nbt.getFloat("Health", 0.0F);
 			}
 
-			if (nbt.contains("MaxHealth", NbtElement.FLOAT_TYPE)) {
-				maxHealth = (int) nbt.getFloat("MaxHealth");
+			if (nbt.contains("MaxHealth")) {
+				maxHealth = (int) nbt.getFloat("MaxHealth", 0.0F);
 			}
 		}
 
 		if (maxHealth != 0) {
-			tooltip.add(
+			textConsumer.accept(
 				Text.translatable(
 					"itemTooltip.dm.generic.health",
 					currentHealth, maxHealth)

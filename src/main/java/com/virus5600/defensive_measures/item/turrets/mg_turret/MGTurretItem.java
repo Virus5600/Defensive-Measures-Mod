@@ -4,6 +4,7 @@ import com.virus5600.defensive_measures.entity.turrets.CannonTurretEntity;
 import com.virus5600.defensive_measures.entity.turrets.MGTurretEntity;
 import com.virus5600.defensive_measures.entity.turrets.TurretEntity;
 import com.virus5600.defensive_measures.item.turrets.TurretItem;
+import net.minecraft.component.type.TooltipDisplayComponent;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.item.ItemStack;
@@ -14,6 +15,7 @@ import net.minecraft.util.Rarity;
 
 import java.lang.reflect.Type;
 import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * The item that spawns the {@link CannonTurretEntity Cannon Turret}.
@@ -33,11 +35,11 @@ public class MGTurretItem extends TurretItem {
 	}
 
 	@Override
-	public void appendTooltip(ItemStack stack, TooltipContext context, List<Text> tooltip, TooltipType type) {
-		super.appendTooltip(stack, context, tooltip, type);
+	public void appendTooltip(ItemStack stack, TooltipContext context, TooltipDisplayComponent displayComponent, Consumer<Text> textConsumer, TooltipType type) {
+		super.appendTooltip(stack, context, displayComponent, textConsumer, type);
 
 		for (int i = 1; i <= 3; i++) {
-			tooltip.add(
+			textConsumer.accept(
 				Text.translatable("itemTooltip.dm.mg_turret.line" + i)
 					.formatted(Formatting.DARK_AQUA)
 			);

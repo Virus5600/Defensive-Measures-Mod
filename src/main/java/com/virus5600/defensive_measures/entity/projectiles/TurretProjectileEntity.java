@@ -19,16 +19,14 @@ import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.entity.projectile.ProjectileUtil;
 import net.minecraft.inventory.StackReference;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtElement;
-import net.minecraft.nbt.NbtHelper;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.registry.Registries;
-import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.tag.EntityTypeTags;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.storage.ReadView;
+import net.minecraft.storage.WriteView;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Unit;
 import net.minecraft.util.hit.BlockHitResult;
@@ -480,62 +478,54 @@ public abstract class TurretProjectileEntity extends ProjectileEntity implements
 	}
 
 	@Override
-	public void writeCustomData(NbtCompound nbt) {
-		super.writeCustomData(nbt);
+	public void writeCustomData(WriteView view) {
+		super.writeCustomData(view);
 
-		nbt.putShort("life", (short) this.life);
-		nbt.putByte("shake", (byte)this.shake);
-		nbt.putBoolean("inGround", this.isInGround());
-		nbt.putByte("pickup", (byte)this.pickupType.ordinal());
-		nbt.putDouble("damage", this.damage);
-		nbt.putBoolean("crit", this.isCritical());
-		nbt.putByte("PierceLevel", this.getPierceLevel());
+		view.putShort("life", (short) this.life);
+		view.putByte("shake", (byte)this.shake);
+		view.putBoolean("inGround", this.isInGround());
+		view.putByte("pickup", (byte) this.pickupType.ordinal());
+		view.putDouble("damage", this.damage);
+		view.putBoolean("crit", this.isCritical());
+		view.putByte("PierceLevel", this.getPierceLevel());
 
 		Identifier soundId = Registries.SOUND_EVENT.getId(this.sound);
 		if (soundId != null) {
-			nbt.putString("SoundEvent", soundId.toString());
+			view.putString("SoundEvent", soundId.toString());
 		}
 
 		if (this.stack != null) {
-			nbt.put("item", this.stack.toNbt(this.getRegistryManager()));
+			view.put("item", ItemStack.CODEC, this.stack);
 		}
 
 		if (this.inBlockState != null) {
-			nbt.put("inBlockState", NbtHelper.fromBlockState(this.inBlockState));
+			view.putNullable("inBlockState", BlockState.CODEC, this.inBlockState);
 		}
 	}
 
 	@Override
-	public void readCustomData(NbtCompound nbt) {
-		super.readCustomData(nbt);
+	public void readCustomData(ReadView view) {
+		super.readCustomData(view);
 
-		this.life = nbt.getShort("life");
-		this.shake = nbt.getByte("shake");
-		this.setInGround(nbt.getBoolean("inGround"));
-		this.damage = nbt.getDouble("damage");
-		this.pickupType = PickupPermission.fromOrdinal(nbt.getByte("pickup"));
-		this.setCritical(nbt.getBoolean("crit"));
-		this.setPierceLevel(nbt.getByte("PierceLevel"));
+		this.life = view.getShort("life", (short) 0);
+		this.shake = view.getByte("shake", (byte) 0) & 255;
+		this.setInGround(view.getBoolean("inGround", false));
+		this.damage = view.getDouble("damage", 2.0F);
+		this.pickupType = PickupPermission.fromOrdinal(view.getByte("pickup", (byte) 0));
+		this.setCritical(view.getBoolean("crit", false));
+		this.setPierceLevel(view.getByte("PierceLevel", (byte) 0));
 
-		if (nbt.contains("inBlockState", NbtElement.COMPOUND_TYPE)) {
-			this.inBlockState = NbtHelper.toBlockState(
-				this.getWorld()
-					.createCommandRegistryWrapper(RegistryKeys.BLOCK),
-				nbt.getCompound("inBlockState")
-			);
-		}
+		this.inBlockState = view.read("inBlockState", BlockState.CODEC)
+			.orElse(null);
 
-		if (nbt.contains("item", NbtElement.COMPOUND_TYPE)) {
-			this.setStack(
-				ItemStack.fromNbt(
-					this.getRegistryManager(),
-					nbt.getCompound("item")
-				).orElse(this.getDefaultItemStack())
-			);
-		}
-		else {
-			this.setStack(this.getDefaultItemStack());
-		}
+		this.setStack(
+			view.read(
+				"item",
+				ItemStack.CODEC
+			).orElse(
+				this.getDefaultItemStack()
+			)
+		);
 	}
 
 	public void applyDamageModifier(float damageModifier) {
