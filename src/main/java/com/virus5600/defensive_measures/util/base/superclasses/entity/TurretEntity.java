@@ -1,6 +1,6 @@
 package com.virus5600.defensive_measures.util.base.superclasses.entity;
 
-//import com.virus5600.defensive_measures.entity.turrets.AATurretEntity;
+import com.virus5600.defensive_measures.entity.turrets.AATurretEntity;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.*;

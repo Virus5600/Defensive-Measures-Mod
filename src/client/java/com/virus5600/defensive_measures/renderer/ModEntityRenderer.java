@@ -32,7 +32,7 @@ public class ModEntityRenderer {
 		EntityRendererRegistry.register(ModEntities.MG_TURRET, MGTurretRenderer::new);
 
 		// v1.1.0
-//		EntityRendererRegistry.register(ModEntities.AA_TURRET, AATurretRenderer::new);
+		EntityRendererRegistry.register(ModEntities.AA_TURRET, AATurretRenderer::new);
 
 		// /////////// //
 		// PROJECTILES //

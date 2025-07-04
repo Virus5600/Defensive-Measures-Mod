@@ -47,13 +47,13 @@ public class ModEntities {
 	);
 
 	// v1.1.0-beta
-//	public static final EntityType<AATurretEntity> AA_TURRET = RegistryUtil.registerEntity(
-//		"aa_turret",
-//		Builder
-//			.create(AATurretEntity::new, SpawnGroup.MISC)
-//			.dimensions(1F, 1F)
-//			.eyeHeight(0.51F)
-//	);
+	public static final EntityType<AATurretEntity> AA_TURRET = RegistryUtil.registerEntity(
+		"aa_turret",
+		Builder
+			.create(AATurretEntity::new, SpawnGroup.MISC)
+			.dimensions(1F, 1F)
+			.eyeHeight(0.51F)
+	);
 
 	// PROJECTILES //
 	// v1.0.0-beta
@@ -98,6 +98,6 @@ public class ModEntities {
 		FabricDefaultAttributeRegistry.register(ModEntities.MG_TURRET, MGTurretEntity.setAttributes());
 
 		// v1.1.0-beta
-//		FabricDefaultAttributeRegistry.register(ModEntities.AA_TURRET, AATurretEntity.setAttributes());
+		FabricDefaultAttributeRegistry.register(ModEntities.AA_TURRET, AATurretEntity.setAttributes());
 	}
 }
