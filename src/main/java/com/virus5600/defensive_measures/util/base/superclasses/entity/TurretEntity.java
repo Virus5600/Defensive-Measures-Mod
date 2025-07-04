@@ -617,6 +617,10 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 				);
 			}
 
+			isSuccess = true;
+		}
+
+		if (isSuccess) {
 			if (item.isDamageable()) {
 				item.damage(1, player);
 			}
@@ -624,11 +628,9 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 				item.decrementUnlessCreative(1, player);
 			}
 
-			isSuccess = true;
+			return ActionResult.SUCCESS;
 		}
 
-		if (isSuccess)
-			return ActionResult.SUCCESS;
 		return super.interactMob(player, hand);
 	}
 
