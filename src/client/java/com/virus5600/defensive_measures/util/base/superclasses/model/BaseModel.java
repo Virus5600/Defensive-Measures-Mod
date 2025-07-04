@@ -1,4 +1,4 @@
-package com.virus5600.defensive_measures.model;
+package com.virus5600.defensive_measures.util.base.superclasses.model;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;

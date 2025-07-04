@@ -1,4 +1,4 @@
-package com.virus5600.defensive_measures.entity.projectiles;
+package com.virus5600.defensive_measures.util.base.superclasses.entity;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -51,8 +51,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
-
-import com.virus5600.defensive_measures.entity.turrets.TurretEntity;
 
 /**
  * {@code TurretProjectile} is an abstract class that acts nearly akin to {@link PersistentProjectileEntity}

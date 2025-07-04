@@ -1,5 +1,6 @@
 package com.virus5600.defensive_measures.entity.projectiles;
 
+import com.virus5600.defensive_measures.util.base.superclasses.entity.ExplosiveProjectileEntity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;

@@ -6,7 +6,7 @@ import net.minecraft.entity.projectile.ProjectileEntity;
 
 import software.bernie.geckolib.animatable.GeoAnimatable;
 
-import com.virus5600.defensive_measures.model.BaseModel;
+import com.virus5600.defensive_measures.util.base.superclasses.model.BaseModel;
 
 import org.jetbrains.annotations.Nullable;
 

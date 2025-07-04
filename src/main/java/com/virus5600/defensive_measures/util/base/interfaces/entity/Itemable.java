@@ -1,4 +1,4 @@
-package com.virus5600.defensive_measures.entity.turrets.interfaces;
+package com.virus5600.defensive_measures.util.base.interfaces.entity;
 
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.NbtComponent;
@@ -16,7 +16,7 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 
 import com.virus5600.defensive_measures.advancement.criterion.ModCriterion;
-import com.virus5600.defensive_measures.entity.turrets.TurretEntity;
+import com.virus5600.defensive_measures.util.base.superclasses.entity.TurretEntity;
 
 import java.util.Optional;
 import java.util.Random;

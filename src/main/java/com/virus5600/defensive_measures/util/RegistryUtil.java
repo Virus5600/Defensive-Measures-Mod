@@ -1,5 +1,6 @@
 package com.virus5600.defensive_measures.util;
 
+import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
@@ -8,6 +9,9 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.damage.DamageType;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
+import net.minecraft.network.RegistryByteBuf;
+import net.minecraft.network.codec.PacketCodec;
+import net.minecraft.network.packet.CustomPayload;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
@@ -39,8 +43,10 @@ public class RegistryUtil {
 		return RegistryKey.of(RegistryKeys.BLOCK, Identifier.of(DefensiveMeasures.MOD_ID, name));
 	}
 
-	public static Block registerBlock(String path, Function<AbstractBlock.Settings, Block> function, AbstractBlock.Settings settings) {
-		return Blocks.register(createBlockKey(path), function, settings);
+	public static Block registerBlock(String path, Function<AbstractBlock.Settings, Block> function, AbstractBlock.Settings settings, BlockUtil.BlockCategory blockCategory) {
+		Block block = Blocks.register(createBlockKey(path), function, settings);
+		BlockUtil.addBlockToCategory(block, blockCategory);
+		return block;
 	}
 
 	// Item Registry
@@ -83,5 +89,45 @@ public class RegistryUtil {
 	// Damage Type Registry
 	public static RegistryKey<DamageType> getDamageTypeKey(String path) {
 		return RegistryKey.of(RegistryKeys.DAMAGE_TYPE, Identifier.of(DefensiveMeasures.MOD_ID, path));
+	}
+
+	// Networking - S2C Packet
+	/**
+	 * Registers an S2C packet channel for the mod.
+	 *
+	 * @param name The {@link Identifier identifier name} of the packet channel.
+	 * @param id The {@link CustomPayload.Id ID} of the packet channel.
+	 * @param codec The {@link PacketCodec} for the packet channel.
+	 *
+	 * @return The {@link Identifier identifier} of the packet channel.
+	 * @param <T> The type of the {@link CustomPayload} packet.
+	 */
+	public static <T extends CustomPayload> Identifier registerS2CPacketPayload(String name, CustomPayload.Id<T> id, PacketCodec<RegistryByteBuf, T> codec) {
+		Identifier identifier = Identifier.of(DefensiveMeasures.MOD_ID, name);
+
+		PayloadTypeRegistry.playS2C()
+			.register(id, codec);
+
+		return identifier;
+	}
+
+	// Networking - C2S Packet
+	/**
+	 * Registers an C2S packet channel for the mod.
+	 *
+	 * @param name The {@link Identifier identifier name} of the packet channel.
+	 * @param id The {@link CustomPayload.Id ID} of the packet channel.
+	 * @param codec The {@link PacketCodec} for the packet channel.
+	 * @param <T> The type of the {@link CustomPayload} packet.
+	 *
+	 * @return The {@link Identifier identifier} of the packet channel.
+	 */
+	public static <T extends CustomPayload> Identifier registerC2SPacketHandler(String name, CustomPayload.Id<T> id, PacketCodec<RegistryByteBuf, T> codec) {
+		Identifier identifier = Identifier.of(DefensiveMeasures.MOD_ID, name);
+
+		PayloadTypeRegistry.playC2S()
+			.register(id, codec);
+
+		return identifier;
 	}
 }

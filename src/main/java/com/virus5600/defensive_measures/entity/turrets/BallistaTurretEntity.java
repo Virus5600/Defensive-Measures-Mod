@@ -1,10 +1,10 @@
 package com.virus5600.defensive_measures.entity.turrets;
 
+import com.virus5600.defensive_measures.util.base.superclasses.entity.TurretEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.attribute.DefaultAttributeContainer.Builder;
-import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.effect.StatusEffects;
@@ -324,14 +324,13 @@ public class BallistaTurretEntity extends TurretEntity implements GeoEntity {
 			}
 		};
 
-		effectSource = new HashMap<>() {
+		effectSource = new HashMap<Item, List<Object[]>>() {
 			{
 				for (Item item : TurretEntity.LOGS) {
-					put(item, new ArrayList<>() {
-						{
-							add(new Object[] {StatusEffects.ABSORPTION, 60, 2});
-						}
-					});
+					put(item, List.<Object[]>of(
+						new Object[] { StatusEffects.ABSORPTION, 60, 2 },
+						new Object[] { StatusEffects.RESISTANCE, 60, 2 }
+					));
 				}
 			}
 		};

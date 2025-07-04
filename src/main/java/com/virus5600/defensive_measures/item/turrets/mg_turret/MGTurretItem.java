@@ -1,9 +1,8 @@
 package com.virus5600.defensive_measures.item.turrets.mg_turret;
 
-import com.virus5600.defensive_measures.entity.turrets.CannonTurretEntity;
 import com.virus5600.defensive_measures.entity.turrets.MGTurretEntity;
-import com.virus5600.defensive_measures.entity.turrets.TurretEntity;
-import com.virus5600.defensive_measures.item.turrets.TurretItem;
+import com.virus5600.defensive_measures.util.base.superclasses.entity.TurretEntity;
+import com.virus5600.defensive_measures.util.base.superclasses.item.TurretItem;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.item.ItemStack;
@@ -16,7 +15,7 @@ import java.lang.reflect.Type;
 import java.util.List;
 
 /**
- * The item that spawns the {@link CannonTurretEntity Cannon Turret}.
+ * The item that spawns the {@link MGTurretEntity MG Turret}.
  *
  * @since 1.0.0
  * @author <a href="https://github.com/Virus5600">Virus5600</a>

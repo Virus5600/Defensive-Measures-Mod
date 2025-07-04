@@ -41,6 +41,10 @@
 	"itemTooltip.dm.mg_turret.line2" : "Firing Arc: X: ±360° | Y: ±27.5°",
 	"itemTooltip.dm.mg_turret.line3" : "Reload Time: 0.15 seconds (burst) | 3.75 seconds (cooldown)",
 
+	"itemTooltip.dm.aa_turret.line1" : "Range: 8-64 blocks",
+	"itemTooltip.dm.aa_turret.line2" : "Firing Arc: X: ±360° | Y: (-25°)-(90°)",
+	"itemTooltip.dm.aa_turret.line3" : "Reload Time: 0.15 seconds (burst) | 5 seconds (cooldown)",
+
 	"entity.dm.cannon_turret" : "Cannon Turret",
 	"entity.dm.cannonball" : "Cannon ball",
 
@@ -50,15 +54,17 @@
 	"entity.dm.mg_turret" : "MG Turret",
 	"entity.dm.mg_bullet" : "MG Bullet",
 
+	"entity.dm.aa_turret" : "AA Turret",
+
 	"death.attack.arrowhead" : "%1$s got poked to death with a sticking arrowhead on a ground",
 	"death.attack.arrowhead.player" : "%1$s stepped on a random Arrowhead whilst fighting with %2$s",
 
 	"subtitles.turret.remove.metal" : "Metallic Turret Removed",
 	"subtitles.turret.remove.wood" : "Wooden Turret Removed",
 
-	"subtitles.turret.iron.repair" : "Repaired Iron Turret",
-	"subtitles.turret.bow.repair" : "Repaired Bow Turret",
-	"subtitles.turret.wood.repair" : "Repaired Wooden Turret",
+	"subtitles.turret.repair.bow" : "Repaired Bow Turret",
+	"subtitles.turret.repair.metal" : "Repaired Metal Turret",
+	"subtitles.turret.repair.wood" : "Repaired Wooden Turret",
 
 	"subtitles.generic.impact.bullet.default" : "Bullet impacted",
 	"subtitles.generic.impact.bullet.flesh" : "Bullet hit an entity",
@@ -78,11 +84,12 @@
 	"subtitles.turret.mg_turret.destroyed" : "MG Turret destroyed",
 	"subtitles.turret.mg_turret.shoot" : "MG Turret shoots",
 
-	"subtitles.turret.anti_air.hurt" : "Anti-air Turret damaged",
-	"subtitles.turret.anti_air.destroyed" : "Anti-air Turret destroyed",
-	"subtitles.turret.anti_air.shoot.begin" : "Anti-air Turret begins shooting",
-	"subtitles.turret.anti_air.shoot" : "Anti-air Turret shoots",
-	"subtitles.turret.anti_air.shoot.end" : "Anti-air Turret finished shooting",
+	"subtitles.turret.aa_turret.hurt" : "AA Turret damaged",
+	"subtitles.turret.aa_turret.destroyed" : "AA Turret destroyed",
+	"subtitles.turret.aa_turret.shoot.begin" : "AA Turret begins shooting",
+	"subtitles.turret.aa_turret.shoot.loop" : "AA Turret attacking",
+	"subtitles.turret.aa_turret.shoot" : "AA Turret shoots",
+	"subtitles.turret.aa_turret.shoot.end" : "AA Turret finished shooting",
 
 	"tag.item.dm.turret_remover_repairable" : "Turret Remover Repairable",
 	"tag.item.dm.turret_removers" : "Turret Removers",

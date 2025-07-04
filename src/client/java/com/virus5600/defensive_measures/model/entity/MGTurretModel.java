@@ -6,7 +6,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
 /**
- * Ballista Turret Model.
+ * Machine Gun Turret Model.
  *
  * @see BaseTurretModel
  *

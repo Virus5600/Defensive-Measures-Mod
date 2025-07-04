@@ -1,4 +1,4 @@
-package com.virus5600.defensive_measures.renderer;
+package com.virus5600.defensive_measures.util.base.superclasses.renderer;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -9,7 +9,7 @@ import software.bernie.geckolib.animatable.GeoAnimatable;
 import software.bernie.geckolib.model.GeoModel;
 import software.bernie.geckolib.renderer.GeoEntityRenderer;
 
-import com.virus5600.defensive_measures.entity.turrets.TurretEntity;
+import com.virus5600.defensive_measures.util.base.superclasses.entity.TurretEntity;
 
 /**
  * This class serves as the base renderer class for all the other

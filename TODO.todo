@@ -10,3 +10,7 @@ TODO: TurretEntity
 - Method
 	- calculateVelocity
 		- Properly calculate the parabolic trajectory (low priority) - Apparently, it was because of the "acceleration" modifier in the "ExplosiveProjectileEntity" class. Fuck.
+
+TODO: Anti-Air Turret
+- Implement dynamic sound.
+	- Implement a new way to add particle effect when shooting only.

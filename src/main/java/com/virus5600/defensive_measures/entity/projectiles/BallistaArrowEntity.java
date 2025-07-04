@@ -1,5 +1,7 @@
 package com.virus5600.defensive_measures.entity.projectiles;
 
+import com.virus5600.defensive_measures.util.base.superclasses.entity.KineticProjectileEntity;
+import com.virus5600.defensive_measures.util.base.superclasses.entity.TurretProjectileEntity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.hit.EntityHitResult;
