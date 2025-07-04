@@ -8,7 +8,7 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking.PlayPay
 import net.minecraft.network.packet.CustomPayload;
 
 @Environment(EnvType.CLIENT)
-public class RegistryUtil {
+public class ClientRegistryUtil {
 	// Networking - S2C Packet
 	/**
 	 * Handles the registration of S2C packet handlers.

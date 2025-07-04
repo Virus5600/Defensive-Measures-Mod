@@ -1,7 +1,5 @@
 package com.virus5600.defensive_measures.networking;
 
-import com.virus5600.defensive_measures.util.RegistryUtil;
-
 /**
  * Class containing all the packet identifiers used by the mod. This is
  * usually used to create the packet handlers and to register the packets
