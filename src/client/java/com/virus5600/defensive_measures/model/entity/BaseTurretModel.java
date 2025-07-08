@@ -185,12 +185,12 @@ public class BaseTurretModel<T extends TurretEntity & GeoAnimatable> extends Bas
 		if (neck.isPresent()) {
 			float targetYRot = Optional.ofNullable(state.getData(DataTickets.ENTITY_YAW))
 				.orElse(0f);
-			this.setLookYaw(neck.get(), targetYRot);
+			this.setLookYaw(neck.get(), -targetYRot * ((float) Math.PI / 180F));
 
 			if (head.isPresent()) {
 				float targetXRot = Optional.ofNullable(state.getData(DataTickets.ENTITY_PITCH))
 					.orElse(0f);
-				this.setLookPitch(head.get(), targetXRot);
+				this.setLookPitch(head.get(), -targetXRot * ((float) Math.PI / 180F));
 			}
 		}
 

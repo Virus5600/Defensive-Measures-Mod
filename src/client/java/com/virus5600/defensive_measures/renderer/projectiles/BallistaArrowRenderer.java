@@ -61,8 +61,8 @@ public class BallistaArrowRenderer<
 		float newPitch = Optional.ofNullable(renderState.getGeckolibData(DataTickets.ENTITY_PITCH))
 			.orElse(0f);
 
-		poseStack.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(newYaw));
-		poseStack.multiply(RotationAxis.POSITIVE_X.rotationDegrees(-newPitch));
+		poseStack.multiply(RotationAxis.POSITIVE_Y.rotationDegrees((newYaw * (float) Math.PI / 180F)));
+		poseStack.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(-newPitch));
 
 		super.preRender(renderState, poseStack, model, bufferSource, buffer, isReRender,
 			packedLight, packedOverlay, renderColor);

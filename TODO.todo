@@ -12,4 +12,4 @@ TODO: TurretEntity
 		- Properly calculate the parabolic trajectory (low priority) - Apparently, it was because of the "acceleration" modifier in the "ExplosiveProjectileEntity" class. Fuck.
 
 [UPDATE 1.21.6]
-TODO: Fix Rotational Rendering Bug
+TODO: Fix Directional Rendering Bug for the Ballista Arrow (Renderer?)

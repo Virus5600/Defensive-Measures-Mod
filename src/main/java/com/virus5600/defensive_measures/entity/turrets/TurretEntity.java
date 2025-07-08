@@ -683,8 +683,9 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 
 		// If the target isn't null, check if the target is within range.
 		boolean inRange = this.isWithinRange(target, this.getMinAttackRange(), this.getMaxAttackRange());
-		if (inRange)
+		if (inRange) {
 			super.setTarget(target);
+		}
 	}
 
 	@Override

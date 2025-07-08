@@ -50,21 +50,4 @@ public class MGBulletRenderer<
 			this.getTextureLocation(renderState)
 		);
 	}
-
-	@Override
-	public void preRender(R renderState, MatrixStack poseStack, BakedGeoModel model,
-		@Nullable VertexConsumerProvider bufferSource, @Nullable VertexConsumer buffer,
-		boolean isReRender, int packedLight, int packedOverlay, int renderColor
-	) {
-		float newYaw = Optional.ofNullable(renderState.getGeckolibData(DataTickets.ENTITY_YAW))
-			.orElse(0f);
-		float newPitch = Optional.ofNullable(renderState.getGeckolibData(DataTickets.ENTITY_PITCH))
-			.orElse(0f);
-
-		poseStack.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(newYaw));
-		poseStack.multiply(RotationAxis.POSITIVE_X.rotationDegrees(-newPitch));
-
-		super.preRender(renderState, poseStack, model, bufferSource, buffer, isReRender,
-			packedLight, packedOverlay, renderColor);
-	}
 }
