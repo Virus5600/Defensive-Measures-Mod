@@ -11,5 +11,9 @@ TODO: TurretEntity
 	- calculateVelocity
 		- Properly calculate the parabolic trajectory (low priority) - Apparently, it was because of the "acceleration" modifier in the "ExplosiveProjectileEntity" class. Fuck.
 
-[UPDATE 1.21.6]
+[UPDATE 1.21.11]
 TODO: Fix Directional Rendering Bug for the Ballista Arrow (Renderer?)
+
+TODO:
+- ~~Fix `setCustomAnimation` issue with Geckolib library~~
+- Migrate to vanilla implementation instead of depending in Geckolib

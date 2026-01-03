@@ -802,7 +802,7 @@ public class BlockUtil {
 			Blocks.ACTIVATOR_RAIL,
 			Blocks.ANVIL,
 			Blocks.CAULDRON,
-			Blocks.CHAIN,
+			Blocks.IRON_CHAIN,
 			Blocks.CHIPPED_ANVIL,
 			Blocks.DAMAGED_ANVIL,
 			Blocks.HEAVY_WEIGHTED_PRESSURE_PLATE,

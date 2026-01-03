@@ -6,6 +6,7 @@ import net.fabricmc.api.Environment;
 import net.minecraft.client.render.entity.EntityRendererFactory.Context;
 import net.minecraft.client.render.entity.state.EntityRenderState;
 
+import org.jspecify.annotations.NonNull;
 import software.bernie.geckolib.renderer.base.GeoRenderState;
 import software.bernie.geckolib.renderer.GeoEntityRenderer;
 
@@ -28,7 +29,7 @@ public class CannonballRenderer<
 	}
 
 	@Override
-	protected float getDeathMaxRotation(GeoRenderState renderState) {
+	protected float getDeathMaxRotation(@NonNull GeoRenderState renderState) {
 		return 0.0f;
 	}
 }

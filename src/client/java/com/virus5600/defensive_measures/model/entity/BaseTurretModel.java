@@ -3,9 +3,10 @@ package com.virus5600.defensive_measures.model.entity;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
+import org.jspecify.annotations.NonNull;
 import software.bernie.geckolib.animatable.GeoAnimatable;
-import software.bernie.geckolib.animatable.processing.AnimationState;
-import software.bernie.geckolib.cache.object.GeoBone;
+import software.bernie.geckolib.animation.AnimationController.AnimationStateHandler;
+import software.bernie.geckolib.cache.model.GeoBone;
 import software.bernie.geckolib.constant.DataTickets;
 
 import com.virus5600.defensive_measures.entity.turrets.TurretEntity;
@@ -64,6 +65,10 @@ public class BaseTurretModel<T extends TurretEntity & GeoAnimatable> extends Bas
 	 * @param modelPath The path of the model
 	 * @param texturePath The path of the texture
 	 * @param animationPath The path of the animation (can be {@code null})
+	 *
+	 * @see #modelPath
+	 * @see #texturePath
+	 * @see #animationPath
 	 */
 	public BaseTurretModel(String modID, String modelPath,
 		String texturePath, @Nullable String animationPath
@@ -96,6 +101,10 @@ public class BaseTurretModel<T extends TurretEntity & GeoAnimatable> extends Bas
 	 * @param boneBase The name of the bone that represents the base or stand of the turret
 	 * @param boneNeck The name of the bone that represents the neck of the turret
 	 * @param boneHead The name of the bone that represents the head of the turret
+	 *
+	 * @see #modelPath
+	 * @see #texturePath
+	 * @see #animationPath
 	 */
 	public BaseTurretModel(String modID,
 		String modelPath, String texturePath, @Nullable String animationPath,
@@ -119,7 +128,7 @@ public class BaseTurretModel<T extends TurretEntity & GeoAnimatable> extends Bas
 	 * @param headPitch The pitch rotation of the head
 	 */
 	protected void setLookPitch(GeoBone bone, float headPitch) {
-		bone.updateRotation(headPitch, 0, 0);
+//		bone.updateRotation(headPitch, 0, 0);
 	}
 
 	/**
@@ -129,7 +138,7 @@ public class BaseTurretModel<T extends TurretEntity & GeoAnimatable> extends Bas
 	 * @param headYaw The yaw rotation of the head
 	 */
 	protected void setLookYaw(GeoBone bone, float headYaw) {
-		bone.updateRotation(0, headYaw, 0);
+//		bone.updateRotation(0, headYaw, 0);
 	}
 
 	/**
@@ -140,10 +149,11 @@ public class BaseTurretModel<T extends TurretEntity & GeoAnimatable> extends Bas
 	 * @param state The animation state
 	 * @return The pitch rotation of the head
 	 */
-	protected float getLookPitch(T animatable, AnimationState<T> state) {
+	protected float getLookPitch(T animatable, AnimationStateHandler<T> state) {
 		float maxPitchChange = animatable.getMaxLookPitchChange();
-		float headPitch = Optional.ofNullable(state.getData(DataTickets.ENTITY_PITCH))
-			.orElse(0f);
+//		float headPitch = Optional.ofNullable(state.getData(DataTickets.ENTITY_PITCH))
+//			.orElse(0f);
+		float headPitch = animatable.getTrackedPitch();
 
 		float targetXRot = (headPitch * ((float) Math.PI / 180F));
 		targetXRot = Math.clamp(targetXRot, -maxPitchChange, maxPitchChange);
@@ -159,10 +169,11 @@ public class BaseTurretModel<T extends TurretEntity & GeoAnimatable> extends Bas
 	 * @param state The animation state
 	 * @return The yaw rotation of the head
 	 */
-	protected float getLookYaw(T animatable, AnimationState<T> state) {
+	protected float getLookYaw(T animatable, AnimationStateHandler<@NonNull T> state) {
 		float maxYawChange = animatable.getMaxHeadRotation();
-		float headYaw = Optional.ofNullable(state.getData(DataTickets.ENTITY_YAW))
-			.orElse(0f);
+//		float headYaw = Optional.ofNullable(state.getData(DataTickets.ENTITY_YAW))
+//			.orElse(0f);
+		float headYaw = animatable.getHeadYaw();
 
 		float targetYRot = (headYaw * ((float) Math.PI / 180F));
 			targetYRot = Math.clamp(targetYRot, -maxYawChange, maxYawChange);
@@ -174,27 +185,27 @@ public class BaseTurretModel<T extends TurretEntity & GeoAnimatable> extends Bas
 	//  INTERFACE METHODS  //
 	// /////////////////// //
 
-	@Override
-	public void setCustomAnimations(AnimationState<T> state) {
-		super.setCustomAnimations(state);
-
-		Optional<GeoBone> base = this.getBone(this.base);
-		Optional<GeoBone> neck = this.getBone(this.neck);
-		Optional<GeoBone> head = this.getBone(this.head);
-
-		if (neck.isPresent()) {
-			float targetYRot = Optional.ofNullable(state.getData(DataTickets.ENTITY_YAW))
-				.orElse(0f);
-			this.setLookYaw(neck.get(), -targetYRot * ((float) Math.PI / 180F));
-
-			if (head.isPresent()) {
-				float targetXRot = Optional.ofNullable(state.getData(DataTickets.ENTITY_PITCH))
-					.orElse(0f);
-				this.setLookPitch(head.get(), -targetXRot * ((float) Math.PI / 180F));
-			}
-		}
-
-		state.setData(DataTickets.ENTITY_BODY_YAW, 0f);
-		base.ifPresent(bone -> bone.setRotY(0));
-	}
+//	@Override
+//	public void setCustomAnimations(AnimationStateHandler<T> state) {
+//		super.setCustomAnimations(state);
+//
+//		Optional<GeoBone> base = this.getBone(this.base);
+//		Optional<GeoBone> neck = this.getBone(this.neck);
+//		Optional<GeoBone> head = this.getBone(this.head);
+//
+//		if (neck.isPresent()) {
+//			float targetYRot = Optional.ofNullable(state.getData(DataTickets.ENTITY_YAW))
+//				.orElse(0f);
+//			this.setLookYaw(neck.get(), -targetYRot * ((float) Math.PI / 180F));
+//
+//			if (head.isPresent()) {
+//				float targetXRot = Optional.ofNullable(state.getData(DataTickets.ENTITY_PITCH))
+//					.orElse(0f);
+//				this.setLookPitch(head.get(), -targetXRot * ((float) Math.PI / 180F));
+//			}
+//		}
+//
+//		state.setData(DataTickets.ENTITY_BODY_YAW, 0f);
+//		base.ifPresent(bone -> bone.setRotY(0));
+//	}
 }

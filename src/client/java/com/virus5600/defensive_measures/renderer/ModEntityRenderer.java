@@ -1,6 +1,6 @@
 package com.virus5600.defensive_measures.renderer;
 
-import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
+import net.minecraft.client.render.entity.EntityRendererFactories;
 
 import com.virus5600.defensive_measures.DefensiveMeasures;
 import com.virus5600.defensive_measures.entity.ModEntities;
@@ -27,17 +27,17 @@ public class ModEntityRenderer {
 		// /////// //
 
 		// v1.0.0
-		EntityRendererRegistry.register(ModEntities.CANNON_TURRET, CannonTurretRenderer::new);
-		EntityRendererRegistry.register(ModEntities.BALLISTA_TURRET, BallistaTurretRenderer::new);
-		EntityRendererRegistry.register(ModEntities.MG_TURRET, MGTurretRenderer::new);
+		EntityRendererFactories.register(ModEntities.CANNON_TURRET, CannonTurretRenderer::new);
+		EntityRendererFactories.register(ModEntities.BALLISTA_TURRET, BallistaTurretRenderer::new);
+		EntityRendererFactories.register(ModEntities.MG_TURRET, MGTurretRenderer::new);
 
 		// /////////// //
 		// PROJECTILES //
 		// /////////// //
 
 		// v1.0.0
-		EntityRendererRegistry.register(ModEntities.CANNONBALL, CannonballRenderer::new);
-		EntityRendererRegistry.register(ModEntities.BALLISTA_ARROW, BallistaArrowRenderer::new);
-		EntityRendererRegistry.register(ModEntities.MG_BULLET, MGBulletRenderer::new);
+		EntityRendererFactories.register(ModEntities.CANNONBALL, CannonballRenderer::new);
+		EntityRendererFactories.register(ModEntities.BALLISTA_ARROW, BallistaArrowRenderer::new);
+		EntityRendererFactories.register(ModEntities.MG_BULLET, MGBulletRenderer::new);
 	}
 }

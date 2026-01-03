@@ -4,13 +4,13 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.ParticleFactory;
-import net.minecraft.client.particle.ParticleTextureSheet;
-import net.minecraft.client.particle.SpriteBillboardParticle;
+import net.minecraft.client.particle.BillboardParticle;
 import net.minecraft.client.particle.SpriteProvider;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.particle.SimpleParticleType;
 
 import com.virus5600.defensive_measures.particle.custom.emitters.CannonFlash;
+import net.minecraft.util.math.random.Random;
 
 /**
  * Defines the particles emitted by certain turrets that creates sparks when they
@@ -22,12 +22,12 @@ import com.virus5600.defensive_measures.particle.custom.emitters.CannonFlash;
  * @version 1.0.0
  */
 @Environment(EnvType.CLIENT)
-public class Sparks extends SpriteBillboardParticle {
+public class Sparks extends BillboardParticle {
 	protected boolean isSuspended = false;
 
 	// CONSTRUCTORS //
 	public Sparks(ClientWorld level, double x, double y, double z, SpriteProvider spriteSet, double xd, double yd, double zd) {
-		super(level, x, y, z, xd, yd, zd);
+		super(level, x, y, z, xd, yd, zd, spriteSet.getFirst());
 
 		this.velocityMultiplier = 1f;
 		this.x = x;
@@ -37,7 +37,6 @@ public class Sparks extends SpriteBillboardParticle {
 		this.maxAge = 20;
 		this.gravityStrength = 1f;
 		this.collidesWithWorld = true;
-		this.setSpriteForAge(spriteSet);
 		this.setVelocity(xd, yd, zd);
 
 		this.red = 1f;
@@ -66,8 +65,8 @@ public class Sparks extends SpriteBillboardParticle {
 
 	// PUBLIC
 	@Override
-	public ParticleTextureSheet getType() {
-		return ParticleTextureSheet.PARTICLE_SHEET_OPAQUE;
+	public RenderType getRenderType() {
+		return RenderType.PARTICLE_ATLAS_OPAQUE;
 	}
 
 	@Override
@@ -112,7 +111,7 @@ public class Sparks extends SpriteBillboardParticle {
 			this.sprites = sprites;
 		}
 
-		public Particle createParticle(SimpleParticleType type, ClientWorld level, double x, double y, double z, double xd, double yd, double zd) {
+		public Particle createParticle(SimpleParticleType type, ClientWorld level, double x, double y, double z, double xd, double yd, double zd, Random random) {
 			return new Sparks(level, x, y, z, this.sprites, xd, yd, zd);
 		}
 	}
@@ -125,7 +124,7 @@ public class Sparks extends SpriteBillboardParticle {
 			this.sprites = sprites;
 		}
 
-		public Particle createParticle(SimpleParticleType type, ClientWorld level, double x, double y, double z, double xd, double yd, double zd) {
+		public Particle createParticle(SimpleParticleType type, ClientWorld level, double x, double y, double z, double xd, double yd, double zd, Random random) {
 			Sparks particle = new Sparks(level, x, y, z, this.sprites, xd, yd, zd);
 			particle.isSuspended = true;
 			particle.gravityStrength = 0.0f;

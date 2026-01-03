@@ -13,6 +13,7 @@ import net.minecraft.sound.SoundEvent;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
 import com.virus5600.defensive_measures.advancement.criterion.ModCriterion;
@@ -100,7 +101,7 @@ public interface Itemable {
 	 * @param nbt {@link NbtCompound} The NBT to copy the data from.
 	 */
 	static void copyDataFromNbt(MobEntity entity, NbtCompound nbt) {
-		NbtComponent.of(nbt).applyToEntity(entity);
+		entity.setComponent(DataComponentTypes.CUSTOM_DATA, NbtComponent.of(nbt));
 	}
 
 	/**
@@ -116,9 +117,9 @@ public interface Itemable {
 	static <T extends TurretEntity> Optional<ActionResult> tryItem(PlayerEntity player, Hand hand, T entity, Item tool, Item modItem) {
 		ItemStack itemStack = player.getStackInHand(hand);
 		if (itemStack.getItem() == tool && entity.isAlive()) {
-			World world = entity.getWorld();
+			World world = entity.getEntityWorld();
 
-			if (!world.isClient) {
+			if (!world.isClient()) {
 				entity.playSound(entity.getEntityRemoveSound(), 1.0f, new Random().nextFloat(0.75f, 1.25f));
 			}
 
@@ -130,9 +131,11 @@ public interface Itemable {
 			ItemStack stack = new ItemStack(modItem);
 			entity.copyDataToStack(stack);
 
-			float x = (float) entity.getPos().x + 0.5f;
-			float y = (float) entity.getPos().y + 0.5f;
-			float z = (float) entity.getPos().z + 0.5f;
+			Vec3d entityPos = entity.getTrackedPosition().getPos();
+
+			float x = (float) entityPos.getX() + 0.5f;
+			float y = (float) entityPos.getY() + 0.5f;
+			float z = (float) entityPos.getZ() + 0.5f;
 			double vx = MathHelper.nextDouble(world.random, -0.1, 0.1);
 			double vy = MathHelper.nextDouble(world.random, 0.0, 0.1);
 			double vz = MathHelper.nextDouble(world.random, -0.1, 0.1);
@@ -141,7 +144,7 @@ public interface Itemable {
 			ItemEntity itemStackEntity = new ItemEntity(world, x, y, z, stack, vx, vy, vz);
 			world.spawnEntity(itemStackEntity);
 
-			if (!world.isClient) {
+			if (!world.isClient()) {
 				ModCriterion.TURRET_ITEM_RETRIEVED_CRITERION.trigger((ServerPlayerEntity) player, stack);
 			}
 

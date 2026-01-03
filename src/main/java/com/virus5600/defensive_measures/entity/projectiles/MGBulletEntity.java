@@ -8,21 +8,21 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
-import net.minecraft.world.GameRules;
 import net.minecraft.world.World;
+import net.minecraft.world.rule.GameRules;
 
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.animatable.manager.AnimatableManager.ControllerRegistrar;
-import software.bernie.geckolib.animatable.processing.AnimationController;
-import software.bernie.geckolib.animatable.processing.AnimationTest;
-import software.bernie.geckolib.animation.PlayState;
+import software.bernie.geckolib.animation.AnimationController;
 import software.bernie.geckolib.animation.RawAnimation;
+import software.bernie.geckolib.animation.object.PlayState;
+import software.bernie.geckolib.animation.state.AnimationTest;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
 import com.virus5600.defensive_measures.entity.ModEntities;
 import com.virus5600.defensive_measures.sound.ModSoundEvents;
-import com.virus5600.defensive_measures.util.BlockUtil;
 import com.virus5600.defensive_measures.util.BlockUtil.BlockCategory;
+import com.virus5600.defensive_measures.util.BlockUtil;
 
 import java.util.Map;
 
@@ -147,7 +147,7 @@ public class MGBulletEntity extends KineticProjectileEntity {
 		this.setSound(ModSoundEvents.BULLET_IMPACT_DEFAULT);
 
 
-		Block block = this.getWorld()
+		Block block = this.getEntityWorld()
 			.getBlockState(blockHitResult.getBlockPos())
 			.getBlock();
 		BlockCategory blockCat = BlockUtil.getBlockCategory(block);
@@ -163,11 +163,11 @@ public class MGBulletEntity extends KineticProjectileEntity {
 
 		super.onBlockHit(blockHitResult);
 
-		if (this.getWorld() instanceof ServerWorld serverWorld) {
-			if (serverWorld.getGameRules().getBoolean(GameRules.DO_MOB_GRIEFING)
+		if (this.getEntityWorld() instanceof ServerWorld serverWorld) {
+			if (serverWorld.getGameRules().getValue(GameRules.DO_MOB_GRIEFING)
 				&& blockCat == BlockCategory.GLASS
 			) {
-				this.getWorld().breakBlock(
+				this.getEntityWorld().breakBlock(
 					blockHitResult.getBlockPos(),
 					false,
 					this.getOwner(),

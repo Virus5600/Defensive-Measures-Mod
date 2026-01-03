@@ -3,7 +3,6 @@ package com.virus5600.defensive_measures;
 import com.virus5600.defensive_measures.advancement.criterion.ModCriterion;
 import com.virus5600.defensive_measures.block.ModBlocks;
 import com.virus5600.defensive_measures.entity.ModEntities;
-import com.virus5600.defensive_measures.entity.damage.ModDamageSources;
 import com.virus5600.defensive_measures.entity.damage.ModDamageTypes;
 import com.virus5600.defensive_measures.item.ModItemGroups;
 import com.virus5600.defensive_measures.item.ModItems;

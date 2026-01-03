@@ -22,12 +22,12 @@ import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib.animatable.GeoEntity;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.animatable.manager.AnimatableManager.ControllerRegistrar;
-import software.bernie.geckolib.animatable.processing.AnimationController;
-import software.bernie.geckolib.animatable.processing.AnimationTest;
-import software.bernie.geckolib.animation.PlayState;
+import software.bernie.geckolib.animation.AnimationController;
 import software.bernie.geckolib.animation.RawAnimation;
-import software.bernie.geckolib.animation.keyframe.event.KeyFrameEvent;
-import software.bernie.geckolib.animation.keyframe.event.data.ParticleKeyframeData;
+import software.bernie.geckolib.animation.object.PlayState;
+import software.bernie.geckolib.animation.state.AnimationTest;
+import software.bernie.geckolib.animation.state.KeyFrameEvent;
+import software.bernie.geckolib.cache.animation.keyframeevent.ParticleKeyframeData;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
 import com.virus5600.defensive_measures.entity.ModEntities;
@@ -129,7 +129,9 @@ public class CannonTurretEntity extends TurretEntity implements GeoEntity {
 
 	@Override
 	public void shootAt(LivingEntity target, float pullProgress) {
-		float dist = (float) this.getPos().distanceTo(target.getPos());
+		float dist = (float) this.getTrackedPosition()
+			.getPos()
+			.distanceTo(target.getTrackedPosition().getPos());
 
 		TurretProjectileVelocity velocityData = TurretProjectileVelocity.init(this)
 			.setVelocity(target)
@@ -144,7 +146,7 @@ public class CannonTurretEntity extends TurretEntity implements GeoEntity {
 	public void tick() {
 		super.tick();
 
-		if (!this.getWorld().isClient) {
+		if (!this.getEntityWorld().isClient()) {
 			int updateCountdownTicks = this.attackGoal.getUpdateCountdownTicks(),
 				afterAttackTick = 5,
 				beforeAttackTick = TOTAL_ATT_COOLDOWN - afterAttackTick;
@@ -217,11 +219,13 @@ public class CannonTurretEntity extends TurretEntity implements GeoEntity {
 		final String LOCATOR = event.keyframeData()
 			.getLocator();
 
+		World world =  this.getEntityWorld();
+
 		if (LOCATOR.equals("barrel")) {
 			Vec3d barrelPos = this.getRelativePos(this.getCurrentBarrel(false)),
 				velocityModifier = this.getRelativePos(0, 0, 1.5).subtract(this.getEyePos());
 
-			this.getWorld().addParticleClient(
+			world.addParticleClient(
 				ModParticles.CANNON_FLASH,
 				barrelPos.getX(), barrelPos.getY(), barrelPos.getZ(),
 				velocityModifier.getX(), velocityModifier.getY(), velocityModifier.getZ()
@@ -232,7 +236,7 @@ public class CannonTurretEntity extends TurretEntity implements GeoEntity {
 				OFFSETS.get(Offsets.FUSE).getFirst()
 			);
 
-			this.getWorld().addParticleClient(
+			world.addParticleClient(
 				ModParticles.CANNON_FUSE,
 				fusePos.getX(), fusePos.getY(), fusePos.getZ(),
 				0, 0.225, -0.50

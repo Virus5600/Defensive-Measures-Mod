@@ -14,7 +14,6 @@ import net.minecraft.util.Formatting;
 import net.minecraft.util.Rarity;
 
 import java.lang.reflect.Type;
-import java.util.List;
 import java.util.function.Consumer;
 
 /**

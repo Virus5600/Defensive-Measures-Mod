@@ -19,9 +19,9 @@ public class MGTurretModel extends BaseTurretModel<MGTurretEntity> {
 	public MGTurretModel() {
 		super(
 			DefensiveMeasures.MOD_ID,
-			"geckolib/models/machine_gun_turret.geo.json",
-			"textures/entity/mg_turret/machine_gun_turret.png",
-			"geckolib/animations/machine_gun_turret.animation.json",
+			"machine_gun_turret",
+			"mg_turret/machine_gun_turret",
+			"machine_gun_turret",
 			"base",
 			"body",
 			"head"

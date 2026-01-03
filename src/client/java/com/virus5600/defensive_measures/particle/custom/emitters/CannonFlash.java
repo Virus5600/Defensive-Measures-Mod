@@ -11,6 +11,7 @@ import net.minecraft.particle.SimpleParticleType;
 import net.minecraft.util.math.MathHelper;
 
 import com.virus5600.defensive_measures.particle.ModParticles;
+import net.minecraft.util.math.random.Random;
 
 /**
  * Defines the particles emitted by the {@link com.virus5600.defensive_measures.entity.turrets.CannonTurretEntity Cannon Turret}
@@ -91,7 +92,7 @@ public class CannonFlash extends CustomEmitter {
 	///  FACTORY ///
 	@Environment(EnvType.CLIENT)
 	public static class Factory implements ParticleFactory<SimpleParticleType> {
-		public Particle createParticle(SimpleParticleType simpleParticleType, ClientWorld world, double x, double y, double z, double vx, double vy, double vz) {
+		public Particle createParticle(SimpleParticleType simpleParticleType, ClientWorld world, double x, double y, double z, double vx, double vy, double vz, Random random) {
 			return new CannonFlash(world, x, y, z, vx, vy, vz);
 		}
 	}

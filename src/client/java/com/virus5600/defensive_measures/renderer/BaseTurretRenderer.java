@@ -6,6 +6,7 @@ import net.fabricmc.api.Environment;
 import net.minecraft.client.render.entity.EntityRendererFactory.Context;
 import net.minecraft.client.render.entity.state.EntityRenderState;
 
+import org.jspecify.annotations.NonNull;
 import software.bernie.geckolib.animatable.GeoAnimatable;
 import software.bernie.geckolib.model.GeoModel;
 import software.bernie.geckolib.renderer.GeoEntityRenderer;
@@ -39,13 +40,13 @@ import com.virus5600.defensive_measures.entity.turrets.TurretEntity;
 public class BaseTurretRenderer<
 	T extends TurretEntity & GeoAnimatable,
 	R extends EntityRenderState & GeoRenderState
-> extends GeoEntityRenderer<T, R> {
-	public BaseTurretRenderer(Context ctx, GeoModel<T> model) {
+> extends GeoEntityRenderer<@NonNull T, @NonNull R> {
+	public BaseTurretRenderer(Context ctx, GeoModel<@NonNull T> model) {
 		super(ctx, model);
 	}
 
 	@Override
-	protected float getDeathMaxRotation(GeoRenderState renderState) {
+	protected float getDeathMaxRotation(@NonNull GeoRenderState renderState) {
 		return 0.0f;
 	}
 }

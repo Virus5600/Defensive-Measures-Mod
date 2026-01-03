@@ -20,8 +20,8 @@ public class CannonballModel extends BaseProjectileModel<CannonballEntity> {
 	public CannonballModel() {
 		super(
 			DefensiveMeasures.MOD_ID,
-			"geckolib/models/projectiles/cannonball.geo.json",
-			"textures/entity/cannon_turret/cannonball.png",
+			"projectiles/cannonball",
+			"cannon_turret/cannonball",
 			null
 		);
 	}

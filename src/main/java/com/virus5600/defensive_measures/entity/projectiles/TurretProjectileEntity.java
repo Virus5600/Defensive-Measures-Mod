@@ -3,10 +3,7 @@ package com.virus5600.defensive_measures.entity.projectiles;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.component.DataComponentTypes;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ProjectileDeflection;
+import net.minecraft.entity.*;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.damage.DamageTypes;
 import net.minecraft.entity.data.DataTracker.Builder;
@@ -195,6 +192,7 @@ public abstract class TurretProjectileEntity extends ProjectileEntity implements
 
 		Entity hitEntity = entityHitResult.getEntity();
 		Entity owner = this.getOwner();
+		World world = this.getEntityWorld();
 
 		// Handles the damage calculation
 		DamageSource dmgSrc = this.getDamageSources().create(DamageTypes.ARROW, this, owner != null ? owner : this);
@@ -242,13 +240,13 @@ public abstract class TurretProjectileEntity extends ProjectileEntity implements
 		}
 
 		// Handles the application of damage to the target
-		if (this.getWorld() instanceof ServerWorld serverWorld) {
+		if (world instanceof ServerWorld serverWorld) {
 			hitEntity.damage(serverWorld, dmgSrc, (float) damageToDeal);
 
 			if (isEnderman) return;
 
 			if (hitEntity instanceof LivingEntity livingEntity) {
-				if (!this.getWorld().isClient() && this.getPierceLevel() <= 0) {
+				if (!world.isClient() && this.getPierceLevel() <= 0) {
 					livingEntity.setStuckArrowCount(livingEntity.getStuckArrowCount() + 1);
 				}
 
@@ -264,10 +262,10 @@ public abstract class TurretProjectileEntity extends ProjectileEntity implements
 			hitEntity.clientDamage(dmgSrc);
 
 			hitEntity.setFireTicks(fireTime);
-			this.deflect(ProjectileDeflection.SIMPLE, hitEntity, owner, false);
+			this.deflect(ProjectileDeflection.SIMPLE, hitEntity, LazyEntityReference.of(hitEntity), false);
 			this.setVelocity(this.getVelocity().multiply(0.2));
 
-			if (this.getWorld() instanceof ServerWorld serverWorld && this.getVelocity().lengthSquared() < 1.0E-7) {
+			if (world instanceof ServerWorld serverWorld && this.getVelocity().lengthSquared() < 1.0E-7) {
 				if (this.pickupType == PickupPermission.ALLOWED && this.stack != null) {
 					this.dropStack(serverWorld, this.asItemStack(), 0.1f);
 				}
@@ -327,7 +325,7 @@ public abstract class TurretProjectileEntity extends ProjectileEntity implements
 
 	@Override
 	protected void onBlockHit(BlockHitResult blockHitResult) {
-		World world = this.getWorld();
+		World world = this.getEntityWorld();
 		this.inBlockState = world.getBlockState(blockHitResult.getBlockPos());
 		super.onBlockHit(blockHitResult);
 
@@ -340,7 +338,7 @@ public abstract class TurretProjectileEntity extends ProjectileEntity implements
 		Vec3d embeddingAdjustment = dirVector.multiply(0.05);
 
 		this.shake = 7;
-		this.setPosition(this.getPos().subtract(embeddingAdjustment));
+		this.setPosition(this.getTrackedPosition().getPos().subtract(embeddingAdjustment));
 		this.setVelocity(Vec3d.ZERO);
 		this.playSound(this.getSound(), 1f, 1.2f / (this.random.nextFloat() * 0.2f + 0.9f));
 		this.setInGround(true);
@@ -355,7 +353,7 @@ public abstract class TurretProjectileEntity extends ProjectileEntity implements
 
 	@Override
 	public void onPlayerCollision(PlayerEntity player) {
-		World world = this.getWorld();
+		World world = this.getEntityWorld();
 		if (world.isClient() && (this.isInGround() || this.isNoClip()) && this.shake <= 0) {
 			if (this.tryPickup(player)) {
 				player.sendPickup(this, 1);
@@ -366,7 +364,7 @@ public abstract class TurretProjectileEntity extends ProjectileEntity implements
 
 	protected void applyCollision(BlockHitResult blockHitResult) {
 		while (this.isAlive()) {
-			Vec3d pos = this.getPos();
+			Vec3d pos = this.getTrackedPosition().getPos();
 			EntityHitResult entityHitResult = this.getEntityCollision(pos, blockHitResult.getPos());
 			Vec3d hitPos = Objects.requireNonNullElse(entityHitResult, blockHitResult).getPos();
 
@@ -413,7 +411,7 @@ public abstract class TurretProjectileEntity extends ProjectileEntity implements
 
 		for (int i = 0; i < 4; i++) {
 			float radius = 0.25F;
-			this.getWorld().addParticleClient(
+			this.getEntityWorld().addParticleClient(
 				ParticleTypes.BUBBLE,
 				pos.x - velocity.x * radius,
 				pos.y - velocity.y * radius,
@@ -532,7 +530,7 @@ public abstract class TurretProjectileEntity extends ProjectileEntity implements
 		this.setDamage(
 			(double) (damageModifier * 2.0F)
 				+ this.random.nextTriangular(
-					(double) this.getWorld().getDifficulty().getId() * 0.11,
+					(double) this.getEntityWorld().getDifficulty().getId() * 0.11,
 				0.57425
 			)
 		);
@@ -543,13 +541,13 @@ public abstract class TurretProjectileEntity extends ProjectileEntity implements
 		boolean isClipping = !this.isNoClip();
 		Vec3d velocity = this.getVelocity();
 		BlockPos blockPos = this.getBlockPos();
-		BlockState blockState = this.getWorld().getBlockState(blockPos);
+		BlockState blockState = this.getEntityWorld().getBlockState(blockPos);
 
 		if (!blockState.isAir() && isClipping) {
-			VoxelShape voxelShape = blockState.getCollisionShape(this.getWorld(), blockPos);
+			VoxelShape voxelShape = blockState.getCollisionShape(this.getEntityWorld(), blockPos);
 
 			if (!voxelShape.isEmpty()) {
-				Vec3d pos = this.getPos();
+				Vec3d pos = this.getTrackedPosition().getPos();
 
 				for (Box box : voxelShape.getBoundingBoxes()) {
 					if (box.offset(blockPos).contains(pos)) {
@@ -569,7 +567,7 @@ public abstract class TurretProjectileEntity extends ProjectileEntity implements
 		}
 
 		if (this.isInGround() && isClipping) {
-			if (!this.getWorld().isClient()) {
+			if (!this.getEntityWorld().isClient()) {
 				if (this.inBlockState != blockState && this.shouldFall()) {
 					this.fall();
 				} else {
@@ -583,7 +581,7 @@ public abstract class TurretProjectileEntity extends ProjectileEntity implements
 			}
 		} else {
 			this.inGroundTime = 0;
-			Vec3d pos = this.getPos();
+			Vec3d pos = this.getTrackedPosition().getPos();
 
 			if (this.isTouchingWater()) {
 				this.spawnBubbleParticles(pos);
@@ -591,7 +589,7 @@ public abstract class TurretProjectileEntity extends ProjectileEntity implements
 
 			if (this.isCritical()) {
 				for (int i = 0; i < 4; i++) {
-					this.getWorld()
+					this.getEntityWorld()
 						.addParticleClient(
 							ParticleTypes.CRIT,
 							pos.x + velocity.x * (double)i / 4.0,
@@ -617,7 +615,7 @@ public abstract class TurretProjectileEntity extends ProjectileEntity implements
 			this.setYaw(updateRotation(this.getYaw(), yawDeg));
 
 			if (isClipping) {
-				BlockHitResult hitResult = this.getWorld()
+				BlockHitResult hitResult = this.getEntityWorld()
 					.getCollisionsIncludingWorldBorder(
 						new RaycastContext(
 							pos,
@@ -716,12 +714,6 @@ public abstract class TurretProjectileEntity extends ProjectileEntity implements
 	public void setVelocity(double x, double y, double z, float power, float uncertainty) {
 		super.setVelocity(x, y, z, power, uncertainty);
 		this.life = 0;
-	}
-
-	@Override
-	public void setVelocityClient(double x, double y, double z) {
-		this.setVelocity(x, y, z);
-		this.life = 0;
 
 		double sqrdPosMagnitude = MathHelper.squaredMagnitude(x, y, z);
 		if (this.isInGround() && sqrdPosMagnitude > 0.0) {
@@ -732,7 +724,7 @@ public abstract class TurretProjectileEntity extends ProjectileEntity implements
 	@Nullable
 	protected EntityHitResult getEntityCollision(Vec3d currentPos, Vec3d nextPos) {
 		return ProjectileUtil.getEntityCollision(
-			this.getWorld(),
+			this.getEntityWorld(),
 			this,
 			currentPos, nextPos,
 			this.getBoundingBox()
@@ -743,7 +735,8 @@ public abstract class TurretProjectileEntity extends ProjectileEntity implements
 	}
 
 	protected boolean shouldFall() {
-		return this.isInGround() && this.getWorld().isSpaceEmpty(new Box(this.getPos(), this.getPos()).expand(0.06));
+		Vec3d pos = this.getTrackedPosition().getPos();
+		return this.isInGround() && this.getEntityWorld().isSpaceEmpty(new Box(pos, pos).expand(0.06));
 	}
 
 	protected boolean isInGround() {
@@ -877,7 +870,7 @@ public abstract class TurretProjectileEntity extends ProjectileEntity implements
 	}
 
 	public boolean isNoClip() {
-		return !this.getWorld().isClient ? this.noClip : (this.dataTracker.get(PROJECTILE_FLAGS) & 2) != 0;
+		return !this.getEntityWorld().isClient() ? this.noClip : (this.dataTracker.get(PROJECTILE_FLAGS) & 2) != 0;
 	}
 
 	@Override

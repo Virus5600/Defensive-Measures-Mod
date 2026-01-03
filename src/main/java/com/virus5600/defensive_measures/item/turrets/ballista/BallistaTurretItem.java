@@ -3,7 +3,6 @@ package com.virus5600.defensive_measures.item.turrets.ballista;
 import net.minecraft.component.type.TooltipDisplayComponent;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.mob.MobEntity;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.text.Text;
@@ -15,7 +14,6 @@ import com.virus5600.defensive_measures.entity.turrets.TurretEntity;
 import com.virus5600.defensive_measures.item.turrets.TurretItem;
 
 import java.lang.reflect.Type;
-import java.util.List;
 import java.util.function.Consumer;
 
 /**

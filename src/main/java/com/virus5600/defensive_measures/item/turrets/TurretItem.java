@@ -144,7 +144,7 @@ public abstract class TurretItem extends Item {
         }
 
         user.incrementStat(Stats.USED.getOrCreateStat(this));
-        world.emitGameEvent(user, GameEvent.ENTITY_PLACE, entity.getPos());
+        world.emitGameEvent(user, GameEvent.ENTITY_PLACE, entity.getTrackedPosition().getPos());
 
         return ActionResult.CONSUME;
 	}

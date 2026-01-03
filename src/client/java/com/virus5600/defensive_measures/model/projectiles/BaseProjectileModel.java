@@ -37,6 +37,10 @@ public class BaseProjectileModel<T extends ProjectileEntity & GeoAnimatable> ext
 	 * @param modelPath The path of the model
 	 * @param texturePath The path of the texture
 	 * @param animationPath The path of the animation (can be {@code null})
+	 *
+	 * @see #modelPath
+	 * @see #texturePath
+	 * @see #animationPath
 	 */
 	public BaseProjectileModel(String modID, String modelPath, String texturePath, @Nullable String animationPath) {
 		super(modID, modelPath, texturePath, animationPath);

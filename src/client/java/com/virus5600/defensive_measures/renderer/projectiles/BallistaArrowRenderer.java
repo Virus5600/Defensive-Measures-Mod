@@ -4,23 +4,22 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
 import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.RenderLayers;
+import net.minecraft.client.render.command.OrderedRenderCommandQueue;
 import net.minecraft.client.render.entity.EntityRendererFactory.Context;
 import net.minecraft.client.render.entity.state.EntityRenderState;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.RotationAxis;
 
-import org.jetbrains.annotations.Nullable;
-
-import software.bernie.geckolib.cache.object.BakedGeoModel;
+import org.jspecify.annotations.NonNull;
 import software.bernie.geckolib.constant.DataTickets;
 import software.bernie.geckolib.renderer.GeoEntityRenderer;
 import software.bernie.geckolib.renderer.base.GeoRenderState;
 
 import com.virus5600.defensive_measures.entity.projectiles.BallistaArrowEntity;
 import com.virus5600.defensive_measures.model.projectiles.BallistaArrowModel;
+import software.bernie.geckolib.renderer.base.RenderPassInfo;
 
 import java.util.Optional;
 
@@ -34,28 +33,28 @@ import java.util.Optional;
 @Environment(EnvType.CLIENT)
 public class BallistaArrowRenderer<
 	R extends EntityRenderState & GeoRenderState
-> extends GeoEntityRenderer<BallistaArrowEntity, R> {
+> extends GeoEntityRenderer<BallistaArrowEntity, @NonNull R> {
 	public BallistaArrowRenderer(Context ctx) {
 		super(ctx, new BallistaArrowModel());
 	}
 
 	@Override
-	protected float getDeathMaxRotation(GeoRenderState renderState) {
+	protected float getDeathMaxRotation(@NonNull GeoRenderState renderState) {
 		return 0.0f;
 	}
 
 	@Override
-	public RenderLayer getRenderType(R renderState, Identifier texture) {
-		return RenderLayer.getEntityTranslucent(
+	public RenderLayer getRenderType(R renderState, @NonNull Identifier texture) {
+		return RenderLayers.entityTranslucent(
 			this.getTextureLocation(renderState)
 		);
 	}
 
 	@Override
-	public void preRender(R renderState, MatrixStack poseStack, BakedGeoModel model,
-		@Nullable VertexConsumerProvider bufferSource, @Nullable VertexConsumer buffer,
-		boolean isReRender, int packedLight, int packedOverlay, int renderColor
-	) {
+	public void preRenderPass(RenderPassInfo<@NonNull R> renderPassInfo, @NonNull OrderedRenderCommandQueue renderTasks) {
+		R renderState = renderPassInfo.renderState();
+		MatrixStack poseStack = renderPassInfo.poseStack();
+
 		float newYaw = Optional.ofNullable(renderState.getGeckolibData(DataTickets.ENTITY_YAW))
 			.orElse(0f);
 		float newPitch = Optional.ofNullable(renderState.getGeckolibData(DataTickets.ENTITY_PITCH))
@@ -64,7 +63,6 @@ public class BallistaArrowRenderer<
 		poseStack.multiply(RotationAxis.POSITIVE_Y.rotationDegrees((newYaw * (float) Math.PI / 180F)));
 		poseStack.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(-newPitch));
 
-		super.preRender(renderState, poseStack, model, bufferSource, buffer, isReRender,
-			packedLight, packedOverlay, renderColor);
+		super.preRenderPass(renderPassInfo, renderTasks);
 	}
 }

@@ -18,12 +18,12 @@ import net.minecraft.world.World;
 import software.bernie.geckolib.animatable.GeoEntity;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.animatable.manager.AnimatableManager.ControllerRegistrar;
-import software.bernie.geckolib.animatable.processing.AnimationController;
-import software.bernie.geckolib.animatable.processing.AnimationTest;
-import software.bernie.geckolib.animation.PlayState;
+import software.bernie.geckolib.animation.AnimationController;
 import software.bernie.geckolib.animation.RawAnimation;
-import software.bernie.geckolib.animation.keyframe.event.KeyFrameEvent;
-import software.bernie.geckolib.animation.keyframe.event.data.ParticleKeyframeData;
+import software.bernie.geckolib.animation.object.PlayState;
+import software.bernie.geckolib.animation.state.AnimationTest;
+import software.bernie.geckolib.animation.state.KeyFrameEvent;
+import software.bernie.geckolib.cache.animation.keyframeevent.ParticleKeyframeData;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
 import software.bernie.geckolib.util.GeckoLibUtil;
@@ -140,7 +140,9 @@ public class MGTurretEntity extends TurretEntity implements GeoEntity {
 	public void shootAt(LivingEntity target, float pullProgress) {
 		this.triggerAnim("FiringSequence", "shoot");
 
-		float dist = (float) this.getPos().distanceTo(target.getPos());
+		float dist = (float) this.getTrackedPosition()
+			.getPos()
+			.distanceTo(target.getTrackedPosition().getPos());
 
 		TurretProjectileVelocity velocityData = TurretProjectileVelocity.init(this)
 			.setVelocity(target)
@@ -210,7 +212,7 @@ public class MGTurretEntity extends TurretEntity implements GeoEntity {
 			Vec3d barrelPos = this.getRelativePos(this.getCurrentBarrel(false)),
 				velocityModifier = this.getRelativePos(0, 0, 0).subtract(this.getEyePos());
 
-			this.getWorld().addParticleClient(
+			this.getEntityWorld().addParticleClient(
 				ModParticles.SUSPENDED_SPARKS,
 				barrelPos.getX(), barrelPos.getY(), barrelPos.getZ(),
 				velocityModifier.getX(), velocityModifier.getY(), velocityModifier.getZ()

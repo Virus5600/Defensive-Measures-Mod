@@ -108,8 +108,8 @@ public abstract class ExplosiveProjectileEntity extends TurretProjectileEntity {
 	// /////////////// //
 
 	@Override
-	protected void onDeflected(@Nullable Entity deflector, boolean fromAttack) {
-		super.onDeflected(deflector, fromAttack);
+	protected void onDeflected(boolean fromAttack) {
+		super.onDeflected(fromAttack);
 
 		if (fromAttack) {
 			this.accelerationPower = 0.1;
@@ -122,7 +122,7 @@ public abstract class ExplosiveProjectileEntity extends TurretProjectileEntity {
 	protected void onBlockHit(BlockHitResult hitResult) {
 		super.onBlockHit(hitResult);
 
-		if (!this.getWorld().isClient()) {
+		if (!this.getEntityWorld().isClient()) {
 			this.doDamage();
 		}
 	}
@@ -131,7 +131,7 @@ public abstract class ExplosiveProjectileEntity extends TurretProjectileEntity {
 	protected void onEntityHit(EntityHitResult hitResult) {
 		super.onEntityHit(hitResult);
 
-		if (!this.getWorld().isClient()) {
+		if (!this.getEntityWorld().isClient()) {
 			this.doDamage();
 		}
 	}
@@ -174,7 +174,7 @@ public abstract class ExplosiveProjectileEntity extends TurretProjectileEntity {
 		);
 
 		// Create the explosion
-		this.getWorld()
+		this.getEntityWorld()
 			.createExplosion(
 				this,
 				dmgSrc,
@@ -204,12 +204,12 @@ public abstract class ExplosiveProjectileEntity extends TurretProjectileEntity {
 		);
 
 		List<LivingEntity> damagedEntities = new ArrayList<>();
-		this.getWorld()
+		this.getEntityWorld()
 			.getOtherEntities(this, fullDmgReceiver)
 			.forEach(entity -> {
 				if (entity instanceof LivingEntity) {
 					entity.damage(
-						(ServerWorld) this.getWorld(),
+						(ServerWorld) this.getEntityWorld(),
 						dmgSrc,
 						(float) baseDmg
 					);
@@ -232,7 +232,7 @@ public abstract class ExplosiveProjectileEntity extends TurretProjectileEntity {
 				this.getZ() + ext
 			);
 
-			this.getWorld()
+			this.getEntityWorld()
 				.getOtherEntities(this, partialDmgReceiver)
 				.forEach(entity -> {
 					if (entity instanceof LivingEntity && !damagedEntities.contains(entity)) {
@@ -241,7 +241,7 @@ public abstract class ExplosiveProjectileEntity extends TurretProjectileEntity {
 						float dmg = (float) (baseDmg * formula);
 
 						entity.damage(
-							(ServerWorld) this.getWorld(),
+							(ServerWorld) this.getEntityWorld(),
 							dmgSrc,
 							dmg
 						);
@@ -270,7 +270,7 @@ public abstract class ExplosiveProjectileEntity extends TurretProjectileEntity {
 	 */
 	protected void addParticles(Vec3d pos, ParticleEffect particleEffect) {
 		if (particleEffect != null) {
-			this.getWorld().addParticleClient(
+			this.getEntityWorld().addParticleClient(
 				particleEffect,
 				pos.x, pos.y, pos.z,
 				0.0, 0.0, 0.0
@@ -297,12 +297,13 @@ public abstract class ExplosiveProjectileEntity extends TurretProjectileEntity {
 	 * this method will not add any particles.
 	 */
 	protected void addParticles() {
-		this.addParticles(this.getPos());
+		this.addParticles(this.getTrackedPosition().getPos());
 	}
 
 	@Override
 	public void tick() {
 		Entity owner = this.getOwner();
+		Vec3d pos = this.getTrackedPosition().getPos();
 
 		this.applyDrag();
 
@@ -311,16 +312,16 @@ public abstract class ExplosiveProjectileEntity extends TurretProjectileEntity {
 			this.getChunkPos().z
 		};
 
-		if (this.getWorld().isClient
+		if (this.getEntityWorld().isClient()
 			|| (owner == null || !owner.isRemoved())
-			&& this.getWorld().getChunkManager().isChunkLoaded(xz[0], xz[1])
+			&& this.getEntityWorld().getChunkManager().isChunkLoaded(xz[0], xz[1])
 		) {
 			HitResult hitResult = ProjectileUtil.getCollision(this, this::canHit, this.getRaycastShapeType());
 			Vec3d vec3d;
 			if (hitResult.getType() != HitResult.Type.MISS) {
 				vec3d = hitResult.getPos();
 			} else {
-				vec3d = this.getPos().add(this.getVelocity());
+				vec3d = pos.add(this.getVelocity());
 			}
 
 			ProjectileUtil.setRotationFromVelocity(this, 0.2F);
@@ -335,7 +336,7 @@ public abstract class ExplosiveProjectileEntity extends TurretProjectileEntity {
 				this.hitOrDeflect(hitResult);
 			}
 
-			this.addParticles(this.getPos().add(0, 0.5, 0));
+			this.addParticles(pos.add(0, 0.5, 0));
 		} else {
 			System.out.println("Projectile is removed.");
 			this.discard();
@@ -498,7 +499,9 @@ public abstract class ExplosiveProjectileEntity extends TurretProjectileEntity {
 	@Override
 	public void onSpawnPacket(EntitySpawnS2CPacket packet) {
 		super.onSpawnPacket(packet);
-		Vec3d vec3d = new Vec3d(packet.getVelocityX(), packet.getVelocityY(), packet.getVelocityZ());
+		Vec3d vel = packet.getVelocity();
+
+		Vec3d vec3d = new Vec3d(vel.getX(), vel.getY(), vel.getZ());
 		this.setVelocity(vec3d);
 	}
 

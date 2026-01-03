@@ -182,7 +182,7 @@ public class CustomEmitter extends NoRenderParticle {
 
 		this.maxAge = maxAge;
 		this.particle = particle;
-		this.posSource = entity.getPos();
+		this.posSource = entity.getTrackedPosition().getPos();
 		this.entity = entity;
 	}
 
@@ -207,7 +207,9 @@ public class CustomEmitter extends NoRenderParticle {
 	@Override
 	public void tick() {
 		if (this.updatePosSource && this.isEntitySource && this.entity != null) {
-			this.posSource = this.useEyePos ? this.entity.getEyePos() : this.entity.getPos();
+			this.posSource = this.useEyePos ?
+				this.entity.getEyePos() :
+				this.entity.getTrackedPosition().getPos();
 		}
 
 		// Custom emitter code

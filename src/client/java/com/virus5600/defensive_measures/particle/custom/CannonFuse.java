@@ -4,8 +4,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.ParticleFactory;
-import net.minecraft.client.particle.ParticleTextureSheet;
-import net.minecraft.client.particle.SpriteBillboardParticle;
+import net.minecraft.client.particle.BillboardParticle;
 import net.minecraft.client.particle.SpriteProvider;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.particle.ParticleTypes;
@@ -14,6 +13,8 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 
 import com.virus5600.defensive_measures.particle.ModParticles;
+import net.minecraft.util.math.random.Random;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Defines the particles emitted by the {@link com.virus5600.defensive_measures.entity.turrets.CannonTurretEntity Cannon Turret}
@@ -26,13 +27,13 @@ import com.virus5600.defensive_measures.particle.ModParticles;
  * @version 1.0.0
  */
 @Environment(EnvType.CLIENT)
-public class CannonFuse extends SpriteBillboardParticle {
+public class CannonFuse extends BillboardParticle {
 	private final Vec3d source;
 	private final float maxParticleAge = 25;
 
 	// CONSTRUCTORS //
 	protected CannonFuse(ClientWorld level, double x, double y, double z, SpriteProvider spriteSet, double xd, double yd, double zd) {
-		super(level, x, y, z, xd, yd, zd);
+		super(level, x, y, z, xd, yd, zd, spriteSet.getFirst());
 
 		this.velocityMultiplier = 0.75f;
 		this.x = x;
@@ -42,7 +43,6 @@ public class CannonFuse extends SpriteBillboardParticle {
 		this.maxAge = 2;
 		this.gravityStrength = 1f;
 		this.collidesWithWorld = true;
-		this.setSpriteForAge(spriteSet);
 		this.source = new Vec3d(x, y, z);
 
 		this.red = 1f;
@@ -68,8 +68,8 @@ public class CannonFuse extends SpriteBillboardParticle {
 
 	// PUBLIC
 	@Override
-	public ParticleTextureSheet getType() {
-		return ParticleTextureSheet.PARTICLE_SHEET_OPAQUE;
+	public RenderType getRenderType() {
+		return RenderType.PARTICLE_ATLAS_OPAQUE;
 	}
 
 	@Override
@@ -129,9 +129,8 @@ public class CannonFuse extends SpriteBillboardParticle {
 			this.sprites = sprites;
 		}
 
-		public Particle createParticle(SimpleParticleType type, ClientWorld level, double x, double y, double z, double xd, double yd, double zd) {
+		public @Nullable Particle createParticle(SimpleParticleType type, ClientWorld level, double x, double y, double z, double xd, double yd, double zd, Random random) {
 			return new CannonFuse(level, x, y, z, this.sprites, xd, yd, zd);
 		}
-
 	}
 }

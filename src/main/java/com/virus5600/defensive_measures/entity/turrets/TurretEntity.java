@@ -644,20 +644,20 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 	}
 
 	@Override
-	public boolean startRiding(Entity entity, boolean force) {
-		if (this.getWorld().isClient()) {
+	public boolean startRiding(Entity entity, boolean force, boolean emitEvent) {
+		if (this.getEntityWorld().isClient()) {
 			this.prevAttachedBlock = null;
 		}
 
 		this.setAttachedFace(Direction.DOWN);
-		return super.startRiding(entity, force);
+		return super.startRiding(entity, force, emitEvent);
 	}
 
 	@Override
 	public void stopRiding() {
 		super.stopRiding();
 
-		if (this.getWorld().isClient) {
+		if (this.getEntityWorld().isClient()) {
 			this.prevAttachedBlock = this.getBlockPos();
 		}
 
@@ -697,10 +697,10 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 
 	@Override
 	public Vec3d getVelocity() {
-		if (this.getWorld().getBlockState(this.getVelocityAffectingPos()).isOf(Blocks.BUBBLE_COLUMN)
-			|| this.getWorld().getBlockState(this.getVelocityAffectingPos().add(0, 1, 0)).isOf(Blocks.BUBBLE_COLUMN)
-			|| this.getWorld().getBlockState(this.getVelocityAffectingPos()).isOf(Blocks.WATER)
-			|| this.getWorld().getBlockState(this.getVelocityAffectingPos().add(0, 1, 0)).isOf(Blocks.WATER)
+		if (this.getEntityWorld().getBlockState(this.getVelocityAffectingPos()).isOf(Blocks.BUBBLE_COLUMN)
+			|| this.getEntityWorld().getBlockState(this.getVelocityAffectingPos().add(0, 1, 0)).isOf(Blocks.BUBBLE_COLUMN)
+			|| this.getEntityWorld().getBlockState(this.getVelocityAffectingPos()).isOf(Blocks.WATER)
+			|| this.getEntityWorld().getBlockState(this.getVelocityAffectingPos().add(0, 1, 0)).isOf(Blocks.WATER)
 			|| this.getAttachedFace() != Direction.DOWN)
 			return new Vec3d(0, -Math.abs(super.getVelocity().getY()), 0);
 
@@ -712,7 +712,7 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 		super.tick();
 
 		// CLIENT SIDE
-		if (this.getWorld().isClient()) {
+		if (this.getEntityWorld().isClient()) {
 			// SNAPPING THE TURRET BACK IN PLACE
 			if (this.getVelocity().x == 0 && this.getVelocity().z == 0 && !this.hasVehicle()) {
 				Vec3d newPos = new Vec3d(
@@ -723,9 +723,9 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 
 				this.tryAttachOrFall();
 				super.setPosition(newPos);
-				this.getWorld().emitGameEvent(this, GameEvent.TELEPORT, newPos);
+				this.getEntityWorld().emitGameEvent(this, GameEvent.TELEPORT, newPos);
 
-				if (this.getVelocity() == Vec3d.ZERO && this.getWorld().isClient() && !this.hasVehicle()) {
+				if (this.getVelocity() == Vec3d.ZERO && this.getEntityWorld().isClient() && !this.hasVehicle()) {
 					this.lastRenderX = this.getX();
 					this.lastRenderY = this.getY();
 					this.lastRenderZ = this.getZ();
@@ -804,7 +804,7 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 	public void tickMovement() {
 		super.tickMovement();
 
-		if (!(this.getWorld().isClient()
+		if (!(this.getEntityWorld().isClient()
 			|| this.hasVehicle()
 			|| this.canStay(this.getBlockPos(), this.getAttachedFace()))) {
 			this.tryAttachOrFall();
@@ -851,11 +851,11 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 		dir = dir == null ? Direction.DOWN : dir;
 		Direction opposite = dir.getOpposite();
 
-		if (!this.getWorld().isDirectionSolid(pos.offset(dir), this, opposite))
+		if (!this.getEntityWorld().isDirectionSolid(pos.offset(dir), this, opposite))
 			return false;
 
 		Box box = this.calculateBoundingBox().offset(pos).contract(1.0E-6);
-		return this.getWorld().isSpaceEmpty(this, box);
+		return this.getEntityWorld().isSpaceEmpty(this, box);
 	}
 
 	/**
@@ -865,7 +865,7 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 	 * @return {@code boolean} Returns {@code true} if the position is valid, otherwise {@code false}.
 	 */
 	protected boolean isValidFallingPosition(BlockPos pos) {
-		BlockState bState = this.getWorld().getBlockState(pos);
+		BlockState bState = this.getEntityWorld().getBlockState(pos);
 
 		if (bState.isAir()
 			|| (bState.isOf(Blocks.BUBBLE_COLUMN) && pos.equals(this.getBlockPos()))
@@ -1552,7 +1552,7 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 		this.dataTracker.set(BURST_DELAY, delay);
 		this.dataTracker.set(USE_BURST, true);
 
-		if (!this.getWorld().isClient) {
+		if (!this.getEntityWorld().isClient()) {
 			this.burstDelayTimer = delay;
 		}
 	}
@@ -1580,7 +1580,7 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 	protected void shootBurst(int count, int delay, TurretProjectileVelocity velocityData) {
 		this.shootBurst(count, delay);
 
-		if (!this.getWorld().isClient) {
+		if (!this.getEntityWorld().isClient()) {
 			this.velocityData = velocityData;
 		}
 	}
@@ -1588,7 +1588,7 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 	protected void shoot(TurretProjectileVelocity velocityData) {
 		try {
 			ProjectileEntity projectile = (ProjectileEntity) this.projectile.create(
-				this.getWorld(),
+				this.getEntityWorld(),
 				SpawnReason.TRIGGERED
 			);
 
@@ -1604,7 +1604,7 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 			this.setProjectileVelocity(projectile, velocityData);
 
 			this.playSound(this.getShootSound(), 1.0f, 1.0f / (this.getRandom().nextFloat() * 0.4f + 0.8f));
-			this.getWorld().spawnEntity(projectile);
+			this.getEntityWorld().spawnEntity(projectile);
 //			System.out.println("[" + projectile.getName().getString() + "] Gravity: " + projectile.getFinalGravity());
 		} catch (IllegalArgumentException | SecurityException e) {
 			DefensiveMeasures.printErr(e);
@@ -1755,7 +1755,7 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 		private TurretProjectileVelocity(TurretEntity turret) {
 			this.turret = turret;
 			this.power = 1f;
-			this.uncertainty = turret.getWorld().getDifficulty().getId() * 2;
+			this.uncertainty = turret.getEntityWorld().getDifficulty().getId() * 2;
 			this.upwardVelocityMultiplier = 1f;
 			this.velocity = Vec3d.ZERO;
 		}

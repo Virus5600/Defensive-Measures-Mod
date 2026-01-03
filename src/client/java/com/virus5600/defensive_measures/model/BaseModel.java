@@ -5,7 +5,9 @@ import net.fabricmc.api.Environment;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.Identifier;
 
+import org.jspecify.annotations.NonNull;
 import software.bernie.geckolib.animatable.GeoAnimatable;
+import software.bernie.geckolib.model.DefaultedEntityGeoModel;
 import software.bernie.geckolib.model.GeoModel;
 
 import com.virus5600.defensive_measures.model.entity.BaseTurretModel;
@@ -36,15 +38,15 @@ import software.bernie.geckolib.renderer.base.GeoRenderState;
  *
  * @since 1.0.0
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
- * @version 1.0.0
+ * @version 1.1.0
  */
 @Environment(EnvType.CLIENT)
-public class BaseModel<T extends Entity & GeoAnimatable> extends GeoModel<T> {
-	/** Determines the path of the model. (i.e.: {@code "geo/cannon_turret.geo.json"}) */
+public class BaseModel<T extends Entity & GeoAnimatable> extends DefaultedEntityGeoModel<@NonNull T> {
+	/** Determines the path of the model. (i.e.: {@code "cannon_turret.geo"} OR {@code "projectiles/mg_bullet.geo"}) */
 	protected Identifier modelPath;
-	/** Determines the path of the texture this model will use. (i.e.: {@code "textures/entity/cannon_turret/cannon_turret.png"}) */
+	/** Determines the path of the texture this model will use. (i.e.: {@code "cannon_turret/cannon_turret"}) */
 	protected Identifier texturePath;
-	/** Determines the path of the animation this model will use. (i.e.: {@code "animations/cannon_turret.animation.json"}) */
+	/** Determines the path of the animation this model will use. (i.e.: {@code "cannon_turret.animation"} OR {@code "projectiles/mg_bullet.animation"}) */
 	protected Identifier animationPath;
 
 	// //////////// //
@@ -60,13 +62,18 @@ public class BaseModel<T extends Entity & GeoAnimatable> extends GeoModel<T> {
 	 * @param modelPath The path of the model
 	 * @param texturePath The path of the texture
 	 * @param animationPath The path of the animation
+	 *
+	 * @see #modelPath
+	 * @see #texturePath
+	 * @see #animationPath
 	 */
 	public BaseModel(String modID, String modelPath, String texturePath, String animationPath) {
-		super();
+		super(Identifier.of(modID, modelPath));
 
-		this.modelPath = Identifier.of(modID, modelPath);
-		this.texturePath = Identifier.of(modID, texturePath);
-		this.animationPath = animationPath != null ? Identifier.of(modID, animationPath) : null;
+		this.modelPath = super.buildFormattedModelPath(Identifier.of(modID, modelPath));
+		this.texturePath = super.buildFormattedTexturePath(Identifier.of(modID, texturePath));
+		this.animationPath = animationPath != null ?
+			super.buildFormattedAnimationPath(Identifier.of(modID, animationPath)) : null;
 	}
 
 	// /////////////////// //
@@ -74,17 +81,17 @@ public class BaseModel<T extends Entity & GeoAnimatable> extends GeoModel<T> {
 	// /////////////////// //
 
 	@Override
-	public Identifier getModelResource(GeoRenderState renderState) {
+	public @NonNull Identifier getModelResource(@NonNull GeoRenderState renderState) {
 		return this.modelPath;
 	}
 
 	@Override
-	public Identifier getTextureResource(GeoRenderState renderState) {
+	public @NonNull Identifier getTextureResource(@NonNull GeoRenderState renderState) {
 		return this.texturePath;
 	}
 
 	@Override
-	public Identifier getAnimationResource(T animatable) {
+	public @NonNull Identifier getAnimationResource(T animatable) {
 		return this.animationPath;
 	}
 }

@@ -20,9 +20,9 @@ public class MGBulletModel extends BaseProjectileModel<MGBulletEntity> {
 	public MGBulletModel() {
 		super(
 			DefensiveMeasures.MOD_ID,
-			"geckolib/models/projectiles/mg_bullet.geo.json",
-			"textures/entity/mg_turret/mg_bullet.png",
-			"geckolib/animations/projectiles/mg_bullet.animation.json"
+			"projectiles/mg_bullet",
+			"mg_turret/mg_bullet",
+			"projectiles/mg_bullet"
 		);
 	}
 }

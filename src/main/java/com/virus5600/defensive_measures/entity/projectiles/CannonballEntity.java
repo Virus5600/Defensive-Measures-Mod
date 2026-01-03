@@ -102,14 +102,14 @@ public class CannonballEntity extends ExplosiveProjectileEntity implements GeoEn
 	protected void onBlockHit(BlockHitResult blockHitResult) {
 		super.onBlockHit(blockHitResult);
 
-		if (!this.getWorld().isClient) {
+		if (!this.getEntityWorld().isClient()) {
 			this.doDamage();
 		}
 	}
 
 	@Override
 	protected void onEntityHit(EntityHitResult entityHitResult) {
-		if (!this.getWorld().isClient) {
+		if (!this.getEntityWorld().isClient()) {
 			this.doDamage();
 		}
 	}
@@ -127,7 +127,7 @@ public class CannonballEntity extends ExplosiveProjectileEntity implements GeoEn
 	@Override
 	protected void onCollision(HitResult hitResult) {
 		super.onCollision(hitResult);
-		if (!this.getWorld().isClient) {
+		if (!this.getEntityWorld().isClient()) {
 			this.doDamage();
 		}
 	}
@@ -151,7 +151,7 @@ public class CannonballEntity extends ExplosiveProjectileEntity implements GeoEn
 		);
 
 		// Create explosion
-		this.getWorld()
+		this.getEntityWorld()
 			.createExplosion(
 				this,
 				dmgSrc,
@@ -180,7 +180,7 @@ public class CannonballEntity extends ExplosiveProjectileEntity implements GeoEn
 			double z1 = MathHelper.floor(this.getZ() - radius - 1.0D);
 			double z3 = MathHelper.floor(this.getZ() + radius + 1.0D);
 
-			this.getWorld()
+			this.getEntityWorld()
 				.getOtherEntities(
 					this,
 					new Box(x1, y1, z1, x2, y2, z3)
@@ -194,7 +194,7 @@ public class CannonballEntity extends ExplosiveProjectileEntity implements GeoEn
 
 					if (entity instanceof LivingEntity) {
 						entity.damage(
-							(ServerWorld) this.getWorld(),
+							(ServerWorld) this.getEntityWorld(),
 							dmgSrc,
 							dmg
 						);

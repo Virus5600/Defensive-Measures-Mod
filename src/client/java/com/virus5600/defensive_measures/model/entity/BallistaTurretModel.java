@@ -20,9 +20,9 @@ public class BallistaTurretModel extends BaseTurretModel<BallistaTurretEntity> {
 	public BallistaTurretModel() {
 		super(
 			DefensiveMeasures.MOD_ID,
-			"geckolib/models/ballista.geo.json",
-			"textures/entity/ballista/ballista.png",
-			"geckolib/animations/ballista.animation.json",
+			"ballista",
+			"ballista/ballista",
+			"ballista",
 			"base",
 			"head",
 			"bow"
