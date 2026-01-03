@@ -1,8 +1,8 @@
 {
-	"parent": "block/block",
+	"format_version": "1.21.11",
+	"credit": "Made with Blockbench",
 	"textures": {
-		"particle": "dm:block/arrowhead",
-		"0": "dm:block/arrowhead"
+		"0": "arrow_head"
 	},
 	"elements": [
 		{
@@ -48,13 +48,12 @@
 			}
 		}
 	],
+	"display": {},
 	"groups": [
 		{
 			"name": "arrow",
 			"origin": [0, 0, 0],
 			"color": 0,
-			"nbt": "{}",
-			"armAnimationEnabled": false,
 			"children": [0, 1, 2]
 		}
 	]

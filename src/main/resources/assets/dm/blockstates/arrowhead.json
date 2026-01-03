@@ -1,7 +1,64 @@
 {
 	"variants": {
-		"": {
-			"model": "dm:block/arrowhead"
+		"arrowhead=1,facing=north": {
+			"model": "dm:block/arrowhead_1"
+		},
+		"arrowhead=1,facing=south": {
+			"model": "dm:block/arrowhead_1",
+			"y": 180
+		},
+		"arrowhead=1,facing=west": {
+			"model": "dm:block/arrowhead_1",
+			"y": 270
+		},
+		"arrowhead=1,facing=east": {
+			"model": "dm:block/arrowhead_1",
+			"y": 90
+		},
+		"arrowhead=2,facing=north": {
+			"model": "dm:block/arrowhead_2"
+		},
+		"arrowhead=2,facing=south": {
+			"model": "dm:block/arrowhead_2",
+			"y": 180
+		},
+		"arrowhead=2,facing=west": {
+			"model": "dm:block/arrowhead_2",
+			"y": 270
+		},
+		"arrowhead=2,facing=east": {
+			"model": "dm:block/arrowhead_2",
+			"y": 90
+		},
+		"arrowhead=3,facing=north": {
+			"model": "dm:block/arrowhead_3"
+		},
+		"arrowhead=3,facing=south": {
+			"model": "dm:block/arrowhead_3",
+			"y": 180
+		},
+		"arrowhead=3,facing=west": {
+			"model": "dm:block/arrowhead_3",
+			"y": 270
+		},
+		"arrowhead=3,facing=east": {
+			"model": "dm:block/arrowhead_3",
+			"y": 90
+		},
+		"arrowhead=4,facing=north": {
+			"model": "dm:block/arrowhead_4"
+		},
+		"arrowhead=4,facing=south": {
+			"model": "dm:block/arrowhead_4",
+			"y": 180
+		},
+		"arrowhead=4,facing=west": {
+			"model": "dm:block/arrowhead_4",
+			"y": 270
+		},
+		"arrowhead=4,facing=east": {
+			"model": "dm:block/arrowhead_4",
+			"y": 90
 		}
 	}
 }
