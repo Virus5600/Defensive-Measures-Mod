@@ -2,8 +2,6 @@ package com.virus5600.defensive_measures.entity.ai.goal;
 
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.RangedAttackMob;
-import net.minecraft.entity.ai.goal.Goal;
-import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.util.math.MathHelper;
 
 import net.minecraft.util.math.Vec3d;
@@ -63,7 +61,7 @@ import java.util.EnumSet;
  * @version 1.0.0
  */
 public class ProjectileAttackGoal extends net.minecraft.entity.ai.goal.ProjectileAttackGoal {
-	private final MobEntity mob;
+	private final TurretEntity mob;
 	private final RangedAttackMob owner;
 	@Nullable
 	private LivingEntity target;
@@ -96,7 +94,7 @@ public class ProjectileAttackGoal extends net.minecraft.entity.ai.goal.Projectil
 			throw new IllegalArgumentException("ProjectileAttackGoal requires Mob implements RangedAttackMob");
 		} else {
 			this.owner = mob;
-			this.mob = (MobEntity)mob;
+			this.mob = (TurretEntity) mob;
 			this.mobSpeed = mobSpeed;
 			this.minIntervalTicks = minIntervalTicks;
 			this.maxIntervalTicks = maxIntervalTicks;
@@ -104,7 +102,7 @@ public class ProjectileAttackGoal extends net.minecraft.entity.ai.goal.Projectil
 			this.minShootRange = minShootRange;
 			this.squaredMaxShootRange = maxShootRange * maxShootRange;
 			this.squaredMinShootRange = minShootRange * minShootRange;
-			this.setControls(EnumSet.of(Goal.Control.MOVE, Goal.Control.LOOK));
+			this.setControls(EnumSet.of(Control.MOVE, Control.LOOK));
 		}
 	}
 
@@ -132,6 +130,7 @@ public class ProjectileAttackGoal extends net.minecraft.entity.ai.goal.Projectil
 		this.target = null;
 		this.seenTargetTicks = 0;
 		this.updateCountdownTicks = -1;
+		this.mob.setTrackedShooting(false);
 	}
 
 	@Override
@@ -157,6 +156,8 @@ public class ProjectileAttackGoal extends net.minecraft.entity.ai.goal.Projectil
 			}
 
 			this.mob.getLookControl().lookAt(this.target, 30.0F, 30.0F);
+			this.mob.setTrackedShooting(false);
+
 			if (--this.updateCountdownTicks == 0) {
 				if (!canBeSeen) {
 					return;
@@ -165,9 +166,11 @@ public class ProjectileAttackGoal extends net.minecraft.entity.ai.goal.Projectil
 				float nextShotScaler = (float) Math.sqrt(squaredDistance) / this.maxShootRange;
 				float pullProgress = MathHelper.clamp(nextShotScaler, 0.1F, 1.0F);
 
+				this.mob.setTrackedShooting(true);
 				this.owner.shootAt(this.target, pullProgress);
 				this.updateCountdownTicks = MathHelper.floor(nextShotScaler * (float) (this.maxIntervalTicks - this.minIntervalTicks) + (float) this.minIntervalTicks);
 			} else if (this.updateCountdownTicks < 0) {
+				this.mob.setTrackedShooting(false);
 				this.updateCountdownTicks = MathHelper.floor(
 					MathHelper.lerp(Math.sqrt(squaredDistance) / (double) this.maxShootRange, this.minIntervalTicks, this.maxIntervalTicks)
 				);

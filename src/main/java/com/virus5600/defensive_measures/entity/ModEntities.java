@@ -79,6 +79,7 @@ public class ModEntities {
 	);
 
 	// REGISTRY //
+	@SuppressWarnings("ConstantConditions")
 	public static void registerModEntityAttributes() {
 		DefensiveMeasures.LOGGER.info("REGISTERING ENTITY ATTRIBUTES FOR {}...", DefensiveMeasures.MOD_NAME);
 

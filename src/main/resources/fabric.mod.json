@@ -29,8 +29,7 @@
 		"fabricloader": ">=0.16.10",
 		"minecraft": "~1.21.4",
 		"java": ">=21",
-		"fabric-api": ">=0.119.0+1.21.4",
-		"geckolib": ">=4.8.4"
+		"fabric-api": ">=0.119.0+1.21.4"
 	},
 	"custom": {
 		"modmenu": {

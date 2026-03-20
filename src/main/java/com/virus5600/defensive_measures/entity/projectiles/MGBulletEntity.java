@@ -11,14 +11,6 @@ import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.world.World;
 import net.minecraft.world.rule.GameRules;
 
-import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
-import software.bernie.geckolib.animatable.manager.AnimatableManager.ControllerRegistrar;
-import software.bernie.geckolib.animation.AnimationController;
-import software.bernie.geckolib.animation.RawAnimation;
-import software.bernie.geckolib.animation.object.PlayState;
-import software.bernie.geckolib.animation.state.AnimationTest;
-import software.bernie.geckolib.util.GeckoLibUtil;
-
 import com.virus5600.defensive_measures.entity.ModEntities;
 import com.virus5600.defensive_measures.sound.ModSoundEvents;
 import com.virus5600.defensive_measures.util.BlockUtil.BlockCategory;
@@ -54,9 +46,7 @@ import java.util.Map;
  * @version 1.0.0
  */
 public class MGBulletEntity extends KineticProjectileEntity {
-	private static final Map<String, RawAnimation> ANIMATIONS;
-
-	private final AnimatableInstanceCache geoCache = GeckoLibUtil.createInstanceCache(this);
+	private static final Map<String, Integer> ANIMATIONS;
 
 	// ////////////// //
 	//  CONSTRUCTORS  //
@@ -195,39 +185,13 @@ public class MGBulletEntity extends KineticProjectileEntity {
 		return 5;
 	}
 
-	// ///////////////////// //
-	// ANIMATION CONTROLLERS //
-	// ///////////////////// //
-
-	private PlayState idleController(final AnimationTest<MGBulletEntity> state) {
-		return state.setAndContinue(ANIMATIONS.get("Idle"));
-	}
-
-	// ////////////////////////// //
-	//  INTERFACE IMPLEMENTATION  //
-	// ////////////////////////// //
-
-	// GeoEntity //
-	@Override
-	public void registerControllers(final ControllerRegistrar controllers) {
-		controllers.add(
-			new AnimationController<>("Idle", 10, this::idleController)
-		);
-	}
-
-	@Override
-	public AnimatableInstanceCache getAnimatableInstanceCache() {
-		return this.geoCache;
-	}
-
 	// ///////////////// //
 	// STATIC INITIALIZE //
 	// ///////////////// //
 
 	static {
 		ANIMATIONS = Map.of(
-			"Idle", RawAnimation.begin()
-				.thenPlay("animation.mg_bullet.idle")
+			"Idle", 0
 		);
 	}
 }

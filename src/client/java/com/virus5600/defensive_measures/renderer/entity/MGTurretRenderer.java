@@ -1,39 +1,34 @@
 package com.virus5600.defensive_measures.renderer.entity;
 
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
+import com.virus5600.defensive_measures.model.ModEntityModels;
+import net.minecraft.client.render.entity.EntityRendererFactory;
+import net.minecraft.util.Identifier;
 
-import net.minecraft.client.render.command.OrderedRenderCommandQueue;
-import net.minecraft.client.render.entity.EntityRendererFactory.Context;
-import net.minecraft.client.render.entity.state.EntityRenderState;
-
-import org.jspecify.annotations.NonNull;
-import software.bernie.geckolib.renderer.base.GeoRenderState;
-
+import com.virus5600.defensive_measures.DefensiveMeasures;
 import com.virus5600.defensive_measures.entity.turrets.MGTurretEntity;
 import com.virus5600.defensive_measures.model.entity.MGTurretModel;
-import com.virus5600.defensive_measures.renderer.BaseTurretRenderer;
-import software.bernie.geckolib.renderer.base.RenderPassInfo;
+import com.virus5600.defensive_measures.renderer.entity.state.BaseTurretRenderState;
 
-/**
- * Machine Gun (MG) Turret's Renderer.
- *
- * @since 1.0.0
- * @author <a href="https://github.com/Virus5600">Virus5600</a>
- * @version 1.0.0
- */
-@Environment(EnvType.CLIENT)
-public class MGTurretRenderer<
-	R extends EntityRenderState & GeoRenderState
-> extends BaseTurretRenderer<MGTurretEntity, R> {
-	public MGTurretRenderer(Context ctx) {
-		super(ctx, new MGTurretModel());
+public class MGTurretRenderer extends BaseTurretRenderer<
+	MGTurretEntity,
+	BaseTurretRenderState,
+	MGTurretModel
+	> {
+	private static final Identifier[] TEXTURES = {
+		Identifier.of(DefensiveMeasures.MOD_ID, "textures/entity/mg_turret/mg_turret.png")
+	};
+
+	public MGTurretRenderer(EntityRendererFactory.Context ctx) {
+		super(
+			ctx,
+			new MGTurretModel(ctx.getPart(ModEntityModels.MG_TURRET)),
+			0.75f,
+			BaseTurretRenderState::new
+		);
 	}
 
 	@Override
-	public void preRenderPass(@NonNull RenderPassInfo<@NonNull R> renderPassInfo, @NonNull OrderedRenderCommandQueue renderTasks) {
-		renderPassInfo.poseStack().scale(0.3375f, 0.3375f, 0.3375f);
-
-		super.preRenderPass(renderPassInfo, renderTasks);
+	public Identifier getTexture(BaseTurretRenderState state) {
+		return TEXTURES[0];
 	}
 }

@@ -7,6 +7,7 @@ import net.minecraft.block.ShapeContext;
 import net.minecraft.block.Waterloggable;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.ai.pathing.NavigationType;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.fluid.Fluids;
@@ -53,15 +54,16 @@ import java.util.Objects;
 public class ArrowheadBlock extends Block implements Waterloggable {
 	public static final MapCodec<ArrowheadBlock> CODEC = createCodec(ArrowheadBlock::new);
 
+	public static int MAX_HEADS = 4;
+
 	public static final IntProperty ARROWHEADS = ModProperties.ARROWHEADS;
 	public static final BooleanProperty WATERLOGGED = Properties.WATERLOGGED;
-	public static final EnumProperty<Direction> FACING = Properties.FACING;
+	public static final EnumProperty<Direction> FACING = Properties.HORIZONTAL_FACING;
 
-	private static final VoxelShape BOTTOM;
-	private static final VoxelShape MIDDLE;
-	private static final VoxelShape TOP;
-	private static final VoxelShape SHAPE;
-
+	private static final VoxelShape ONE_HEAD;
+	private static final VoxelShape TWO_HEADS;
+	private static final VoxelShape THREE_HEADS;
+	private static final VoxelShape FOUR_HEADS;
 	/**
 	 * Defines the block hitbox of Arrowhead based on the amount of arrowhead
 	 * block placed in the same space.
@@ -92,7 +94,7 @@ public class ArrowheadBlock extends Block implements Waterloggable {
 	protected boolean canReplace(BlockState state, ItemPlacementContext context) {
 		return !context.shouldCancelInteraction()
 			&& context.getStack().getItem() == this.asItem()
-			&& state.get(ARROWHEADS) < 4
+			&& state.get(ARROWHEADS) < MAX_HEADS
 			|| super.canReplace(state, context);
 	}
 
@@ -108,7 +110,7 @@ public class ArrowheadBlock extends Block implements Waterloggable {
 
 	@Override
 	protected boolean canPlaceAt(BlockState state, WorldView world, BlockPos pos) {
-		return Block.sideCoversSmallSquare(world, pos.down(), Direction.UP);
+		return hasTopRim(world, pos) || Block.sideCoversSmallSquare(world, pos.down(), Direction.UP);
 	}
 
 	@Override
@@ -204,17 +206,16 @@ public class ArrowheadBlock extends Block implements Waterloggable {
 	}
 
 	static {
-		BOTTOM = Block.createCuboidShape(6f, 0f, 6f, 10f, 2f, 10f);
-		MIDDLE = Block.createCuboidShape(6.5f, 1.75f, 6.5f, 9.5f, 3.25f, 9.5f);
-		TOP = Block.createCuboidShape(7f, 2.25f, 7f, 9f, 4.25f, 9f);
-		SHAPE = VoxelShapes.union(BOTTOM, MIDDLE, TOP);
+		ONE_HEAD = Block.createCuboidShape(6, 0, 6, 10, 3, 10);
+		TWO_HEADS = Block.createCuboidShape(6, 0, 3, 10, 3, 13);
+		THREE_HEADS = Block.createCuboidShape(3, 0, 3, 13, 3, 13);
+		FOUR_HEADS = Block.createCuboidShape(3, 0, 3, 13, 3, 13);
 
-		// Handles 1 to 4 blocks.
-		SHAPES_BY_HEAD  = new VoxelShape[] {
-			SHAPE,
-			SHAPE,
-			SHAPE,
-			SHAPE
+		SHAPES_BY_HEAD = new VoxelShape[] {
+			ONE_HEAD,
+			TWO_HEADS,
+			THREE_HEADS,
+			FOUR_HEADS
 		};
 	}
 }

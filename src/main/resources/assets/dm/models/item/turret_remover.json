@@ -77,8 +77,18 @@
 		}
 	],
 	"display": {
+		"ground": {
+			"rotation": [0, 0, -90]
+		},
+		"gui": {
+			"rotation": [-15.7, -39.09, -44.9],
+			"translation": [0.25, -1.75, 0]
+		},
 		"head": {
 			"translation": [0, 1.25, 0]
+		},
+		"fixed": {
+			"translation": [0, -1, -1.75]
 		}
 	},
 	"groups": [

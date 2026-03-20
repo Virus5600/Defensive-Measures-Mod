@@ -1,5 +1,8 @@
 package com.virus5600.defensive_measures.entity.turrets;
 
+import com.virus5600.defensive_measures.entity.turrets.interfaces.TurretVariant;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.*;
@@ -85,7 +88,7 @@ import java.util.stream.Collectors;
  * update the attributes accordingly.
  *
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
- * @since 1.0.1
+ * @since 1.1.0
  *
  * @see MobEntity
  * @see Itemable
@@ -120,6 +123,7 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 	 * Tracks the Z position of this turret.
 	 */
 	protected static final TrackedData<Float> Z;
+
 	/**
 	 * Tracks the amount of projectile to shoot in a burst.
 	 */
@@ -132,6 +136,7 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 	 * Tracks the delay between each shot projectile in a burst.
 	 */
 	protected static final TrackedData<Integer> BURST_DELAY;
+	protected static final TrackedData<Boolean> SHOOTING;
 	/**
 	 * The maximum health of this turret entity. Change this value using the {@link #setTurretMaxHealth(float)}
 	 * method before calling the {@link TurretEntity#setAttributes()} method to set the max health
@@ -226,9 +231,17 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 	 */
 	protected Item itemable;
 	/**
+	 * Tracks how long before the idle animation is played again.
+	 */
+	protected int idleAnimationTimeout = 0;
+	/**
 	 * A randomizer for this turret's instance.
 	 */
 	protected final Random random;
+
+	public final AnimationState idleAnimationState = new AnimationState();
+	public final AnimationState shootAnimationState = new AnimationState();
+	public final AnimationState deathAnimationState = new AnimationState();
 
 	/**
 	 * List of plank items in the game. This allows easy insertion of all the items when needed by iterating through the List.
@@ -431,11 +444,12 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 			.add(BURST_COUNT, 0)
 			.add(BURST_PROJECTILE_FIRED, 0)
 			.add(BURST_DELAY, 0)
+			.add(SHOOTING, false)
 		;
 	}
 
 	/**
-	 * Sets the standard attributes for this entity. The attributes that are set are as follows:
+	 * Sets the standard attributes for this entity. The default attributes that are set are as follows:
 	 * <ul>
 	 *	<li>
 	 * 		<b>{@link EntityAttributes#MAX_HEALTH}</b> - The maximum health of this entity. By
@@ -708,6 +722,11 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 	}
 
 	@Override
+	public void onDeath(DamageSource damageSource) {
+		super.onDeath(damageSource);
+	}
+
+	@Override
 	public void tick() {
 		super.tick();
 
@@ -734,6 +753,9 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 
 			// Head Pitch when shooting
 			this.setPitch(this.getTrackedPitch());
+
+			// Play Animations
+			this.updateAnimations();
 		}
 		// SERVER SIDE
 		else {
@@ -1015,6 +1037,14 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 
 	public float getTrackedPitch() {
 		return this.dataTracker.get(SHOOTING_PITCH);
+	}
+
+	public boolean getTrackedShooting() {
+		return this.dataTracker.get(SHOOTING);
+	}
+
+	public void setTrackedShooting(boolean shooting) {
+		this.dataTracker.set(SHOOTING, shooting);
 	}
 
 	/**
@@ -1436,6 +1466,33 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 		this.shoot(velocityData);
 	}
 
+	/**
+	 * Retrieves the idle animation state of this turret.
+	 *
+	 * @return {@code AnimationState} The idle animation state of this turret.
+	 */
+	public AnimationState getIdleAnimationState() {
+		return this.idleAnimationState;
+	}
+
+	/**
+	 * Retrieves the shoot animation state of this turret.
+	 *
+	 * @return {@code AnimationState} The shoot animation state of this turret.
+	 */
+	public AnimationState getShootAnimationState() {
+		return this.shootAnimationState;
+	}
+
+	/**
+	 * Retrieves the death animation state of this turret.
+	 *
+	 * @return {@code AnimationState} The death animation state of this turret.
+	 */
+	public AnimationState getDeathAnimationState() {
+		return this.deathAnimationState;
+	}
+
 	// ////////////////////////////// //
 	// ABSTRACT & OVERRIDABLE METHODS //
 	// ////////////////////////////// //
@@ -1473,6 +1530,28 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 	 * @return {@code byte} The projectile's pierce level.
 	 */
 	public abstract byte getProjectilePierceLevel();
+
+	/**
+	 * Retrieves the reload or attack cooldown of the turret in ticks. To properly get
+	 * the second or millisecond value:
+	 * <ul>
+	 *     <li>{@code float seconds = val / 20}</li>
+	 *     <li>{@code float milliseconds = seconds * 1000}</li>
+	 * </ul>
+	 * <hr>
+	 * <b>NOTE:</b> When the value is to be used against animations, change {@code 20} to {@code 50}
+	 * to match the renderer's tick time.</li>
+	 *
+	 * @return {@code int} The turret's reload time in ticks.
+	 */
+	public abstract int getTotalAttCooldown();
+
+	/**
+	 * Retrieves the variant of this turret, if any.
+	 *
+	 * @return {@code TurretVariant} The variant of this turret, or {@code null} if none.
+	 */
+	public abstract @Nullable TurretVariant getVariant();
 
 	// OVERRIDABLES //
 
@@ -1523,6 +1602,30 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 			velocityData.getPower(),
 			velocityData.getUncertainty()
 		);
+	}
+
+	@Environment(EnvType.CLIENT)
+	protected void updateAnimations() {
+		this.idleAnimationState.start(this.age);
+
+		if (this.isDead()) {
+			this.deathAnimationState.start(this.age);
+		}
+
+		float elapsedTime = this.shootAnimationState.getTimeInMilliseconds(this.age);
+		float reload = (this.getTotalAttCooldown() / 50f) * 1000;
+
+		boolean isAnimPlaying = this.shootAnimationState.isRunning();
+		boolean isAttacking = elapsedTime >= reload;
+		boolean isShooting = this.getTrackedShooting();
+
+		if (isShooting) {
+			this.shootAnimationState.start(this.age);
+		}
+
+		if (!isShooting && isAnimPlaying && isAttacking) {
+			this.shootAnimationState.stop();
+		}
 	}
 
 	protected void shoot() {
@@ -1587,6 +1690,8 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 
 	protected void shoot(TurretProjectileVelocity velocityData) {
 		try {
+			this.shootAnimationState.startIfNotRunning(this.age);
+
 			ProjectileEntity projectile = (ProjectileEntity) this.projectile.create(
 				this.getEntityWorld(),
 				SpawnReason.TRIGGERED
@@ -2066,5 +2171,6 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 		BURST_COUNT = DataTracker.registerData(TurretEntity.class, TrackedDataHandlerRegistry.INTEGER);
 		BURST_PROJECTILE_FIRED = DataTracker.registerData(TurretEntity.class, TrackedDataHandlerRegistry.INTEGER);
 		BURST_DELAY = DataTracker.registerData(TurretEntity.class, TrackedDataHandlerRegistry.INTEGER);
+		SHOOTING = DataTracker.registerData(TurretEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
 	}
 }

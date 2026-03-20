@@ -5,14 +5,6 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.world.World;
 
-import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
-import software.bernie.geckolib.animatable.manager.AnimatableManager.ControllerRegistrar;
-import software.bernie.geckolib.animation.AnimationController;
-import software.bernie.geckolib.animation.RawAnimation;
-import software.bernie.geckolib.animation.object.PlayState;
-import software.bernie.geckolib.animation.state.AnimationTest;
-import software.bernie.geckolib.util.GeckoLibUtil;
-
 import com.virus5600.defensive_measures.entity.ModEntities;
 
 import java.util.Map;
@@ -44,9 +36,8 @@ import java.util.Map;
  * @version 1.0.0
  */
 public class BallistaArrowEntity extends KineticProjectileEntity {
-	private static final Map<String, RawAnimation> ANIMATIONS;
+	private static final Map<String, Integer> ANIMATIONS;
 
-	private final AnimatableInstanceCache geoCache = GeckoLibUtil.createInstanceCache(this);
 
 	// ////////////// //
 	//  CONSTRUCTORS  //
@@ -87,50 +78,14 @@ public class BallistaArrowEntity extends KineticProjectileEntity {
 		return 5;
 	}
 
-	// ///////////////////// //
-	// ANIMATION CONTROLLERS //
-	// ///////////////////// //
-
-	private PlayState idleController(final AnimationTest<BallistaArrowEntity> state) {
-		return state.setAndContinue(ANIMATIONS.get("Idle"));
-	}
-
-	private PlayState onAirController(final AnimationTest<BallistaArrowEntity> state) {
-		if (this.isInGround() || this.isOnGround()) {
-			return PlayState.STOP;
-		}
-
-		return state.setAndContinue(ANIMATIONS.get("OnAir"));
-	}
-
-	// /////////////////////////// //
-	//  INTERFACE IMPLEMENTATIONS  //
-	// /////////////////////////// //
-
-	// GeoEntity //
-	@Override
-	public void registerControllers(final ControllerRegistrar controllers) {
-		controllers.add(
-			new AnimationController<>("Idle", 10, this::idleController),
-			new AnimationController<>("OnAir", 10, this::onAirController)
-		);
-	}
-
-	@Override
-	public AnimatableInstanceCache getAnimatableInstanceCache() {
-		return this.geoCache;
-	}
-
 	// ///////////////// //
 	// STATIC INITIALIZE //
 	// ///////////////// //
 
 	static {
 		ANIMATIONS = Map.of(
-			"Idle", RawAnimation.begin()
-				.thenPlay("animation.ballista_arrow.idle"),
-			"OnAir", RawAnimation.begin()
-				.thenPlay("animation.ballista_arrow.move")
+			"Idle", 0,
+			"OnAir", 0
 		);
 	}
 }

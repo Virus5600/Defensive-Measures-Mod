@@ -16,11 +16,6 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import net.minecraft.world.explosion.ExplosionBehavior;
 
-import software.bernie.geckolib.animatable.GeoEntity;
-import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
-import software.bernie.geckolib.animatable.manager.AnimatableManager.ControllerRegistrar;
-import software.bernie.geckolib.util.GeckoLibUtil;
-
 import com.virus5600.defensive_measures.entity.ModEntities;
 
 /**
@@ -68,9 +63,7 @@ import com.virus5600.defensive_measures.entity.ModEntities;
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
  * @version 1.0.0
  */
-public class CannonballEntity extends ExplosiveProjectileEntity implements GeoEntity {
-	private final AnimatableInstanceCache geoCache = GeckoLibUtil.createInstanceCache(this);
-
+public class CannonballEntity extends ExplosiveProjectileEntity {
 	// ////////////// //
 	//  CONSTRUCTORS  //
 	// ////////////// //
@@ -208,20 +201,6 @@ public class CannonballEntity extends ExplosiveProjectileEntity implements GeoEn
 	@Override
 	public void tick() {
 		super.tick();
-	}
-
-	// ///////////////////////// //
-	// INTERFACE IMPLEMENTATIONS //
-	// ///////////////////////// //
-
-	// GeoEntity //
-	@Override
-	public void registerControllers(final ControllerRegistrar controllers) {
-	}
-
-	@Override
-	public AnimatableInstanceCache getAnimatableInstanceCache() {
-		return this.geoCache;
 	}
 
 	// ExplosiveProjectileEntity //

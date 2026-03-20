@@ -38,10 +38,6 @@ import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
 
 import org.jetbrains.annotations.NotNull;
-import software.bernie.geckolib.animatable.GeoEntity;
-import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
-import software.bernie.geckolib.util.GeckoLibUtil;
-
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
@@ -61,14 +57,13 @@ import com.virus5600.defensive_measures.entity.turrets.TurretEntity;
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
  * @version 1.0.0
  */
-public abstract class TurretProjectileEntity extends ProjectileEntity implements GeoEntity {
+public abstract class TurretProjectileEntity extends ProjectileEntity {
 	protected static final TrackedData<Byte> PROJECTILE_FLAGS = DataTracker.registerData(TurretProjectileEntity.class, TrackedDataHandlerRegistry.BYTE);
 	protected static final TrackedData<Byte> PIERCE_LEVEL = DataTracker.registerData(TurretProjectileEntity.class, TrackedDataHandlerRegistry.BYTE);
 	protected static final TrackedData<Boolean> IN_GROUND = DataTracker.registerData(TurretProjectileEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
 	protected static final int CRITICAL_FLAG = 1;
 	protected static final int NO_CLIP_FLAG = 2;
 
-	private final AnimatableInstanceCache geoCache = GeckoLibUtil.createInstanceCache(this);
 	/** Holds the blockstate information of the block in this projectile's position. */
 	@Nullable
 	private BlockState inBlockState;
@@ -891,16 +886,6 @@ public abstract class TurretProjectileEntity extends ProjectileEntity implements
 			this.setDamage(turret.getProjectileDamage());
 			this.setPierceLevel(turret.getProjectilePierceLevel());
 		}
-	}
-
-	// ///////////////////////// //
-	// INTERFACE IMPLEMENTATIONS //
-	// ///////////////////////// //
-
-	// GeoEntity //
-	@Override
-	public AnimatableInstanceCache getAnimatableInstanceCache() {
-		return this.geoCache;
 	}
 
 	// ///////////////////// //

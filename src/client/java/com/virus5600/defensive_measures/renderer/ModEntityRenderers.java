@@ -5,7 +5,7 @@ import net.minecraft.client.render.entity.EntityRendererFactories;
 import com.virus5600.defensive_measures.DefensiveMeasures;
 import com.virus5600.defensive_measures.entity.ModEntities;
 import com.virus5600.defensive_measures.renderer.entity.*;
-import com.virus5600.defensive_measures.renderer.projectiles.*;
+//import com.virus5600.defensive_measures.renderer.projectiles.*;
 
 /**
  * Registers entity renderers for all entities in the mod.
@@ -18,7 +18,7 @@ import com.virus5600.defensive_measures.renderer.projectiles.*;
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
  * @version 1.0.0
  */
-public class ModEntityRenderer {
+public class ModEntityRenderers {
 	public static void registerEntityRenderers() {
 		DefensiveMeasures.LOGGER.info("REGISTERING ENTITY RENDERERS FOR {}...", DefensiveMeasures.MOD_NAME);
 
@@ -36,8 +36,8 @@ public class ModEntityRenderer {
 		// /////////// //
 
 		// v1.0.0
-		EntityRendererFactories.register(ModEntities.CANNONBALL, CannonballRenderer::new);
-		EntityRendererFactories.register(ModEntities.BALLISTA_ARROW, BallistaArrowRenderer::new);
-		EntityRendererFactories.register(ModEntities.MG_BULLET, MGBulletRenderer::new);
+//		EntityRendererFactories.register(ModEntities.CANNONBALL, CannonballRenderer::new);
+//		EntityRendererFactories.register(ModEntities.BALLISTA_ARROW, BallistaArrowRenderer::new);
+//		EntityRendererFactories.register(ModEntities.MG_BULLET, MGBulletRenderer::new);
 	}
 }

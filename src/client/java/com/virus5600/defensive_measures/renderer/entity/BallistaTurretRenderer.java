@@ -1,28 +1,34 @@
 package com.virus5600.defensive_measures.renderer.entity;
 
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
-import net.minecraft.client.render.entity.EntityRendererFactory.Context;
-import net.minecraft.client.render.entity.state.EntityRenderState;
+import com.virus5600.defensive_measures.model.ModEntityModels;
+import net.minecraft.client.render.entity.EntityRendererFactory;
+import net.minecraft.util.Identifier;
 
-import software.bernie.geckolib.renderer.base.GeoRenderState;
-
+import com.virus5600.defensive_measures.DefensiveMeasures;
 import com.virus5600.defensive_measures.entity.turrets.BallistaTurretEntity;
 import com.virus5600.defensive_measures.model.entity.BallistaTurretModel;
-import com.virus5600.defensive_measures.renderer.BaseTurretRenderer;
+import com.virus5600.defensive_measures.renderer.entity.state.BaseTurretRenderState;
 
-/**
- * Ballista Turret's renderer.
- *
- * @since 1.0.0
- * @author <a href="https://github.com/Virus5600">Virus5600</a>
- * @version 1.0.0
- */
-@Environment(EnvType.CLIENT)
-public class BallistaTurretRenderer<
-	R extends EntityRenderState & GeoRenderState
-> extends BaseTurretRenderer<BallistaTurretEntity, R> {
-	public BallistaTurretRenderer(Context ctx) {
-		super(ctx, new BallistaTurretModel());
+public class BallistaTurretRenderer extends BaseTurretRenderer<
+	BallistaTurretEntity,
+	BaseTurretRenderState,
+	BallistaTurretModel
+	> {
+	private static final Identifier[] TEXTURES = {
+		Identifier.of(DefensiveMeasures.MOD_ID, "textures/entity/ballista/ballista.png")
+	};
+
+	public BallistaTurretRenderer(EntityRendererFactory.Context ctx) {
+		super(
+			ctx,
+			new BallistaTurretModel(ctx.getPart(ModEntityModels.BALLISTA_TURRET)),
+			0.75f,
+			BaseTurretRenderState::new
+		);
+	}
+
+	@Override
+	public Identifier getTexture(BaseTurretRenderState state) {
+		return TEXTURES[0];
 	}
 }

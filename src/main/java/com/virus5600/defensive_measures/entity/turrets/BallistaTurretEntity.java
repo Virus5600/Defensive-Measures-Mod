@@ -18,26 +18,18 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
-import software.bernie.geckolib.animatable.GeoEntity;
-import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
-import software.bernie.geckolib.animatable.manager.AnimatableManager.ControllerRegistrar;
-import software.bernie.geckolib.animation.AnimationController;
-import software.bernie.geckolib.animation.RawAnimation;
-import software.bernie.geckolib.animation.object.PlayState;
-import software.bernie.geckolib.animation.state.AnimationTest;
-import software.bernie.geckolib.util.GeckoLibUtil;
-
 import org.jetbrains.annotations.Nullable;
 
 import com.virus5600.defensive_measures.entity.ModEntities;
 import com.virus5600.defensive_measures.entity.TurretMaterial;
 import com.virus5600.defensive_measures.entity.ai.goal.ProjectileAttackGoal;
+import com.virus5600.defensive_measures.entity.turrets.interfaces.TurretVariant;
 import com.virus5600.defensive_measures.item.ModItems;
 import com.virus5600.defensive_measures.sound.ModSoundEvents;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -58,24 +50,21 @@ import java.util.Map;
  * </ul>
  *
  * @see TurretEntity
- * @see GeoEntity
  *
  * @since 1.0.0
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
- * @version 1.0.0
+ * @version 1.1.0
  */
-public class BallistaTurretEntity extends TurretEntity implements GeoEntity {
+public class BallistaTurretEntity extends TurretEntity {
 	/**
 	 * Defines how many seconds the ballista should wait before shooting again.
 	 * The time is calculated in ticks and by default, it's 2.5 seconds <b>(20 ticks times 2.5 seconds)</b>.
 	 */
 	private static final int TOTAL_ATT_COOLDOWN = (int) (20 * 2.5);
-	private static final Map<String, RawAnimation> ANIMATIONS;
 	private static final Map<Offsets, List<Vec3d>> OFFSETS;
 	private static final Map<Item, SoundEvent> HEAL_SOUNDS;
 	private static final double[] DAMAGE;
 	private static final byte[] PIERCE_LEVELS;
-
 
 	/**
 	 * Contains all the items that can heal this entity.
@@ -86,17 +75,14 @@ public class BallistaTurretEntity extends TurretEntity implements GeoEntity {
 	 */
 	protected static final Map<Item, List<Object[]>> effectSource;
 
-	private final AnimatableInstanceCache geoCache = GeckoLibUtil.createInstanceCache(this);
-	private boolean animPlayed = false;
-
 	// //////////// //
 	// CONSTRUCTORS //
 	// //////////// //
 	public BallistaTurretEntity(EntityType<? extends MobEntity> entityType, World world) {
-		super(entityType, world, TurretMaterial.WOOD, ModEntities.BALLISTA_ARROW, ModItems.BALLISTA_TURRET);
+//		super(entityType, world, TurretMaterial.WOOD, ModEntities.BALLISTA_ARROW, ModItems.BALLISTA_TURRET);
+		super(entityType, world, TurretMaterial.WOOD, ModItems.BALLISTA_TURRET);
 
 		this.setShootSound(ModSoundEvents.TURRET_BALLISTA_SHOOT);
-		this.setHealSound(ModSoundEvents.TURRET_REPAIR_WOOD);
 		this.addHealables(healables);
 		this.addEffectSource(effectSource);
 	}
@@ -141,12 +127,12 @@ public class BallistaTurretEntity extends TurretEntity implements GeoEntity {
 			.setUpwardVelocityMultiplier(dist * 0.125f);
 
 		super.shootAt(velocityData);
-
-		this.triggerAnim("Attack", "shoot");
+//		this.triggerAnim("Attack", "shoot");
 	}
 
 	@Override
 	public void onRemove(Entity.RemovalReason reason) {
+		// Shoot the animation projectile as a real projectile when the turret is destroyed
 		if (this.isDead()) {
 			this.shoot(
 				TurretEntity.TurretProjectileVelocity
@@ -162,7 +148,7 @@ public class BallistaTurretEntity extends TurretEntity implements GeoEntity {
 	public ActionResult interactMob(PlayerEntity player, Hand hand) {
 		Item usedItem = player.getStackInHand(hand).getItem();
 
-		if (this.isHealableItem(usedItem) && this.getHealSound() != ModSoundEvents.TURRET_REPAIR_WOOD) {
+		if (this.isHealableItem(usedItem)) {
 			this.setHealSound(HEAL_SOUNDS.get(usedItem));
 		}
 
@@ -172,6 +158,10 @@ public class BallistaTurretEntity extends TurretEntity implements GeoEntity {
 	@Override
 	public void tick() {
 		super.tick();
+
+		if (this.getEntityWorld().isClient()) {
+			this.updateAnimations();
+		}
 	}
 
 	// /////////////////// //
@@ -205,47 +195,13 @@ public class BallistaTurretEntity extends TurretEntity implements GeoEntity {
 		return ModSoundEvents.TURRET_REMOVED_WOOD;
 	}
 
-	// ///////////////////// //
-	// ANIMATION CONTROLLERS //
-	// ///////////////////// //
-
-	private  PlayState deathController(final AnimationTest<BallistaTurretEntity> state) {
-		if (!this.isAlive() && !this.animPlayed) {
-			this.animPlayed = true;
-			state.setAnimation(ANIMATIONS.get("Death"));
-			return PlayState.STOP;
-		}
-		return PlayState.CONTINUE;
-	}
-
-	private PlayState idleController(final AnimationTest<BallistaTurretEntity> state) {
-		return state
-			.setAndContinue(ANIMATIONS.get("Idle"));
-	}
-
-	private PlayState shootController(final AnimationTest<BallistaTurretEntity> state) {
-		return PlayState.STOP;
-	}
-
 	// ///////////////////////// //
 	// INTERFACE IMPLEMENTATIONS //
 	// ///////////////////////// //
 
-	// GeoEntity //
 	@Override
-	public void registerControllers(final ControllerRegistrar controllers) {
-		controllers
-			.add(
-				new AnimationController<>("Death", 10, this::deathController),
-				new AnimationController<>("Idle", 10, this::idleController),
-				new AnimationController<>("Attack", 10, this::shootController)
-					.triggerableAnim("shoot", ANIMATIONS.get("Shoot"))
-			);
-	}
-
-	@Override
-	public AnimatableInstanceCache getAnimatableInstanceCache() {
-		return this.geoCache;
+	public @Nullable TurretVariant getVariant() {
+		return null;
 	}
 
 	// //////////////////////// //
@@ -263,6 +219,10 @@ public class BallistaTurretEntity extends TurretEntity implements GeoEntity {
 
 	public byte getProjectilePierceLevel() {
 		return PIERCE_LEVELS[this.getLevel() - 1];
+	}
+
+	public int getTotalAttCooldown() {
+		return TOTAL_ATT_COOLDOWN;
 	}
 
 	// /////////////////// //
@@ -295,25 +255,14 @@ public class BallistaTurretEntity extends TurretEntity implements GeoEntity {
 			)
 		);
 
-		ANIMATIONS = Map.of(
-			"Death", RawAnimation.begin()
-				.thenPlayAndHold("animation.ballista.death"),
-			"Idle", RawAnimation.begin()
-				.thenLoop("animation.ballista.setup"),
-			"Shoot", RawAnimation.begin()
-				.thenPlay("animation.ballista.shoot")
-		);
+		// HEAL SOUNDS
+		HEAL_SOUNDS = new HashMap<>();
+		HEAL_SOUNDS.put(Items.STICK, ModSoundEvents.TURRET_REPAIR_WOOD);
+		HEAL_SOUNDS.put(Items.STRING, ModSoundEvents.TURRET_REPAIR_BOW);
 
-		HEAL_SOUNDS = new HashMap<>() {
-			{
-				put(Items.STICK, ModSoundEvents.TURRET_REPAIR_WOOD);
-				put(Items.STRING, ModSoundEvents.TURRET_REPAIR_BOW);
-
-				final List<Item> WOODS = new ArrayList<>(TurretEntity.PLANKS.stream().toList());
-				WOODS.addAll(TurretEntity.LOGS);
-				WOODS.forEach(item -> put(item, ModSoundEvents.TURRET_REPAIR_WOOD));
-			}
-		};
+		final List<Item> WOODS = new ArrayList<>(TurretEntity.PLANKS.stream().toList());
+		WOODS.addAll(TurretEntity.LOGS);
+		WOODS.forEach(item -> HEAL_SOUNDS.put(item, ModSoundEvents.TURRET_REPAIR_WOOD));
 
 		healables = new HashMap<>() {
 			{
@@ -328,11 +277,9 @@ public class BallistaTurretEntity extends TurretEntity implements GeoEntity {
 		effectSource = new HashMap<>() {
 			{
 				for (Item item : TurretEntity.LOGS) {
-					put(item, new ArrayList<>() {
-						{
-							add(new Object[] {StatusEffects.ABSORPTION, 60, 2});
-						}
-					});
+					put(item, List.<Object[]>of(
+						new Object[] {StatusEffects.ABSORPTION, 60, 2}
+					));
 				}
 			}
 		};

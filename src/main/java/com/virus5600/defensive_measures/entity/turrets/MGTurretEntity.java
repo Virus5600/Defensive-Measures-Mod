@@ -1,5 +1,6 @@
 package com.virus5600.defensive_measures.entity.turrets;
 
+import com.virus5600.defensive_measures.entity.turrets.interfaces.TurretVariant;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.attribute.DefaultAttributeContainer.Builder;
@@ -15,26 +16,12 @@ import net.minecraft.sound.SoundEvent;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
-import software.bernie.geckolib.animatable.GeoEntity;
-import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
-import software.bernie.geckolib.animatable.manager.AnimatableManager.ControllerRegistrar;
-import software.bernie.geckolib.animation.AnimationController;
-import software.bernie.geckolib.animation.RawAnimation;
-import software.bernie.geckolib.animation.object.PlayState;
-import software.bernie.geckolib.animation.state.AnimationTest;
-import software.bernie.geckolib.animation.state.KeyFrameEvent;
-import software.bernie.geckolib.cache.animation.keyframeevent.ParticleKeyframeData;
-import software.bernie.geckolib.util.GeckoLibUtil;
-
-import software.bernie.geckolib.util.GeckoLibUtil;
-
 import org.jetbrains.annotations.Nullable;
 
 import com.virus5600.defensive_measures.entity.ModEntities;
 import com.virus5600.defensive_measures.entity.TurretMaterial;
 import com.virus5600.defensive_measures.entity.ai.goal.ProjectileAttackGoal;
 import com.virus5600.defensive_measures.item.ModItems;
-import com.virus5600.defensive_measures.particle.ModParticles;
 import com.virus5600.defensive_measures.sound.ModSoundEvents;
 
 import java.util.List;
@@ -60,13 +47,12 @@ import java.util.Map;
  * </ul>
  *
  * @see TurretEntity
- * @see GeoEntity
  *
  * @since 1.0.0
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
  * @version 1.0.0
  */
-public class MGTurretEntity extends TurretEntity implements GeoEntity {
+public class MGTurretEntity extends TurretEntity {
 	/**
 	 * Defines how many seconds the machine gun should wait before shooting again.
 	 * The time is calculated in ticks and by default, it's 3.75 seconds <b>(20 ticks times 3.75 seconds)</b>.
@@ -76,7 +62,6 @@ public class MGTurretEntity extends TurretEntity implements GeoEntity {
 	 * cooldown attribute and will be handled by the {@link #tick() tick()} method.
 	 */
 	private static final int TOTAL_ATT_COOLDOWN = (int) (20 * 3.75);
-	private static final Map<String, RawAnimation> ANIMATIONS;
 	private static final Map<Offsets, List<Vec3d>> OFFSETS;
 	private static final double[] DAMAGE;
 	private static final byte[] PIERCE_LEVELS;
@@ -90,14 +75,12 @@ public class MGTurretEntity extends TurretEntity implements GeoEntity {
 	 */
 	protected static final Map<Item, List<Object[]>> effectSource;
 
-	private final AnimatableInstanceCache geoCache = GeckoLibUtil.createInstanceCache(this);
-	private boolean animPlayed = false;
-
 	// //////////// //
 	// CONSTRUCTORS //
 	// //////////// //
 	public MGTurretEntity(EntityType<? extends MobEntity> entityType, World world) {
-		super(entityType, world, TurretMaterial.METAL, ModEntities.MG_BULLET, ModItems.MG_TURRET);
+//		super(entityType, world, TurretMaterial.METAL, ModEntities.MG_BULLET, ModItems.MG_TURRET);
+		super(entityType, world, TurretMaterial.METAL, ModItems.MG_TURRET);
 
 		this.setShootSound(ModSoundEvents.TURRET_MG_SHOOT);
 		this.setHealSound(ModSoundEvents.TURRET_REPAIR_METAL);
@@ -138,7 +121,7 @@ public class MGTurretEntity extends TurretEntity implements GeoEntity {
 
 	@Override
 	public void shootAt(LivingEntity target, float pullProgress) {
-		this.triggerAnim("FiringSequence", "shoot");
+//		this.triggerAnim("FiringSequence", "shoot");
 
 		float dist = (float) this.getTrackedPosition()
 			.getPos()
@@ -182,64 +165,13 @@ public class MGTurretEntity extends TurretEntity implements GeoEntity {
 		return ModSoundEvents.TURRET_REMOVED_METAL;
 	}
 
-	// ///////////////////// //
-	// ANIMATION CONTROLLERS //
-	// ///////////////////// //
-
-	private PlayState deathController(final AnimationTest<MGTurretEntity> event) {
-		if (!this.isAlive() && !this.animPlayed) {
-			this.animPlayed = true;
-			event.setAnimation(ANIMATIONS.get("Death"));
-			return PlayState.STOP;
-		}
-		return PlayState.CONTINUE;
-	}
-
-	private PlayState idleController(final AnimationTest<MGTurretEntity> event) {
-		return event
-			.setAndContinue(ANIMATIONS.get("Idle"));
-	}
-
-	private PlayState shootController(final AnimationTest<MGTurretEntity> event) {
-		return PlayState.STOP;
-	}
-
-	private void shootKeyframeHandler(KeyFrameEvent<MGTurretEntity, ParticleKeyframeData> event) {
-		final String LOCATOR = event.keyframeData()
-			.getLocator();
-
-		if (LOCATOR.equals("barrel")) {
-			Vec3d barrelPos = this.getRelativePos(this.getCurrentBarrel(false)),
-				velocityModifier = this.getRelativePos(0, 0, 0).subtract(this.getEyePos());
-
-			this.getEntityWorld().addParticleClient(
-				ModParticles.SUSPENDED_SPARKS,
-				barrelPos.getX(), barrelPos.getY(), barrelPos.getZ(),
-				velocityModifier.getX(), velocityModifier.getY(), velocityModifier.getZ()
-			);
-		}
-	}
-
 	// ///////////////////////// //
 	// INTERFACE IMPLEMENTATIONS //
 	// ///////////////////////// //
 
-	// GeoEntity //
 	@Override
-	public void registerControllers(final ControllerRegistrar controllers) {
-		controllers
-			.add(
-				new AnimationController<>("Death", 10, this::deathController),
-				new AnimationController<>("Idle", 10, this::idleController),
-				new AnimationController<>("FiringSequence", 10, this::shootController)
-					.triggerableAnim("shoot", ANIMATIONS.get("Shoot"))
-					.setParticleKeyframeHandler(this::shootKeyframeHandler)
-			);
-	}
-
-	@Override
-	public AnimatableInstanceCache getAnimatableInstanceCache() {
-		return this.geoCache;
+	public @Nullable TurretVariant getVariant() {
+		return null;
 	}
 
 	// //////////////////////// //
@@ -257,6 +189,10 @@ public class MGTurretEntity extends TurretEntity implements GeoEntity {
 
 	public byte getProjectilePierceLevel() {
 		return PIERCE_LEVELS[this.getLevel() - 1];
+	}
+
+	public int getTotalAttCooldown() {
+		return TOTAL_ATT_COOLDOWN;
 	}
 
 	// /////////////////// //
@@ -287,15 +223,6 @@ public class MGTurretEntity extends TurretEntity implements GeoEntity {
 			Offsets.BARREL, List.of(
 				new Vec3d(0.0, 0.0, 0.5)
 			)
-		);
-
-		ANIMATIONS = Map.of(
-			"Death", RawAnimation.begin()
-				.thenPlayAndHold("animation.machine_gun_turret.death"),
-			"Idle", RawAnimation.begin()
-				.thenLoop("animation.machine_gun_turret.setup"),
-			"Shoot", RawAnimation.begin()
-				.thenPlay("animation.machine_gun_turret.shoot")
 		);
 
 		healables = Map.of(

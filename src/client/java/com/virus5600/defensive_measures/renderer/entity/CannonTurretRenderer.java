@@ -1,28 +1,34 @@
 package com.virus5600.defensive_measures.renderer.entity;
 
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
-import net.minecraft.client.render.entity.EntityRendererFactory.Context;
-import net.minecraft.client.render.entity.state.EntityRenderState;
+import com.virus5600.defensive_measures.model.ModEntityModels;
+import net.minecraft.client.render.entity.EntityRendererFactory;
+import net.minecraft.util.Identifier;
 
-import software.bernie.geckolib.renderer.base.GeoRenderState;
-
+import com.virus5600.defensive_measures.DefensiveMeasures;
 import com.virus5600.defensive_measures.entity.turrets.CannonTurretEntity;
 import com.virus5600.defensive_measures.model.entity.CannonTurretModel;
-import com.virus5600.defensive_measures.renderer.BaseTurretRenderer;
+import com.virus5600.defensive_measures.renderer.entity.state.BaseTurretRenderState;
 
-/**
- * Cannon Turret's Renderer.
- *
- * @since 1.0.0
- * @author <a href="https://github.com/Virus5600">Virus5600</a>
- * @version 1.0.0
- */
-@Environment(EnvType.CLIENT)
-public class CannonTurretRenderer<
-	R extends EntityRenderState & GeoRenderState
-> extends BaseTurretRenderer<CannonTurretEntity, R> {
-	public CannonTurretRenderer(Context ctx) {
-		super(ctx, new CannonTurretModel());
+public class CannonTurretRenderer extends BaseTurretRenderer<
+	CannonTurretEntity,
+	BaseTurretRenderState,
+	CannonTurretModel
+	> {
+	private static final Identifier[] TEXTURES = {
+		Identifier.of(DefensiveMeasures.MOD_ID, "textures/entity/cannon_turret/cannon_turret.png")
+	};
+
+	public CannonTurretRenderer(EntityRendererFactory.Context ctx) {
+		super(
+			ctx,
+			new CannonTurretModel(ctx.getPart(ModEntityModels.CANNON_TURRET)),
+			0.75f,
+			BaseTurretRenderState::new
+		);
+	}
+
+	@Override
+	public Identifier getTexture(BaseTurretRenderState state) {
+		return TEXTURES[0];
 	}
 }
