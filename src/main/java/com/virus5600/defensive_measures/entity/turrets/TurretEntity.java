@@ -596,7 +596,8 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 		boolean isSuccess = false;
 
 		// Turret Remover Interaction
-		if (item.getItem().equals(ModItems.TURRET_REMOVER)) {
+		if (item.getItem().equals(ModItems.TURRET_REMOVER)
+			&& !this.getEntityWorld().isClient()) {
 			if (isSurvival) {
 				item.damage(1, player);
 			}
@@ -723,6 +724,10 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 
 	@Override
 	public void onDeath(DamageSource damageSource) {
+		if (!this.getEntityWorld().isClient() && this.hasCustomName()) {
+			DefensiveMeasures.LOGGER.info("Named entity {} died: {}", this, this.getDamageTracker().getDeathMessage().getString());
+		}
+
 		super.onDeath(damageSource);
 	}
 
@@ -1622,7 +1627,7 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 		this.idleAnimationState.startIfNotRunning(this.age);
 
 		if (this.isDead()) {
-			this.deathAnimationState.start(this.age);
+			this.deathAnimationState.startIfNotRunning(this.age);
 		}
 
 		float elapsedTime = this.shootAnimationState.getTimeInMilliseconds(this.age);

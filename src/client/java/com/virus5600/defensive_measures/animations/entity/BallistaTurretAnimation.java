@@ -10,6 +10,7 @@ public class BallistaTurretAnimation {
 		.addBoneAnimation("rightString", new Transformation(Transformation.Targets.SCALE,
 			new Keyframe(0.0F, AnimationHelper.createScalingVector(1.6F, 1.0F, 1.0F), Transformation.Interpolations.LINEAR)
 		))
+		.looping()
 		.build();
 
 	public static final AnimationDefinition ANIM_SHOOT = AnimationDefinition.Builder.create(1.24F)

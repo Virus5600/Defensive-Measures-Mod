@@ -35,7 +35,7 @@ public class ModEntities {
 		Builder
 			.create(BallistaTurretEntity::new, SpawnGroup.MISC)
 			.dimensions(1F, 1F)
-			.eyeHeight(0.75F)
+			.eyeHeight(0.71F)
 	);
 
 	public static final EntityType<MGTurretEntity> MG_TURRET = RegistryUtil.registerEntity(

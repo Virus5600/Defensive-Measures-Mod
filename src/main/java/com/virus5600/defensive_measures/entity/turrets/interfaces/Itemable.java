@@ -87,10 +87,6 @@ public interface Itemable {
 		nbtCompound.putFloat("Health", entity.getHealth());
 		nbtCompound.putFloat("MaxHealth", entity.getMaxHealth());
 
-		// UUID Handling...
-		nbtCompound.putLong("UUIDLeast", entity.getUuid().getLeastSignificantBits());
-		nbtCompound.putLong("UUIDMost", entity.getUuid().getMostSignificantBits());
-
 		stack.set(DataComponentTypes.CUSTOM_DATA, NbtComponent.of(nbtCompound));
 	}
 
@@ -121,34 +117,31 @@ public interface Itemable {
 
 			if (!world.isClient()) {
 				entity.playSound(entity.getEntityRemoveSound(), 1.0f, new Random().nextFloat(0.75f, 1.25f));
-			}
 
-			if (player.isCreative() && !player.isSneaking()) {
+				if (player.isCreative() && !player.isSneaking()) {
+					entity.discard();
+					return Optional.of(ActionResult.SUCCESS);
+				}
+
+				ItemStack stack = new ItemStack(modItem);
+				entity.copyDataToStack(stack);
+
+				Vec3d entityPos = entity.getEntityPos();
+
+				float x = (float) entityPos.getX() + 0.5f;
+				float y = (float) entityPos.getY() + 0.5f;
+				float z = (float) entityPos.getZ() + 0.5f;
+				double vx = MathHelper.nextDouble(world.random, -0.1, 0.1);
+				double vy = MathHelper.nextDouble(world.random, 0.0, 0.1);
+				double vz = MathHelper.nextDouble(world.random, -0.1, 0.1);
+
 				entity.discard();
-				return Optional.of(ActionResult.SUCCESS);
-			}
+				ItemEntity itemStackEntity = new ItemEntity(world, x, y, z, stack, vx, vy, vz);
+				world.spawnEntity(itemStackEntity);
 
-			ItemStack stack = new ItemStack(modItem);
-			entity.copyDataToStack(stack);
-
-			Vec3d entityPos = entity.getTrackedPosition().getPos();
-
-			float x = (float) entityPos.getX() + 0.5f;
-			float y = (float) entityPos.getY() + 0.5f;
-			float z = (float) entityPos.getZ() + 0.5f;
-			double vx = MathHelper.nextDouble(world.random, -0.1, 0.1);
-			double vy = MathHelper.nextDouble(world.random, 0.0, 0.1);
-			double vz = MathHelper.nextDouble(world.random, -0.1, 0.1);
-
-			entity.discard();
-			ItemEntity itemStackEntity = new ItemEntity(world, x, y, z, stack, vx, vy, vz);
-			world.spawnEntity(itemStackEntity);
-
-			if (!world.isClient()) {
 				ModCriterion.TURRET_ITEM_RETRIEVED_CRITERION.trigger((ServerPlayerEntity) player, stack);
 			}
 
-			entity.discard();
 			return Optional.of(ActionResult.SUCCESS);
 		}
 		return Optional.empty();

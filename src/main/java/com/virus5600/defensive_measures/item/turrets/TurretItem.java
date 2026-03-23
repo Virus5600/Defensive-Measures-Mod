@@ -104,6 +104,8 @@ public abstract class TurretItem extends Item {
 			);
 
 			if (entity != null) {
+				this.applyNbt((MobEntity) entity, nbt);
+
 				itemStack.decrement(1);
 				world.emitGameEvent(context.getPlayer(), GameEvent.ENTITY_PLACE, blockPos);
 			}
@@ -179,6 +181,7 @@ public abstract class TurretItem extends Item {
 	}
 
 	@Override
+	@Deprecated
 	public void appendTooltip(ItemStack stack, TooltipContext context, TooltipDisplayComponent displayComponent, Consumer<Text> textConsumer, TooltipType type) {
 		int maxHealth = (int) this.getTurretMaxHealth();
 		int currentHealth = maxHealth;
@@ -204,6 +207,46 @@ public abstract class TurretItem extends Item {
 					currentHealth, maxHealth)
 					.formatted(Formatting.RED)
 			);
+		}
+	}
+
+	/**
+	 * Sets custom data from the NBT Compound to the entity, allowing the old turret data
+	 * to carry over to the new one this item will spawn.
+	 * When overriding this method, {@link TurretItem#applyNbt(MobEntity, NbtCompound)} must
+	 * be called within the override method so that the following data could be set properly:
+	 * <ul>
+	 *     <li>{@code NoAI}</li>
+	 *     <li>{@code Silent}</li>
+	 *     <li>{@code NoGravity}</li>
+	 *     <li>{@code Glowing}</li>
+	 *     <li>{@code Invulnerable}</li>
+	 *     <li>{@code Health}</li>
+	 * </ul>
+	 *
+	 * @param entity {@link MobEntity} The entity to apply the NBT data to.
+	 * @param nbt {@link NbtCompound} The NBT data to apply to the entity.
+	 */
+	protected void applyNbt(MobEntity entity, NbtCompound nbt) {
+		if (nbt.contains("NoAI")) {
+			entity.setAiDisabled(nbt.getBoolean("NoAI", false));
+		}
+		if (nbt.contains("Silent")) {
+			entity.setSilent(nbt.getBoolean("Silent", false));
+		}
+		if (nbt.contains("NoGravity")) {
+			entity.setNoGravity(nbt.getBoolean("NoGravity", false));
+		}
+		if (nbt.contains("Glowing")) {
+			entity.setGlowing(nbt.getBoolean("Glowing", false));
+		}
+		if (nbt.contains("Invulnerable")) {
+			entity.setInvulnerable(nbt.getBoolean("Invulnerable", false));
+		}
+		if (nbt.contains("Health")) {
+			float max = entity.getMaxHealth();
+			float hp = Math.min(nbt.getFloat("Health", max), max);
+			entity.setHealth(hp);
 		}
 	}
 
