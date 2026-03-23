@@ -1604,9 +1604,22 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 		);
 	}
 
+	/**
+	 * Handles the basic animation of the turrets such as:
+	 * <ul>
+	 *     <li>{@code idleAnimationState}</li>
+	 *     <li>{@code shootAnimationState}</li>
+	 *     <li>{@code deathAnimationState}</li>
+	 * </ul>
+	 * Check the super method on how it was implemented if you wish
+	 * to override the method and prevent some of it from running
+	 * but also wish to keep others.
+	 *
+	 * @apiNote This method is only run on the client side, so any logic that is meant to be run on the server side should not be placed here.
+	 */
 	@Environment(EnvType.CLIENT)
 	protected void updateAnimations() {
-		this.idleAnimationState.start(this.age);
+		this.idleAnimationState.startIfNotRunning(this.age);
 
 		if (this.isDead()) {
 			this.deathAnimationState.start(this.age);

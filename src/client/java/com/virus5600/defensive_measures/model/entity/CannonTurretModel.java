@@ -65,7 +65,7 @@ public class CannonTurretModel extends EntityModel<BaseTurretRenderState> {
 	public void setAngles(BaseTurretRenderState state) {
 		super.setAngles(state);
 
-		this.setHeadAngles(state.relativeHeadYaw, state.pitch);
+		this.setHeadAngles(state.relativeHeadYaw + state.bodyYaw + 180, state.pitch);
 
 		this.shootAnim.apply(state.shootAnimationState, state.age);
 		this.deathAnim.apply(state.deathAnimationState, state.age);

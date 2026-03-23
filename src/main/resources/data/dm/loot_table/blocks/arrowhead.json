@@ -1,13 +1,63 @@
 {
 	"type": "minecraft:block",
-	"pools": [{
-		"rolls": 1.0,
-		"entries": [{
-			"type": "minecraft:item",
-			"name": "dm:arrowhead"
-		}],
-		"conditions": [{
-			"condition": "minecraft:survives_explosion"
-		}]
-	}]
+	"pools": [
+		{
+			"rolls": 1.0,
+			"entries": [
+				{
+					"type": "minecraft:item",
+					"name": "dm:arrowhead",
+					"functions": [
+						{
+							"function": "minecraft:set_count",
+							"count": 2,
+							"conditions": [
+								{
+									"condition": "minecraft:block_state_property",
+									"block": "dm:arrowhead",
+									"properties": {
+										"arrowheads": "2"
+									}
+								}
+							]
+						},
+						{
+							"function": "minecraft:set_count",
+							"count": 3,
+							"conditions": [
+								{
+									"condition": "minecraft:block_state_property",
+									"block": "dm:arrowhead",
+									"properties": {
+										"arrowheads": "3"
+									}
+								}
+							]
+						},
+						{
+							"function": "minecraft:set_count",
+							"count": 4,
+							"conditions": [
+								{
+									"condition": "minecraft:block_state_property",
+									"block": "dm:arrowhead",
+									"properties": {
+										"arrowheads": "4"
+									}
+								}
+							]
+						},
+						{
+							"function": "minecraft:explosion_decay"
+						}
+					]
+				}
+			],
+			"conditions": [
+				{
+					"condition": "minecraft:survives_explosion"
+				}
+			]
+		}
+	]
 }

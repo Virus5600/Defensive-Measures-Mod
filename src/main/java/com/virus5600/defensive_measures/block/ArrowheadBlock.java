@@ -7,7 +7,6 @@ import net.minecraft.block.ShapeContext;
 import net.minecraft.block.Waterloggable;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.pathing.NavigationType;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.fluid.Fluids;
@@ -22,7 +21,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
@@ -58,7 +56,6 @@ public class ArrowheadBlock extends Block implements Waterloggable {
 
 	public static final IntProperty ARROWHEADS = ModProperties.ARROWHEADS;
 	public static final BooleanProperty WATERLOGGED = Properties.WATERLOGGED;
-	public static final EnumProperty<Direction> FACING = Properties.HORIZONTAL_FACING;
 
 	private static final VoxelShape ONE_HEAD;
 	private static final VoxelShape TWO_HEADS;
@@ -105,7 +102,7 @@ public class ArrowheadBlock extends Block implements Waterloggable {
 
 	@Override
 	protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
-		builder.add(ARROWHEADS, WATERLOGGED, FACING);
+		builder.add(ARROWHEADS, WATERLOGGED);
 	}
 
 	@Override
@@ -162,8 +159,7 @@ public class ArrowheadBlock extends Block implements Waterloggable {
 		if (blockState.isOf(this)) {
 			Direction dir = ctx.getHorizontalPlayerFacing().getOpposite();
 
-			return blockState.cycle(ARROWHEADS)
-				.with(FACING, dir);
+			return blockState.cycle(ARROWHEADS);
 		} else {
 			FluidState fluidState = ctx.getWorld().getFluidState(ctx.getBlockPos());
 
@@ -175,14 +171,19 @@ public class ArrowheadBlock extends Block implements Waterloggable {
 
 	@Override
 	public void onSteppedOn(World world, BlockPos pos, BlockState state, Entity entity) {
-		if (entity instanceof LivingEntity livingEntity) {
+		if (!entity.bypassesSteppingEffects() && entity instanceof LivingEntity) {
 			if (world instanceof ServerWorld serverWorld) {
 				DamageSource dmgSrc = ModDamageSources.create(world, ModDamageTypes.ARROWHEAD);
-				livingEntity.damage(serverWorld, dmgSrc, this.getDamageDealt(state));
+				entity.damage(serverWorld, dmgSrc, this.getDamageDealt(state));
 			}
 		}
 
 		super.onSteppedOn(world, pos, state, entity);
+	}
+
+	@Override
+	public boolean canMobSpawnInside(BlockState state) {
+		return false;
 	}
 
 	@Override
@@ -206,10 +207,10 @@ public class ArrowheadBlock extends Block implements Waterloggable {
 	}
 
 	static {
-		ONE_HEAD = Block.createCuboidShape(6, 0, 6, 10, 3, 10);
-		TWO_HEADS = Block.createCuboidShape(6, 0, 3, 10, 3, 13);
-		THREE_HEADS = Block.createCuboidShape(3, 0, 3, 13, 3, 13);
-		FOUR_HEADS = Block.createCuboidShape(3, 0, 3, 13, 3, 13);
+		ONE_HEAD = Block.createCuboidShape(6, 0, 6, 10, 4, 10);
+		TWO_HEADS = Block.createCuboidShape(3, 0, 6, 13, 4, 10);
+		THREE_HEADS = Block.createCuboidShape(3, 0, 3, 13, 4, 13);
+		FOUR_HEADS = Block.createCuboidShape(3, 0, 3, 13, 4, 13);
 
 		SHAPES_BY_HEAD = new VoxelShape[] {
 			ONE_HEAD,

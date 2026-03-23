@@ -15,5 +15,4 @@ TODO: TurretEntity
 TODO: Fix Directional Rendering Bug for the Ballista Arrow (Renderer?)
 
 TODO:
-- ~~Fix `setCustomAnimation` issue with Geckolib library~~
-- Migrate to vanilla implementation instead of depending in Geckolib
+- Fix other animation implementation
