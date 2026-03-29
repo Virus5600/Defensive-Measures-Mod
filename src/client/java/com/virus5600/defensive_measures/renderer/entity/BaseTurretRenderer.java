@@ -38,7 +38,6 @@ public abstract class BaseTurretRenderer<
 		turretRenderState.variant = turretEntity.getVariant();
 		turretRenderState.shooting = turretEntity.getTrackedShooting();
 
-		turretRenderState.idleAnimationState.copyFrom(turretEntity.getIdleAnimationState());
 		turretRenderState.shootAnimationState.copyFrom(turretEntity.getShootAnimationState());
 		turretRenderState.deathAnimationState.copyFrom(turretEntity.getDeathAnimationState());
 	}

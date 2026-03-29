@@ -6,7 +6,6 @@ import net.minecraft.entity.AnimationState;
 import com.virus5600.defensive_measures.entity.turrets.interfaces.TurretVariant;
 
 public class BaseTurretRenderState extends LivingEntityRenderState {
-	public final AnimationState idleAnimationState = new AnimationState();
 	public final AnimationState shootAnimationState = new AnimationState();
 	public final AnimationState deathAnimationState = new AnimationState();
 
