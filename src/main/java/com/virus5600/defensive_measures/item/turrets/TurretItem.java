@@ -13,6 +13,10 @@ import net.minecraft.component.type.TooltipDisplayComponent;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnReason;
+import net.minecraft.entity.attribute.EntityAttributeInstance;
+import net.minecraft.entity.attribute.EntityAttributes;
+import net.minecraft.entity.effect.StatusEffect;
+import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
@@ -21,12 +25,17 @@ import net.minecraft.item.ItemUsageContext;
 import net.minecraft.item.SpawnEggItem;
 import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtList;
+import net.minecraft.nbt.NbtOps;
+import net.minecraft.registry.RegistryKeys;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.stat.Stats;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Hand;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
@@ -243,10 +252,44 @@ public abstract class TurretItem extends Item {
 		if (nbt.contains("Invulnerable")) {
 			entity.setInvulnerable(nbt.getBoolean("Invulnerable", false));
 		}
+		if (nbt.contains("MaxHealth")) {
+			float maxHp = nbt.getFloat("MaxHealth", entity.getMaxHealth());
+			EntityAttributeInstance maxHealthAttr = entity.getAttributeInstance(EntityAttributes.MAX_HEALTH);
+
+			if (maxHealthAttr != null) {
+				maxHealthAttr.setBaseValue(maxHp);
+			}
+		}
 		if (nbt.contains("Health")) {
 			float max = entity.getMaxHealth();
 			float hp = Math.min(nbt.getFloat("Health", max), max);
 			entity.setHealth(hp);
+		}
+		if (nbt.contains("ActiveEffects")) {
+			NbtList effectList = nbt.getList("ActiveEffects")
+				.orElse(new NbtList());
+
+			effectList.forEach(effect -> {
+				NbtCompound effectNbt = (NbtCompound) effect;
+				Identifier effId = Identifier.of(
+					effectNbt.getString("id").orElse("")
+				);
+
+				RegistryEntry<StatusEffect> entry = entity.getEntityWorld()
+					.getRegistryManager()
+					.getOrThrow(RegistryKeys.STATUS_EFFECT)
+					.getEntry(effId)
+					.orElse(null);
+
+				if (entry != null) {
+					NbtCompound nbtCompound = effectNbt.getCompound("effect")
+						.orElse(null);
+
+					StatusEffectInstance.CODEC
+						.parse(NbtOps.INSTANCE, nbtCompound)
+						.ifSuccess(entity::addStatusEffect);
+				}
+			});
 		}
 	}
 

@@ -606,8 +606,14 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 				.orElse(super.interactMob(player, hand));
 		}
 
-		// Healables
-		if (this.isHealableItem(item.getItem())) {
+		// Conditions for applying healables and effects
+		boolean isHealable = this.isHealableItem(item.getItem());
+		boolean isEffSrc = this.isEffectSource(item.getItem());
+
+		boolean isDamaged = this.getHealth() < this.getMaxHealth();
+
+		// Healables - Only heal when damaged, preventing item usage when entity doesn't need healing
+		if (isHealable && isDamaged) {
 			// Heals the turret
 			this.heal(this.getHealAmt(item.getItem()));
 
@@ -618,8 +624,8 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 			isSuccess = true;
 		}
 
-		// Effect Source
-		if (this.isEffectSource(item.getItem())) {
+		// Effect Source - Only apply when item has effect properties
+		if (isEffSrc) {
 			for (Object[] args : this.getMobEffect(item.getItem())) {
 				this.addStatusEffect(
 					new StatusEffectInstance(
@@ -630,7 +636,14 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 				);
 			}
 
-			isSuccess = true;
+			if (!isSuccess) {
+				isSuccess = true;
+
+				// Indicates an effect was applied
+				float pitch = 1F + (this.random.nextFloat() - this.random.nextFloat()) * 0.2F;
+				this.playSound(this.getHealSound(), 1F, pitch);
+			}
+
 		}
 
 		if (isSuccess) {
@@ -1698,6 +1711,24 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 		this.setTarget(target);
 	}
 
+	/**
+	 * Shoots a burst of projectiles with a specified count and delay between each shot.
+	 * <br><br>
+	 * This method is used when a turret is set to shoot multiple projectiles in a single attack,
+	 * allowing for a burst of projectiles to be fired in quick succession. The {@code count} parameter
+	 * determines how many projectiles will be fired in the burst, while the {@code delay} parameter
+	 * determines the delay between each shot.
+	 * <br><br>
+	 * In this overloaded version, the velocity data is instead used instead of a target, allowing
+	 * for the burst to shoot in said direction using the velocity data that will be applied to the
+	 * projectile.
+	 *
+	 * @param count The number of projectiles to shoot in the burst
+	 * @param delay The delay between each shot in ticks
+	 * @param velocityData An instance of {@link TurretProjectileVelocity} that will be applued to the projectile
+	 *
+	 * @see TurretProjectileVelocity
+	 */
 	protected void shootBurst(int count, int delay, TurretProjectileVelocity velocityData) {
 		this.shootBurst(count, delay);
 

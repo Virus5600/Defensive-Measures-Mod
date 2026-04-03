@@ -121,8 +121,6 @@ public class MGTurretEntity extends TurretEntity {
 
 	@Override
 	public void shootAt(LivingEntity target, float pullProgress) {
-//		this.triggerAnim("FiringSequence", "shoot");
-
 		float dist = (float) this.getTrackedPosition()
 			.getPos()
 			.distanceTo(target.getTrackedPosition().getPos());

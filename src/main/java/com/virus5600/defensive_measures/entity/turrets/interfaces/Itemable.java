@@ -3,11 +3,14 @@ package com.virus5600.defensive_measures.entity.turrets.interfaces;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.NbtComponent;
 import net.minecraft.entity.ItemEntity;
+import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtList;
+import net.minecraft.nbt.NbtOps;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.util.ActionResult;
@@ -76,7 +79,29 @@ public interface Itemable {
 		// Sets the name
 		stack.set(DataComponentTypes.CUSTOM_NAME, entity.hasCustomName() ? entity.getCustomName() : stack.getName());
 
+		// Finalized NBT
 		NbtCompound nbtCompound = new NbtCompound();
+		// For storing active entity status effects
+		NbtList effectList = new NbtList();
+
+		entity.getActiveStatusEffects().forEach((entry, effectInstance) -> {
+			NbtCompound effectNbt = new NbtCompound();
+
+			// Store the effect key
+			entry.getKey().ifPresent(
+				key -> effectNbt.putString("id", key.getValue().toString())
+			);
+
+			// Then store the effect instance
+			effectNbt.put(
+				"effect",
+				StatusEffectInstance.CODEC
+					.encodeStart(NbtOps.INSTANCE, effectInstance)
+					.getOrThrow()
+			);
+
+			effectList.add(effectNbt);
+		});
 
 		// Sets the NBT
 		nbtCompound.putBoolean("NoAI", entity.isAiDisabled());
@@ -86,6 +111,7 @@ public interface Itemable {
 		nbtCompound.putBoolean("Invulnerable", entity.isInvulnerable());
 		nbtCompound.putFloat("Health", entity.getHealth());
 		nbtCompound.putFloat("MaxHealth", entity.getMaxHealth());
+		nbtCompound.put("ActiveEffects",  effectList);
 
 		stack.set(DataComponentTypes.CUSTOM_DATA, NbtComponent.of(nbtCompound));
 	}
