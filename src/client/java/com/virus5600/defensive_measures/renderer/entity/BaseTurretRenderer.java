@@ -1,6 +1,5 @@
 package com.virus5600.defensive_measures.renderer.entity;
 
-import com.virus5600.defensive_measures.animations.entity.BallistaTurretAnimation;
 import com.virus5600.defensive_measures.entity.turrets.TurretEntity;
 import com.virus5600.defensive_measures.renderer.entity.state.BaseTurretRenderState;
 import net.minecraft.client.render.entity.EntityRendererFactory;

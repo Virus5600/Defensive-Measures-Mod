@@ -214,11 +214,11 @@ public class BallistaTurretEntity extends TurretEntity {
 	}
 
 	public double getProjectileDamage() {
-		return DAMAGE[this.getLevel() - 1];
+		return DAMAGE[this.getTrackedLevel() - 1];
 	}
 
 	public byte getProjectilePierceLevel() {
-		return PIERCE_LEVELS[this.getLevel() - 1];
+		return PIERCE_LEVELS[this.getTrackedLevel() - 1];
 	}
 
 	public int getTotalAttCooldown() {

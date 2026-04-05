@@ -137,6 +137,7 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 	 */
 	protected static final TrackedData<Integer> BURST_DELAY;
 	protected static final TrackedData<Boolean> SHOOTING;
+	protected static final TrackedData<Boolean> IS_LOCKED_BUT_NOT_ATTACKING;
 	/**
 	 * The maximum health of this turret entity. Change this value using the {@link #setTurretMaxHealth(float)}
 	 * method before calling the {@link TurretEntity#setAttributes()} method to set the max health
@@ -445,6 +446,7 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 			.add(BURST_PROJECTILE_FIRED, 0)
 			.add(BURST_DELAY, 0)
 			.add(SHOOTING, false)
+			.add(IS_LOCKED_BUT_NOT_ATTACKING, false)
 		;
 	}
 
@@ -667,7 +669,7 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 	@Override
 	public void readCustomData(ReadView view) {
 		super.readCustomData(view);
-		this.setLevel(view.getInt("Level", this.level));
+		this.setTrackedLevel(view.getInt("Level", this.level));
 		this.setFromItem(view.getByte("FromItem", this.isFromItem()));
 	}
 
@@ -777,7 +779,7 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 		}
 		// SERVER SIDE
 		else {
-			this.dataTracker.set(SHOOTING_PITCH, this.getPitch());
+			this.setTrackedPitch(this.getPitch());
 
 			// Adjusts the pitch when shooting
 			if (this.getTarget() != null) {
@@ -791,7 +793,7 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 				p *= (float) (180.0 / Math.PI);
 				p = MathHelper.clamp(p, -this.getMaxLookPitchChange(), this.getMaxLookPitchChange());
 
-				this.dataTracker.set(SHOOTING_PITCH, p);
+				this.setTrackedPitch(p);
 			}
 
 			// Negates the levitation effect
@@ -800,7 +802,7 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 			}
 
 			// When using the burst attack
-			if (this.dataTracker.get(USE_BURST)) {
+			if (this.getTrackedUseBurst()) {
 				if (this.getTarget() == null) {
 					this.resetBurst();
 				}
@@ -866,7 +868,7 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 	 * to call it if needed.
 	 */
 	public void resetBurst() {
-		this.dataTracker.set(USE_BURST, false);
+		this.setTrackedUseBurst(false);
 		this.dataTracker.set(BURST_COUNT, 0);
 		this.dataTracker.set(BURST_PROJECTILE_FIRED, 0);
 		this.dataTracker.set(BURST_DELAY, 0);
@@ -1028,9 +1030,85 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 		);
 	}
 
+	// //////////// //
+	// TRACKED DATA //
+	// //////////// //
+
+	public int getTrackedLevel() {
+		return Math.clamp(this.dataTracker.get(LEVEL), 1, this.getMaxLevel());
+	}
+
+	public void setTrackedLevel(int level) {
+		this.dataTracker.set(LEVEL, Math.clamp(level, 1, this.getMaxLevel()));
+	}
+
+	public float getTrackedPitch() {
+		return this.dataTracker.get(SHOOTING_PITCH);
+	}
+
+	public void setTrackedPitch(float pitch) {
+		this.dataTracker.set(SHOOTING_PITCH, pitch);
+	}
+
+	public boolean getTrackedUseBurst() {
+		return this.dataTracker.get(USE_BURST);
+	}
+
+	public void setTrackedUseBurst(boolean usingBurst) {
+		this.dataTracker.set(USE_BURST, usingBurst);
+	}
+
+	/**
+	 * Retrieves the direction where this turret is attached to.
+	 * @return {@code Direction} The direction where this turret is attached to.
+	 */
+	protected Direction getAttachedFace() {
+		return this.dataTracker.get(ATTACHED_FACE);
+	}
+
+	/**
+	 * Sets the direction where this will be attached to.
+	 * @param dir The direction to attach to.
+	 */
+	protected void setAttachedFace(Direction dir) {
+		this.dataTracker.set(ATTACHED_FACE, dir);
+	}
+
+	public boolean getTrackedShooting() {
+		return this.dataTracker.get(SHOOTING);
+	}
+
+	public void setTrackedShooting(boolean shooting) {
+		this.dataTracker.set(SHOOTING, shooting);
+	}
+
+	public void setTrackedLockedButNotAttacking(boolean locked) {
+		this.dataTracker.set(IS_LOCKED_BUT_NOT_ATTACKING, locked);
+	}
+
+	public boolean getTrackedLockedButNotAttacking() {
+		return this.dataTracker.get(IS_LOCKED_BUT_NOT_ATTACKING);
+	}
+
 	// /////////////////// //
 	// GETTERS AND SETTERS //
 	// /////////////////// //
+
+	/**
+	 * Retrieves the maximum level of this turret.
+	 * <br><br>
+	 * The default maximum level is 3. This can value can be changed
+	 * by overriding this method and returning a different value.
+	 * <br><br>
+	 * This method is also used by {@link #getTrackedLevel()} and {@link #setTrackedLevel(int)}
+	 * to clamp the level between 1 and the maximum level, ensuring that the
+	 * level is within the bounds of the maximum level.
+	 *
+	 * @return {@code int} The maximum level of this turret.
+	 */
+	public int getMaxLevel() {
+		return 3;
+	}
 
 	public static float getTurretMaxHealth() {
 		return TurretEntity.MAX_HEALTH;
@@ -1051,18 +1129,6 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 	@Override
 	protected MoveEffect getMoveEffect() {
 		return MoveEffect.NONE;
-	}
-
-	public float getTrackedPitch() {
-		return this.dataTracker.get(SHOOTING_PITCH);
-	}
-
-	public boolean getTrackedShooting() {
-		return this.dataTracker.get(SHOOTING);
-	}
-
-	public void setTrackedShooting(boolean shooting) {
-		this.dataTracker.set(SHOOTING, shooting);
 	}
 
 	/**
@@ -1407,47 +1473,6 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 			.get(currentBarrel);
 	}
 
-	// //////////// //
-	// TRACKED DATA //
-	// //////////// //
-
-	/**
-	 * Retrieves the maximum level of this turret.
-	 * <br><br>
-	 * The default maximum level is 3. This can value can be changed
-	 * by overriding this method and returning a different value.
-	 * <br><br>
-	 * This method is also used by {@link #getLevel()} and {@link #setLevel(int)}
-	 * to clamp the level between 1 and the maximum level, ensuring that the
-	 * level is within the bounds of the maximum level.
-	 *
-	 * @return {@code int} The maximum level of this turret.
-	 */
-	public int getMaxLevel() {
-		return 3;
-	}
-	public int getLevel() {
-		return Math.clamp(this.dataTracker.get(LEVEL), 1, this.getMaxLevel());
-	}
-	public void setLevel(int level) {
-		this.dataTracker.set(LEVEL, Math.clamp(level, 1, this.getMaxLevel()));
-	}
-
-	/**
-	 * Retrieves the direction where this turret is attached to.
-	 * @return {@code Direction} The direction where this turret is attached to.
-	 */
-	protected Direction getAttachedFace() {
-		return this.dataTracker.get(ATTACHED_FACE);
-	}
-	/**
-	 * Sets the direction where this will be attached to.
-	 * @param dir The direction to attach to.
-	 */
-	protected void setAttachedFace(Direction dir) {
-		this.dataTracker.set(ATTACHED_FACE, dir);
-	}
-
 	// ///////////////////////// //
 	// INTERFACE IMPLEMENTATIONS //
 	// ///////////////////////// //
@@ -1632,6 +1657,10 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 	 * Check the super method on how it was implemented if you wish
 	 * to override the method and prevent some of it from running
 	 * but also wish to keep others.
+	 * <br><br>
+	 * Applying particle effects to a turret must be done inside this
+	 * method. Call the superclass's method prior to the particle logic
+	 * (see {@link CannonTurretEntity Cannon Turret's class} for reference.
 	 *
 	 * @apiNote This method is only run on the client side, so any logic that is meant to be run on the server side should not be placed here.
 	 */
@@ -1684,7 +1713,7 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 	protected void shootBurst(int count, int delay) {
 		this.dataTracker.set(BURST_COUNT, count);
 		this.dataTracker.set(BURST_DELAY, delay);
-		this.dataTracker.set(USE_BURST, true);
+		this.setTrackedUseBurst(true);
 
 		if (!this.getEntityWorld().isClient()) {
 			this.burstDelayTimer = delay;
@@ -2211,6 +2240,7 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 		FROM_ITEM = DataTracker.registerData(TurretEntity.class, TrackedDataHandlerRegistry.BYTE);
 		SHOOTING_PITCH = DataTracker.registerData(TurretEntity.class, TrackedDataHandlerRegistry.FLOAT);
 		USE_BURST = DataTracker.registerData(TurretEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
+		IS_LOCKED_BUT_NOT_ATTACKING = DataTracker.registerData(TurretEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
 
 		ATTACHED_FACE = DataTracker.registerData(TurretEntity.class, TrackedDataHandlerRegistry.FACING);
 		X = DataTracker.registerData(TurretEntity.class, TrackedDataHandlerRegistry.FLOAT);

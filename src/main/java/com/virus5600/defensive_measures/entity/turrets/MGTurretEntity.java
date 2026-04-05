@@ -1,6 +1,9 @@
 package com.virus5600.defensive_measures.entity.turrets;
 
 import com.virus5600.defensive_measures.entity.turrets.interfaces.TurretVariant;
+import com.virus5600.defensive_measures.particle.ModParticles;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.attribute.DefaultAttributeContainer.Builder;
@@ -40,7 +43,7 @@ import java.util.Map;
  *     <li><b>Health:</b> 25</li>
  *     <li><b>Base Damage:</b> 5.0</li>
  *     <li><b>Base Pierce Level:</b> 5</li>
- *     <li><b>Attack Cooldown:</b> 0.1 seconds per bullets / 3.75 seconds per burst</li>
+ *     <li><b>Attack Cooldown:</b> 0.125 seconds per bullets / 3.75 seconds per burst</li>
  *     <li><b>Attack Range:</b> 20 blocks</li>
  *     <li><b>X Firing Arc:</b> ±360°</li>
  *     <li><b>Y Firing Arc:</b> ±27.5°</li>
@@ -103,7 +106,7 @@ public class MGTurretEntity extends TurretEntity {
 	@Override
 	protected void initDataTracker(DataTracker.Builder builder) {
 		// Initialize standard data trackers
-	super.initDataTracker(builder);
+		super.initDataTracker(builder);
 	}
 
 	public static Builder setAttributes() {
@@ -129,7 +132,7 @@ public class MGTurretEntity extends TurretEntity {
 			.setVelocity(target)
 			.setUpwardVelocityMultiplier(dist * 0.125f);
 
-		super.shootBurst(5, 3, velocityData);
+		super.shootBurst(5, 5, velocityData);
 	}
 
 	// /////////////////// //
@@ -182,15 +185,46 @@ public class MGTurretEntity extends TurretEntity {
 	}
 
 	public double getProjectileDamage() {
-		return DAMAGE[this.getLevel() - 1];
+		return DAMAGE[this.getTrackedLevel() - 1];
 	}
 
 	public byte getProjectilePierceLevel() {
-		return PIERCE_LEVELS[this.getLevel() - 1];
+		return PIERCE_LEVELS[this.getTrackedLevel() - 1];
 	}
 
 	public int getTotalAttCooldown() {
 		return TOTAL_ATT_COOLDOWN;
+	}
+
+	// //////////// //
+	// OVERRIDABLES //
+	// //////////// //
+
+	@Environment(EnvType.CLIENT)
+	@Override
+	protected void updateAnimations() {
+		// Calls all the previous animation logics first before handling
+		// particle logic
+		super.updateAnimations();
+
+		// Set variables that will be used for logic
+		boolean isShooting = this.getTrackedShooting();
+		boolean stillShooting = this.getTrackedUseBurst();
+
+		// Handles the Flash particle for when the MG shoots
+		if (isShooting || stillShooting) {
+			Vec3d barrelPos = this.getRelativePos(
+				this.getCurrentBarrel(false)
+					.add(0, 0, 0.05)
+			);
+
+			this.getEntityWorld()
+				.addParticleClient(
+					ModParticles.SUSPENDED_SPARKS,
+					barrelPos.getX(), barrelPos.getY(), barrelPos.getZ(),
+					0, 0, 0
+				);
+		}
 	}
 
 	// /////////////////// //

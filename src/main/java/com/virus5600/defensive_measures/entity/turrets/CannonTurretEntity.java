@@ -1,5 +1,7 @@
 package com.virus5600.defensive_measures.entity.turrets;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.entity.AnimationState;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -27,6 +29,7 @@ import com.virus5600.defensive_measures.entity.TurretMaterial;
 import com.virus5600.defensive_measures.entity.ai.goal.ProjectileAttackGoal;
 import com.virus5600.defensive_measures.entity.turrets.interfaces.TurretVariant;
 import com.virus5600.defensive_measures.item.ModItems;
+import com.virus5600.defensive_measures.particle.ModParticles;
 import com.virus5600.defensive_measures.sound.ModSoundEvents;
 
 import java.util.HashMap;
@@ -71,7 +74,6 @@ public class CannonTurretEntity extends TurretEntity {
 	private static final Map<Item, SoundEvent> HEAL_SOUNDS;
 	private static final double[] DAMAGE;
 	private static final byte[] PIERCE_LEVELS;
-
 	/**
 	 * Contains all the items that can heal this entity.
 	 */
@@ -138,8 +140,6 @@ public class CannonTurretEntity extends TurretEntity {
 			.setUpwardVelocityMultiplier(dist * 0.1625f);
 
 		super.shootAt(velocityData);
-//		this.stopTriggeredAnim("FiringSequence", "charge");
-//		this.triggerAnim("FiringSequence", "shoot");
 	}
 
 	@Override
@@ -157,17 +157,18 @@ public class CannonTurretEntity extends TurretEntity {
 	public void tick() {
 		super.tick();
 
+		// Client Side
 		if (this.getEntityWorld().isClient()) {
 			this.updateAnimations();
 		}
+		// Server Side
 		else {
 			int updateCountdownTicks = this.attackGoal.getUpdateCountdownTicks(),
 				afterAttackTick = 5,
 				beforeAttackTick = TOTAL_ATT_COOLDOWN - afterAttackTick;
+			boolean isCharging = updateCountdownTicks > afterAttackTick && updateCountdownTicks < beforeAttackTick;
 
-			if (updateCountdownTicks > afterAttackTick && updateCountdownTicks < beforeAttackTick ) {
-//				this.triggerAnim("FiringSequence", "charge");
-			}
+			this.setTrackedLockedButNotAttacking(isCharging);
 		}
 	}
 
@@ -212,35 +213,6 @@ public class CannonTurretEntity extends TurretEntity {
 		return 3f;
 	}
 
-//	private void firingSequenceKeyframeHandler(KeyFrameEvent<CannonTurretEntity, ParticleKeyframeData> event) {
-//		final String LOCATOR = event.keyframeData()
-//			.getLocator();
-//
-//		World world =  this.getEntityWorld();
-//
-//		if (LOCATOR.equals("barrel")) {
-//			Vec3d barrelPos = this.getRelativePos(this.getCurrentBarrel(false)),
-//				velocityModifier = this.getRelativePos(0, 0, 1.5).subtract(this.getEyePos());
-//
-//			world.addParticleClient(
-//				ModParticles.CANNON_FLASH,
-//				barrelPos.getX(), barrelPos.getY(), barrelPos.getZ(),
-//				velocityModifier.getX(), velocityModifier.getY(), velocityModifier.getZ()
-//			);
-//		}
-//		else if (LOCATOR.equals("fuse")) {
-//			Vec3d fusePos = this.getRelativePos(
-//				OFFSETS.get(Offsets.FUSE).getFirst()
-//			);
-//
-//			world.addParticleClient(
-//				ModParticles.CANNON_FUSE,
-//				fusePos.getX(), fusePos.getY(), fusePos.getZ(),
-//				0, 0.225, -0.50
-//			);
-//		}
-//	}
-
 	// ///////////////////////// //
 	// INTERFACE IMPLEMENTATIONS //
 	// ///////////////////////// //
@@ -260,15 +232,58 @@ public class CannonTurretEntity extends TurretEntity {
 	}
 
 	public double getProjectileDamage() {
-		return DAMAGE[this.getLevel() - 1];
+		return DAMAGE[this.getTrackedLevel() - 1];
 	}
 
 	public byte getProjectilePierceLevel() {
-		return PIERCE_LEVELS[this.getLevel() - 1];
+		return PIERCE_LEVELS[this.getTrackedLevel() - 1];
 	}
 
 	public int getTotalAttCooldown() {
 		return TOTAL_ATT_COOLDOWN;
+	}
+
+	// //////////// //
+	// OVERRIDABLES //
+	// //////////// //
+
+	@Environment(EnvType.CLIENT)
+	@Override
+	protected void updateAnimations() {
+		// Calls all the previous animation logics first before handling
+		// particle logic
+		super.updateAnimations();
+
+		// Set variables that will be used for the logic
+		boolean isLockedButNotAttacking = this.getTrackedLockedButNotAttacking();
+		boolean isShooting = this.getTrackedShooting();
+
+		// Handles Fuse particle for when locked but not yet shooting
+		if (!isShooting && isLockedButNotAttacking) {
+			Vec3d fusePos = this.getRelativePos(
+				OFFSETS.get(Offsets.FUSE).getFirst()
+			);
+
+			this.getEntityWorld()
+				.addParticleClient(
+					ModParticles.CANNON_FUSE,
+					fusePos.getX(), fusePos.getY(), fusePos.getZ(),
+					0, 0.225, -0.5
+				);
+		}
+
+		// Handles the Flash particle for when the cannon shoots
+		if (isShooting) {
+			Vec3d barrelPos = this.getRelativePos(this.getCurrentBarrel(false)),
+				velocityModifier = this.getRelativePos(0, 0, 1.5).subtract(this.getEyePos());
+
+			this.getEntityWorld()
+				.addParticleClient(
+					ModParticles.CANNON_FLASH,
+					barrelPos.getX(), barrelPos.getY(), barrelPos.getZ(),
+					velocityModifier.getX(), velocityModifier.getY(), velocityModifier.getZ()
+				);
+		}
 	}
 
 	// /////////////////// //
