@@ -50,7 +50,7 @@ jobs:
           echo "Fabric API Version: ${{ matrix.version.api }}"
 
       - name: Run MC test client
-        uses: headlesshq/mc-runtime-test@3.0.0
+        uses: headlesshq/mc-runtime-test@4.3.0
         with:
           mc: ${{ matrix.version.minecraft_version }}
           modloader: ${{ matrix.version.loader }}
