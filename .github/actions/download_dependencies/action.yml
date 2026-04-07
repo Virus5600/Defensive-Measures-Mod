@@ -4,8 +4,8 @@ description: "Downloads the dependencies for the mod"
 inputs:
   minecraft_version:
     type: string
-    description: 'Minecraft version to use for testing. Defaults to "1.21.3".'
-    default: "1.21.3"
+    description: 'Minecraft version to use for testing. Defaults to "1.21.11".'
+    default: "1.21.11"
 
   loader:
     type: string
