@@ -4,7 +4,6 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.model.ModelPart;
-import net.minecraft.client.render.entity.animation.Animation;
 import net.minecraft.client.render.entity.model.EntityModel;
 import net.minecraft.client.render.entity.state.EntityRenderState;
 import net.minecraft.resource.ResourceManager;
@@ -16,9 +15,8 @@ import com.virus5600.defensive_measures.model.projectiles.BaseProjectileModel;
 import com.virus5600.defensive_measures.renderer.entity.state.BaseTurretRenderState;
 
 import org.jetbrains.annotations.NotNull;
-import org.jspecify.annotations.Nullable;
 
-import java.util.Map;
+import java.util.Arrays;
 
 /**
  * This class serves as the base model for all models in the mod. It extends
@@ -42,11 +40,10 @@ import java.util.Map;
  */
 @Environment(EnvType.CLIENT)
 public class BaseModel<T extends EntityRenderState> extends EntityModel<T> {
-	/** A map of common animations used by turret models. */
-	protected final Map<String, Animation> animations;
-
-	/** Determines the path of the texture this model will use. */
-	protected Identifier[] texturePath;
+	/** Determines the path of the texture(s) this model will use. */
+	protected Identifier texturePath;
+	/** Identifies all the texture(s) this model will use. */
+	protected Identifier[] textures;
 	/** Identifies the default or base texture this model will use. */
 	protected Identifier baseTexture;
 
@@ -55,52 +52,47 @@ public class BaseModel<T extends EntityRenderState> extends EntityModel<T> {
 	// //////////// //
 
 	/**
-	 * Constructs a new {@link BaseModel} with the specified model path,
-	 * texture path, and animation path. These paths and bone names will be used by this model
-	 * renderer to render the turret entity with GeckoLib 3.
+	 * Constructs a new {@link BaseModel} with the specified root model part and texture path. The
+	 * constructor will use
 	 *
 	 * @param root        The root model part of this model.
-	 * @param texturePath The path of the texture or folder containing textures for this model.
-	 * @param idleAnim    The idle animation for this model.
-	 * @param shootAnim   The shooting animation for this model.
-	 * @param deathAnim   The death animation for this model. Can be null.
+	 * @param texturePath The path of the folder that contains the texture(s) for this model.
+	 * @param textures    An array of all the texture names this model will use.
 	 *
 	 * @see #texturePath
+	 * @see #textures
 	 */
-	public BaseModel(
-		@NotNull ModelPart root, @NotNull String texturePath,
-		@Nullable Animation idleAnim, @Nullable Animation shootAnim, @Nullable Animation deathAnim
-		) {
+	public BaseModel(@NotNull ModelPart root, @NotNull String texturePath, @NotNull String[] textures) {
 		super(root);
 
-		// Set the texture path(s)
-		if (texturePath.endsWith(".png")) {
-			this.texturePath = new Identifier[] {
-				Identifier.of(DefensiveMeasures.MOD_ID, texturePath)
-			};
-		}
-		else {
-			ResourceManager manager = MinecraftClient.getInstance().getResourceManager();
+		ResourceManager manager = MinecraftClient.getInstance().getResourceManager();
 
-			this.texturePath = manager.findResources(
-					texturePath,
-					path -> path.getPath().endsWith(".png"))
-				.keySet()
-				.toArray(new Identifier[0]);
-		}
+		texturePath = "textures/entity/" + texturePath;
+		this.texturePath = Identifier.of(texturePath);
 
-		this.baseTexture = this.texturePath[0];
+		this.textures = Arrays.stream(textures)
+			.map(texture -> Identifier.of(
+				DefensiveMeasures.MOD_ID,
+				this.texturePath.getPath() + "/" + texture
+			))
+			.toArray(Identifier[]::new);
 
-		// Set the common animations in the animation map
-		if (idleAnim != null) {
-			this.animations = Map.of(
-				"idle", idleAnim,
-				"shoot", (shootAnim == null ? idleAnim : shootAnim),
-				"death", (deathAnim == null ? idleAnim : deathAnim)
-			);
-		}
-		else {
-			this.animations = null;
-		}
+		this.baseTexture = this.textures[0];
+	}
+
+	// ////////////// //
+	// CUSTOM METHODS //
+	// ////////////// //
+
+	protected Identifier getTexturePath() {
+		return this.texturePath;
+	}
+
+	public Identifier[] getTextures() {
+		return this.textures;
+	}
+
+	public Identifier getBaseTexture() {
+		return this.baseTexture;
 	}
 }

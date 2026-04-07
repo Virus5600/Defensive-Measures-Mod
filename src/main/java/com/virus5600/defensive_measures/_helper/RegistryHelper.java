@@ -1,4 +1,4 @@
-package com.virus5600.defensive_measures.util;
+package com.virus5600.defensive_measures._helper;
 
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
@@ -31,9 +31,9 @@ import java.util.function.Function;
  *
  * @since 1.0.0
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
- * @version 1.0.0
+ * @version 1.0.1
  */
-public class RegistryUtil {
+public final class RegistryHelper {
 	// Block Registry
 	private static RegistryKey<Block> createBlockKey(String name) {
 		return RegistryKey.of(RegistryKeys.BLOCK, Identifier.of(DefensiveMeasures.MOD_ID, name));

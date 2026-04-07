@@ -10,7 +10,7 @@ import com.virus5600.defensive_measures.item.turrets.TurretItem;
 import com.virus5600.defensive_measures.item.turrets.ballista.*;
 import com.virus5600.defensive_measures.item.turrets.cannon.*;
 import com.virus5600.defensive_measures.item.turrets.mg_turret.*;
-import com.virus5600.defensive_measures.util.RegistryUtil;
+import com.virus5600.defensive_measures._helper.RegistryHelper;
 
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.fabricmc.fabric.api.registry.FuelRegistryEvents;
@@ -87,7 +87,7 @@ public class ModItems {
 	 * @return The registered item.
 	 */
 	private static Item registerItem(String name, EntityType<? extends MobEntity> entityType, TurretItemFactory<? extends TurretItem> factory) {
-		return RegistryUtil.registerItem(
+		return RegistryHelper.registerItem(
 			name,
 			(settings) -> factory.create(entityType, settings),
 			new Settings()
@@ -103,7 +103,7 @@ public class ModItems {
 	 * @return The registered item.
 	 */
 	private static Item registerToolItem(String name, Function<Item.Settings, Item> factory) {
-		return RegistryUtil.registerItem(
+		return RegistryHelper.registerItem(
 			name,
 			factory
 		);
@@ -116,7 +116,7 @@ public class ModItems {
 	 * @return The registered item.
 	 */
 	private static Item registerItem(String name, ItemFactory<? extends Item> factory) {
-		return RegistryUtil.registerItem(
+		return RegistryHelper.registerItem(
 			name,
 			factory::create,
 			new Settings()
@@ -129,7 +129,7 @@ public class ModItems {
 	 * @return The registered item.
 	 */
 	private static Item registerItem(Block block) {
-		return RegistryUtil.registerItem(block);
+		return RegistryHelper.registerItem(block);
 	}
 
 	public static void registerModItems() {

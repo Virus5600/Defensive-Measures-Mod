@@ -1,0 +1,35 @@
+{
+	"replace": false,
+	"values": [
+		"#c:chains",
+		"minecraft:iron_block",
+		"minecraft:gold_block",
+		"minecraft:netherite_block",
+		"minecraft:raw_iron_block",
+		"minecraft:raw_gold_block",
+		"minecraft:raw_copper_block",
+		"minecraft:copper_block",
+		"minecraft:exposed_copper",
+		"minecraft:weathered_copper",
+		"minecraft:oxidized_copper",
+		"minecraft:waxed_copper_block",
+		"minecraft:waxed_exposed_copper",
+		"minecraft:waxed_weathered_copper",
+		"minecraft:waxed_oxidized_copper",
+		"minecraft:iron_door",
+		"minecraft:iron_trapdoor",
+		"minecraft:iron_bars",
+		"minecraft:hopper",
+		"minecraft:anvil",
+		"minecraft:chipped_anvil",
+		"minecraft:damaged_anvil",
+		"minecraft:cauldron",
+		"minecraft:lava_cauldron",
+		"minecraft:water_cauldron",
+		"minecraft:powder_snow_cauldron",
+		"minecraft:lightning_rod",
+		"minecraft:lantern",
+		"minecraft:soul_lantern"
+	]
+}
+

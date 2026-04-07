@@ -1,4 +1,4 @@
-package com.virus5600.defensive_measures.util;
+package com.virus5600.defensive_measures._util;
 
 import net.minecraft.item.Item;
 
@@ -12,9 +12,9 @@ import net.minecraft.item.Item;
  *
  * @since 1.0.0
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
- * @version 1.0.0
+ * @version 1.0.1
  */
-public class ItemUtil {
+public final class ItemUtil {
 	/**
 	 * Identifies whether the provided {@code item} is a subclass of the provided {@code class}
 	 * @param type Target subclass

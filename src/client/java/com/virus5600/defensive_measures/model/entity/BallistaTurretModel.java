@@ -1,32 +1,30 @@
 package com.virus5600.defensive_measures.model.entity;
 
 import net.minecraft.client.model.*;
-import net.minecraft.client.render.entity.animation.Animation;
-import net.minecraft.client.render.entity.model.EntityModel;
-import net.minecraft.util.math.MathHelper;
 
 import com.virus5600.defensive_measures.animations.entity.BallistaTurretAnimation;
 import com.virus5600.defensive_measures.renderer.entity.state.BaseTurretRenderState;
 
-public class BallistaTurretModel extends EntityModel<BaseTurretRenderState> {
+public class BallistaTurretModel extends BaseTurretModel<BaseTurretRenderState> {
 
-	private final ModelPart head;
-	private final ModelPart bow;
-
-	private final Animation shootAnim;
-	private final Animation deathAnim;
+	protected final static String[] TEXTURES = new String[] {
+		"ballista.png"
+	};
 
 	public BallistaTurretModel(ModelPart root) {
-		super(root);
+		super(
+			root, "ballista", TEXTURES,
 
-		ModelPart base = root.getChild("base");
-		this.head = base.getChild("head");
-		this.bow = this.head.getChild("bow");
+			root.getChild("base").getChild("head"),
+			root.getChild("base").getChild("head").getChild("bow"),
 
-		this.shootAnim = BallistaTurretAnimation.ANIM_BALLISTA_SHOOT.createAnimation(root);
-		this.deathAnim = BallistaTurretAnimation.ANIM_BALLISTA_DEATH.createAnimation(root);
+			BallistaTurretAnimation.ANIM_BALLISTA_SHOOT.createAnimation(root),
+			BallistaTurretAnimation.ANIM_BALLISTA_DEATH.createAnimation(root)
+		);
+
 	}
 
+	@SuppressWarnings("unused")
 	public static TexturedModelData getTexturedModelData() {
 		ModelData modelData = new ModelData();
 		ModelPartData modelPartData = modelData.getRoot();
@@ -115,20 +113,17 @@ public class BallistaTurretModel extends EntityModel<BaseTurretRenderState> {
 		return TexturedModelData.of(modelData, 128, 128);
 	}
 
+	// //////////////// //
+	// ABSTRACT METHODS //
+	// //////////////// //
+
 	@Override
-	public void setAngles(BaseTurretRenderState state) {
-		super.setAngles(state);
-
-		this.setHeadAngles(state.relativeHeadYaw + state.bodyYaw + 180, state.pitch);
-
-		this.shootAnim.apply(state.shootAnimationState, state.age);
-		this.deathAnim.apply(state.deathAnimationState, state.age);
+	protected float getMinPitch() {
+		return -22.5f;
 	}
 
-	private void setHeadAngles(float headYaw, float headPitch) {
-		headPitch = MathHelper.clamp(headPitch, -22.5f, 22.5f);
-
-		this.head.yaw = headYaw * ((float) Math.PI / 180F);
-		this.bow.pitch = headPitch * ((float) Math.PI / 180F);
+	@Override
+	protected float getMaxPitch() {
+		return 22.5f;
 	}
 }

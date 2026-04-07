@@ -23,7 +23,6 @@ import org.jetbrains.annotations.Nullable;
 import com.virus5600.defensive_measures.entity.ModEntities;
 import com.virus5600.defensive_measures.entity.TurretMaterial;
 import com.virus5600.defensive_measures.entity.ai.goal.ProjectileAttackGoal;
-import com.virus5600.defensive_measures.entity.turrets.interfaces.TurretVariant;
 import com.virus5600.defensive_measures.item.ModItems;
 import com.virus5600.defensive_measures.sound.ModSoundEvents;
 
@@ -193,15 +192,6 @@ public class BallistaTurretEntity extends TurretEntity {
 	@Override
 	public SoundEvent getEntityRemoveSound() {
 		return ModSoundEvents.TURRET_REMOVED_WOOD;
-	}
-
-	// ///////////////////////// //
-	// INTERFACE IMPLEMENTATIONS //
-	// ///////////////////////// //
-
-	@Override
-	public @Nullable TurretVariant getVariant() {
-		return null;
 	}
 
 	// //////////////////////// //

@@ -1,0 +1,25 @@
+{
+	"replace": false,
+	"values": [
+		"#c:concrete",
+		"#minecraft:base_stone_overworld",
+		"#minecraft:base_stone_nether",
+		"#minecraft:stone_bricks",
+		"#minecraft:terracotta",
+		"#minecraft:deepslate_ore_replaceables",
+		"minecraft:obsidian",
+		"minecraft:crying_obsidian",
+		"minecraft:end_stone",
+		"minecraft:dripstone_block",
+		"minecraft:pointed_dripstone",
+		"minecraft:calcite",
+		"minecraft:tuff",
+		"minecraft:polished_tuff",
+		"minecraft:tuff_bricks",
+		"minecraft:quartz_block",
+		"minecraft:smooth_quartz",
+		"minecraft:purpur_block",
+		"minecraft:magma_block"
+	]
+}
+

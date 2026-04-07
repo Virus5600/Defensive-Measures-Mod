@@ -1,30 +1,28 @@
 package com.virus5600.defensive_measures.model.entity;
 
 import net.minecraft.client.model.*;
-import net.minecraft.client.render.entity.animation.Animation;
-import net.minecraft.client.render.entity.model.EntityModel;
-import net.minecraft.util.math.MathHelper;
 
 import com.virus5600.defensive_measures.animations.entity.CannonTurretAnimation;
 import com.virus5600.defensive_measures.renderer.entity.state.BaseTurretRenderState;
 
-public class CannonTurretModel extends EntityModel<BaseTurretRenderState> {
-	private final ModelPart stand;
-	private final ModelPart head;
-
-	private final Animation shootAnim;
-	private final Animation deathAnim;
+public class CannonTurretModel extends BaseTurretModel<BaseTurretRenderState> {
+	protected final static String[] TEXTURES = new String[] {
+		"cannon_turret.png"
+	};
 
 	public CannonTurretModel(ModelPart root) {
-		super(root);
+		super(
+			root, "cannon_turret", TEXTURES,
 
-		this.stand = root.getChild("stand");
-		this.head = stand.getChild("head");
+			root.getChild("stand"),
+			root.getChild("stand").getChild("head"),
 
-		this.shootAnim = CannonTurretAnimation.ANIM_CANNON_SHOOT.createAnimation(root);
-		this.deathAnim = CannonTurretAnimation.ANIM_CANNON_DEATH.createAnimation(root);
+			CannonTurretAnimation.ANIM_CANNON_SHOOT.createAnimation(root),
+			CannonTurretAnimation.ANIM_CANNON_DEATH.createAnimation(root)
+		);
 	}
 
+	@SuppressWarnings("unused")
 	public static TexturedModelData getTexturedModelData() {
 		ModelData modelData = new ModelData();
 		ModelPartData modelPartData = modelData.getRoot();
@@ -61,20 +59,17 @@ public class CannonTurretModel extends EntityModel<BaseTurretRenderState> {
 		return TexturedModelData.of(modelData, 64, 64);
 	}
 
+	// //////////////// //
+	// ABSTRACT METHODS //
+	// //////////////// //
+
 	@Override
-	public void setAngles(BaseTurretRenderState state) {
-		super.setAngles(state);
-
-		this.setHeadAngles(state.relativeHeadYaw + state.bodyYaw + 180, state.pitch);
-
-		this.shootAnim.apply(state.shootAnimationState, state.age);
-		this.deathAnim.apply(state.deathAnimationState, state.age);
+	protected float getMinPitch() {
+		return -30f;
 	}
 
-	private void setHeadAngles(float headYaw, float headPitch) {
-		headPitch = MathHelper.clamp(headPitch, -30f, 30f);
-
-		this.stand.yaw = headYaw * ((float)Math.PI / 180F);
-		this.head.pitch = headPitch * ((float)Math.PI / 180F);
+	@Override
+	protected float getMaxPitch() {
+		return 30f;
 	}
 }

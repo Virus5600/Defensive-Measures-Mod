@@ -1,6 +1,5 @@
 package com.virus5600.defensive_measures.entity.turrets;
 
-import com.virus5600.defensive_measures.entity.turrets.interfaces.TurretVariant;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.block.BlockState;
@@ -43,6 +42,7 @@ import net.minecraft.util.math.random.Random;
 import net.minecraft.world.LocalDifficulty;
 import net.minecraft.world.ServerWorldAccess;
 import net.minecraft.world.World;
+import net.minecraft.world.event.GameEvent;
 
 import com.virus5600.defensive_measures.DefensiveMeasures;
 import com.virus5600.defensive_measures.entity.TurretMaterial;
@@ -52,11 +52,10 @@ import com.virus5600.defensive_measures.entity.turrets.interfaces.Itemable;
 import com.virus5600.defensive_measures.item.ModItems;
 import com.virus5600.defensive_measures.item.turrets.TurretItem;
 
-import net.minecraft.world.event.GameEvent;
-import org.jetbrains.annotations.Nullable;
-
 import java.util.*;
 import java.util.stream.Collectors;
+
+import org.jetbrains.annotations.Nullable;
 
 /**
  * The mob base for all the <b>Turrets</b> that will be added into this mod. The
@@ -1588,13 +1587,6 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 	 * @return {@code int} The turret's reload time in ticks.
 	 */
 	public abstract int getTotalAttCooldown();
-
-	/**
-	 * Retrieves the variant of this turret, if any.
-	 *
-	 * @return {@code TurretVariant} The variant of this turret, or {@code null} if none.
-	 */
-	public abstract @Nullable TurretVariant getVariant();
 
 	// OVERRIDABLES //
 

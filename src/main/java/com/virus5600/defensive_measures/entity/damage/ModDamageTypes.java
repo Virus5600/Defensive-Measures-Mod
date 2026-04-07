@@ -4,7 +4,7 @@ import net.minecraft.entity.damage.DamageType;
 import net.minecraft.registry.RegistryKey;
 
 import com.virus5600.defensive_measures.DefensiveMeasures;
-import com.virus5600.defensive_measures.util.RegistryUtil;
+import com.virus5600.defensive_measures._helper.RegistryHelper;
 
 /**
  * A class that registers custom damage types for the mod.
@@ -18,7 +18,7 @@ import com.virus5600.defensive_measures.util.RegistryUtil;
  * @version 1.0.0
  */
 public class ModDamageTypes {
-	public static final RegistryKey<DamageType> ARROWHEAD = RegistryUtil.getDamageTypeKey("arrowhead");
+	public static final RegistryKey<DamageType> ARROWHEAD = RegistryHelper.getDamageTypeKey("arrowhead");
 
 	public static void registerDamageTypes() {
 		DefensiveMeasures.LOGGER.info("REGISTERING DAMAGE TYPES FOR {}...", DefensiveMeasures.MOD_NAME);

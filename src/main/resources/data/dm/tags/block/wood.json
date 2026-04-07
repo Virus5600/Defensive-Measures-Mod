@@ -1,0 +1,33 @@
+{
+	"replace": false,
+	"values": [
+		"#minecraft:logs",
+		"#minecraft:planks",
+		"#minecraft:wooden_slabs",
+		"#minecraft:wooden_stairs",
+		"#minecraft:wooden_doors",
+		"#minecraft:wooden_trapdoors",
+		"#minecraft:wooden_fences",
+		"#minecraft:fence_gates",
+		"#minecraft:wooden_buttons",
+		"#minecraft:wooden_pressure_plates",
+		"minecraft:azalea",
+		"minecraft:flowering_azalea",
+		"minecraft:bamboo",
+		"minecraft:bamboo_block",
+		"minecraft:scaffolding",
+		"minecraft:beehive",
+		"minecraft:bee_nest",
+		"minecraft:bookshelf",
+		"minecraft:barrel",
+		"minecraft:campfire",
+		"minecraft:soul_campfire",
+		"minecraft:daylight_detector",
+		"minecraft:fletching_table",
+		"minecraft:jukebox",
+		"minecraft:ladder",
+		"minecraft:loom",
+		"minecraft:note_block"
+	]
+}
+

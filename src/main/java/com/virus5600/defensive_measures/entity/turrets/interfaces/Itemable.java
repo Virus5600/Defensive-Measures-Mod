@@ -113,6 +113,11 @@ public interface Itemable {
 		nbtCompound.putFloat("MaxHealth", entity.getMaxHealth());
 		nbtCompound.put("ActiveEffects",  effectList);
 
+		// Handling turret related stuff
+		if (entity instanceof TurretEntity turretEntity) {
+			nbtCompound.putInt("TurretLevel", turretEntity.getTrackedLevel());
+		}
+
 		stack.set(DataComponentTypes.CUSTOM_DATA, NbtComponent.of(nbtCompound));
 	}
 

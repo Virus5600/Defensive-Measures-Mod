@@ -3,8 +3,10 @@ package com.virus5600.defensive_measures.item.turrets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Consumer;
 
+import com.virus5600.defensive_measures.entity.turrets.TurretEntity;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.FluidBlock;
 import net.minecraft.component.DataComponentTypes;
@@ -23,6 +25,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
 import net.minecraft.item.SpawnEggItem;
+import net.minecraft.item.tooltip.TooltipData;
 import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
@@ -222,9 +225,10 @@ public abstract class TurretItem extends Item {
 	/**
 	 * Sets custom data from the NBT Compound to the entity, allowing the old turret data
 	 * to carry over to the new one this item will spawn.
-	 * When overriding this method, {@link TurretItem#applyNbt(MobEntity, NbtCompound)} must
-	 * be called within the override method so that the following data could be set properly:
+	 * When overriding this method, this method must be called within the override method
+	 * so that the following data could be set properly:
 	 * <ul>
+	 *     <li>{@code TurretLevel}</li>
 	 *     <li>{@code NoAI}</li>
 	 *     <li>{@code Silent}</li>
 	 *     <li>{@code NoGravity}</li>
@@ -290,6 +294,13 @@ public abstract class TurretItem extends Item {
 						.ifSuccess(entity::addStatusEffect);
 				}
 			});
+		}
+
+		// Handling turret related stuff
+		if (entity instanceof TurretEntity turretEntity) {
+			if (nbt.contains("TurretLevel")) {
+				turretEntity.setTrackedLevel(nbt.getInt("TurretLevel", 1));
+			}
 		}
 	}
 

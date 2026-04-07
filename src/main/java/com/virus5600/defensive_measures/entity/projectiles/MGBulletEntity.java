@@ -1,6 +1,6 @@
 package com.virus5600.defensive_measures.entity.projectiles;
 
-import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.passive.IronGolemEntity;
@@ -13,8 +13,8 @@ import net.minecraft.world.rule.GameRules;
 
 import com.virus5600.defensive_measures.entity.ModEntities;
 import com.virus5600.defensive_measures.sound.ModSoundEvents;
-import com.virus5600.defensive_measures.util.BlockUtil.BlockCategory;
-import com.virus5600.defensive_measures.util.BlockUtil;
+import com.virus5600.defensive_measures._helper.BlockHelper.BlockCategory;
+import com.virus5600.defensive_measures._helper.BlockHelper;
 
 import java.util.Map;
 
@@ -128,7 +128,7 @@ public class MGBulletEntity extends KineticProjectileEntity {
 	 *
 	 * @param blockHitResult The block hit result
 	 *
-	 * @see BlockUtil#getBlockCategory(Block)
+	 * @see BlockHelper#getBlockCategory(BlockState)
 	 * @see BlockCategory
 	 */
 	@Override
@@ -136,11 +136,8 @@ public class MGBulletEntity extends KineticProjectileEntity {
 		// Default sound == Dirt, Greenery, Others
 		this.setSound(ModSoundEvents.BULLET_IMPACT_DEFAULT);
 
-
-		Block block = this.getEntityWorld()
-			.getBlockState(blockHitResult.getBlockPos())
-			.getBlock();
-		BlockCategory blockCat = BlockUtil.getBlockCategory(block);
+		BlockState state = this.getEntityWorld().getBlockState(blockHitResult.getBlockPos());
+		BlockCategory blockCat = BlockHelper.getBlockCategory(state);
 
 		switch (blockCat) {
 			case BlockCategory.GLASS -> this.setSound(ModSoundEvents.BULLET_IMPACT_GLASS);

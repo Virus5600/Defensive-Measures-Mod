@@ -2,7 +2,6 @@ package com.virus5600.defensive_measures.entity.turrets;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.entity.AnimationState;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.attribute.DefaultAttributeContainer;
@@ -27,7 +26,6 @@ import org.jetbrains.annotations.Nullable;
 import com.virus5600.defensive_measures.entity.ModEntities;
 import com.virus5600.defensive_measures.entity.TurretMaterial;
 import com.virus5600.defensive_measures.entity.ai.goal.ProjectileAttackGoal;
-import com.virus5600.defensive_measures.entity.turrets.interfaces.TurretVariant;
 import com.virus5600.defensive_measures.item.ModItems;
 import com.virus5600.defensive_measures.particle.ModParticles;
 import com.virus5600.defensive_measures.sound.ModSoundEvents;
@@ -82,8 +80,6 @@ public class CannonTurretEntity extends TurretEntity {
 	 * Contains all the items that can give effect to this entity
 	 */
 	protected static final Map<Item, List<Object[]>> effectSource;
-
-	public final AnimationState idleAnimationState = new AnimationState();
 
 	// //////////// //
 	// CONSTRUCTORS //
@@ -211,15 +207,6 @@ public class CannonTurretEntity extends TurretEntity {
 	@Override
 	public float getMinAttackRange() {
 		return 3f;
-	}
-
-	// ///////////////////////// //
-	// INTERFACE IMPLEMENTATIONS //
-	// ///////////////////////// //
-
-	@Override
-	public @Nullable TurretVariant getVariant() {
-		return null;
 	}
 
 	// //////////////////////// //

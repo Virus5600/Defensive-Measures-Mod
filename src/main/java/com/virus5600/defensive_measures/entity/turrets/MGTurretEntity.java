@@ -1,7 +1,5 @@
 package com.virus5600.defensive_measures.entity.turrets;
 
-import com.virus5600.defensive_measures.entity.turrets.interfaces.TurretVariant;
-import com.virus5600.defensive_measures.particle.ModParticles;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.entity.EntityType;
@@ -25,6 +23,7 @@ import com.virus5600.defensive_measures.entity.ModEntities;
 import com.virus5600.defensive_measures.entity.TurretMaterial;
 import com.virus5600.defensive_measures.entity.ai.goal.ProjectileAttackGoal;
 import com.virus5600.defensive_measures.item.ModItems;
+import com.virus5600.defensive_measures.particle.ModParticles;
 import com.virus5600.defensive_measures.sound.ModSoundEvents;
 
 import java.util.List;
@@ -164,15 +163,6 @@ public class MGTurretEntity extends TurretEntity {
 	@Override
 	public SoundEvent getEntityRemoveSound() {
 		return ModSoundEvents.TURRET_REMOVED_METAL;
-	}
-
-	// ///////////////////////// //
-	// INTERFACE IMPLEMENTATIONS //
-	// ///////////////////////// //
-
-	@Override
-	public @Nullable TurretVariant getVariant() {
-		return null;
 	}
 
 	// //////////////////////// //

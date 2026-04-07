@@ -4,7 +4,7 @@ import com.virus5600.defensive_measures.DefensiveMeasures;
 
 import com.virus5600.defensive_measures.entity.projectiles.*;
 import com.virus5600.defensive_measures.entity.turrets.*;
-import com.virus5600.defensive_measures.util.RegistryUtil;
+import com.virus5600.defensive_measures._helper.RegistryHelper;
 
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
 
@@ -22,7 +22,7 @@ import net.minecraft.entity.SpawnGroup;
 public class ModEntities {
 	// TURRETS //
 	// v1.0.0
-	public static final EntityType<CannonTurretEntity> CANNON_TURRET = RegistryUtil.registerEntity(
+	public static final EntityType<CannonTurretEntity> CANNON_TURRET = RegistryHelper.registerEntity(
 		"cannon_turret",
 		Builder
 			.create(CannonTurretEntity::new, SpawnGroup.MISC)
@@ -30,7 +30,7 @@ public class ModEntities {
 			.eyeHeight(0.51F)
 	);
 
-	public static final EntityType<BallistaTurretEntity> BALLISTA_TURRET = RegistryUtil.registerEntity(
+	public static final EntityType<BallistaTurretEntity> BALLISTA_TURRET = RegistryHelper.registerEntity(
 		"ballista",
 		Builder
 			.create(BallistaTurretEntity::new, SpawnGroup.MISC)
@@ -38,7 +38,7 @@ public class ModEntities {
 			.eyeHeight(0.71F)
 	);
 
-	public static final EntityType<MGTurretEntity> MG_TURRET = RegistryUtil.registerEntity(
+	public static final EntityType<MGTurretEntity> MG_TURRET = RegistryHelper.registerEntity(
 		"mg_turret",
 		Builder
 			.create(MGTurretEntity::new, SpawnGroup.MISC)
@@ -48,7 +48,7 @@ public class ModEntities {
 
 	// PROJECTILES //
 	// v1.0.0
-	public static final EntityType<CannonballEntity> CANNONBALL = RegistryUtil.registerEntity(
+	public static final EntityType<CannonballEntity> CANNONBALL = RegistryHelper.registerEntity(
 		"cannonball",
 		Builder
 			.<CannonballEntity>create(CannonballEntity::new, SpawnGroup.MISC)
@@ -58,7 +58,7 @@ public class ModEntities {
 			.trackingTickInterval(10)
 	);
 
-	public static final EntityType<BallistaArrowEntity> BALLISTA_ARROW = RegistryUtil.registerEntity(
+	public static final EntityType<BallistaArrowEntity> BALLISTA_ARROW = RegistryHelper.registerEntity(
 		"ballista_arrow",
 		Builder
 			.<BallistaArrowEntity>create(BallistaArrowEntity::new, SpawnGroup.MISC)
@@ -68,7 +68,7 @@ public class ModEntities {
 			.trackingTickInterval(10)
 	);
 
-	public static final EntityType<MGBulletEntity> MG_BULLET = RegistryUtil.registerEntity(
+	public static final EntityType<MGBulletEntity> MG_BULLET = RegistryHelper.registerEntity(
 		"mg_bullet",
 		Builder
 			.<MGBulletEntity>create(MGBulletEntity::new, SpawnGroup.MISC)
