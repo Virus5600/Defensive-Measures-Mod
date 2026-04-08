@@ -1,6 +1,5 @@
 package com.virus5600.defensive_measures.renderer.entity;
 
-import com.virus5600.defensive_measures.model.entity.BaseTurretModel;
 import net.minecraft.client.render.entity.EntityRendererFactory;
 import net.minecraft.client.render.entity.MobEntityRenderer;
 import net.minecraft.client.util.math.MatrixStack;
@@ -8,6 +7,7 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.RotationAxis;
 
 import com.virus5600.defensive_measures.entity.turrets.TurretEntity;
+import com.virus5600.defensive_measures.model.entity.BaseTurretModel;
 import com.virus5600.defensive_measures.renderer.entity.state.BaseTurretRenderState;
 
 import java.util.function.Supplier;
@@ -21,8 +21,13 @@ public abstract class BaseTurretRenderer<
 	private final Supplier<S> renderStateFactory;
 	private boolean deathRotEnabled = false;
 
-	public BaseTurretRenderer(EntityRendererFactory.Context context, M entityModel, float f, Supplier<S> renderStateFactory) {
-		super(context, entityModel, f);
+	public BaseTurretRenderer(
+		EntityRendererFactory.Context context,
+		M entityModel,
+		float shadowRadius,
+		Supplier<S> renderStateFactory
+	) {
+		super(context, entityModel, shadowRadius);
 
 		this.renderStateFactory = renderStateFactory;
 	}
@@ -36,6 +41,7 @@ public abstract class BaseTurretRenderer<
 	public void updateRenderState(T turretEntity, S turretRenderState, float tickProgress) {
 		super.updateRenderState(turretEntity, turretRenderState, tickProgress);
 
+		turretRenderState.idleAnimationState.copyFrom(turretEntity.getIdleAnimationState());
 		turretRenderState.shootAnimationState.copyFrom(turretEntity.getShootAnimationState());
 		turretRenderState.deathAnimationState.copyFrom(turretEntity.getDeathAnimationState());
 

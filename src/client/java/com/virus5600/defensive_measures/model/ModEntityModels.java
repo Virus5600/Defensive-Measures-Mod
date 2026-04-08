@@ -1,6 +1,5 @@
 package com.virus5600.defensive_measures.model;
 
-import com.google.common.collect.Sets;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry;
 import net.minecraft.block.WoodType;
 import net.minecraft.client.render.block.entity.HangingSignBlockEntityRenderer;
@@ -10,6 +9,9 @@ import net.minecraft.util.Identifier;
 
 import com.virus5600.defensive_measures.DefensiveMeasures;
 import com.virus5600.defensive_measures.model.entity.*;
+import com.virus5600.defensive_measures.model.projectiles.*;
+
+import com.google.common.collect.Sets;
 
 import java.util.Set;
 import java.util.stream.Stream;
@@ -27,6 +29,13 @@ public class ModEntityModels {
 	public static final EntityModelLayer BALLISTA_TURRET = registerMain("ballista");
 	public static final EntityModelLayer MG_TURRET = registerMain("mg_turret");
 
+	// /////////// //
+	// PROJECTILES //
+	// /////////// //
+
+	// v1.0.0
+	public static final EntityModelLayer CANNONBALL = registerMain("cannonball");
+
 	public static void registerEntityModels() {
 		DefensiveMeasures.LOGGER.info("REGISTERING ENTITY MODELS FOR {}...", DefensiveMeasures.MOD_NAME);
 
@@ -38,6 +47,13 @@ public class ModEntityModels {
 		EntityModelLayerRegistry.registerModelLayer(CANNON_TURRET, CannonTurretModel::getTexturedModelData);
 		EntityModelLayerRegistry.registerModelLayer(BALLISTA_TURRET, BallistaTurretModel::getTexturedModelData);
 		EntityModelLayerRegistry.registerModelLayer(MG_TURRET, MGTurretModel::getTexturedModelData);
+
+		// /////////// //
+		// PROJECTILES //
+		// /////////// //
+
+		// v1.0.0
+		EntityModelLayerRegistry.registerModelLayer(CANNONBALL, CannonballModel::getTexturedModelData);
 	}
 
 	private static EntityModelLayer registerMain(String id) {

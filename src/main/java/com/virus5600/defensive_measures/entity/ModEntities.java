@@ -56,6 +56,7 @@ public class ModEntities {
 			.dimensions(0.5f, 0.5f)
 			.maxTrackingRange(4)
 			.trackingTickInterval(10)
+			.eyeHeight(0.25F)
 	);
 
 	public static final EntityType<BallistaArrowEntity> BALLISTA_ARROW = RegistryHelper.registerEntity(

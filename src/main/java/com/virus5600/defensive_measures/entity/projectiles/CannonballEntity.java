@@ -120,6 +120,7 @@ public class CannonballEntity extends ExplosiveProjectileEntity {
 	@Override
 	protected void onCollision(HitResult hitResult) {
 		super.onCollision(hitResult);
+
 		if (!this.getEntityWorld().isClient()) {
 			this.doDamage();
 		}

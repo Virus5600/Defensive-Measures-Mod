@@ -10,18 +10,32 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * A base model for projectiles shot by turrets. It handles all the common logic
- * for rendering a {@link ProjectileEntity projectile entity}. The
- * class also provides helper methods for setting the pitch and yaw rotation of the head, which are
- * also overridables so that you can customize the rendering behavior of the turret.
+ * A base model for projectiles shot by turrets. It handles all the common logic for rendering a
+ * {@link ProjectileEntity projectile entity}. The class also provides helper methods commonly
+ * used by projectiles, which are also overridables so that you can customize the rendering
+ * behavior of the turret.
+ * <br><br>
+ * This class is meant to be extended by all turret projectile models in the mod, such as {@link CannonballModel},
+ * so that all the common rendering logic can be shared among all turret projectiles. This centralization
+ * also meant that the render state used by all turret projectile models will be the same, which
+ * is {@link BaseProjectileRenderState}, so that all turret projectile models can be rendered using
+ * the same render state, allowing for more consistent and efficient rendering of turret projectile
+ * entities in the game. However, when more states are needed to be added to the render state, a new
+ * render state class that extends {@link BaseProjectileRenderState} could be used, allowing
+ * flexibility while keeping everything DRY.
+ *
+ * @param <S> The type of the render state this model uses. This should be a class that extends
+ *            {@link BaseProjectileRenderState} and contains all the necessary information for rendering
+ *            the turret entity, such as head yaw and pitch, shooting animation state, and death
+ *            animation state.
  *
  * @see BaseModel
  *
  * @since 1.0.0
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
- * @version 2.0.0
+ * @version 2.1.0
  */
-public class BaseProjectileModel extends BaseModel<BaseProjectileRenderState> {
+public abstract class BaseProjectileModel<S extends BaseProjectileRenderState> extends BaseModel<S> {
 
 	/** An optional looping animation of the custom projectile. */
 	protected final Animation loopAnim;
@@ -62,7 +76,7 @@ public class BaseProjectileModel extends BaseModel<BaseProjectileRenderState> {
 	 * @see #baseTexture
 	 */
 	public BaseProjectileModel(
-		@NotNull ModelPart root, @NotNull String texturePath, @NotNull String[] textures,
+		@NotNull ModelPart root,@NotNull String texturePath, @NotNull String[] textures,
 		@Nullable Animation loopAnim
 	) {
 		super(root, texturePath, textures);

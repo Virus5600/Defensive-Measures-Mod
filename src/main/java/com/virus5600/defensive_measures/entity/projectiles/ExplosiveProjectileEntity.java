@@ -303,7 +303,7 @@ public abstract class ExplosiveProjectileEntity extends TurretProjectileEntity {
 	@Override
 	public void tick() {
 		Entity owner = this.getOwner();
-		Vec3d pos = this.getTrackedPosition().getPos();
+		Vec3d pos = this.getEntityPos();
 
 		this.applyDrag();
 
@@ -317,16 +317,17 @@ public abstract class ExplosiveProjectileEntity extends TurretProjectileEntity {
 			&& this.getEntityWorld().getChunkManager().isChunkLoaded(xz[0], xz[1])
 		) {
 			HitResult hitResult = ProjectileUtil.getCollision(this, this::canHit, this.getRaycastShapeType());
-			Vec3d vec3d;
+			Vec3d vec3d = pos;
 			if (hitResult.getType() != HitResult.Type.MISS) {
 				vec3d = hitResult.getPos();
 			} else {
-				vec3d = pos.add(this.getVelocity());
+				vec3d = vec3d.add(this.getVelocity());
 			}
 
 			ProjectileUtil.setRotationFromVelocity(this, 0.2F);
 			this.setPosition(vec3d);
 			this.tickBlockCollision();
+			this.applyGravity();
 			super.tick();
 			if (this.isBurning()) {
 				this.setOnFireFor(1.0F);
@@ -336,8 +337,9 @@ public abstract class ExplosiveProjectileEntity extends TurretProjectileEntity {
 				this.hitOrDeflect(hitResult);
 			}
 
-			this.addParticles(pos.add(0, 0.5, 0));
-		} else {
+			this.addParticles(pos.add(0, 0.25, 0));
+		}
+		else {
 			System.out.println("Projectile is removed.");
 			this.discard();
 		}

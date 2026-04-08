@@ -85,8 +85,8 @@ public class CannonTurretEntity extends TurretEntity {
 	// CONSTRUCTORS //
 	// //////////// //
 	public CannonTurretEntity(EntityType<? extends MobEntity> entityType, World world) {
-//		super(entityType, world, TurretMaterial.METAL, ModEntities.CANNONBALL, ModItems.CANNON_TURRET);
-		super(entityType, world, TurretMaterial.METAL, ModItems.CANNON_TURRET);
+		super(entityType, world, TurretMaterial.METAL, ModEntities.CANNONBALL, ModItems.CANNON_TURRET);
+//		super(entityType, world, TurretMaterial.METAL, ModItems.CANNON_TURRET);
 
 		this.setShootSound(ModSoundEvents.TURRET_CANNON_SHOOT);
 		this.setHealSound(ModSoundEvents.TURRET_REPAIR_METAL);

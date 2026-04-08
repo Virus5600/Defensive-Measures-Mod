@@ -5,4 +5,7 @@ import net.minecraft.entity.AnimationState;
 
 public class BaseProjectileRenderState extends EntityRenderState {
 	public final AnimationState loopAnimationState = new AnimationState();
+
+	public float yaw;
+	public float pitch;
 }

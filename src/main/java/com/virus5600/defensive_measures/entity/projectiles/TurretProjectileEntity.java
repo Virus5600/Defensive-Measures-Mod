@@ -1,7 +1,8 @@
 package com.virus5600.defensive_measures.entity.projectiles;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.entity.*;
 import net.minecraft.entity.damage.DamageSource;
@@ -29,19 +30,17 @@ import net.minecraft.util.Unit;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Objects;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
+
+import java.util.Objects;
 
 import com.virus5600.defensive_measures.entity.turrets.TurretEntity;
 
@@ -64,12 +63,6 @@ public abstract class TurretProjectileEntity extends ProjectileEntity {
 	protected static final int CRITICAL_FLAG = 1;
 	protected static final int NO_CLIP_FLAG = 2;
 
-	/** Holds the blockstate information of the block in this projectile's position. */
-	@Nullable
-	private BlockState inBlockState;
-	/** Holds the information about the list of entities this projectile have pierced through. */
-	@Nullable
-	private IntOpenHashSet piercedEntities;
 	/** Defines the current sound this projectile will play when it hit something */
 	private SoundEvent sound = this.getHitSound();
 	/** Defines the item stack this projectile is. Used when picking up the projectile to turn into items. */
@@ -77,6 +70,12 @@ public abstract class TurretProjectileEntity extends ProjectileEntity {
 	private ItemStack stack;
 	private int life;
 
+	/** Holds the blockstate information of the block in this projectile's position. */
+	@Nullable
+	protected BlockState inBlockState;
+	/** Holds the information about the list of entities this projectile have pierced through. */
+	@Nullable
+	protected IntOpenHashSet piercedEntities;
 	/** Identifies if this projectile can be picked up or not. */
 	protected PickupPermission pickupType = PickupPermission.DISALLOWED;
 	/** Defines how long the shaking animation will play (in ticks). */
@@ -88,13 +87,39 @@ public abstract class TurretProjectileEntity extends ProjectileEntity {
 	/** Determines whether this projectile scales its damage based on its speed. */
 	protected boolean speedAffectDamage = true;
 
+	public final AnimationState loopAnimationState = new AnimationState();
+
 	// //////////// //
 	// CONSTRUCTORS //
 	// //////////// //
+
+	/**
+	 * Constructs a new {@code TurretProjectileEntity} with the given {@code EntityType}
+	 * and {@code World}.
+	 *
+	 * @param entityType The type of this entity.
+	 * @param world The world this entity is in.
+	 *
+	 * @see EntityType
+	 */
 	protected TurretProjectileEntity(EntityType<? extends TurretProjectileEntity> entityType, World world) {
 		super(entityType, world);
 	}
 
+	/**
+	 * Constructs a new {@code TurretProjectileEntity} with the given {@code EntityType},
+	 * ({@code x}, {@code y}, {@code z}) coordinates, {@code World}, and the {@code ItemStack} this
+	 * projectile comes from if it is throwable/usable.
+	 *
+	 * @param entityType The type of this entity.
+	 * @param x The {@code X} coordinate this projectile is located.
+	 * @param y The {@code Y} coordinate this projectile is located.
+	 * @param z The {@code Z} coordinate this projectile is located.
+	 * @param world The world this entity is in.
+	 * @param stack The item stack used to spawn this projectile.
+	 *
+	 * @see EntityType
+	 */
 	protected TurretProjectileEntity(
 		EntityType<? extends TurretProjectileEntity> entityType,
 		double x,
@@ -118,6 +143,16 @@ public abstract class TurretProjectileEntity extends ProjectileEntity {
 		}
 	}
 
+	/**
+	 * Constructs a new {@code TurretProjectileEntity} with the given {@code EntityType},
+	 * {@code LivingEntity} owner, {@code World}, and the {@code ItemStack} this
+	 * projectile comes from if it is throwable/usable.
+	 *
+	 * @param entityType The type of this entity.
+	 * @param owner The living entity that owns this projectile.
+	 * @param world The world this entity is in.
+	 * @param stack The item stack used to spawn this projectile.
+	 */
 	protected TurretProjectileEntity(
 		EntityType<? extends TurretProjectileEntity> entityType,
 		@NotNull LivingEntity owner,
@@ -131,6 +166,7 @@ public abstract class TurretProjectileEntity extends ProjectileEntity {
 	// //////////// //
 	// INITIALIZERS //
 	// //////////// //
+
 	@Override
 	protected void initDataTracker(Builder builder) {
 		builder.add(PROJECTILE_FLAGS, (byte) 0)
@@ -358,35 +394,40 @@ public abstract class TurretProjectileEntity extends ProjectileEntity {
 	}
 
 	protected void applyCollision(BlockHitResult blockHitResult) {
-		while (this.isAlive()) {
-			Vec3d pos = this.getTrackedPosition().getPos();
-			EntityHitResult entityHitResult = this.getEntityCollision(pos, blockHitResult.getPos());
-			Vec3d hitPos = Objects.requireNonNullElse(entityHitResult, blockHitResult).getPos();
+		while (true) {
+			if (this.isAlive()) {
+				Vec3d pos = this.getEntityPos();
+				EntityHitResult entityHitResult = this.getEntityCollision(pos, blockHitResult.getPos());
+				Vec3d nextPos = Objects.requireNonNullElse(entityHitResult, blockHitResult).getPos();
 
-			this.setPosition(hitPos);
-			this.tickBlockCollision(pos, hitPos);
+				this.setPosition(nextPos);
+				this.tickBlockCollision(pos, nextPos);
 
-			if (this.portalManager != null && this.portalManager.isInPortal()) {
-				this.tickPortalTeleportation();
-			}
+				if (this.portalManager != null && this.portalManager.isInPortal()) {
+					this.tickPortalTeleportation();
+				}
 
-			if (entityHitResult == null) {
-				if (this.isAlive() && blockHitResult.getType() != HitResult.Type.MISS) {
-					this.hitOrDeflect(blockHitResult);
+				if (entityHitResult == null) {
+					if (this.isAlive() && blockHitResult.getType() != HitResult.Type.MISS) {
+						this.hitOrDeflect(blockHitResult);
+						this.velocityDirty = true;
+					}
+				}
+				else {
+					if (!this.isAlive() || this.noClip) {
+						continue;
+					}
+
+					ProjectileDeflection deflection = this.hitOrDeflect(entityHitResult);
 					this.velocityDirty = true;
-				}
 
-				break;
-			}
-			else if (this.isAlive() && !this.noClip) {
-				ProjectileDeflection deflection = this.hitOrDeflect(entityHitResult);
-				this.velocityDirty = true;
-
-				if (this.getPierceLevel() > 0 && deflection == ProjectileDeflection.NONE) {
-					continue;
+					if (this.getPierceLevel() > 0 && deflection == ProjectileDeflection.NONE) {
+						continue;
+					}
 				}
-				break;
 			}
+
+			return;
 		}
 	}
 
@@ -531,126 +572,24 @@ public abstract class TurretProjectileEntity extends ProjectileEntity {
 		);
 	}
 
-	@Override
-	public void tick() {
-		boolean isClipping = !this.isNoClip();
-		Vec3d velocity = this.getVelocity();
-		BlockPos blockPos = this.getBlockPos();
-		BlockState blockState = this.getEntityWorld().getBlockState(blockPos);
+	protected boolean tryPickup(PlayerEntity player) {
+		boolean didPickedUp = false;
 
-		if (!blockState.isAir() && isClipping) {
-			VoxelShape voxelShape = blockState.getCollisionShape(this.getEntityWorld(), blockPos);
-
-			if (!voxelShape.isEmpty()) {
-				Vec3d pos = this.getTrackedPosition().getPos();
-
-				for (Box box : voxelShape.getBoundingBoxes()) {
-					if (box.offset(blockPos).contains(pos)) {
-						this.setInGround(true);
-						break;
-					}
-				}
+		if (this.pickupType == PickupPermission.ALLOWED) {
+			if (this.stack != null) {
+				didPickedUp = player.getInventory().insertStack(this.asItemStack());
 			}
 		}
-
-		if (this.shake > 0) {
-			this.shake--;
+		else if (this.pickupType == PickupPermission.CREATIVE_ONLY) {
+			didPickedUp = player.isInCreativeMode();
 		}
 
-		if (this.isTouchingWaterOrRain() || blockState.isOf(Blocks.POWDER_SNOW)) {
-			this.extinguish();
-		}
-
-		if (this.isInGround() && isClipping) {
-			if (!this.getEntityWorld().isClient()) {
-				if (this.inBlockState != blockState && this.shouldFall()) {
-					this.fall();
-				} else {
-					this.age();
-				}
-			}
-
-			this.inGroundTime++;
-			if (this.isAlive()) {
-				this.tickBlockCollision();
-			}
-		} else {
-			this.inGroundTime = 0;
-			Vec3d pos = this.getTrackedPosition().getPos();
-
-			if (this.isTouchingWater()) {
-				this.spawnBubbleParticles(pos);
-			}
-
-			if (this.isCritical()) {
-				for (int i = 0; i < 4; i++) {
-					this.getEntityWorld()
-						.addParticleClient(
-							ParticleTypes.CRIT,
-							pos.x + velocity.x * (double)i / 4.0,
-							pos.y + velocity.y * (double)i / 4.0,
-							pos.z + velocity.z * (double)i / 4.0,
-							-velocity.x,
-							-velocity.y + 0.2,
-							-velocity.z
-						);
-				}
-			}
-
-			float yawDeg;
-			if (!isClipping) {
-				yawDeg = (float)(MathHelper.atan2(-velocity.x, -velocity.z) * 180.0F / (float)Math.PI);
-			} else {
-				yawDeg = (float) (MathHelper.atan2(velocity.x, velocity.z) * 180.0F / (float) Math.PI);
-			}
-
-			float pitchDeg = (float)(MathHelper.atan2(velocity.y, velocity.horizontalLength()) * 180.0F / (float)Math.PI);
-
-			this.setPitch(updateRotation(this.getPitch(), pitchDeg));
-			this.setYaw(updateRotation(this.getYaw(), yawDeg));
-
-			if (isClipping) {
-				BlockHitResult hitResult = this.getEntityWorld()
-					.getCollisionsIncludingWorldBorder(
-						new RaycastContext(
-							pos,
-							pos.add(velocity),
-							RaycastContext.ShapeType.COLLIDER,
-							RaycastContext.FluidHandling.NONE,
-							this
-						)
-					);
-
-				this.applyCollision(hitResult);
-			} else {
-				this.setPosition(pos.add(velocity));
-				this.tickBlockCollision();
-			}
-
-			this.applyDrag();
-			if (isClipping && !this.isInGround()) {
-				this.applyGravity();
-			}
-
-			super.tick();
-		}
+		return didPickedUp;
 	}
 
-	// //////////////////////////// //
-	// GETTERS, SETTERS, AND ASKERS //
-	// //////////////////////////// //
-	/** Overridable method that defines the sound played when this projectile hits something. **/
-	public SoundEvent getHitSound() {
-		return SoundEvents.ENTITY_ARROW_HIT;
-	}
-
-	protected final SoundEvent getSound() {
-		return this.sound;
-	}
-
-	public void setSound(SoundEvent sound) {
-		this.sound = sound;
-	}
+	// //////////////////////////////// //
+	// QUESTION METHODS (True or False) //
+	// //////////////////////////////// //
 
 	/**
 	 * Determines whether the speed of the projectile affects the damage it deals,
@@ -662,6 +601,64 @@ public abstract class TurretProjectileEntity extends ProjectileEntity {
 	 */
 	public boolean speedAffectsDamage() {
 		return this.speedAffectDamage;
+	}
+
+	protected boolean shouldFall() {
+		Vec3d pos = this.getTrackedPosition().getPos();
+		return this.isInGround() && this.getEntityWorld().isSpaceEmpty(new Box(pos, pos).expand(0.06));
+	}
+
+	@Override
+	protected boolean canHit(Entity entity) {
+		return super.canHit(entity)
+			&& (
+			this.piercedEntities == null
+				|| !this.piercedEntities.contains(entity.getId())
+		);
+	}
+
+	@Override
+	public boolean canHit() {
+		return super.canHit() && !this.isInGround();
+	}
+
+	@Override
+	public boolean isAttackable() {
+		return this.getType().isIn(EntityTypeTags.REDIRECTABLE_PROJECTILE);
+	}
+
+	@Override
+	protected boolean deflectsAgainstWorldBorder() {
+		return true;
+	}
+
+	// //////////// //
+	// TRACKED DATA //
+	// //////////// //
+
+	protected void setInGround(boolean inGround) {
+		this.dataTracker.set(IN_GROUND, inGround);
+	}
+
+	protected boolean isInGround() {
+		return this.dataTracker.get(IN_GROUND);
+	}
+
+	// ///////////////// //
+	// GETTERS & SETTERS //
+	// ///////////////// //
+
+	/** Overridable method that defines the sound played when this projectile hits something. **/
+	public SoundEvent getHitSound() {
+		return SoundEvents.ENTITY_ARROW_HIT;
+	}
+
+	protected final SoundEvent getSound() {
+		return this.sound;
+	}
+
+	public void setSound(SoundEvent sound) {
+		this.sound = sound;
 	}
 
 	protected void setSpeedAffectsDamage(boolean speedAffectDamage) {
@@ -729,50 +726,8 @@ public abstract class TurretProjectileEntity extends ProjectileEntity {
 		);
 	}
 
-	protected boolean shouldFall() {
-		Vec3d pos = this.getTrackedPosition().getPos();
-		return this.isInGround() && this.getEntityWorld().isSpaceEmpty(new Box(pos, pos).expand(0.06));
-	}
-
-	protected boolean isInGround() {
-		return this.dataTracker.get(IN_GROUND);
-	}
-
-	protected void setInGround(boolean inGround) {
-		this.dataTracker.set(IN_GROUND, inGround);
-	}
-
 	@Override
-	protected boolean canHit(Entity entity) {
-		return super.canHit(entity)
-			&& (
-				this.piercedEntities == null
-				|| !this.piercedEntities.contains(entity.getId())
-			);
-	}
-
-	@Override
-	public boolean canHit() {
-		return super.canHit() && !this.isInGround();
-	}
-
-	protected boolean tryPickup(PlayerEntity player) {
-		boolean didPickedUp = false;
-
-		if (this.pickupType == PickupPermission.ALLOWED) {
-			if (this.stack != null) {
-				didPickedUp = player.getInventory().insertStack(this.asItemStack());
-			}
-		}
-		else if (this.pickupType == PickupPermission.CREATIVE_ONLY) {
-			didPickedUp = player.isInCreativeMode();
-		}
-
-		return didPickedUp;
-	}
-
-	@Override
-	protected  MoveEffect getMoveEffect() {
+	protected MoveEffect getMoveEffect() {
 		return MoveEffect.NONE;
 	}
 
@@ -784,11 +739,6 @@ public abstract class TurretProjectileEntity extends ProjectileEntity {
 		return this.damage;
 	}
 
-	@Override
-	public boolean isAttackable() {
-		return this.getType().isIn(EntityTypeTags.REDIRECTABLE_PROJECTILE);
-	}
-
 	public void setCritical(boolean critical) {
 		this.setProjectileFlag(CRITICAL_FLAG, critical);
 	}
@@ -797,53 +747,9 @@ public abstract class TurretProjectileEntity extends ProjectileEntity {
 		return this.dataTracker.get(PIERCE_LEVEL);
 	}
 
-	/**
-	 * Defines this projectile's maximum allowed piercing level.
-	 * <br>
-	 * The piercing level defines the number of entities this projectile can pierce through before
-	 * it is destroyed. If the piercing level is set to 0, the projectile will not pierce through
-	 * any entity. This is the usual behavior for any {@link KineticProjectileEntity Kinetic Projectiles}.
-	 * <br>
-	 * However, when an {@link ExplosiveProjectileEntity Explosive Projectile} defines a piercing level
-	 * more than 0, it will pierce through entities and explode upon reaching the maximum piercing
-	 * level. This allows the projectile to deal damage to multiple entities before exploding, or
-	 * even allowing possibilities for chain reactions like when a projectile hits an entity, it
-	 * explodes and damages nearby entities before finally exploding itself.
-	 *
-	 * @return the maximum pierce level
-	 */
-	public abstract byte getMaxPierceLevel();
-
 	protected void setPierceLevel(byte level) {
 		this.dataTracker.set(PIERCE_LEVEL, level);
 	}
-
-	/**
-	 * An overridable method that determines whether an armor point affects the
-	 * piercing of the projectile.
-	 *
-	 * @return {@code true} if the armor point affects the piercing of the projectile,
-	 * {@code false} otherwise.
-	 */
-	public abstract boolean armorAffectsPiercing();
-
-	/**
-	 * An overridable method that determines whether an armor point affects the
-	 * speed of the projectile.
-	 *
-	 * @return {@code true} if the armor point affects the piercing of the projectile,
-	 * {@code false} otherwise.
-	 */
-	public abstract boolean armorAffectsVelocity();
-
-	/**
-	 * An overridable method that determines whether an armor point affects the
-	 * damage dealt by the projectile.
-	 *
-	 * @return {@code true} if the armor point affects the piercing of the projectile,
-	 * {@code false} otherwise.
-	 */
-	public abstract boolean armorAffectsDamage();
 
 	private void setProjectileFlag(int index, boolean flag) {
 		byte projectileFlags = this.dataTracker.get(PROJECTILE_FLAGS);
@@ -874,11 +780,6 @@ public abstract class TurretProjectileEntity extends ProjectileEntity {
 	}
 
 	@Override
-	protected boolean deflectsAgainstWorldBorder() {
-		return true;
-	}
-
-	@Override
 	public void setOwner(Entity owner) {
 		super.setOwner(owner);
 
@@ -888,9 +789,80 @@ public abstract class TurretProjectileEntity extends ProjectileEntity {
 		}
 	}
 
+	// ///////////////////////// //
+	// INTERFACE IMPLEMENTATIONS //
+	// ///////////////////////// //
+
+	/**
+	 * Retrieves the looping animation state of this turret projectile.
+	 *
+	 * @return {@code AnimationState} The looping animation state of this turret.
+	 */
+	public AnimationState getLoopAnimationState() {
+		return this.loopAnimationState;
+	}
+
+	// ////////////////////////////// //
+	// ABSTRACT & OVERRIDABLE METHODS //
+	// ////////////////////////////// //
+
+	// ABSTRACTS //
+
+	/**
+	 * Defines this projectile's maximum allowed piercing level.
+	 * <br>
+	 * The piercing level defines the number of entities this projectile can pierce through before
+	 * it is destroyed. If the piercing level is set to 0, the projectile will not pierce through
+	 * any entity. This is the usual behavior for any {@link KineticProjectileEntity Kinetic Projectiles}.
+	 * <br>
+	 * However, when an {@link ExplosiveProjectileEntity Explosive Projectile} defines a piercing level
+	 * more than 0, it will pierce through entities and explode upon reaching the maximum piercing
+	 * level. This allows the projectile to deal damage to multiple entities before exploding, or
+	 * even allowing possibilities for chain reactions like when a projectile hits an entity, it
+	 * explodes and damages nearby entities before finally exploding itself.
+	 *
+	 * @return the maximum pierce level
+	 */
+	public abstract byte getMaxPierceLevel();
+
+	/**
+	 * An overridable method that determines whether an armor point affects the
+	 * piercing of the projectile.
+	 *
+	 * @return {@code true} if the armor point affects the piercing of the projectile,
+	 * {@code false} otherwise.
+	 */
+	public abstract boolean armorAffectsPiercing();
+
+	/**
+	 * An overridable method that determines whether an armor point affects the
+	 * speed of the projectile.
+	 *
+	 * @return {@code true} if the armor point affects the piercing of the projectile,
+	 * {@code false} otherwise.
+	 */
+	public abstract boolean armorAffectsVelocity();
+
+	/**
+	 * An overridable method that determines whether an armor point affects the
+	 * damage dealt by the projectile.
+	 *
+	 * @return {@code true} if the armor point affects the piercing of the projectile,
+	 * {@code false} otherwise.
+	 */
+	public abstract boolean armorAffectsDamage();
+
+	// OVERRIDABLES //
+
+	@Environment(EnvType.CLIENT)
+	protected void updateAnimations() {
+		this.loopAnimationState.startIfNotRunning(this.age);
+	}
+
 	// ///////////////////// //
 	// LOCAL CLASS AND ENUMS //
 	// ///////////////////// //
+
 	public enum PickupPermission {
 		DISALLOWED,
 		ALLOWED,

@@ -5,7 +5,7 @@ import net.minecraft.client.render.entity.EntityRendererFactories;
 import com.virus5600.defensive_measures.DefensiveMeasures;
 import com.virus5600.defensive_measures.entity.ModEntities;
 import com.virus5600.defensive_measures.renderer.entity.*;
-//import com.virus5600.defensive_measures.renderer.projectiles.*;
+import com.virus5600.defensive_measures.renderer.projectiles.*;
 
 /**
  * Registers entity renderers for all entities in the mod.
@@ -36,7 +36,7 @@ public class ModEntityRenderers {
 		// /////////// //
 
 		// v1.0.0
-//		EntityRendererFactories.register(ModEntities.CANNONBALL, CannonballRenderer::new);
+		EntityRendererFactories.register(ModEntities.CANNONBALL, CannonballRenderer::new);
 //		EntityRendererFactories.register(ModEntities.BALLISTA_ARROW, BallistaArrowRenderer::new);
 //		EntityRendererFactories.register(ModEntities.MG_BULLET, MGBulletRenderer::new);
 	}

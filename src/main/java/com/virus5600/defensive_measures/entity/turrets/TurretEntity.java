@@ -239,9 +239,9 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 	 */
 	protected final Random random;
 
-	public final AnimationState idleAnimationState = new AnimationState();
-	public final AnimationState shootAnimationState = new AnimationState();
-	public final AnimationState deathAnimationState = new AnimationState();
+	protected final AnimationState idleAnimationState = new AnimationState();
+	protected final AnimationState shootAnimationState = new AnimationState();
+	protected final AnimationState deathAnimationState = new AnimationState();
 
 	/**
 	 * List of plank items in the game. This allows easy insertion of all the items when needed by iterating through the List.
@@ -324,6 +324,7 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 	 * @param itemable The itemable counterpart of this entity.
 	 *
 	 * @see #itemable
+	 * @see EntityType
 	 */
 	public TurretEntity(EntityType<? extends MobEntity> entityType, World world,
 						TurretMaterial material, Item itemable
@@ -920,7 +921,7 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 	/**
 	 * Identifies whether the submitted item is part of the healable map.
 	 * @param item The item in question
-	 * @return boolean
+	 * @return {@code boolean}
 	 */
 	public boolean isHealableItem(Item item) {
 		return this.healables.containsKey(item);
@@ -930,7 +931,7 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 	 * Identifies whether the submitted item is part of the effect source map.
 	 * @param item The item in question
 	 *
-	 * @return boolean
+	 * @return {@code boolean}
 	 *
 	 * @see StatusEffect
 	 */
@@ -942,7 +943,8 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 	 *
 	 * @param item The item in question
 	 * @param effect The effect to check
-	 * @return boolean
+	 *
+	 * @return {@code boolean}
 	 */
 	public boolean effectSourceHasEffect(Item item, StatusEffect effect) {
 		List<Object[]> mobEffects = this.getMobEffect(item);
@@ -1089,9 +1091,9 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 		return this.dataTracker.get(IS_LOCKED_BUT_NOT_ATTACKING);
 	}
 
-	// /////////////////// //
-	// GETTERS AND SETTERS //
-	// /////////////////// //
+	// ///////////////// //
+	// GETTERS & SETTERS //
+	// ///////////////// //
 
 	/**
 	 * Retrieves the maximum level of this turret.
@@ -1540,6 +1542,7 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 	// ////////////////////////////// //
 
 	// ABSTRACTS //
+
 	/**
 	 * Defines where the turret's projectile spawn is. This is, basically, the barrel of a cannon or
 	 * machine gun, or the crossbow's bolt holder.
