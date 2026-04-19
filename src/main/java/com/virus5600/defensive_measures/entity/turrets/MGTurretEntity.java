@@ -81,8 +81,7 @@ public class MGTurretEntity extends TurretEntity {
 	// CONSTRUCTORS //
 	// //////////// //
 	public MGTurretEntity(EntityType<? extends MobEntity> entityType, World world) {
-//		super(entityType, world, TurretMaterial.METAL, ModEntities.MG_BULLET, ModItems.MG_TURRET);
-		super(entityType, world, TurretMaterial.METAL, ModItems.MG_TURRET);
+		super(entityType, world, TurretMaterial.METAL, ModEntities.MG_BULLET, ModItems.MG_TURRET);
 
 		this.setShootSound(ModSoundEvents.TURRET_MG_SHOOT);
 		this.setHealSound(ModSoundEvents.TURRET_REPAIR_METAL);
@@ -123,9 +122,8 @@ public class MGTurretEntity extends TurretEntity {
 
 	@Override
 	public void shootAt(LivingEntity target, float pullProgress) {
-		float dist = (float) this.getTrackedPosition()
-			.getPos()
-			.distanceTo(target.getTrackedPosition().getPos());
+		float dist = (float) this.getEntityPos()
+			.distanceTo(target.getEntityPos());
 
 		TurretProjectileVelocity velocityData = TurretProjectileVelocity.init(this)
 			.setVelocity(target)

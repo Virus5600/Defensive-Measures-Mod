@@ -36,6 +36,7 @@ public class ModEntityModels {
 	// v1.0.0
 	public static final EntityModelLayer CANNONBALL = registerMain("cannonball");
 	public static final EntityModelLayer BALLISTA_BOLT = registerMain("ballista_bolt");
+	public static final EntityModelLayer MG_BULLET = registerMain("mg_bullet");
 
 	public static void registerEntityModels() {
 		DefensiveMeasures.LOGGER.info("REGISTERING ENTITY MODELS FOR {}...", DefensiveMeasures.MOD_NAME);
@@ -56,6 +57,7 @@ public class ModEntityModels {
 		// v1.0.0
 		EntityModelLayerRegistry.registerModelLayer(CANNONBALL, CannonballModel::getTexturedModelData);
 		EntityModelLayerRegistry.registerModelLayer(BALLISTA_BOLT, BallistaBoltModel::getTexturedModelData);
+		EntityModelLayerRegistry.registerModelLayer(MG_BULLET, MGBulletModel::getTexturedModelData);
 	}
 
 	private static EntityModelLayer registerMain(String id) {

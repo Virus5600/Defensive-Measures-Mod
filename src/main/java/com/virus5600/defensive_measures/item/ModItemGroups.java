@@ -47,9 +47,9 @@ public class ModItemGroups {
 		.icon(ModItems.CANNON_TURRET::getDefaultStack)
 		.build();
 
-	////////////////////
+	// ////////////// //
 	// REGISTER ITEMS //
-	////////////////////
+	// ////////////// //
 
 	public static void registerModItemGroups() {
 		DefensiveMeasures.LOGGER.info("REGISTERING ITEM GROUPS FOR {}...", DefensiveMeasures.MOD_NAME);

@@ -38,6 +38,6 @@ public class ModEntityRenderers {
 		// v1.0.0
 		EntityRendererFactories.register(ModEntities.CANNONBALL, CannonballRenderer::new);
 		EntityRendererFactories.register(ModEntities.BALLISTA_BOLT, BallistaBoltRenderer::new);
-//		EntityRendererFactories.register(ModEntities.MG_BULLET, MGBulletRenderer::new);
+		EntityRendererFactories.register(ModEntities.MG_BULLET, MGBulletRenderer::new);
 	}
 }

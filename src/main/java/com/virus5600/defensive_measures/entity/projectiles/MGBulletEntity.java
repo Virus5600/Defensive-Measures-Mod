@@ -46,8 +46,6 @@ import java.util.Map;
  * @version 1.0.0
  */
 public class MGBulletEntity extends KineticProjectileEntity {
-	private static final Map<String, Integer> ANIMATIONS;
-
 	// ////////////// //
 	//  CONSTRUCTORS  //
 	// ////////////// //
@@ -180,15 +178,5 @@ public class MGBulletEntity extends KineticProjectileEntity {
 
 	public byte getMaxPierceLevel() {
 		return 5;
-	}
-
-	// ///////////////// //
-	// STATIC INITIALIZE //
-	// ///////////////// //
-
-	static {
-		ANIMATIONS = Map.of(
-			"Idle", 0
-		);
 	}
 }

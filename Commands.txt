@@ -3,3 +3,6 @@ data get entity @e[type=item,limit=1,sort=nearest]
 
 data get entity @e[type=axolotl,limit=1,sort=nearest]
 data get entity @e[type=item,limit=1,sort=nearest]
+
+trigger triggerRaid
+trigger triggerRaid set 50
