@@ -1,5 +1,6 @@
 package com.virus5600.defensive_measures.entity.turrets;
 
+import com.virus5600.defensive_measures.sound.ModSoundEvents;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.block.BlockState;
@@ -1107,6 +1108,13 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 	// ///////////////// //
 	// GETTERS & SETTERS //
 	// ///////////////// //
+
+	@Nullable
+	@Override
+	protected SoundEvent getHurtSound(DamageSource source) {
+		return this.getTurretMaterial().equals(TurretMaterial.METAL) ?
+			ModSoundEvents.TURRET_HURT_METAL : ModSoundEvents.TURRET_HURT_WOOD;
+	}
 
 	/**
 	 * Retrieves the maximum level of this turret.

@@ -68,6 +68,9 @@
 	"subtitles.generic.impact.bullet.stone" : "Bullet impacted on stone",
 	"subtitles.generic.impact.bullet.wood" : "Bullet impacted on wood",
 
+	"subtitles.turret.hurt.metal" : "Metal turret damaged",
+	"subtitles.turret.hurt.wood" : "Wooden turret damaged",
+
 	"subtitles.turret.cannon.hurt" : "Cannon Turret damaged",
 	"subtitles.turret.cannon.destroyed" : "Cannon Turret destroyed",
 	"subtitles.turret.cannon.shoot" : "Cannon Turret shoots",
