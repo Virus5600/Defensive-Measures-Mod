@@ -170,6 +170,15 @@ public class MGTurretEntity extends TurretEntity {
 	// //////////////////////// //
 
 	// TurretEntity //
+
+	/**
+	 * {@inheritDoc}
+	 * @see {@code MGTurretAnimation#ANIM_MG_DEATH}
+	 */
+	protected int getDeathAnimDuration() {
+		return (int) (1.5F * 20);
+	}
+
 	protected List<Vec3d> getTurretProjectileSpawn() {
 		return OFFSETS.get(Offsets.BARREL);
 	}

@@ -60,8 +60,8 @@ public abstract class BaseProjectileRenderer<
 		stack.push();
 
 		if (this.shouldLookAtDir()) {
-			stack.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(state.yaw - 90.0F));
-			stack.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(state.pitch));
+			stack.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(state.yaw - 180F));
+			stack.multiply(RotationAxis.POSITIVE_X.rotationDegrees(state.pitch));
 		}
 
 		queue.submitModel(

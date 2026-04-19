@@ -17,7 +17,7 @@
 	"item.dm.ballista_base" : "Основание баллисты",
 	"item.dm.ballista_base_with_stand" : "Основание баллисты с креплением",
 	"item.dm.ballista_bow" : "Дугообразная баллиста",
-	"item.dm.ballista_arrow" : "Стрела для баллисты",
+	"item.dm.ballista_bolt" : "Стрела для баллисты",
 	"item.dm.ballista" : "Место для баллисты",
 
 	"item.dm.mg_ammo_case" : "Коробка для боеприпасов",
@@ -31,7 +31,7 @@
 	"entity.dm.cannonball" : "Пушечное ядро",
 
 	"entity.dm.ballista" : "Баллиста",
-	"entity.dm.ballista_arrow" : "Стрела для баллисты",
+	"entity.dm.ballista_bolt" : "Стрела для баллисты",
 
 	"entity.dm.mg_turret" : "Пулемётная турель",
 	"entity.dm.mg_bullet" : "Пуля для пулемётной турели",

@@ -1,8 +1,9 @@
 package com.virus5600.defensive_measures.item.turrets.ballista;
 
-import com.virus5600.defensive_measures.item.interfaces.FuelItem;
 import net.minecraft.item.Item;
 import net.minecraft.util.Rarity;
+
+import com.virus5600.defensive_measures.item.interfaces.FuelItem;
 
 /**
  * The class for the Ballista Bow {@link Item item}.

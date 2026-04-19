@@ -78,8 +78,7 @@ public class BallistaTurretEntity extends TurretEntity {
 	// CONSTRUCTORS //
 	// //////////// //
 	public BallistaTurretEntity(EntityType<? extends MobEntity> entityType, World world) {
-//		super(entityType, world, TurretMaterial.WOOD, ModEntities.BALLISTA_ARROW, ModItems.BALLISTA_TURRET);
-		super(entityType, world, TurretMaterial.WOOD, ModItems.BALLISTA_TURRET);
+		super(entityType, world, TurretMaterial.WOOD, ModEntities.BALLISTA_BOLT, ModItems.BALLISTA_TURRET);
 
 		this.setShootSound(ModSoundEvents.TURRET_BALLISTA_SHOOT);
 		this.addHealables(healables);
@@ -117,16 +116,14 @@ public class BallistaTurretEntity extends TurretEntity {
 
 	@Override
 	public void shootAt(LivingEntity target, float pullProgress) {
-		float dist = (float) this.getTrackedPosition()
-			.getPos()
-			.distanceTo(target.getTrackedPosition().getPos());
+		float dist = (float) this.getEntityPos()
+			.distanceTo(target.getEntityPos());
 
 		TurretProjectileVelocity velocityData = TurretProjectileVelocity.init(this)
 			.setVelocity(target)
 			.setUpwardVelocityMultiplier(dist * 0.125f);
 
 		super.shootAt(velocityData);
-//		this.triggerAnim("Attack", "shoot");
 	}
 
 	@Override
@@ -199,6 +196,15 @@ public class BallistaTurretEntity extends TurretEntity {
 	// //////////////////////// //
 
 	// TurretEntity //
+
+	/**
+	 * {@inheritDoc}
+	 * @see {@code BallistaTurretAnimation#ANIM_BALLISTA_DEATH}
+	 */
+	protected int getDeathAnimDuration() {
+		return (int) (1.5F * 20);
+	}
+
 	protected List<Vec3d> getTurretProjectileSpawn() {
 		return OFFSETS.get(Offsets.BOLT_HOLDER);
 	}

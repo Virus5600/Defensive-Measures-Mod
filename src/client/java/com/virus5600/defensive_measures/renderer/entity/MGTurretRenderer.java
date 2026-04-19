@@ -17,7 +17,6 @@ public class MGTurretRenderer extends BaseTurretRenderer<
 		super(
 			ctx,
 			new MGTurretModel(ctx.getPart(ModEntityModels.MG_TURRET)),
-			0.75f,
 			BaseTurretRenderState::new
 		);
 	}

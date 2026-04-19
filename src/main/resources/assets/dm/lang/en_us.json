@@ -17,7 +17,7 @@
 	"item.dm.ballista_base" : "Ballista Base",
 	"item.dm.ballista_base_with_stand" : "Ballista Base with Stand",
 	"item.dm.ballista_bow" : "Ballista Bow",
-	"item.dm.ballista_arrow" : "Ballista Arrow",
+	"item.dm.ballista_bolt" : "Ballista Bolt",
 	"item.dm.ballista" : "Place Ballista",
 
 	"item.dm.mg_ammo_case" : "Ammo Case",
@@ -45,7 +45,7 @@
 	"entity.dm.cannonball" : "Cannon ball",
 
 	"entity.dm.ballista" : "Ballista",
-	"entity.dm.ballista_arrow" : "Ballista Arrow",
+	"entity.dm.ballista_bolt" : "Ballista Bolt",
 
 	"entity.dm.mg_turret" : "MG Turret",
 	"entity.dm.mg_bullet" : "MG Bullet",

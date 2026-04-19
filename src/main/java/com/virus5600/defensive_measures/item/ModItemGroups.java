@@ -1,8 +1,5 @@
 package com.virus5600.defensive_measures.item;
 
-import com.virus5600.defensive_measures.DefensiveMeasures;
-
-import com.virus5600.defensive_measures.block.ModBlocks;
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.registry.Registries;
@@ -10,6 +7,9 @@ import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
+
+import com.virus5600.defensive_measures.DefensiveMeasures;
+import com.virus5600.defensive_measures.block.ModBlocks;
 
 /**
  * A class that contains all the item groups in the mod.

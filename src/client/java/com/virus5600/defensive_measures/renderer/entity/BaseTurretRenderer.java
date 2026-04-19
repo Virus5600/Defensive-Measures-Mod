@@ -24,12 +24,27 @@ public abstract class BaseTurretRenderer<
 	public BaseTurretRenderer(
 		EntityRendererFactory.Context context,
 		M entityModel,
+		Supplier<S> renderStateFactory
+	) {
+		this(context, entityModel, 0.5F, renderStateFactory);;
+	}
+
+	public BaseTurretRenderer(
+		EntityRendererFactory.Context context,
+		M entityModel,
 		float shadowRadius,
 		Supplier<S> renderStateFactory
 	) {
 		super(context, entityModel, shadowRadius);
 
 		this.renderStateFactory = renderStateFactory;
+	}
+
+	@Override
+	public Identifier getTexture(S state) {
+		int index = state.turretLvl - 1;
+
+		return this.getModel().getTextures()[index];
 	}
 
 	@Override
@@ -47,6 +62,8 @@ public abstract class BaseTurretRenderer<
 
 		turretRenderState.turretLvl = turretEntity.getTrackedLevel();
 		turretRenderState.shooting = turretEntity.getTrackedShooting();
+
+		turretRenderState.hurt = turretEntity.hurtTime > 0 && turretEntity.isAlive();
 	}
 
 	@Override
@@ -61,13 +78,6 @@ public abstract class BaseTurretRenderer<
 			matrices.translate(0.0F, (turretState.height + 0.1F) / baseHeight, 0.0F);
 			matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(180.0F));
 		}
-	}
-
-	@Override
-	public Identifier getTexture(S state) {
-		int index = state.turretLvl - 1;
-
-		return this.getModel().getTextures()[index];
 	}
 
 	// ////////////// //

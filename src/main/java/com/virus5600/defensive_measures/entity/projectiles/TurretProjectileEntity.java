@@ -369,13 +369,13 @@ public abstract class TurretProjectileEntity extends ProjectileEntity {
 		Vec3d embeddingAdjustment = dirVector.multiply(0.05);
 
 		this.shake = 7;
-		this.setPosition(this.getTrackedPosition().getPos().subtract(embeddingAdjustment));
+		this.setPosition(this.getEntityPos().subtract(embeddingAdjustment));
 		this.setVelocity(Vec3d.ZERO);
 		this.playSound(this.getSound(), 1f, 1.2f / (this.random.nextFloat() * 0.2f + 0.9f));
 		this.setInGround(true);
 		this.setCritical(false);
 		this.setPierceLevel((byte) 0);
-		this.setSound(SoundEvents.ENTITY_ARROW_HIT);
+		this.setSound(this.getHitSound());
 		this.clearPiercingStatus();
 	}
 
@@ -604,7 +604,7 @@ public abstract class TurretProjectileEntity extends ProjectileEntity {
 	}
 
 	protected boolean shouldFall() {
-		Vec3d pos = this.getTrackedPosition().getPos();
+		Vec3d pos = this.getEntityPos();
 		return this.isInGround() && this.getEntityWorld().isSpaceEmpty(new Box(pos, pos).expand(0.06));
 	}
 

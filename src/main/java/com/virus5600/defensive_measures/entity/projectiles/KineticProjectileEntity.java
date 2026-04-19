@@ -59,117 +59,115 @@ public abstract class KineticProjectileEntity extends TurretProjectileEntity {
 
 	@Override
 	public void tick() {
-		if (!this.getEntityWorld().isClient()) {
-			boolean isClipping = !this.isNoClip();
-			Vec3d velocity = this.getVelocity();
-			BlockPos blockPos = this.getBlockPos();
-			BlockState blockState = this.getEntityWorld().getBlockState(blockPos);
+		boolean isClipping = !this.isNoClip();
+		Vec3d velocity = this.getVelocity();
+		BlockPos blockPos = this.getBlockPos();
+		BlockState blockState = this.getEntityWorld().getBlockState(blockPos);
 
-			if (!blockState.isAir() && isClipping) {
-				VoxelShape voxelShape = blockState.getCollisionShape(this.getEntityWorld(), blockPos);
+		if (!blockState.isAir() && isClipping) {
+			VoxelShape voxelShape = blockState.getCollisionShape(this.getEntityWorld(), blockPos);
 
-				if (!voxelShape.isEmpty()) {
-					Vec3d pos = this.getEntityPos();
-
-					for (Box box : voxelShape.getBoundingBoxes()) {
-						if (box.offset(blockPos).contains(pos)) {
-							this.setVelocity(Vec3d.ZERO);
-							this.setInGround(true);
-							break;
-						}
-					}
-				}
-			}
-
-			if (this.shake > 0) {
-				--this.shake;
-			}
-
-			if (this.isTouchingWaterOrRain() || blockState.isOf(Blocks.POWDER_SNOW)) {
-				this.extinguish();
-			}
-
-			if (this.isInGround() && isClipping) {
-				if (!this.getEntityWorld().isClient()) {
-					if (this.inBlockState != blockState && this.shouldFall()) {
-						this.fall();
-					} else {
-						this.age();
-					}
-				}
-
-				++this.inGroundTime;
-				if (this.isAlive()) {
-					this.tickBlockCollision();
-				}
-
-				if (!this.getEntityWorld().isClient()) {
-					this.setOnFire(this.getFireTicks() > 0);
-				}
-			}
-			else {
-				this.inGroundTime = 0;
+			if (!voxelShape.isEmpty()) {
 				Vec3d pos = this.getEntityPos();
 
-				if (this.isTouchingWater()) {
-					this.spawnBubbleParticles(pos);
-				}
-
-				if (this.isCritical()) {
-					for (int i = 0; i < 4; i++) {
-						this.getEntityWorld()
-							.addParticleClient(
-								ParticleTypes.CRIT,
-								pos.x + velocity.x * (double)i / 4.0,
-								pos.y + velocity.y * (double)i / 4.0,
-								pos.z + velocity.z * (double)i / 4.0,
-								-velocity.x,
-								-velocity.y + 0.2,
-								-velocity.z
-							);
+				for (Box box : voxelShape.getBoundingBoxes()) {
+					if (box.offset(blockPos).contains(pos)) {
+						this.setVelocity(Vec3d.ZERO);
+						this.setInGround(true);
+						break;
 					}
 				}
-
-				float yawDeg;
-				if (!isClipping) {
-					yawDeg = (float)(MathHelper.atan2(-velocity.x, -velocity.z) * 180.0F / (float)Math.PI);
-				}
-				else {
-					yawDeg = (float) (MathHelper.atan2(velocity.x, velocity.z) * 180.0F / (float) Math.PI);
-				}
-
-				float pitchDeg = (float)(MathHelper.atan2(velocity.y, velocity.horizontalLength()) * 180.0F / (float)Math.PI);
-
-				this.setPitch(updateRotation(this.getPitch(), pitchDeg));
-				this.setYaw(updateRotation(this.getYaw(), yawDeg));
-				this.tickLeftOwner();
-
-				if (isClipping) {
-					BlockHitResult hitResult = this.getEntityWorld()
-						.getCollisionsIncludingWorldBorder(
-							new RaycastContext(
-								pos,
-								pos.add(velocity),
-								RaycastContext.ShapeType.COLLIDER,
-								RaycastContext.FluidHandling.NONE,
-								this
-							)
-						);
-
-					this.applyCollision(hitResult);
-				}
-				else {
-					this.setPosition(pos.add(velocity));
-					this.tickBlockCollision();
-				}
-
-				this.applyDrag();
-				if (isClipping && !this.isInGround()) {
-					this.applyGravity();
-				}
-
-				super.tick();
 			}
+		}
+
+		if (this.shake > 0) {
+			--this.shake;
+		}
+
+		if (this.isTouchingWaterOrRain() || blockState.isOf(Blocks.POWDER_SNOW)) {
+			this.extinguish();
+		}
+
+		if (this.isInGround() && isClipping) {
+			if (!this.getEntityWorld().isClient()) {
+				if (this.inBlockState != blockState && this.shouldFall()) {
+					this.fall();
+				} else {
+					this.age();
+				}
+			}
+
+			++this.inGroundTime;
+			if (this.isAlive()) {
+				this.tickBlockCollision();
+			}
+
+			if (!this.getEntityWorld().isClient()) {
+				this.setOnFire(this.getFireTicks() > 0);
+			}
+		}
+		else {
+			this.inGroundTime = 0;
+			Vec3d pos = this.getEntityPos();
+
+			if (this.isTouchingWater()) {
+				this.spawnBubbleParticles(pos);
+			}
+
+			if (this.isCritical()) {
+				for (int i = 0; i < 4; i++) {
+					this.getEntityWorld()
+						.addParticleClient(
+							ParticleTypes.CRIT,
+							pos.x + velocity.x * (double)i / 4.0,
+							pos.y + velocity.y * (double)i / 4.0,
+							pos.z + velocity.z * (double)i / 4.0,
+							-velocity.x,
+							-velocity.y + 0.2,
+							-velocity.z
+						);
+				}
+			}
+
+			float yawDeg;
+			if (!isClipping) {
+				yawDeg = (float)(MathHelper.atan2(-velocity.x, -velocity.z) * 180.0F / (float)Math.PI);
+			}
+			else {
+				yawDeg = (float) (MathHelper.atan2(velocity.x, velocity.z) * 180.0F / (float) Math.PI);
+			}
+
+			float pitchDeg = (float)(MathHelper.atan2(velocity.y, velocity.horizontalLength()) * 180.0F / (float)Math.PI);
+
+			this.setPitch(updateRotation(this.getPitch(), pitchDeg));
+			this.setYaw(updateRotation(this.getYaw(), yawDeg));
+			this.tickLeftOwner();
+
+			if (isClipping) {
+				BlockHitResult hitResult = this.getEntityWorld()
+					.getCollisionsIncludingWorldBorder(
+						new RaycastContext(
+							pos,
+							pos.add(velocity),
+							RaycastContext.ShapeType.COLLIDER,
+							RaycastContext.FluidHandling.NONE,
+							this
+						)
+					);
+
+				this.applyCollision(hitResult);
+			}
+			else {
+				this.setPosition(pos.add(velocity));
+				this.tickBlockCollision();
+			}
+
+			this.applyDrag();
+			if (isClipping && !this.isInGround()) {
+				this.applyGravity();
+			}
+
+			super.tick();
 		}
 	}
 

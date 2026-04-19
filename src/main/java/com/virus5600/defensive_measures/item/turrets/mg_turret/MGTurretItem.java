@@ -1,9 +1,5 @@
 package com.virus5600.defensive_measures.item.turrets.mg_turret;
 
-import com.virus5600.defensive_measures.entity.turrets.CannonTurretEntity;
-import com.virus5600.defensive_measures.entity.turrets.MGTurretEntity;
-import com.virus5600.defensive_measures.entity.turrets.TurretEntity;
-import com.virus5600.defensive_measures.item.turrets.TurretItem;
 import net.minecraft.component.type.TooltipDisplayComponent;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.mob.MobEntity;
@@ -12,6 +8,11 @@ import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Rarity;
+
+import com.virus5600.defensive_measures.entity.turrets.CannonTurretEntity;
+import com.virus5600.defensive_measures.entity.turrets.MGTurretEntity;
+import com.virus5600.defensive_measures.entity.turrets.TurretEntity;
+import com.virus5600.defensive_measures.item.turrets.TurretItem;
 
 import java.lang.reflect.Type;
 import java.util.function.Consumer;

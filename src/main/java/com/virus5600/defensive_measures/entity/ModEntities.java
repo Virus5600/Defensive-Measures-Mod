@@ -59,14 +59,15 @@ public class ModEntities {
 			.eyeHeight(0.25F)
 	);
 
-	public static final EntityType<BallistaArrowEntity> BALLISTA_ARROW = RegistryHelper.registerEntity(
-		"ballista_arrow",
+	public static final EntityType<BallistaBoltEntity> BALLISTA_BOLT = RegistryHelper.registerEntity(
+		"ballista_bolt",
 		Builder
-			.<BallistaArrowEntity>create(BallistaArrowEntity::new, SpawnGroup.MISC)
+			.<BallistaBoltEntity>create(BallistaBoltEntity::new, SpawnGroup.MISC)
 			.dropsNothing()
-			.dimensions(0.125f, 0.125f)
+			.dimensions(0.5f, 0.5f)
 			.maxTrackingRange(4)
 			.trackingTickInterval(10)
+			.eyeHeight(0.1F)
 	);
 
 	public static final EntityType<MGBulletEntity> MG_BULLET = RegistryHelper.registerEntity(

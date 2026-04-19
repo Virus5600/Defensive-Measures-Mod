@@ -2,7 +2,7 @@
 	"replace": false,
 	"values": [
 		"dm:cannonball",
-		"dm:ballista_arrow",
+		"dm:ballista_bolt",
 		"dm:mg_bullet"
 	]
 }

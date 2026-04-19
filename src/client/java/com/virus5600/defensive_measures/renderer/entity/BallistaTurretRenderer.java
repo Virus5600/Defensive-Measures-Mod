@@ -17,7 +17,6 @@ public class BallistaTurretRenderer extends BaseTurretRenderer<
 		super(
 			ctx,
 			new BallistaTurretModel(ctx.getPart(ModEntityModels.BALLISTA_TURRET)),
-			0.75f,
 			BaseTurretRenderState::new
 		);
 	}

@@ -7,8 +7,6 @@ import net.minecraft.world.World;
 
 import com.virus5600.defensive_measures.entity.ModEntities;
 
-import java.util.Map;
-
 /**
  * The projectile used by {@link com.virus5600.defensive_measures.entity.turrets.BallistaTurretEntity Ballista Turret}.
  *
@@ -33,32 +31,29 @@ import java.util.Map;
  *
  * @since 1.0.0
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
- * @version 1.0.0
+ * @version 1.0.1
  */
-public class BallistaArrowEntity extends KineticProjectileEntity {
-	private static final Map<String, Integer> ANIMATIONS;
-
-
+public class BallistaBoltEntity extends KineticProjectileEntity {
 	// ////////////// //
 	//  CONSTRUCTORS  //
 	// ////////////// //
-	public BallistaArrowEntity(
+	public BallistaBoltEntity(
 		EntityType<? extends TurretProjectileEntity> entityType,
 		World world
 	) {
 		super(entityType, world);
 
+		this.setPierceLevel(this.getMaxPierceLevel());
 		this.setDamage(4);
 	}
 
-	public BallistaArrowEntity(World world, LivingEntity owner) {
-		this(ModEntities.BALLISTA_ARROW, world);
+	public BallistaBoltEntity(World world, LivingEntity owner) {
+		this(ModEntities.BALLISTA_BOLT, world);
 
-		this.setPierceLevel(this.getMaxPierceLevel());
 		this.setOwner(owner);
 	}
 
-	public BallistaArrowEntity(
+	public BallistaBoltEntity(
 		LivingEntity owner,
 		double directionX,
 		double directionY,
@@ -72,20 +67,10 @@ public class BallistaArrowEntity extends KineticProjectileEntity {
 	// ///////// //
 	//  METHODS  //
 	// ///////// //
+
 	// PUBLIC
 	@Override
 	public byte getMaxPierceLevel() {
 		return 5;
-	}
-
-	// ///////////////// //
-	// STATIC INITIALIZE //
-	// ///////////////// //
-
-	static {
-		ANIMATIONS = Map.of(
-			"Idle", 0,
-			"OnAir", 0
-		);
 	}
 }

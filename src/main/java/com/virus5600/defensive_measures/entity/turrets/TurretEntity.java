@@ -543,6 +543,19 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 	// PROCESS METHODS //
 	// /////////////// //
 
+	@Override
+	protected void updatePostDeath() {
+		boolean forRemoval = this.deathTime >= this.getDeathAnimDuration();
+		boolean isMainThread = !this.getEntityWorld().isClient();
+		boolean stillExisting = !this.isRemoved();
+
+		++this.deathTime;
+		if (forRemoval && isMainThread && stillExisting) {
+			this.getEntityWorld().sendEntityStatus(this, EntityStatuses.ADD_DEATH_PARTICLES);
+			this.remove(RemovalReason.KILLED);
+		}
+	}
+
 	/**
 	 * Attempts to attach this entity to a block or fall if there is no block to attach to
 	 * at the current position. If the entity is attached to a block, it will not fall but
@@ -1556,7 +1569,17 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 	 *
 	 * @return {@code List<Vec3d>} The list of projectile spawn points.
 	 */
-	abstract List<Vec3d> getTurretProjectileSpawn();
+	protected abstract List<Vec3d> getTurretProjectileSpawn();
+
+	/**
+	 * Defines how long the turret's death animation is. This is defined by simply multiplying
+	 * the death animation duration in seconds by twenty ({@code animDur * 20}).
+	 *
+	 * @return {@code int} The duration of the turret's death animation in ticks.
+	 *
+	 * @apiNote Must be manually updated whenever the death animation duration on the client side is updated
+	 */
+	protected abstract int getDeathAnimDuration();
 
 	/**
 	 * Determines the damage this turret's projectile will deal. This only
@@ -1631,9 +1654,10 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 	 * @param velocityData The data that will be used to set the velocity of the projectile.
 	 */
 	protected void setProjectileVelocity(ProjectileEntity projectile, TurretProjectileVelocity velocityData) {
-		double vx = velocityData.getVelocity().getX();
-		double vy = velocityData.getVelocity().getY();
-		double vz = velocityData.getVelocity().getZ();
+		Vec3d velocity = velocityData.getVelocity();
+		double vx = velocity.getX();
+		double vy = velocity.getY();
+		double vz = velocity.getZ();
 
 		projectile.setVelocity(
 			vx, vy, vz,
@@ -1771,8 +1795,7 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 			);
 
 			if (projectile == null) {
-				System.err.println("Projectile is null for " + this.getName().getString());
-				DefensiveMeasures.LOGGER.info("Projectile is null for {}", this.getName().getString());
+				DefensiveMeasures.LOGGER.warn("Projectile is null for {}", this.getName().getString());
 				return;
 			}
 

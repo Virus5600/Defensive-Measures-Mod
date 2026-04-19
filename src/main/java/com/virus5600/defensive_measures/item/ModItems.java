@@ -1,7 +1,15 @@
 package com.virus5600.defensive_measures.item;
 
-import com.virus5600.defensive_measures.DefensiveMeasures;
+import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
+import net.fabricmc.fabric.api.registry.FuelRegistryEvents;
+import net.minecraft.block.Block;
+import net.minecraft.entity.EntityType;
+import net.minecraft.entity.mob.MobEntity;
+import net.minecraft.item.Item;
+import net.minecraft.item.Item.Settings;
 
+import com.virus5600.defensive_measures.DefensiveMeasures;
+import com.virus5600.defensive_measures._helper.RegistryHelper;
 import com.virus5600.defensive_measures.block.ModBlocks;
 import com.virus5600.defensive_measures.entity.ModEntities;
 import com.virus5600.defensive_measures.item.equipments.TurretRemoverItem;
@@ -10,15 +18,6 @@ import com.virus5600.defensive_measures.item.turrets.TurretItem;
 import com.virus5600.defensive_measures.item.turrets.ballista.*;
 import com.virus5600.defensive_measures.item.turrets.cannon.*;
 import com.virus5600.defensive_measures.item.turrets.mg_turret.*;
-import com.virus5600.defensive_measures._helper.RegistryHelper;
-
-import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
-import net.fabricmc.fabric.api.registry.FuelRegistryEvents;
-import net.minecraft.block.Block;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.mob.MobEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.Item.Settings;
 
 import java.util.Arrays;
 import java.util.function.Function;
@@ -55,7 +54,7 @@ public class ModItems {
 	// BALLISTA
 	public final static Item BALLISTA_TURRET = registerItem("ballista", ModEntities.BALLISTA_TURRET, BallistaTurretItem::new);
 	public final static Item ARROWHEAD = registerItem(ModBlocks.ARROWHEAD);
-	public final static Item BALLISTA_ARROW = registerItem("ballista_arrow", BallistaArrowItem::new);
+	public final static Item BALLISTA_ARROW = registerItem("ballista_arrow", BallistaBoltItem::new);
 	public final static Item BALLISTA_BASE = registerItem("ballista_base", BallistaBaseItem::new);
 	public final static Item BALLISTA_BASE_WITH_STAND = registerItem("ballista_base_with_stand", BallistaBaseWithStandItem::new);
 	public final static Item BALLISTA_BOW = registerItem("ballista_bow", BallistaBowItem::new);

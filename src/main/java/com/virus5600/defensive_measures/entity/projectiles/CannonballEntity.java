@@ -67,7 +67,10 @@ public class CannonballEntity extends ExplosiveProjectileEntity {
 	// ////////////// //
 	//  CONSTRUCTORS  //
 	// ////////////// //
-	public CannonballEntity(EntityType<? extends ExplosiveProjectileEntity> entityType, World world) {
+	public CannonballEntity(
+		EntityType<? extends ExplosiveProjectileEntity> entityType,
+		World world
+	) {
 		super(entityType, world);
 		this.setFireTicks(0);
 		this.setOnFire(false);
@@ -81,7 +84,13 @@ public class CannonballEntity extends ExplosiveProjectileEntity {
 		this.setOwner(owner);
 	}
 
-	public CannonballEntity(LivingEntity owner, double directionX, double directionY, double directionZ, World world) {
+	public CannonballEntity(
+		LivingEntity owner,
+		double directionX,
+		double directionY,
+		double directionZ,
+		World world
+	) {
 		this(owner, world);
 		this.setVelocity(directionX, directionY, directionZ);
 	}

@@ -17,7 +17,6 @@ public class CannonTurretRenderer extends BaseTurretRenderer<
 		super(
 			ctx,
 			new CannonTurretModel(ctx.getPart(ModEntityModels.CANNON_TURRET)),
-			0.75f,
 			BaseTurretRenderState::new
 		);
 	}

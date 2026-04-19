@@ -86,7 +86,6 @@ public class CannonTurretEntity extends TurretEntity {
 	// //////////// //
 	public CannonTurretEntity(EntityType<? extends MobEntity> entityType, World world) {
 		super(entityType, world, TurretMaterial.METAL, ModEntities.CANNONBALL, ModItems.CANNON_TURRET);
-//		super(entityType, world, TurretMaterial.METAL, ModItems.CANNON_TURRET);
 
 		this.setShootSound(ModSoundEvents.TURRET_CANNON_SHOOT);
 		this.setHealSound(ModSoundEvents.TURRET_REPAIR_METAL);
@@ -127,9 +126,8 @@ public class CannonTurretEntity extends TurretEntity {
 
 	@Override
 	public void shootAt(LivingEntity target, float pullProgress) {
-		float dist = (float) this.getTrackedPosition()
-			.getPos()
-			.distanceTo(target.getTrackedPosition().getPos());
+		float dist = (float) getEntityPos()
+			.distanceTo(target.getEntityPos());
 
 		TurretProjectileVelocity velocityData = TurretProjectileVelocity.init(this)
 			.setVelocity(target)
@@ -214,6 +212,15 @@ public class CannonTurretEntity extends TurretEntity {
 	// //////////////////////// //
 
 	// TurretEntity //
+
+	/**
+	 * {@inheritDoc}
+	 * @see {@code CannonTurretAnimation#ANIM_CANNON_DEATH}
+	 */
+	protected int getDeathAnimDuration() {
+		return (int) (1F * 20);
+	}
+
 	protected List<Vec3d> getTurretProjectileSpawn() {
 		return OFFSETS.get(Offsets.BARREL);
 	}
