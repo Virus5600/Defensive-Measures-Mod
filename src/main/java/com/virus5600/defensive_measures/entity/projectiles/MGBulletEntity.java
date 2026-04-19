@@ -4,10 +4,14 @@ import net.minecraft.block.BlockState;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.passive.IronGolemEntity;
+import net.minecraft.particle.BlockStateParticleEffect;
+import net.minecraft.particle.ParticleEffect;
+import net.minecraft.particle.ParticleTypes;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraft.world.rule.GameRules;
 
@@ -15,8 +19,6 @@ import com.virus5600.defensive_measures.entity.ModEntities;
 import com.virus5600.defensive_measures.sound.ModSoundEvents;
 import com.virus5600.defensive_measures._helper.BlockHelper.BlockCategory;
 import com.virus5600.defensive_measures._helper.BlockHelper;
-
-import java.util.Map;
 
 /**
  * The projectile used by {@link com.virus5600.defensive_measures.entity.turrets.MGTurretEntity MG Turret}.
@@ -131,9 +133,6 @@ public class MGBulletEntity extends KineticProjectileEntity {
 	 */
 	@Override
 	protected void onBlockHit(BlockHitResult blockHitResult) {
-		// Default sound == Dirt, Greenery, Others
-		this.setSound(ModSoundEvents.BULLET_IMPACT_DEFAULT);
-
 		BlockState state = this.getEntityWorld().getBlockState(blockHitResult.getBlockPos());
 		BlockCategory blockCat = BlockHelper.getBlockCategory(state);
 
@@ -143,7 +142,30 @@ public class MGBulletEntity extends KineticProjectileEntity {
 			case BlockCategory.METAL -> this.setSound(ModSoundEvents.BULLET_IMPACT_METAL);
 			case BlockCategory.STONE -> this.setSound(ModSoundEvents.BULLET_IMPACT_STONE);
 			case BlockCategory.WOOD -> this.setSound(ModSoundEvents.BULLET_IMPACT_WOOD);
+			// Default sound == Dirt, Greenery, Others
 			default -> this.setSound(ModSoundEvents.BULLET_IMPACT_DEFAULT);
+		}
+
+		if (blockCat != BlockCategory.GLASS) {
+			BlockState hitState = this.getEntityWorld().getBlockState(blockHitResult.getBlockPos());
+			ParticleEffect particle = new BlockStateParticleEffect(ParticleTypes.BLOCK, hitState);
+
+			Vec3d vel = this.getVelocity().negate().multiply(2.5).normalize();
+			Vec3d pos = this.getEntityPos();
+
+			if (this.getEntityWorld() instanceof ServerWorld sw) {
+				int pNum = this.random.nextBetween(5, 7);
+				for (int i = 0; i < pNum; i++) {
+					Vec3d rPos = pos.addRandom(this.random, 0.5F);
+					sw.spawnParticles(
+						particle,
+						rPos.x, rPos.y, rPos.z,
+						0,
+						vel.x,  vel.y, vel.z,
+						this.random.nextBetween(3, 7)
+					);
+				}
+			}
 		}
 
 		super.onBlockHit(blockHitResult);
