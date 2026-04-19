@@ -1,6 +1,6 @@
 {
 	"model": {
 		"type": "minecraft:model",
-		"model": "dm:item/ballista_arrow"
+		"model": "dm:item/ballista_bolt"
 	}
 }
