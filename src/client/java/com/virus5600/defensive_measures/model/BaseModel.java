@@ -65,10 +65,8 @@ public class BaseModel<T extends EntityRenderState> extends EntityModel<T> {
 	public BaseModel(@NotNull ModelPart root, @NotNull String texturePath, @NotNull String[] textures) {
 		super(root);
 
-		ResourceManager manager = MinecraftClient.getInstance().getResourceManager();
-
 		texturePath = "textures/entity/" + texturePath;
-		this.texturePath = Identifier.of(texturePath);
+		this.texturePath = Identifier.of(DefensiveMeasures.MOD_ID, texturePath);
 
 		this.textures = Arrays.stream(textures)
 			.map(texture -> Identifier.of(

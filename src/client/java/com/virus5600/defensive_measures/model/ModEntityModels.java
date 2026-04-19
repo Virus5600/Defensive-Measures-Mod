@@ -74,7 +74,7 @@ public class ModEntityModels {
 	}
 
 	private static EntityModelLayer create(String id, String layer) {
-		return new EntityModelLayer(Identifier.ofVanilla(id), layer);
+		return new EntityModelLayer(Identifier.of(DefensiveMeasures.MOD_ID, id), layer);
 	}
 
 	private static EquipmentModelData<EntityModelLayer> registerEquipment(String id) {

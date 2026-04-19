@@ -273,10 +273,25 @@ public abstract class TurretItem extends Item {
 				.orElse(new NbtList());
 
 			effectList.forEach(effect -> {
-				NbtCompound effectNbt = (NbtCompound) effect;
-				Identifier effId = Identifier.of(
-					effectNbt.getString("id").orElse("")
-				);
+				// Guard against non-compound list elements
+				if (!(effect instanceof NbtCompound effectNbt)) {
+					return;
+				}
+
+				// Validate and parse the effect id
+				String idString = effectNbt.getString("id").orElse(null);
+				if (idString == null || idString.isEmpty()) {
+					return;
+				}
+
+				Identifier effId;
+				try {
+					effId = Identifier.of(idString);
+				}
+				// Skip invalid identifiers
+				catch (IllegalArgumentException e) {
+					return;
+				}
 
 				RegistryEntry<StatusEffect> entry = entity.getEntityWorld()
 					.getRegistryManager()

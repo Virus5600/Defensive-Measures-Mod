@@ -100,7 +100,10 @@ public interface Itemable {
 					.getOrThrow()
 			);
 
-			effectList.add(effectNbt);
+			// Only include effect nbt when not empty
+			if (!effectNbt.isEmpty()) {
+				effectList.add(effectNbt);
+			}
 		});
 
 		// Sets the NBT

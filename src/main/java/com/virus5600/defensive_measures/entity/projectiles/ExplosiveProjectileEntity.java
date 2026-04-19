@@ -340,7 +340,7 @@ public abstract class ExplosiveProjectileEntity extends TurretProjectileEntity {
 			this.addParticles(pos.add(0, 0.25, 0));
 		}
 		else {
-			System.out.println("Projectile is removed.");
+//			System.out.println("Projectile is removed.");
 			this.discard();
 		}
 	}
