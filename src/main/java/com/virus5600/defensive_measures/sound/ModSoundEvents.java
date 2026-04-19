@@ -27,6 +27,8 @@ public class ModSoundEvents {
 	public final static SoundEvent TURRET_REPAIR_METAL = ModSoundEvents.registerSoundEvent("turret.repair.metal");
 	public final static SoundEvent TURRET_REPAIR_WOOD = ModSoundEvents.registerSoundEvent("turret.repair.wood");
 	public final static SoundEvent TURRET_REPAIR_BOW = ModSoundEvents.registerSoundEvent("turret.repair.bow");
+	public final static SoundEvent TURRET_HURT_METAL = ModSoundEvents.registerSoundEvent("turret.hurt.metal");
+	public final static SoundEvent TURRET_HURT_WOOD = ModSoundEvents.registerSoundEvent("turret.hurt.wood");
 
 	// CANNON
 	public final static SoundEvent TURRET_CANNON_HURT = ModSoundEvents.registerSoundEvent("turret.cannon.hurt");

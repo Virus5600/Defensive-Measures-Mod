@@ -120,6 +120,23 @@
 		],
 		"subtitle": "subtitles.turret.wood.repair"
 	},
+	"turret.hurt.metal": {
+		"sounds": [
+			"mob/zombie/metal1",
+			"mob/zombie/metal2",
+			"mob/zombie/metal3"
+		],
+		"subtitle": "subtitles.turret.hurt.metal"
+	},
+	"turret.hurt.wood": {
+		"sounds": [
+			"mob/zombie/wood1",
+			"mob/zombie/wood2",
+			"mob/zombie/wood3",
+			"mob/zombie/wood4"
+		],
+		"subtitle": "subtitles.turret.hurt.wood"
+	},
 
 	"turret.cannon.hurt": {
 		"sounds": [
