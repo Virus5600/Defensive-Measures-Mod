@@ -1,0 +1,32 @@
+{
+	"parent": "minecraft:recipes/root",
+	"criteria": {
+		"has_ingredients": {
+			"trigger": "minecraft:inventory_changed",
+			"conditions": {
+				"items": [
+					{
+						"items": "#minecraft:wooden_slabs"
+					}
+				]
+			}
+		},
+		"has_the_recipe": {
+			"trigger": "minecraft:recipe_unlocked",
+			"conditions": {
+				"recipe": "dm:cannon_stand"
+			}
+		}
+	},
+	"requirements": [
+		[
+			"has_the_recipe",
+			"has_ingredients"
+		]
+	],
+	"rewards": {
+		"recipes": [
+			"dm:cannon_stand"
+		]
+	}
+}

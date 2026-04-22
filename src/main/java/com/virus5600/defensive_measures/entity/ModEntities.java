@@ -21,7 +21,7 @@ import net.minecraft.entity.SpawnGroup;
  */
 public class ModEntities {
 	// TURRETS //
-	// v1.0.0
+	// v1.0.0-beta
 	public static final EntityType<CannonTurretEntity> CANNON_TURRET = RegistryHelper.registerEntity(
 		"cannon_turret",
 		Builder
@@ -47,7 +47,7 @@ public class ModEntities {
 	);
 
 	// PROJECTILES //
-	// v1.0.0
+	// v1.0.0-beta
 	public static final EntityType<CannonballEntity> CANNONBALL = RegistryHelper.registerEntity(
 		"cannonball",
 		Builder
@@ -86,7 +86,7 @@ public class ModEntities {
 		DefensiveMeasures.LOGGER.info("REGISTERING ENTITY ATTRIBUTES FOR {}...", DefensiveMeasures.MOD_NAME);
 
 		// TURRETS //
-		// v1.0.0
+		// v1.0.0-beta
 		FabricDefaultAttributeRegistry.register(ModEntities.CANNON_TURRET, CannonTurretEntity.setAttributes());
 		FabricDefaultAttributeRegistry.register(ModEntities.BALLISTA_TURRET, BallistaTurretEntity.setAttributes());
 		FabricDefaultAttributeRegistry.register(ModEntities.MG_TURRET, MGTurretEntity.setAttributes());

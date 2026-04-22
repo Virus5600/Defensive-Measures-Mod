@@ -6,6 +6,8 @@
 
 	"block.dm.arrowhead" : "Arrowhead",
 
+	"block.dm.turret_assembly_station": "Turret Assembly Station",
+
 	"item.dm.turret_remover": "Turret Remover",
 
 	"item.dm.cannon_base" : "Cannon Base",
@@ -89,5 +91,9 @@
 
 	"tag.item.dm.turret_remover_repairable" : "Turret Remover Repairable",
 	"tag.item.dm.turret_removers" : "Turret Removers",
-	"tag.item.dm.turrets" : "Turrets"
+	"tag.item.dm.turrets" : "Turrets",
+
+	"container.dm.turret_assembly_station": "Assemble Turret",
+
+	"stat.dm.interact_with_turret_assembly_station": "Interactions with Turret Assembly Station"
 }

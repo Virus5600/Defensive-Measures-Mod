@@ -1,0 +1,36 @@
+{
+	"parent": "minecraft:recipes/root",
+	"criteria": {
+		"has_ingredients": {
+			"trigger": "minecraft:inventory_changed",
+			"conditions": {
+				"items": [
+					{
+						"items": [
+							"dm:mg_head",
+							"dm:mg_stand",
+							"dm:mg_base"
+						]
+					}
+				]
+			}
+		},
+		"has_the_recipe": {
+			"trigger": "minecraft:recipe_unlocked",
+			"conditions": {
+				"recipe": "dm:mg_turret"
+			}
+		}
+	},
+	"requirements": [
+		[
+			"has_the_recipe",
+			"has_ingredients"
+		]
+	],
+	"rewards": {
+		"recipes": [
+			"dm:mg_turret"
+		]
+	}
+}

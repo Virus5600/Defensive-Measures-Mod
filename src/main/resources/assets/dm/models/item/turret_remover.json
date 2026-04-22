@@ -2,7 +2,8 @@
 	"format_version": "1.21.11",
 	"credit": "Made with Blockbench",
 	"textures": {
-		"0": "dm:item/turret_remover"
+		"0": "dm:item/turret_remover",
+		"particle": "dm:item/turret_remover"
 	},
 	"elements": [
 		{

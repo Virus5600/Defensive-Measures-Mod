@@ -88,12 +88,11 @@ import org.jetbrains.annotations.Nullable;
  * update the attributes accordingly.
  *
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
- * @since 1.1.0
+ * @since 1.0.1
  *
  * @see MobEntity
  * @see Itemable
  * @see RangedAttackMob
- *
  */
 public abstract class TurretEntity extends MobEntity implements Itemable, RangedAttackMob {
 	/**

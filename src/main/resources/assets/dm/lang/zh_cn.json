@@ -6,6 +6,8 @@
 
 	"block.dm.arrowhead" : "箭头",
 
+	"block.dm.turret_assembly_station": "Turret Assembly Station",
+
 	"item.dm.turret_remover": "拆卸工具",
 
 	"item.dm.cannon_base" : "炮塔底座",
@@ -49,5 +51,9 @@
 	"subtitles.turret.ballista.shoot" : "弩箭塔：射击",
 	"subtitles.turret.mg_turret.hurt" : "机枪塔：受损",
 	"subtitles.turret.mg_turret.destroyed" : "机枪塔：被摧毁",
-	"subtitles.turret.mg_turret.shoot" : "机枪塔：开火"
+	"subtitles.turret.mg_turret.shoot" : "机枪塔：开火",
+
+	"container.dm.turret_assembly_station": "Assemble Turret",
+
+	"stat.dm.interact_with_turret_assembly_station": "Interactions with Turret Assembly Station"
 }

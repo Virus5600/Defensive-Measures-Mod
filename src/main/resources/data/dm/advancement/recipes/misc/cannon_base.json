@@ -1,0 +1,45 @@
+{
+	"parent": "minecraft:recipes/root",
+	"criteria": {
+		"has_wooden_slabs": {
+			"trigger": "minecraft:inventory_changed",
+			"conditions": {
+				"items": [
+					{
+						"items": "#minecraft:wooden_slabs"
+					}
+				]
+			}
+		},
+		"has_smooth_stone_slabs": {
+			"trigger": "minecraft:inventory_changed",
+			"conditions": {
+				"items": [
+					{
+						"items": [
+							"minecraft:smooth_stone_slab"
+						]
+					}
+				]
+			}
+		},
+		"has_the_recipe": {
+			"trigger": "minecraft:recipe_unlocked",
+			"conditions": {
+				"recipe": "dm:ballista"
+			}
+		}
+	},
+	"requirements": [
+		[
+			"has_the_recipe",
+			"has_wooden_slabs",
+			"has_smooth_stone_slabs"
+		]
+	],
+	"rewards": {
+		"recipes": [
+			"dm:cannon_base"
+		]
+	}
+}

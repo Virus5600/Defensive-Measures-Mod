@@ -1,0 +1,45 @@
+{
+	"parent": "minecraft:recipes/root",
+	"criteria": {
+		"has_ingredients": {
+			"trigger": "minecraft:inventory_changed",
+			"conditions": {
+				"items": [
+					{
+						"items": [
+							"dm:ballista_base"
+						]
+					}
+				]
+			}
+		},
+		"has_wooden_fences": {
+			"trigger": "minecraft:inventory_changed",
+			"conditions": {
+				"items": [
+					{
+						"items": "#minecraft:wooden_fences"
+					}
+				]
+			}
+		},
+		"has_the_recipe": {
+			"trigger": "minecraft:recipe_unlocked",
+			"conditions": {
+				"recipe": "dm:ballista_base_with_stand"
+			}
+		}
+	},
+	"requirements": [
+		[
+			"has_the_recipe",
+			"has_ingredients",
+			"has_wooden_fences"
+		]
+	],
+	"rewards": {
+		"recipes": [
+			"dm:ballista_base_with_stand"
+		]
+	}
+}

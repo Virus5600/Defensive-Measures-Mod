@@ -1,5 +1,7 @@
 package com.virus5600.defensive_measures._helper;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
@@ -13,6 +15,13 @@ import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.tag.TagKey;
+import net.minecraft.resource.featuretoggle.FeatureFlags;
+import net.minecraft.screen.ScreenHandler;
+import net.minecraft.screen.ScreenHandlerType;
+import net.minecraft.stat.StatFormatter;
+import net.minecraft.stat.StatType;
+import net.minecraft.stat.Stats;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
 import com.virus5600.defensive_measures.DefensiveMeasures;
@@ -83,5 +92,27 @@ public final class RegistryHelper {
 	// Damage Type Registry
 	public static RegistryKey<DamageType> getDamageTypeKey(String path) {
 		return RegistryKey.of(RegistryKeys.DAMAGE_TYPE, Identifier.of(DefensiveMeasures.MOD_ID, path));
+	}
+
+	// Stats Registry
+	public static Identifier registerStat(String id, StatFormatter formatter) {
+		Identifier identifier = Identifier.of(DefensiveMeasures.MOD_ID, id);
+		Registry.register(Registries.CUSTOM_STAT, id, identifier);
+		Stats.CUSTOM.getOrCreateStat(identifier, formatter);
+		return identifier;
+	}
+
+	public static <T> StatType<T> registerStatType(String id, Registry<T> registry) {
+		Text text = Text.translatable("stat_type." + DefensiveMeasures.MOD_ID + "." + id);
+		return Registry.register(Registries.STAT_TYPE, id, new StatType<>(registry, text));
+	}
+
+	// Screen Handler Type Registry
+	public static <T extends ScreenHandler> ScreenHandlerType<T> registerScreenHandlerType(String id, ScreenHandlerType.Factory<T> factory) {
+		return Registry.register(
+			Registries.SCREEN_HANDLER,
+			Identifier.of(DefensiveMeasures.MOD_ID, id),
+			new ScreenHandlerType<>(factory, FeatureFlags.VANILLA_FEATURES)
+		);
 	}
 }

@@ -7,7 +7,9 @@ import com.virus5600.defensive_measures.entity.damage.ModDamageTypes;
 import com.virus5600.defensive_measures.item.ModItemGroups;
 import com.virus5600.defensive_measures.item.ModItems;
 import com.virus5600.defensive_measures.particle.ModParticles;
+import com.virus5600.defensive_measures.screen.ModScreenHandlers;
 import com.virus5600.defensive_measures.sound.ModSoundEvents;
+import com.virus5600.defensive_measures.stat.ModStats;
 import net.fabricmc.api.ModInitializer;
 
 import org.slf4j.Logger;
@@ -55,6 +57,8 @@ public class DefensiveMeasures implements ModInitializer {
 		ModCriterion.registerModCriterion();
 		ModEntities.registerModEntityAttributes();
 		ModParticles.registerParticles();
+		ModStats.registerStats();
+		ModScreenHandlers.registerScreenHandlers();
 
 		LOGGER.info("{} MAIN ENTRY POINT INITIALIZED.", MOD_NAME);
 	}

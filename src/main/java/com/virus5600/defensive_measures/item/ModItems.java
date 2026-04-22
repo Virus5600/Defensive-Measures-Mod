@@ -18,6 +18,7 @@ import com.virus5600.defensive_measures.item.turrets.TurretItem;
 import com.virus5600.defensive_measures.item.turrets.ballista.*;
 import com.virus5600.defensive_measures.item.turrets.cannon.*;
 import com.virus5600.defensive_measures.item.turrets.mg_turret.*;
+import net.minecraft.item.ItemGroups;
 
 import java.util.Arrays;
 import java.util.function.Function;
@@ -34,6 +35,10 @@ import java.util.function.Function;
  * @version 1.0.0
  */
 public class ModItems {
+	// VANILLA GROUPS
+	public final static Item[] FUNCTIONAL_ITEMS;
+
+	// MODDED GROUPS
 	public final static Item[] DM_ITEMS;
 	public final static Item[] DM_EQUIPMENTS;
 	public final static Item[] DM_TRAPS;
@@ -73,6 +78,13 @@ public class ModItems {
 
 	// TURRET REMOVER
 	public final static Item TURRET_REMOVER = registerToolItem("turret_remover", (settings) -> new TurretRemoverItem(ModToolMaterials.TURRET_REMOVER, 0.0f, 0.0f, settings));
+
+	// ////// //
+	// BLOCKS //
+	// ////// //
+
+	// TURRET ASSEMBLY STATION
+	public final static Item TURRET_ASSEMBLY_STATION = registerItem(ModBlocks.TURRET_ASSEMBLY_STATION);
 
 	// //////////////////////// //
 	// REGISTRY RELATED METHODS //
@@ -134,6 +146,12 @@ public class ModItems {
 	public static void registerModItems() {
 		DefensiveMeasures.LOGGER.info("REGISTERING ITEMS TO ITEM GROUPS...");
 
+		Arrays.stream(FUNCTIONAL_ITEMS).iterator().forEachRemaining(
+			(item) -> ItemGroupEvents.modifyEntriesEvent(ItemGroups.FUNCTIONAL).register(
+				(content) -> content.add(item)
+			)
+		);
+
 		Arrays.stream(DM_ITEMS).iterator().forEachRemaining(
 			(item) -> ItemGroupEvents.modifyEntriesEvent(ModItemGroups.DMI_KEY).register(
 				(content) -> content.add(item)
@@ -176,6 +194,10 @@ public class ModItems {
 	}
 
 	static {
+		FUNCTIONAL_ITEMS = new Item[] {
+			TURRET_ASSEMBLY_STATION
+		};
+
 		DM_ITEMS = new Item[] {
 			// CANNON
 			CANNON_BASE,

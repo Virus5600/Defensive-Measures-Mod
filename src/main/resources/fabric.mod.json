@@ -26,10 +26,10 @@
 		]
 	},
 	"depends": {
-		"fabricloader": ">=0.16.10",
-		"minecraft": "~1.21.4",
+		"fabricloader": ">=0.18.4",
+		"minecraft": "~1.21.11",
 		"java": ">=21",
-		"fabric-api": ">=0.119.0+1.21.4"
+		"fabric-api": ">=0.141.3+1.21.11"
 	},
 	"custom": {
 		"modmenu": {
@@ -37,6 +37,7 @@
 				"curseforge": "https://www.curseforge.com/minecraft/mc-mods/defensive-measures",
 				"modrinth": "https://modrinth.com/mod/defensive-measures",
 				"planetminecraft": "https://www.planetminecraft.com/mod/defensive-measures-mod/",
+				"github": "https://github.com/Virus5600/Defensive-Measures-Mod/releases",
 				"discord": "https://discord.gg/PCUKucADFr"
 			},
 			"update_checker": true
