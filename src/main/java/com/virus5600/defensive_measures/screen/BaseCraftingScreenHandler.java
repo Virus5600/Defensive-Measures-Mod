@@ -7,15 +7,10 @@ import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.RecipeInputInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.s2c.play.ScreenHandlerSlotUpdateS2CPacket;
-import net.minecraft.recipe.CraftingRecipe;
-import net.minecraft.recipe.RecipeEntry;
-import net.minecraft.recipe.RecipeType;
+import net.minecraft.recipe.*;
 import net.minecraft.recipe.book.RecipeBookType;
 import net.minecraft.recipe.input.CraftingRecipeInput;
-import net.minecraft.screen.AbstractCraftingScreenHandler;
-import net.minecraft.screen.ScreenHandler;
-import net.minecraft.screen.ScreenHandlerContext;
-import net.minecraft.screen.ScreenHandlerType;
+import net.minecraft.screen.*;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
@@ -45,12 +40,22 @@ public abstract class BaseCraftingScreenHandler extends AbstractCraftingScreenHa
 		ItemStack itemStack = ItemStack.EMPTY;
 
 		if (world.getServer() != null) {
-			Optional<RecipeEntry<CraftingRecipe>> optional = world.getServer().getRecipeManager().getFirstMatch(RecipeType.CRAFTING, craftingRecipeInput, world, recipe);
+			Optional<RecipeEntry<CraftingRecipe>> optional = world.getServer()
+				.getRecipeManager()
+				.getFirstMatch(
+					RecipeType.CRAFTING,
+					craftingRecipeInput,
+					world,
+					recipe != null ? recipe.id() : null
+				);
+
 			if (optional.isPresent()) {
 				RecipeEntry<CraftingRecipe> recipeEntry = optional.get();
 				CraftingRecipe craftingRecipe = recipeEntry.value();
+
 				if (resultInventory.shouldCraftRecipe(serverPlayerEntity, recipeEntry)) {
 					ItemStack itemStack2 = craftingRecipe.craft(craftingRecipeInput, world.getRegistryManager());
+
 					if (itemStack2.isItemEnabled(world.getEnabledFeatures())) {
 						itemStack = itemStack2;
 					}

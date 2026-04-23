@@ -1,7 +1,5 @@
 package com.virus5600.defensive_measures._helper;
 
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
@@ -10,6 +8,10 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.damage.DamageType;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
+import net.minecraft.recipe.Recipe;
+import net.minecraft.recipe.RecipeSerializer;
+import net.minecraft.recipe.RecipeType;
+import net.minecraft.recipe.book.RecipeBookCategory;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
@@ -114,5 +116,30 @@ public final class RegistryHelper {
 			Identifier.of(DefensiveMeasures.MOD_ID, id),
 			new ScreenHandlerType<>(factory, FeatureFlags.VANILLA_FEATURES)
 		);
+	}
+
+	// Recipe Related Registry
+	public static <T extends Recipe<?>>RecipeType<T> registerRecipeType(String id) {
+		return Registry.register(
+			Registries.RECIPE_TYPE,
+			Identifier.of(DefensiveMeasures.MOD_ID, id),
+			new RecipeType<T>() {
+				public String toString() {
+					return id;
+				}
+			}
+		);
+	}
+
+	public static <S extends RecipeSerializer<T>, T extends Recipe<?>> S registerRecipeSerializer(String id, S recipeSerializer) {
+		return Registry.register(
+			Registries.RECIPE_SERIALIZER,
+			Identifier.of(DefensiveMeasures.MOD_ID, id),
+			recipeSerializer
+		);
+	}
+
+	public static RecipeBookCategory registerRecipeBookCat(String id) {
+		return Registry.register(Registries.RECIPE_BOOK_CATEGORY, id, new RecipeBookCategory());
 	}
 }

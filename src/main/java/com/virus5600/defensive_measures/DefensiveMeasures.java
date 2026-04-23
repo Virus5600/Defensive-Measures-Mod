@@ -7,6 +7,9 @@ import com.virus5600.defensive_measures.entity.damage.ModDamageTypes;
 import com.virus5600.defensive_measures.item.ModItemGroups;
 import com.virus5600.defensive_measures.item.ModItems;
 import com.virus5600.defensive_measures.particle.ModParticles;
+import com.virus5600.defensive_measures.recipe.ModRecipeSerializers;
+import com.virus5600.defensive_measures.recipe.ModRecipeTypes;
+import com.virus5600.defensive_measures.recipe.book.ModRecipeBookCategories;
 import com.virus5600.defensive_measures.screen.ModScreenHandlers;
 import com.virus5600.defensive_measures.sound.ModSoundEvents;
 import com.virus5600.defensive_measures.stat.ModStats;
@@ -59,6 +62,9 @@ public class DefensiveMeasures implements ModInitializer {
 		ModParticles.registerParticles();
 		ModStats.registerStats();
 		ModScreenHandlers.registerScreenHandlers();
+		ModRecipeSerializers.registerModRecipeSerializers();
+		ModRecipeTypes.registerModRecipesTypes();
+		ModRecipeBookCategories.registerBlueprintCategories();
 
 		LOGGER.info("{} MAIN ENTRY POINT INITIALIZED.", MOD_NAME);
 	}

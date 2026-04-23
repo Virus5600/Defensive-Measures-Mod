@@ -5,8 +5,6 @@ import net.minecraft.block.Block;
 
 import com.virus5600.defensive_measures.DefensiveMeasures;
 import com.virus5600.defensive_measures._helper.RegistryHelper;
-import net.minecraft.block.enums.NoteBlockInstrument;
-import net.minecraft.sound.BlockSoundGroup;
 
 /**
  * Register and store all custom blocks for the mod.
@@ -24,7 +22,7 @@ public class ModBlocks {
 	public final static Block ARROWHEAD = RegistryHelper.registerBlock("arrowhead", ArrowheadBlock::new, Settings.create());
 
 	// 1.1.0-beta
-	public final static Block TURRET_ASSEMBLY_STATION = RegistryHelper.registerBlock("turret_assembly_station", TurretAssemblyStation::new, Settings.create());
+	public final static Block TURRET_ASSEMBLY_STATION = RegistryHelper.registerBlock("turret_assembly_station", TurretAssemblyStationBlock::new, Settings.create());
 
 	public static void registerModBlocks() {
 		DefensiveMeasures.LOGGER.info("REGISTERING BLOCKS FOR {}...", DefensiveMeasures.MOD_NAME);

@@ -12,5 +12,5 @@ TODO: TurretEntity
 		- Properly calculate the parabolic trajectory (low priority) - Apparently, it was because of the "acceleration" modifier in the "ExplosiveProjectileEntity" class. Fuck.
 
 TODO:
-- Implement new icons
-- Implement recipe advancements
+- Implement new recipe system
+- Implement blueprint widget (to replace recipe book)

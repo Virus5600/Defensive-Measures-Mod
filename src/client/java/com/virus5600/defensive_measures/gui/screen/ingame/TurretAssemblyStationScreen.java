@@ -29,14 +29,17 @@ public class TurretAssemblyStationScreen extends RecipeBookScreen<TurretAssembly
 		this.titleX = 29;
 		this.titleY = 6;
 
-		this.playerInventoryTitleX = 47;
+		this.playerInventoryTitleX = 65;
 		this.playerInventoryTitleY = this.backgroundHeight - 96;
 
 		super.init();
 	}
 
 	protected ScreenPos getRecipeBookButtonPos() {
-		return new ScreenPos(this.x + 5, this.height / 2 - 51);
+		return new ScreenPos(
+			this.x + 27,
+			this.height / 2 + 55
+		);
 	}
 
 	protected void drawBackground(DrawContext context, float deltaTicks, int mouseX, int mouseY) {

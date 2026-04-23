@@ -17,7 +17,7 @@ public class TurretAssemblyStationScreenHandler extends BaseCraftingScreenHandle
 
 		this.addResultSlot(this.player, 206, 71);
 		this.addInputSlots(30, 17);
-		this.addPlayerSlots(playerInventory, 48, 159);
+		this.addPlayerSlots(playerInventory, 66, 159);
 	}
 
 	// //////////////// //

@@ -44,14 +44,14 @@ import com.virus5600.defensive_measures.stat.ModStats;
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
  * @version 1.0.0
  */
-public class TurretAssemblyStation extends BaseFunctionalBlock {
-	public static final MapCodec<TurretAssemblyStation> CODEC = createCodec(TurretAssemblyStation::new);
+public class TurretAssemblyStationBlock extends BaseFunctionalBlock {
+	public static final MapCodec<TurretAssemblyStationBlock> CODEC = createCodec(TurretAssemblyStationBlock::new);
 
 	public static final EnumProperty<Direction> FACING;
 
 	private static final VoxelShape SHAPE;
 
-	public TurretAssemblyStation(Settings settings) {
+	public TurretAssemblyStationBlock(Settings settings) {
 		super(settings);
 
 		settings.instrument(NoteBlockInstrument.IRON_XYLOPHONE)
@@ -87,7 +87,7 @@ public class TurretAssemblyStation extends BaseFunctionalBlock {
 	}
 
 	@Override
-	public MapCodec<TurretAssemblyStation> getCodec() {
+	public MapCodec<TurretAssemblyStationBlock> getCodec() {
 		return CODEC;
 	}
 
@@ -131,7 +131,7 @@ public class TurretAssemblyStation extends BaseFunctionalBlock {
 
 		SHAPE = VoxelShapes.union(
 			// Table Top
-			Block.createCuboidShape(0, 12, 0, 16, 16, 16),
+			Block.createCuboidShape(0, 14, 0, 16, 16, 16),
 			// Legs
 			Block.createCuboidShape(1, 0, 13, 3, 14, 15),
 			Block.createCuboidShape(1, 0, 1, 3, 14, 3),

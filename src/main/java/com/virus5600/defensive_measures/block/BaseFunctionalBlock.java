@@ -24,14 +24,14 @@ import java.util.function.Function;
  * <br>
  * {@code BaseFunctionalBlock} extends the {@link Block} class, meaning that it inherits all of the
  * properties and methods of a normal block, but ith its methods are derived from the {@link net.minecraft.block.CraftingTableBlock CraftingTableBlock}
- * to simplify and centralize the common logic code of future functional blocks such as {@link TurretAssemblyStation}.
+ * to simplify and centralize the common logic code of future functional blocks such as {@link TurretAssemblyStationBlock}.
  *
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
  * @since 1.1.0
  *
  * @see net.minecraft.block.Block
  * @see net.minecraft.block.CraftingTableBlock
- * @see TurretAssemblyStation
+ * @see TurretAssemblyStationBlock
  */
 public abstract class BaseFunctionalBlock extends Block {
 	public BaseFunctionalBlock(AbstractBlock.Settings settings) {
