@@ -8,7 +8,6 @@ import net.minecraft.network.codec.PacketCodecs;
 import net.minecraft.recipe.Recipe;
 import net.minecraft.recipe.RecipeSerializer;
 import net.minecraft.recipe.RecipeType;
-import net.minecraft.recipe.book.RecipeBookCategory;
 import net.minecraft.recipe.input.CraftingRecipeInput;
 
 import com.virus5600.defensive_measures.recipe.book.ModCraftingRecipeCategory;

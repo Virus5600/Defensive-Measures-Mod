@@ -10,6 +10,7 @@ import net.minecraft.network.packet.s2c.play.ScreenHandlerSlotUpdateS2CPacket;
 import net.minecraft.recipe.*;
 import net.minecraft.recipe.book.RecipeBookType;
 import net.minecraft.recipe.input.CraftingRecipeInput;
+import net.minecraft.registry.RegistryKey;
 import net.minecraft.screen.*;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -18,6 +19,8 @@ import net.minecraft.server.world.ServerWorld;
 import org.jspecify.annotations.Nullable;
 
 import com.virus5600.defensive_measures.block.ModBlocks;
+import com.virus5600.defensive_measures.recipe.ModRecipeTypes;
+import com.virus5600.defensive_measures.recipe.TASShapedRecipe;
 
 import java.util.List;
 import java.util.Optional;
@@ -34,30 +37,40 @@ public abstract class BaseCraftingScreenHandler extends AbstractCraftingScreenHa
 		this.player = playerInventory.player;
 	}
 
-	protected static void updateResult(ScreenHandler handler, ServerWorld world, PlayerEntity player, RecipeInputInventory craftingInventory, CraftingResultInventory resultInventory, @Nullable RecipeEntry<CraftingRecipe> recipe) {
+	protected static <T extends Recipe<CraftingRecipeInput>> void updateResult(
+		ScreenHandler handler,
+		RecipeType<T> recipeType,
+		ServerWorld world,
+		PlayerEntity player,
+		RecipeInputInventory craftingInventory,
+		CraftingResultInventory resultInventory,
+		@Nullable RecipeEntry<T> recipe
+	) {
 		CraftingRecipeInput craftingRecipeInput = craftingInventory.createRecipeInput();
 		ServerPlayerEntity serverPlayerEntity = (ServerPlayerEntity) player;
 		ItemStack itemStack = ItemStack.EMPTY;
 
 		if (world.getServer() != null) {
-			Optional<RecipeEntry<CraftingRecipe>> optional = world.getServer()
+			RegistryKey<Recipe<?>> cachedId = recipe != null ? recipe.id() : null;
+
+			Optional<RecipeEntry<T>> optional = world.getServer()
 				.getRecipeManager()
 				.getFirstMatch(
-					RecipeType.CRAFTING,
+					recipeType,
 					craftingRecipeInput,
 					world,
 					recipe != null ? recipe.id() : null
 				);
 
 			if (optional.isPresent()) {
-				RecipeEntry<CraftingRecipe> recipeEntry = optional.get();
-				CraftingRecipe craftingRecipe = recipeEntry.value();
+				RecipeEntry<T> recipeEntry = optional.get();
+				T customRecipe = recipeEntry.value();
 
 				if (resultInventory.shouldCraftRecipe(serverPlayerEntity, recipeEntry)) {
-					ItemStack itemStack2 = craftingRecipe.craft(craftingRecipeInput, world.getRegistryManager());
+					ItemStack craftedItem = customRecipe.craft(craftingRecipeInput, world.getRegistryManager());
 
-					if (itemStack2.isItemEnabled(world.getEnabledFeatures())) {
-						itemStack = itemStack2;
+					if (craftedItem.isItemEnabled(world.getEnabledFeatures())) {
+						itemStack = craftedItem;
 					}
 				}
 			}
@@ -66,14 +79,29 @@ public abstract class BaseCraftingScreenHandler extends AbstractCraftingScreenHa
 
 		resultInventory.setStack(0, itemStack);
 		handler.setReceivedStack(0, itemStack);
-		serverPlayerEntity.networkHandler.sendPacket(new ScreenHandlerSlotUpdateS2CPacket(handler.syncId, handler.nextRevision(), 0, itemStack));
+		serverPlayerEntity.networkHandler.sendPacket(
+			new ScreenHandlerSlotUpdateS2CPacket(
+				handler.syncId,
+				handler.nextRevision(),
+				0,
+				itemStack
+			)
+		);
 	}
 
 	public void onContentChanged(Inventory inventory) {
 		if (!this.filling) {
 			this.context.run((world, pos) -> {
 				if (world instanceof ServerWorld serverWorld) {
-					updateResult(this, serverWorld, this.player, this.craftingInventory, this.craftingResultInventory, null);
+					updateResult(
+						this,
+						ModRecipeTypes.TAS_RECIPE_TYPE,
+						serverWorld,
+						this.player,
+						this.craftingInventory,
+						this.craftingResultInventory,
+						null
+					);
 				}
 			});
 		}
@@ -85,7 +113,19 @@ public abstract class BaseCraftingScreenHandler extends AbstractCraftingScreenHa
 
 	public void onInputSlotFillFinish(ServerWorld world, RecipeEntry<CraftingRecipe> recipe) {
 		this.filling = false;
-		updateResult(this, world, this.player, this.craftingInventory, this.craftingResultInventory, recipe);
+
+		@SuppressWarnings("unchecked")
+		RecipeEntry<TASShapedRecipe> tasRecipe = (RecipeEntry<TASShapedRecipe>) (Object) recipe;
+
+		updateResult(
+			this,
+			ModRecipeTypes.TAS_RECIPE_TYPE,
+			world,
+			this.player,
+			this.craftingInventory,
+			this.craftingResultInventory,
+			tasRecipe
+		);
 	}
 
 	public void onClosed(PlayerEntity player) {

@@ -7,21 +7,21 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
+import net.minecraft.recipe.Ingredient;
+import net.minecraft.recipe.IngredientPlacement;
 import net.minecraft.recipe.Recipe;
 import net.minecraft.recipe.RecipeSerializer;
 import net.minecraft.recipe.ShapedRecipe;
-import net.minecraft.recipe.IngredientPlacement;
-import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.display.RecipeDisplay;
 import net.minecraft.recipe.display.ShapedCraftingRecipeDisplay;
 import net.minecraft.recipe.display.SlotDisplay;
 import net.minecraft.recipe.input.CraftingRecipeInput;
 import net.minecraft.recipe.input.RecipeInput;
+import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.world.World;
 
 import com.virus5600.defensive_measures.recipe.book.ModCraftingRecipeCategory;
 
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.VisibleForTesting;
 

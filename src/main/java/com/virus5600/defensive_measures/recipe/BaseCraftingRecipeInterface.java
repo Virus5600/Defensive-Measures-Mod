@@ -1,14 +1,14 @@
 package com.virus5600.defensive_measures.recipe;
 
-import com.virus5600.defensive_measures.recipe.book.ModRecipeBookCategories;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.Recipe;
 import net.minecraft.recipe.book.RecipeBookCategory;
-
-import com.virus5600.defensive_measures.recipe.book.ModCraftingRecipeCategory;
 import net.minecraft.recipe.input.RecipeInput;
 import net.minecraft.util.collection.DefaultedList;
+
+import com.virus5600.defensive_measures.recipe.book.ModCraftingRecipeCategory;
+import com.virus5600.defensive_measures.recipe.book.ModRecipeBookCategories;
 
 public interface BaseCraftingRecipeInterface<T extends RecipeInput> extends Recipe<T> {
 	ModCraftingRecipeCategory getCategory();
@@ -34,6 +34,7 @@ public interface BaseCraftingRecipeInterface<T extends RecipeInput> extends Reci
 			case TURRETS -> category = ModRecipeBookCategories.TAS_TURRETS;
 			case PARTS -> category = ModRecipeBookCategories.TAS_PARTS;
 			case TRAPS -> category = ModRecipeBookCategories.TAS_TRAPS;
+			case DEFENSE -> category = ModRecipeBookCategories.TAS_DEFENSE;
 			case EQUIPMENTS -> category = ModRecipeBookCategories.TAS_EQUIPMENTS;
 			case MISC -> category = ModRecipeBookCategories.TAS_MISC;
 			default -> throw new MatchException(null, null);

@@ -13,7 +13,7 @@ public class ModRecipeSerializers {
 	}
 
 	static {
-		TAS_SERIALIZER = RegistryHelper.registerRecipeSerializer("tas_serializer", BaseCraftingRecipe.createSerializer(
+		TAS_SERIALIZER = RegistryHelper.registerRecipeSerializer("tas_shaped", BaseCraftingRecipe.createSerializer(
 			TASShapedRecipe.CODEC,
 			TASShapedRecipe.PACKET_CODEC
 		));
