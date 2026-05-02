@@ -29,7 +29,7 @@
 	],
 	"rewards": {
 		"recipes": [
-			"dm:mg_base"
+			"dm:mg_turret/mg_base"
 		]
 	}
 }

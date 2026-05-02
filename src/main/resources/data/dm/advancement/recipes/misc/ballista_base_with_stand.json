@@ -39,7 +39,7 @@
 	],
 	"rewards": {
 		"recipes": [
-			"dm:ballista_base_with_stand"
+			"dm:ballista/ballista_base_with_stand"
 		]
 	}
 }

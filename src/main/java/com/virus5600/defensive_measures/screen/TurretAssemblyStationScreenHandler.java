@@ -24,8 +24,5 @@ public class TurretAssemblyStationScreenHandler extends BaseCraftingScreenHandle
 	// OVERRIDE METHODS //
 	// //////////////// //
 
-	@Override
-	public RecipeBookType getCategory() {
-		return RecipeBookType.CRAFTING;
-	}
+	// TODO: Implement populateRecipeFinder;
 }

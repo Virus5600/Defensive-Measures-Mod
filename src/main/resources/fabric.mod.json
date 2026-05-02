@@ -15,6 +15,7 @@
 
 	"license": "MIT",
 	"icon": "assets/dm/icon.png",
+	"accessWidener": "dm.accesswidener",
 
 	"environment": "*",
 	"entrypoints": {

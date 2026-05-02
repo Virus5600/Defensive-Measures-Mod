@@ -30,7 +30,7 @@
 	],
 	"rewards": {
 		"recipes": [
-			"dm:ballista"
+			"dm:ballista/ballista"
 		]
 	}
 }

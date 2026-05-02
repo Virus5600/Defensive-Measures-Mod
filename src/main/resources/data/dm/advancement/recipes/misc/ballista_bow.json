@@ -51,7 +51,7 @@
 	],
 	"rewards": {
 		"recipes": [
-			"dm:ballista_bow"
+			"dm:ballista/ballista_bow"
 		]
 	}
 }

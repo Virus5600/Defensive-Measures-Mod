@@ -28,7 +28,7 @@
 	],
 	"rewards": {
 		"recipes": [
-			"dm:mg_ammo_case"
+			"dm:mg_turret/mg_ammo_case"
 		]
 	}
 }

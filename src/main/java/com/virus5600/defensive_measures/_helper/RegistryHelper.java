@@ -12,6 +12,7 @@ import net.minecraft.recipe.Recipe;
 import net.minecraft.recipe.RecipeSerializer;
 import net.minecraft.recipe.RecipeType;
 import net.minecraft.recipe.book.RecipeBookCategory;
+import net.minecraft.recipe.display.RecipeDisplay;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
@@ -136,6 +137,14 @@ public final class RegistryHelper {
 			Registries.RECIPE_SERIALIZER,
 			Identifier.of(DefensiveMeasures.MOD_ID, id),
 			recipeSerializer
+		);
+	}
+
+	public static <S extends RecipeDisplay.Serializer<T>, T extends RecipeDisplay> S registerRecipeDisplay(String id, S recipeDisplaySerializer) {
+		return Registry.register(
+			Registries.RECIPE_DISPLAY,
+			Identifier.of(DefensiveMeasures.MOD_ID, id),
+			recipeDisplaySerializer
 		);
 	}
 

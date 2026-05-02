@@ -320,7 +320,7 @@ public abstract class BaseCraftingScreenHandler extends AbstractCraftingScreenHa
 	}
 
 	@Override
-	public RecipeBookType getCategory() {
+	public final RecipeBookType getCategory() {
 		return RecipeBookType.CRAFTING;
 	}
 

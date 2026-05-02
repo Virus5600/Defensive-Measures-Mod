@@ -41,7 +41,7 @@
 	],
 	"rewards": {
 		"recipes": [
-			"dm:cannon_turret_shortcut"
+			"dm:cannon_turret/cannon_turret_shortcut"
 		]
 	}
 }

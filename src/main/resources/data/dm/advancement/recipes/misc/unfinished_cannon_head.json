@@ -30,7 +30,7 @@
 	],
 	"rewards": {
 		"recipes": [
-			"dm:unfinished_cannon_head"
+			"dm:cannon_turret/unfinished_cannon_head"
 		]
 	}
 }

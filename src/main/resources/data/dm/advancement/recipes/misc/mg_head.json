@@ -32,7 +32,7 @@
 	],
 	"rewards": {
 		"recipes": [
-			"dm:mg_head"
+			"dm:mg_turret/mg_head"
 		]
 	}
 }

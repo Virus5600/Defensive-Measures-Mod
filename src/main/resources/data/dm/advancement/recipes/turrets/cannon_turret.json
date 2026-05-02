@@ -30,7 +30,7 @@
 	],
 	"rewards": {
 		"recipes": [
-			"dm:cannon_turret"
+			"dm:cannon_turret/cannon_turret"
 		]
 	}
 }

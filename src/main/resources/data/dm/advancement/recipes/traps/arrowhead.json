@@ -28,7 +28,7 @@
 	],
 	"rewards": {
 		"recipes": [
-			"dm:ballista_arrowhead"
+			"dm:ballista/ballista_arrowhead"
 		]
 	}
 }

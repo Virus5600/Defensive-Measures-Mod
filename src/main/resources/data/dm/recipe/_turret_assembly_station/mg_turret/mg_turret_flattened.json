@@ -15,7 +15,7 @@
 		"i": "minecraft:iron_ingot",
 		"g": "minecraft:green_dye",
 		"b": "minecraft:iron_block",
-		"c": "dm:copper_ingot",
+		"c": "minecraft:copper_ingot",
 		"f": "minecraft:flint",
 		"d": "minecraft:gunpowder"
 	},
