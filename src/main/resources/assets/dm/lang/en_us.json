@@ -5,6 +5,7 @@
 	"itemGroup.dm.defensive_measures.turrets" : "Defensive Measures Turrets",
 
 	"block.dm.bolt_head" : "Bolt Head",
+	"block.dm.electric_fence" : "Electric Fence",
 
 	"block.dm.turret_assembly_station": "Turret Assembly Station",
 
@@ -55,6 +56,9 @@
 	"death.attack.bolt_head" : "%1$s got poked to death with a sticking bolt head on a ground",
 	"death.attack.bolt_head.player" : "%1$s stepped on a random bolt head whilst fighting with %2$s",
 
+	"death.attack.electricity": "%1$s learned that quartz conducts electricity the hard way.",
+	"death.attack.electricity.player": "%1$s was piezoelectrically persuaded to let go by %2$s",
+
 	"subtitles.turret.remove.metal" : "Metallic Turret Removed",
 	"subtitles.turret.remove.wood" : "Wooden Turret Removed",
 
@@ -93,7 +97,7 @@
 	"tag.item.dm.turret_removers" : "Turret Removers",
 	"tag.item.dm.turrets" : "Turrets",
 
-	"container.dm.turret_assembly_station": "Assemble Turret",
+	"container.dm.turret_assembly_station": "Assembling",
 
 	"stat.dm.interact_with_turret_assembly_station": "Interactions with Turret Assembly Station"
 }

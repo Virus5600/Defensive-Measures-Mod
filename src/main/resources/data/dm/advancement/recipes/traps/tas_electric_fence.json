@@ -1,0 +1,48 @@
+﻿{
+	"parent": "minecraft:recipes/root",
+	"criteria": {
+		"tas_interacted": {
+			"trigger": "minecraft:tick",
+			"conditions": {
+				"player": {
+					"stats": [
+						{
+							"type": "dm:custom",
+							"stat": "dm:interact_with_turret_assembly_station",
+							"value": {
+								"min": 1
+							}
+						}
+					]
+				}
+			}
+		},
+		"has_ingredients": {
+			"trigger": "minecraft:inventory_changed",
+			"conditions": {
+				"items": [
+					{
+						"items": [
+							"minecraft:cobblestone",
+							"minecraft:quartz",
+							"minecraft:copper_ingot"
+						]
+					}
+				]
+			}
+		}
+	},
+	"requirements": [
+		[
+			"tas_interacted"
+		],
+		[
+			"has_ingredients"
+		]
+	],
+	"rewards": {
+		"recipes": [
+			"dm:_turret_assembly_station/electric_fence/electric_fence"
+		]
+	}
+}

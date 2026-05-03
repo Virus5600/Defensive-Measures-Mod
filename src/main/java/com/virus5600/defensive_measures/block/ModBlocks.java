@@ -23,6 +23,7 @@ public class ModBlocks {
 
 	// 1.1.0-beta
 	public final static Block TURRET_ASSEMBLY_STATION = RegistryHelper.registerBlock("turret_assembly_station", TurretAssemblyStationBlock::new, Settings.create());
+	public final static Block ELECTRIC_FENCE = RegistryHelper.registerBlock("electric_fence", ElectricFenceBlock::new, Settings.create());
 
 	public static void registerModBlocks() {
 		DefensiveMeasures.LOGGER.info("REGISTERING BLOCKS FOR {}...", DefensiveMeasures.MOD_NAME);

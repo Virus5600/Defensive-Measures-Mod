@@ -85,6 +85,7 @@ public class ModItems {
 
 	// TURRET ASSEMBLY STATION
 	public final static Item TURRET_ASSEMBLY_STATION = registerItem(ModBlocks.TURRET_ASSEMBLY_STATION);
+	public final static Item ELECTRIC_FENCE = registerItem(ModBlocks.ELECTRIC_FENCE);
 
 	// //////////////////////// //
 	// REGISTRY RELATED METHODS //
@@ -224,7 +225,8 @@ public class ModItems {
 		};
 
 		DM_TRAPS = new Item[] {
-			BOLT_HEAD
+			BOLT_HEAD,
+			ELECTRIC_FENCE,
 		};
 
 		DM_TURRETS = new Item[] {

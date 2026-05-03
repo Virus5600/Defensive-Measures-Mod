@@ -108,7 +108,7 @@ public class BlueprintWidget extends BaseRecipeBookWidget<AbstractCraftingScreen
 			new BaseRecipeBookWidget.Tab(ModRecipeBookType.TURRET_ASSEMBLY_STATION),
 			new BaseRecipeBookWidget.Tab(ModItems.CANNON_TURRET, ModRecipeBookCategories.TAS_TURRETS),
 			new BaseRecipeBookWidget.Tab(ModItems.BALLISTA_BOLT, ModItems.MG_HEAD, ModRecipeBookCategories.TAS_PARTS),
-			new BaseRecipeBookWidget.Tab(ModItems.BOLT_HEAD, ModRecipeBookCategories.TAS_TRAPS),
+			new BaseRecipeBookWidget.Tab(ModItems.ELECTRIC_FENCE, ModRecipeBookCategories.TAS_TRAPS),
 			new BaseRecipeBookWidget.Tab(Items.OAK_FENCE, ModRecipeBookCategories.TAS_DEFENSE),
 			new BaseRecipeBookWidget.Tab(ModItems.TURRET_REMOVER, ModRecipeBookCategories.TAS_EQUIPMENTS),
 			new BaseRecipeBookWidget.Tab(Items.COPPER_INGOT, ModRecipeBookCategories.TAS_MISC)

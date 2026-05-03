@@ -38,7 +38,7 @@ public class ModItemGroups {
 	public static final RegistryKey<ItemGroup> DMTR_KEY = RegistryKey.of(Registries.ITEM_GROUP.getKey(), Identifier.of(DefensiveMeasures.MOD_ID, "defensive_measures_traps"));
 	public static final ItemGroup DEFENSIVE_MEASURES_TRAPS = FabricItemGroup.builder()
 		.displayName(Text.translatable("itemGroup.dm.defensive_measures.traps"))
-		.icon(() -> ModBlocks.BOLT_HEAD.asItem().getDefaultStack())
+		.icon(() -> ModBlocks.ELECTRIC_FENCE.asItem().getDefaultStack())
 		.build();
 
 	public static final RegistryKey<ItemGroup> DMTT_KEY = RegistryKey.of(Registries.ITEM_GROUP.getKey(), Identifier.of(DefensiveMeasures.MOD_ID, "defensive_measures_turrets"));
