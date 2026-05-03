@@ -1,4 +1,4 @@
-{
+﻿{
 	"parent": "minecraft:recipes/root",
 	"criteria": {
 		"has_ingredients": {
@@ -7,9 +7,9 @@
 				"items": [
 					{
 						"items": [
-							"minecraft:smooth_stone_slab",
 							"dm:cannon_stand",
-							"dm:cannon_head"
+							"dm:cannon_head",
+							"minecraft:smooth_stone_slab"
 						]
 					}
 				]
@@ -24,19 +24,12 @@
 					}
 				]
 			}
-		},
-		"has_the_recipe": {
-			"trigger": "minecraft:recipe_unlocked",
-			"conditions": {
-				"recipe": "dm:cannon_turret_shortcut"
-			}
 		}
 	},
 	"requirements": [
 		[
-			"has_the_recipe",
-			"has_ingredients",
-			"has_wooden_slabs"
+			"has_wooden_slabs",
+			"has_ingredients"
 		]
 	],
 	"rewards": {

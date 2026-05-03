@@ -18,14 +18,16 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.NetworkRecipeId;
 import net.minecraft.recipe.display.SlotDisplayContexts;
 import net.minecraft.text.Text;
-
 import net.minecraft.util.Identifier;
 import net.minecraft.util.context.ContextParameterMap;
-import org.jetbrains.annotations.Nullable;
-import com.google.common.collect.Lists;
+
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
+
+import com.google.common.collect.Lists;
+
+import org.jetbrains.annotations.Nullable;
 
 @Environment(EnvType.CLIENT)
 public class BaseRecipeBookResults {

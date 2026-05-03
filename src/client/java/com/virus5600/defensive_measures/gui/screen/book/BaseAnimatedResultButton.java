@@ -91,7 +91,7 @@ public class BaseAnimatedResultButton extends ClickableWidget {
 		boolean shouldBounce = this.bounce > 0.0F;
 
 		if (shouldBounce) {
-			float f = 1.0F + 0.1F * (float)Math.sin((double)(this.bounce / 15.0F * (float)Math.PI));
+			float f = 1.0F + 0.1F * (float)Math.sin((this.bounce / 15.0F * (float)Math.PI));
 			ctx.getMatrices().pushMatrix();
 			ctx.getMatrices().translate((float)(this.getX() + 8), (float)(this.getY() + 12));
 			ctx.getMatrices().scale(f, f);

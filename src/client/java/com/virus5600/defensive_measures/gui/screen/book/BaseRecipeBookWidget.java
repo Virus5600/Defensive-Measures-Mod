@@ -28,6 +28,7 @@ import net.minecraft.recipe.NetworkRecipeId;
 import net.minecraft.recipe.RecipeFinder;
 import net.minecraft.recipe.book.RecipeBookCategory;
 import net.minecraft.recipe.book.RecipeBookGroup;
+import net.minecraft.recipe.book.RecipeBookType;
 import net.minecraft.recipe.display.RecipeDisplay;
 import net.minecraft.recipe.display.SlotDisplayContexts;
 import net.minecraft.screen.AbstractRecipeScreenHandler;
@@ -37,7 +38,6 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.context.ContextParameterMap;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.World;
 
 import com.virus5600.defensive_measures.recipebook.ModRecipeBookType;
 
@@ -105,8 +105,6 @@ public abstract class BaseRecipeBookWidget<T extends AbstractRecipeScreenHandler
 	}
 
 	public void initialize(int parentWidth, int parentHeight, MinecraftClient client, boolean narrow) {
-		Objects.requireNonNull(client.player);
-
 		this.client = client;
 		this.parentWidth = parentWidth;
 		this.parentHeight = parentHeight;
@@ -127,15 +125,9 @@ public abstract class BaseRecipeBookWidget<T extends AbstractRecipeScreenHandler
 		int y = this.getTop();
 
 		this.recipeFinder.clear();
-
-		Objects.requireNonNull(this.client);
-		Objects.requireNonNull(this.client.player);
-		Objects.requireNonNull(this.client.player.getInventory());
 		this.client.player.getInventory().populateRecipeFinder(this.recipeFinder);
 
 		this.screenHandler.populateRecipeFinder(this.recipeFinder);
-
-		Objects.requireNonNull(this.client.textRenderer);
 
 		String searchFldTxt = this.searchField != null ? this.searchField.getText() : "";
 		this.searchField = this.buildNewSearchField(81, 9 + 5, null);
@@ -187,8 +179,6 @@ public abstract class BaseRecipeBookWidget<T extends AbstractRecipeScreenHandler
 				.findFirst()
 				.orElse(null);
 		}
-
-		Objects.requireNonNull(this.currentTab);
 		this.currentTab.focus();
 
 		this.populateAllRecipes();
@@ -197,11 +187,11 @@ public abstract class BaseRecipeBookWidget<T extends AbstractRecipeScreenHandler
 	}
 
 	private int getTop() {
-		return (this.parentHeight - 166) / 2;
+		return (this.parentHeight - this.getUVSize().height) / 2;
 	}
 
 	private int getLeft() {
-		return (this.parentWidth - 147) / 2 - this.leftOffset;
+		return (this.parentWidth - this.getUVSize().width) / 2 - this.leftOffset;
 	}
 
 	public int findLeftEdge(int width, int backgroundWidth) {
@@ -253,8 +243,18 @@ public abstract class BaseRecipeBookWidget<T extends AbstractRecipeScreenHandler
 
 	private void populateAllRecipes() {
 		for (Tab tab : this.tabs) {
-			for (RecipeResultCollection recipeResultCollection : this.recipeBook.getResultsForCategory(tab.category())) {
-				this.populateRecipes(recipeResultCollection, this.recipeFinder);
+			RecipeBookGroup category = tab.category();
+
+			if (category instanceof ModRecipeBookType modRecipeBookType) {
+				for (RecipeBookCategory recipeCategory : modRecipeBookType.getCategories()) {
+					for (RecipeResultCollection recipeResultCollection : this.recipeBook.getResultsForCategory(recipeCategory)) {
+						this.populateRecipes(recipeResultCollection, this.recipeFinder);
+					}
+				}
+			} else {
+				for (RecipeResultCollection recipeResultCollection : this.recipeBook.getResultsForCategory(category)) {
+					this.populateRecipes(recipeResultCollection, this.recipeFinder);
+				}
 			}
 		}
 	}
@@ -262,11 +262,18 @@ public abstract class BaseRecipeBookWidget<T extends AbstractRecipeScreenHandler
 	protected abstract void populateRecipes(RecipeResultCollection recipeResultCollection, RecipeFinder recipeFinder);
 
 	private void refreshResults(boolean resetCurrentPage, boolean filteringCraftable) {
-		Objects.requireNonNull(this.currentTab);
-		Objects.requireNonNull(this.searchField);
-		Objects.requireNonNull(this.client);
+		List<RecipeResultCollection> categoryResults = Lists.newArrayList();
 
-		List<RecipeResultCollection> categoryResults = this.recipeBook.getResultsForCategory(this.currentTab.getCategory());
+		// Handle ModRecipeBookType (All tab) specially to include all categories
+		RecipeBookGroup category = this.currentTab.getCategory();
+		if (category instanceof ModRecipeBookType modRecipeBookType) {
+			for (RecipeBookCategory recipeCategory : modRecipeBookType.getCategories()) {
+				categoryResults.addAll(this.recipeBook.getResultsForCategory(recipeCategory));
+			}
+		} else {
+			categoryResults.addAll(this.recipeBook.getResultsForCategory(category));
+		}
+
 		List<RecipeResultCollection> categoryResultsDupe = Lists.newArrayList(categoryResults);
 		categoryResultsDupe.removeIf((resultCollection) -> !resultCollection.hasDisplayableRecipes());
 
@@ -295,8 +302,8 @@ public abstract class BaseRecipeBookWidget<T extends AbstractRecipeScreenHandler
 	}
 
 	private void refreshTabButtons(boolean filteringCraftable) {
-		int i = (this.parentWidth - 147) / 2 - this.leftOffset - 30;
-		int j = (this.parentHeight - 166) / 2 + 3;
+		int i = (this.parentWidth - this.getUVSize().width) / 2 - this.leftOffset - 30;
+		int j = (this.parentHeight - this.getUVSize().height) / 2 + 3;
 		int k = 27;
 		int l = 0;
 
@@ -315,9 +322,6 @@ public abstract class BaseRecipeBookWidget<T extends AbstractRecipeScreenHandler
 	}
 
 	public void update() {
-		Objects.requireNonNull(this.client);
-		Objects.requireNonNull(this.client.player);
-
 		boolean bl = this.isGuiOpen();
 		if (this.isOpen() != bl) {
 			this.setOpen(bl);
@@ -332,9 +336,6 @@ public abstract class BaseRecipeBookWidget<T extends AbstractRecipeScreenHandler
 	}
 
 	private void refreshInputs() {
-		Objects.requireNonNull(this.client);
-		Objects.requireNonNull(this.client.player);
-
 		this.recipeFinder.clear();
 		this.client.player.getInventory().populateRecipeFinder(this.recipeFinder);
 		this.screenHandler.populateRecipeFinder(this.recipeFinder);
@@ -347,10 +348,6 @@ public abstract class BaseRecipeBookWidget<T extends AbstractRecipeScreenHandler
 	}
 
 	public void render(DrawContext context, int mouseX, int mouseY, float deltaTicks) {
-		Objects.requireNonNull(this.client);
-		Objects.requireNonNull(this.client.player);
-		Objects.requireNonNull(this.searchField);
-
 		if (this.isOpen()) {
 			if (!this.client.isCtrlPressed()) {
 				this.displayTime += deltaTicks;
@@ -359,10 +356,14 @@ public abstract class BaseRecipeBookWidget<T extends AbstractRecipeScreenHandler
 			int i = this.getLeft();
 			int j = this.getTop();
 
+			Dimension uvDimension = this.getUVSize();
+			Dimension textureDimension = this.getTextureSize();
+
 			context.drawTexture(
 				RenderPipelines.GUI_TEXTURED, this.getUITexture(),
 				i, j, 1.0F, 1.0F,
-				147, 166, 256, 256
+				uvDimension.width, uvDimension.height,
+				textureDimension.width, textureDimension.height
 			);
 
 			this.searchField.render(context, mouseX, mouseY, deltaTicks);
@@ -390,11 +391,15 @@ public abstract class BaseRecipeBookWidget<T extends AbstractRecipeScreenHandler
 	}
 
 	public boolean mouseClicked(Click click, boolean doubled) {
-		Objects.requireNonNull(this.client);
-		Objects.requireNonNull(this.client.player);
-
 		if (this.isOpen() && !this.client.player.isSpectator()) {
-			if (this.recipesArea.mouseClicked(click, this.getLeft(), this.getTop(), 147, 166, doubled)) {
+			Dimension uvDimension = this.getUVSize();
+			boolean recipesAreaClicked = this.recipesArea
+				.mouseClicked(click,
+					this.getLeft(), this.getTop(),
+					uvDimension.width, uvDimension.height,
+					doubled);
+
+			if (recipesAreaClicked) {
 				NetworkRecipeId networkRecipeId = this.recipesArea.getLastClickedRecipe();
 				RecipeResultCollection recipeResultCollection = this.recipesArea.getLastClickedResults();
 				if (networkRecipeId != null && recipeResultCollection != null) {
@@ -444,10 +449,6 @@ public abstract class BaseRecipeBookWidget<T extends AbstractRecipeScreenHandler
 	}
 
 	private boolean select(RecipeResultCollection results, NetworkRecipeId recipeId, boolean craftAll) {
-		Objects.requireNonNull(this.client);
-		Objects.requireNonNull(this.client.interactionManager);
-		Objects.requireNonNull(this.client.player);
-
 		if (!results.isCraftable(recipeId) && recipeId.equals(this.selectedRecipeId)) {
 			return false;
 		} else {
@@ -476,14 +477,12 @@ public abstract class BaseRecipeBookWidget<T extends AbstractRecipeScreenHandler
 	}
 
 	private void toggleFilteringCraftable() {
-		net.minecraft.recipe.book.RecipeBookType recipeBookType = this.screenHandler.getCategory();
+		RecipeBookType recipeBookType = this.screenHandler.getCategory();
 		boolean bl = !this.recipeBook.isFilteringCraftable(recipeBookType);
 		this.recipeBook.setFilteringCraftable(recipeBookType, bl);
 	}
 
 	public boolean isClickOutsideBounds(double mouseX, double mouseY, int x, int y, int backgroundWidth, int backgroundHeight) {
-		Objects.requireNonNull(this.currentTab);
-
 		if (!this.isOpen()) {
 			return true;
 		} else {
@@ -492,7 +491,7 @@ public abstract class BaseRecipeBookWidget<T extends AbstractRecipeScreenHandler
 				mouseX >= (double) (x + backgroundWidth) ||
 				mouseY >= (double) (y + backgroundHeight);
 
-			boolean isInsideBackground = (double) (x - 147) < mouseX &&
+			boolean isInsideBackground = (double) (x - this.getUVSize().width) < mouseX &&
 				mouseX < (double) x &&
 				(double) y < mouseY &&
 				mouseY < (double) (y + backgroundHeight);
@@ -502,10 +501,6 @@ public abstract class BaseRecipeBookWidget<T extends AbstractRecipeScreenHandler
 	}
 
 	public boolean keyPressed(KeyInput input) {
-		Objects.requireNonNull(this.client);
-		Objects.requireNonNull(this.client.player);
-		Objects.requireNonNull(this.searchField);
-
 		this.searching = false;
 
 		if (this.isOpen() && !this.client.player.isSpectator()) {
@@ -539,10 +534,6 @@ public abstract class BaseRecipeBookWidget<T extends AbstractRecipeScreenHandler
 	}
 
 	public boolean charTyped(CharInput input) {
-		Objects.requireNonNull(this.client);
-		Objects.requireNonNull(this.client.player);
-		Objects.requireNonNull(this.searchField);
-
 		if (this.searching) {
 			return false;
 		} else if (this.isOpen() && !this.client.player.isSpectator()) {
@@ -569,8 +560,6 @@ public abstract class BaseRecipeBookWidget<T extends AbstractRecipeScreenHandler
 	}
 
 	private void refreshSearchResults() {
-		Objects.requireNonNull(this.searchField);
-
 		String searchInput = this.searchField.getText().toLowerCase(Locale.ROOT);
 		this.triggerPirateSpeakEasterEgg(searchInput);
 
@@ -582,8 +571,6 @@ public abstract class BaseRecipeBookWidget<T extends AbstractRecipeScreenHandler
 	}
 
 	private void triggerPirateSpeakEasterEgg(String search) {
-		Objects.requireNonNull(this.client);
-
 		if ("excitedze".equals(search)) {
 			LanguageManager languageManager = this.client.getLanguageManager();
 			String pirateLang = "en_pt";
@@ -616,33 +603,26 @@ public abstract class BaseRecipeBookWidget<T extends AbstractRecipeScreenHandler
 	}
 
 	public void onRecipeDisplayed(NetworkRecipeId recipeId) {
-		Objects.requireNonNull(this.client);
-		Objects.requireNonNull(this.client.player);
-
 		this.client.player.onRecipeDisplayed(recipeId);
 	}
 
 	public void onCraftFailed(RecipeDisplay display) {
+		Objects.requireNonNull(this.client.world);
+
 		this.ghostRecipe.clear();
-		ContextParameterMap contextParameterMap = SlotDisplayContexts.createParameters((World) Objects.requireNonNull(this.client.world));
+		ContextParameterMap contextParameterMap = SlotDisplayContexts.createParameters(this.client.world);
 		this.showGhostRecipe(this.ghostRecipe, display, contextParameterMap);
 	}
-
-	// TODO: Fix ghost recipe background clipping out of its container
-	// TODO: Fix incorrect item position when serializing recipes, using incorrect pattern for recipes not utilizing the full grid
 
 	protected abstract void showGhostRecipe(GhostRecipe ghostRecipe, RecipeDisplay display, ContextParameterMap context);
 
 	protected void sendBookDataPacket() {
-		Objects.requireNonNull(this.client);
-
 		if (this.client.getNetworkHandler() != null) {
 			net.minecraft.recipe.book.RecipeBookType recipeBookType = this.screenHandler.getCategory();
 			boolean bl = this.recipeBook.getOptions().isGuiOpen(recipeBookType);
 			boolean bl2 = this.recipeBook.getOptions().isFilteringCraftable(recipeBookType);
 			this.client.getNetworkHandler().sendPacket(new RecipeCategoryOptionsC2SPacket(recipeBookType, bl, bl2));
 		}
-
 	}
 
 	public Selectable.SelectionType getType() {
@@ -690,16 +670,16 @@ public abstract class BaseRecipeBookWidget<T extends AbstractRecipeScreenHandler
 		return this.dimension;
 	}
 
+	/**
+	 * Identifies the dimension of the actual texture to be used for the GUI.
+	 * @return Dimension
+	 */
 	protected Dimension getUVSize() {
 		return this.uvSize;
 	}
 
 	protected int getLeftOffset() {
 		return 86;
-	}
-
-	protected int getPadding() {
-		return 8;
 	}
 
 	protected int getMaxSearchLength() {
@@ -715,9 +695,6 @@ public abstract class BaseRecipeBookWidget<T extends AbstractRecipeScreenHandler
 	}
 
 	protected TextFieldWidget buildNewSearchField(int width, int height, @Nullable Text searchText) {
-		Objects.requireNonNull(this.client);
-		Objects.requireNonNull(this.client.textRenderer);
-
 		TextRenderer textRenderer = this.client.textRenderer;
 		int x = this.getLeft() + 25;
 		int y = this.getTop() + 13;
@@ -737,6 +714,10 @@ public abstract class BaseRecipeBookWidget<T extends AbstractRecipeScreenHandler
 	protected abstract ButtonTextures getBookButtonTextures();
 
 	protected abstract boolean isCraftingSlot(Slot slot);
+
+	// ///////////// //
+	// CUSTOM RECORD //
+	// ///////////// //
 
 	public record Tab(ItemStack primaryIcon, Optional<ItemStack> secondaryIcon,
 	                  RecipeBookGroup category) {

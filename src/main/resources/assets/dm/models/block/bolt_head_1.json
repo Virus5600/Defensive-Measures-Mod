@@ -3,8 +3,8 @@
 	"credit": "Made with Blockbench",
 	"parent": "block/block",
 	"textures": {
-		"0": "dm:block/arrowhead",
-		"particle": "dm:block/arrowhead"
+		"0": "dm:block/bolt_head",
+		"particle": "dm:block/bolt_head"
 	},
 	"elements": [
 		{

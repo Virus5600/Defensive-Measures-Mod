@@ -57,18 +57,24 @@ public final class CustomShapedRecipe {
 
 	public boolean matches(CraftingRecipeInput input) {
 		if (input.getStackCount() == this.ingredientCount) {
-			if (input.getWidth() == this.width && input.getHeight() == this.height) {
-				if (!this.symmetrical && this.matches(input, true)) {
-					return true;
-				}
+			if (input.getWidth() >= this.width && input.getHeight() >= this.height) {
+				for (int offsetY = 0; offsetY <= input.getHeight() - this.height; ++offsetY) {
+					for (int offsetX = 0; offsetX <= input.getWidth() - this.width; ++offsetX) {
+						if (!this.symmetrical && this.matches(input, true, offsetX, offsetY)) {
+							return true;
+						}
 
-				return this.matches(input, false);
+						if (this.matches(input, false, offsetX, offsetY)) {
+							return true;
+						}
+					}
+				}
 			}
 		}
 		return false;
 	}
 
-	private boolean matches(CraftingRecipeInput input, boolean mirrored) {
+	private boolean matches(CraftingRecipeInput input, boolean mirrored, int offsetX, int offsetY) {
 		for(int row = 0; row < this.height; ++row) {
 			for(int col = 0; col < this.width; ++col) {
 				Optional<Ingredient> optional;
@@ -78,7 +84,7 @@ public final class CustomShapedRecipe {
 					optional = this.ingredients.get(col + row * this.width);
 				}
 
-				ItemStack itemStack = input.getStackInSlot(col, row);
+				ItemStack itemStack = input.getStackInSlot(col + offsetX, row + offsetY);
 				if (!Ingredient.matches(optional, itemStack)) {
 					return false;
 				}

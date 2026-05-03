@@ -7,8 +7,9 @@
 				"items": [
 					{
 						"items": [
-							"dm:unfinished_cannon_head",
-							"minecraft:string"
+							"minecraft:crafting_table",
+							"minecraft:iron_bars",
+							"minecraft:iron_ingot"
 						]
 					}
 				]
@@ -22,7 +23,7 @@
 	],
 	"rewards": {
 		"recipes": [
-			"dm:cannon_turret/cannon_head"
+			"dm:turret_assembly_station"
 		]
 	}
 }

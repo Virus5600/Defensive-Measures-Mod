@@ -1,4 +1,4 @@
-{
+﻿{
 	"parent": "minecraft:recipes/root",
 	"criteria": {
 		"has_ingredients": {
@@ -7,24 +7,31 @@
 				"items": [
 					{
 						"items": [
-							"dm:arrowhead",
+							"dm:bolt_head",
 							"minecraft:stick"
 						]
 					}
 				]
 			}
 		},
-		"has_the_recipe": {
+		"has_recipe_bolt_head": {
 			"trigger": "minecraft:recipe_unlocked",
 			"conditions": {
-				"recipe": "dm:ballista_bolt"
+				"recipe": "dm:ballista/ballista_bolt_head"
+			}
+		},
+		"has_recipe_tas_bolt_head": {
+			"trigger": "minecraft:recipe_unlocked",
+			"conditions": {
+				"recipe": "dm:_turret_assembly_station/bolt_head/ballista_bolt_head"
 			}
 		}
 	},
 	"requirements": [
+		["has_ingredients"],
 		[
-			"has_the_recipe",
-			"has_ingredients"
+			"has_recipe_bolt_head",
+			"has_recipe_tas_bolt_head"
 		]
 	],
 	"rewards": {

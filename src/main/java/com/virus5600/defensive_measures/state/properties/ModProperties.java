@@ -1,5 +1,6 @@
 package com.virus5600.defensive_measures.state.properties;
 
+import com.virus5600.defensive_measures.block.BoltHeadBlock;
 import net.minecraft.state.property.IntProperty;
 
 /**
@@ -7,8 +8,8 @@ import net.minecraft.state.property.IntProperty;
  */
 public class ModProperties {
 	/**
-	 * A property that specifies the amount of arrowheads in an {@link com.virus5600.defensive_measures.block.ArrowheadBlock Arrowhead Block}.
+	 * A property that specifies the amount of bolt heads in an {@link BoltHeadBlock Bolt Head Block}.
 	 * Value ranges from {@code 1} to {@code 4}.
 	 */
-	public static final IntProperty ARROWHEADS = IntProperty.of("arrowheads", 1, 4);
+	public static final IntProperty BOLT_HEADS = IntProperty.of("bolt_heads", 1, 4);
 }

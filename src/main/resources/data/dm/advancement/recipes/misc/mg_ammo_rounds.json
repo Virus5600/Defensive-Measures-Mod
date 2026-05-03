@@ -1,4 +1,4 @@
-{
+﻿{
 	"parent": "minecraft:recipes/root",
 	"criteria": {
 		"has_ingredients": {
@@ -7,25 +7,18 @@
 				"items": [
 					{
 						"items": [
-							"minecraft:iron_ingot",
+							"minecraft:copper_ingot",
 							"minecraft:flint",
 							"minecraft:gunpowder",
-							"minecraft:copper_ingot"
+							"minecraft:iron_ingot"
 						]
 					}
 				]
-			}
-		},
-		"has_the_recipe": {
-			"trigger": "minecraft:recipe_unlocked",
-			"conditions": {
-				"recipe": "dm:mg_ammo_rounds"
 			}
 		}
 	},
 	"requirements": [
 		[
-			"has_the_recipe",
 			"has_ingredients"
 		]
 	],

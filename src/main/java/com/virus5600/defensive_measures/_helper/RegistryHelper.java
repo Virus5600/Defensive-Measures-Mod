@@ -1,5 +1,6 @@
 package com.virus5600.defensive_measures._helper;
 
+import com.virus5600.defensive_measures.stat.ModStats;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
@@ -100,7 +101,7 @@ public final class RegistryHelper {
 	// Stats Registry
 	public static Identifier registerStat(String id, StatFormatter formatter) {
 		Identifier identifier = Identifier.of(DefensiveMeasures.MOD_ID, id);
-		Registry.register(Registries.CUSTOM_STAT, id, identifier);
+		Registry.register(Registries.CUSTOM_STAT, identifier, identifier);
 		Stats.CUSTOM.getOrCreateStat(identifier, formatter);
 		return identifier;
 	}

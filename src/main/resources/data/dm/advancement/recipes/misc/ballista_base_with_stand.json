@@ -1,4 +1,4 @@
-{
+﻿{
 	"parent": "minecraft:recipes/root",
 	"criteria": {
 		"has_ingredients": {
@@ -22,19 +22,12 @@
 					}
 				]
 			}
-		},
-		"has_the_recipe": {
-			"trigger": "minecraft:recipe_unlocked",
-			"conditions": {
-				"recipe": "dm:ballista_base_with_stand"
-			}
 		}
 	},
 	"requirements": [
 		[
-			"has_the_recipe",
-			"has_ingredients",
-			"has_wooden_fences"
+			"has_wooden_fences",
+			"has_ingredients"
 		]
 	],
 	"rewards": {

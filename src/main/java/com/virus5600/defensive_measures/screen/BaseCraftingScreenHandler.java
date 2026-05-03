@@ -10,7 +10,6 @@ import net.minecraft.network.packet.s2c.play.ScreenHandlerSlotUpdateS2CPacket;
 import net.minecraft.recipe.*;
 import net.minecraft.recipe.book.RecipeBookType;
 import net.minecraft.recipe.input.CraftingRecipeInput;
-import net.minecraft.registry.RegistryKey;
 import net.minecraft.screen.*;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -19,9 +18,11 @@ import net.minecraft.server.world.ServerWorld;
 import org.jspecify.annotations.Nullable;
 
 import com.virus5600.defensive_measures.block.ModBlocks;
+import com.virus5600.defensive_measures.recipe.BaseCraftingRecipe;
 import com.virus5600.defensive_measures.recipe.ModRecipeTypes;
 import com.virus5600.defensive_measures.recipe.TASShapedRecipe;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -37,7 +38,7 @@ public abstract class BaseCraftingScreenHandler extends AbstractCraftingScreenHa
 		this.player = playerInventory.player;
 	}
 
-	protected static <T extends Recipe<CraftingRecipeInput>> void updateResult(
+	protected static <T extends BaseCraftingRecipe<CraftingRecipeInput>> void updateResult(
 		ScreenHandler handler,
 		RecipeType<T> recipeType,
 		ServerWorld world,
@@ -51,8 +52,6 @@ public abstract class BaseCraftingScreenHandler extends AbstractCraftingScreenHa
 		ItemStack itemStack = ItemStack.EMPTY;
 
 		if (world.getServer() != null) {
-			RegistryKey<Recipe<?>> cachedId = recipe != null ? recipe.id() : null;
-
 			Optional<RecipeEntry<T>> optional = world.getServer()
 				.getRecipeManager()
 				.getFirstMatch(
@@ -316,7 +315,7 @@ public abstract class BaseCraftingScreenHandler extends AbstractCraftingScreenHa
 	}
 
 	public List<Slot> getInputSlots() {
-		return this.slots.subList(1, this.getInputSlotEnd());
+		return this.slots.subList(this.getInputSlotStart(), this.getInputSlotEnd() + 1);
 	}
 
 	@Override
@@ -327,5 +326,66 @@ public abstract class BaseCraftingScreenHandler extends AbstractCraftingScreenHa
 	@Override
 	protected PlayerEntity getPlayer() {
 		return this.player;
+	}
+
+	@Override
+	@SuppressWarnings({"unchecked", "rawtypes"})
+	public AbstractRecipeScreenHandler.PostFillAction fillInputSlots(boolean craftAll, boolean creative, RecipeEntry<?> recipe, ServerWorld world, PlayerInventory inventory) {
+		RecipeEntry<BaseCraftingRecipe<?>> recipeEntry = (RecipeEntry) recipe;
+		BaseCraftingRecipe<?> baseRecipe = recipeEntry.value();
+		int recipeWidth = baseRecipe.getWidth();
+		int recipeHeight = baseRecipe.getHeight();
+		int gridWidth = this.getWidth();
+		int gridHeight = this.getHeight();
+		int startX = (gridWidth - recipeWidth) / 2;
+		int startY = (gridHeight - recipeHeight) / 2;
+		List<Slot> inputSlots = this.getInputSlots();
+		List<Slot> centeredInputSlots = new ArrayList<>(recipeWidth * recipeHeight);
+
+		for (int row = 0; row < recipeHeight; ++row) {
+			for (int col = 0; col < recipeWidth; ++col) {
+				int slotIndex = (startY + row) * gridWidth + startX + col;
+
+				if (slotIndex >= 0 && slotIndex < inputSlots.size()) {
+					centeredInputSlots.add(inputSlots.get(slotIndex));
+				}
+			}
+		}
+
+		if (centeredInputSlots.size() != recipeWidth * recipeHeight) {
+			centeredInputSlots = inputSlots;
+		}
+
+		this.onInputSlotFillStart();
+
+		AbstractRecipeScreenHandler.PostFillAction result;
+		try {
+			result = InputSlotFiller.fill(new InputSlotFiller.Handler() {
+				@Override
+				public void populateRecipeFinder(RecipeFinder finder) {
+					BaseCraftingScreenHandler.this.populateRecipeFinder(finder);
+				}
+
+				@Override
+				public void clear() {
+					BaseCraftingScreenHandler.this.craftingResultInventory.clear();
+					BaseCraftingScreenHandler.this.craftingInventory.clear();
+				}
+
+				@Override
+				public boolean matches(RecipeEntry entry) {
+					BaseCraftingRecipe<?> recipe = (BaseCraftingRecipe<?>) entry.value();
+
+					return recipe.matches(
+						BaseCraftingScreenHandler.this.craftingInventory.createRecipeInput(),
+						BaseCraftingScreenHandler.this.getPlayer().getEntityWorld()
+					);
+				}
+			}, recipeWidth, recipeHeight, centeredInputSlots, centeredInputSlots, inventory, (RecipeEntry) recipeEntry, craftAll, creative);
+		} finally {
+			this.onInputSlotFillFinish(world, (RecipeEntry<CraftingRecipe>) (RecipeEntry) recipeEntry);
+		}
+
+		return result;
 	}
 }

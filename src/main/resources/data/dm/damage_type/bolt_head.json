@@ -1,5 +1,5 @@
 {
-	"message_id": "arrowhead",
+	"message_id": "bolt_head",
 	"exhaustion": 0.1,
 	"scaling": "when_caused_by_living_non_player",
 	"effects": "thorns"

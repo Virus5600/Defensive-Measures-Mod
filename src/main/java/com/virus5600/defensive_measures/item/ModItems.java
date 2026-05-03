@@ -58,7 +58,7 @@ public class ModItems {
 
 	// BALLISTA
 	public final static Item BALLISTA_TURRET = registerItem("ballista", ModEntities.BALLISTA_TURRET, BallistaTurretItem::new);
-	public final static Item ARROWHEAD = registerItem(ModBlocks.ARROWHEAD);
+	public final static Item BOLT_HEAD = registerItem(ModBlocks.BOLT_HEAD);
 	public final static Item BALLISTA_BOLT = registerItem("ballista_bolt", BallistaBoltItem::new);
 	public final static Item BALLISTA_BASE = registerItem("ballista_base", BallistaBaseItem::new);
 	public final static Item BALLISTA_BASE_WITH_STAND = registerItem("ballista_base_with_stand", BallistaBaseWithStandItem::new);
@@ -224,7 +224,7 @@ public class ModItems {
 		};
 
 		DM_TRAPS = new Item[] {
-			ARROWHEAD
+			BOLT_HEAD
 		};
 
 		DM_TURRETS = new Item[] {

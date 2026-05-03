@@ -19,7 +19,7 @@ import com.virus5600.defensive_measures._helper.RegistryHelper;
  */
 public class ModBlocks {
 	// 1.0.0-beta
-	public final static Block ARROWHEAD = RegistryHelper.registerBlock("arrowhead", ArrowheadBlock::new, Settings.create());
+	public final static Block BOLT_HEAD = RegistryHelper.registerBlock("bolt_head", BoltHeadBlock::new, Settings.create());
 
 	// 1.1.0-beta
 	public final static Block TURRET_ASSEMBLY_STATION = RegistryHelper.registerBlock("turret_assembly_station", TurretAssemblyStationBlock::new, Settings.create());

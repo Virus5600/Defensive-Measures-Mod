@@ -14,7 +14,6 @@ import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
-import net.minecraft.state.property.EnumProperty;
 import net.minecraft.state.property.IntProperty;
 import net.minecraft.state.property.Properties;
 import net.minecraft.util.math.BlockPos;
@@ -34,14 +33,14 @@ import com.virus5600.defensive_measures.state.properties.ModProperties;
 import java.util.Objects;
 
 /**
- * Arrowhead blocks are blocks that deal damage to entities that step on them.
+ * Bolt head blocks are blocks that deal damage to entities that step on them.
  * <br><br>
  * Similar to how magma blocks deal damage to entities that step on them,
- * arrowhead blocks deal damage to entities that step on them. This, however,
+ * bolt head blocks deal damage to entities that step on them. This, however,
  * does not discriminate against sneaking entities, meaning that sneaking
- * entities will still take damage from arrowhead blocks unlike magma blocks.
+ * entities will still take damage from bolt head blocks unlike magma blocks.
  * <br><br>
- * Arrowhead blocks deal 2 damage to entities that step on them. This could
+ * Bolt head blocks deal 2 damage to entities that step on them. This could
  * be changed by any subclass of this block by simply changing the value of
  * the {@link #damageDealt} field.
  *
@@ -49,12 +48,12 @@ import java.util.Objects;
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
  * @version 1.1.0
  */
-public class ArrowheadBlock extends Block implements Waterloggable {
-	public static final MapCodec<ArrowheadBlock> CODEC = createCodec(ArrowheadBlock::new);
+public class BoltHeadBlock extends Block implements Waterloggable {
+	public static final MapCodec<BoltHeadBlock> CODEC = createCodec(BoltHeadBlock::new);
 
 	public static int MAX_HEADS = 4;
 
-	public static final IntProperty ARROWHEADS = ModProperties.ARROWHEADS;
+	public static final IntProperty BOLT_HEADS = ModProperties.BOLT_HEADS;
 	public static final BooleanProperty WATERLOGGED = Properties.WATERLOGGED;
 
 	private static final VoxelShape ONE_HEAD;
@@ -62,17 +61,17 @@ public class ArrowheadBlock extends Block implements Waterloggable {
 	private static final VoxelShape THREE_HEADS;
 	private static final VoxelShape FOUR_HEADS;
 	/**
-	 * Defines the block hitbox of Arrowhead based on the amount of arrowhead
+	 * Defines the block hitbox of bolt head based on the amount of bolt heads
 	 * block placed in the same space.
 	 */
 	private static final VoxelShape[] SHAPES_BY_HEAD;
 
 	/**
-	 * Defines the amount of damage that the arrowhead block will deal to entities.
+	 * Defines the amount of damage that the bolt head block will deal to entities.
 	 */
 	protected int damageDealt = 2;
 
-	public ArrowheadBlock(Settings settings) {
+	public BoltHeadBlock(Settings settings) {
 		super(settings);
 
 		settings.hardness(1.5f)
@@ -82,7 +81,7 @@ public class ArrowheadBlock extends Block implements Waterloggable {
 		this.setDefaultState(
 			this.stateManager
 				.getDefaultState()
-				.with(ARROWHEADS, 1)
+				.with(BOLT_HEADS, 1)
 				.with(WATERLOGGED, false)
 		);
 	}
@@ -91,18 +90,18 @@ public class ArrowheadBlock extends Block implements Waterloggable {
 	protected boolean canReplace(BlockState state, ItemPlacementContext context) {
 		return !context.shouldCancelInteraction()
 			&& context.getStack().getItem() == this.asItem()
-			&& state.get(ARROWHEADS) < MAX_HEADS
+			&& state.get(BOLT_HEADS) < MAX_HEADS
 			|| super.canReplace(state, context);
 	}
 
 	@Override
 	protected VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
-		return SHAPES_BY_HEAD[state.get(ARROWHEADS) - 1];
+		return SHAPES_BY_HEAD[state.get(BOLT_HEADS) - 1];
 	}
 
 	@Override
 	protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
-		builder.add(ARROWHEADS, WATERLOGGED);
+		builder.add(BOLT_HEADS, WATERLOGGED);
 	}
 
 	@Override
@@ -159,7 +158,7 @@ public class ArrowheadBlock extends Block implements Waterloggable {
 		if (blockState.isOf(this)) {
 			Direction dir = ctx.getHorizontalPlayerFacing().getOpposite();
 
-			return blockState.cycle(ARROWHEADS);
+			return blockState.cycle(BOLT_HEADS);
 		} else {
 			FluidState fluidState = ctx.getWorld().getFluidState(ctx.getBlockPos());
 
@@ -173,7 +172,7 @@ public class ArrowheadBlock extends Block implements Waterloggable {
 	public void onSteppedOn(World world, BlockPos pos, BlockState state, Entity entity) {
 		if (!entity.bypassesSteppingEffects() && entity instanceof LivingEntity) {
 			if (world instanceof ServerWorld serverWorld) {
-				DamageSource dmgSrc = ModDamageSources.create(world, ModDamageTypes.ARROWHEAD);
+				DamageSource dmgSrc = ModDamageSources.create(world, ModDamageTypes.BOLT_HEAD);
 				entity.damage(serverWorld, dmgSrc, this.getDamageDealt(state));
 			}
 		}
@@ -187,7 +186,7 @@ public class ArrowheadBlock extends Block implements Waterloggable {
 	}
 
 	@Override
-	public MapCodec<ArrowheadBlock> getCodec() {
+	public MapCodec<BoltHeadBlock> getCodec() {
 		return CODEC;
 	}
 
@@ -198,12 +197,12 @@ public class ArrowheadBlock extends Block implements Waterloggable {
 	/**
 	 * Returns the final damage to be dealt when this block is stepped on.
 	 *
-	 * @param state The block state of this arrowhead block.
+	 * @param state The block state of this bolt head block.
 	 *
 	 * @return The final damage to be dealt when this block is stepped on.
 	 */
 	public float getDamageDealt(BlockState state) {
-		return this.damageDealt * state.get(ARROWHEADS);
+		return this.damageDealt * state.get(BOLT_HEADS);
 	}
 
 	static {

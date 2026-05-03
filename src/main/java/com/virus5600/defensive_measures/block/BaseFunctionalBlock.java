@@ -89,7 +89,7 @@ public abstract class BaseFunctionalBlock extends Block {
 	 *
 	 * Example:<br>
 	 * - {@code createCodec(CraftingTableBlock::new)}<br>
-	 * - {@link ArrowheadBlock#CODEC createCodec(ArrowheadBlock::new);}<br>
+	 * - {@link BoltHeadBlock#CODEC createCodec(BoltHeadBlock::new);}<br>
 	 *
 	 * @return {@link MapCodec} A MapCodec that will be used to serialize and deserialize this block.
 	 */

@@ -18,7 +18,7 @@ import com.virus5600.defensive_measures._helper.RegistryHelper;
  * @version 1.0.0
  */
 public class ModDamageTypes {
-	public static final RegistryKey<DamageType> ARROWHEAD = RegistryHelper.getDamageTypeKey("arrowhead");
+	public static final RegistryKey<DamageType> BOLT_HEAD = RegistryHelper.getDamageTypeKey("bolt_head");
 
 	public static void registerDamageTypes() {
 		DefensiveMeasures.LOGGER.info("REGISTERING DAMAGE TYPES FOR {}...", DefensiveMeasures.MOD_NAME);

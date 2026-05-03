@@ -6,6 +6,7 @@ import net.minecraft.client.gui.screen.recipebook.RecipeResultCollection;
 import net.minecraft.item.Items;
 import net.minecraft.recipe.RecipeFinder;
 import net.minecraft.recipe.display.RecipeDisplay;
+import net.minecraft.recipe.display.SlotDisplay;
 import net.minecraft.screen.AbstractCraftingScreenHandler;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.text.Text;
@@ -50,11 +51,28 @@ public class BlueprintWidget extends BaseRecipeBookWidget<AbstractCraftingScreen
 		switch (display) {
 			case TASCraftingRecipeDisplay tasCraftingRecipeDisplay -> {
 				List<Slot> inputSlots = this.screenHandler.getInputSlots();
-					List<net.minecraft.recipe.display.SlotDisplay> ingredients = tasCraftingRecipeDisplay.ingredients();
-				int ingredientCount = Math.min(inputSlots.size(), ingredients.size());
+				List<SlotDisplay> ingredients = tasCraftingRecipeDisplay.ingredients();
+				int recipeWidth = tasCraftingRecipeDisplay.width();
+				int recipeHeight = tasCraftingRecipeDisplay.height();
+				int gridWidth = this.screenHandler.getWidth();
+				int gridHeight = this.screenHandler.getHeight();
 
-				for (int i = 0; i < ingredientCount; i++) {
-					ghostRecipe.addResults(inputSlots.get(i), context, ingredients.get(i));
+				// Center the recipe in the grid
+				int startX = (gridWidth - recipeWidth) / 2;
+				int startY = (gridHeight - recipeHeight) / 2;
+
+				// Place each ingredient at its correct grid position, centered
+				for (int i = 0; i < ingredients.size(); i++) {
+					int recipeX = i % recipeWidth;
+					int recipeY = i / recipeWidth;
+
+					int actualX = startX + recipeX;
+					int actualY = startY + recipeY;
+					int slotIndex = actualY * gridWidth + actualX;
+
+					if (slotIndex < inputSlots.size()) {
+						ghostRecipe.addInputs(inputSlots.get(slotIndex), context, ingredients.get(i));
+					}
 				}
 
 				ghostRecipe.addResults(this.screenHandler.getOutputSlot(), context, tasCraftingRecipeDisplay.result());
@@ -77,12 +95,20 @@ public class BlueprintWidget extends BaseRecipeBookWidget<AbstractCraftingScreen
 		recipeResultCollection.populateRecipes(recipeFinder, this::canDisplay);
 	}
 
+	// //////////////// //
+	// OVERRIDE METHODS //
+	// //////////////// //
+
+	protected int getLeftOffset() {
+		return 106;
+	}
+
 	static {
 		TABS = List.of(
 			new BaseRecipeBookWidget.Tab(ModRecipeBookType.TURRET_ASSEMBLY_STATION),
 			new BaseRecipeBookWidget.Tab(ModItems.CANNON_TURRET, ModRecipeBookCategories.TAS_TURRETS),
 			new BaseRecipeBookWidget.Tab(ModItems.BALLISTA_BOLT, ModItems.MG_HEAD, ModRecipeBookCategories.TAS_PARTS),
-			new BaseRecipeBookWidget.Tab(ModItems.ARROWHEAD, ModRecipeBookCategories.TAS_TRAPS),
+			new BaseRecipeBookWidget.Tab(ModItems.BOLT_HEAD, ModRecipeBookCategories.TAS_TRAPS),
 			new BaseRecipeBookWidget.Tab(Items.OAK_FENCE, ModRecipeBookCategories.TAS_DEFENSE),
 			new BaseRecipeBookWidget.Tab(ModItems.TURRET_REMOVER, ModRecipeBookCategories.TAS_EQUIPMENTS),
 			new BaseRecipeBookWidget.Tab(Items.COPPER_INGOT, ModRecipeBookCategories.TAS_MISC)

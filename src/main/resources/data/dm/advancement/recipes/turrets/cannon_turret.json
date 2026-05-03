@@ -1,4 +1,4 @@
-{
+﻿{
 	"parent": "minecraft:recipes/root",
 	"criteria": {
 		"has_ingredients": {
@@ -7,24 +7,17 @@
 				"items": [
 					{
 						"items": [
+							"dm:cannon_base",
 							"dm:cannon_head",
-							"dm:cannon_stand",
-							"dm:cannon_base"
+							"dm:cannon_stand"
 						]
 					}
 				]
-			}
-		},
-		"has_the_recipe": {
-			"trigger": "minecraft:recipe_unlocked",
-			"conditions": {
-				"recipe": "dm:cannon_turret"
 			}
 		}
 	},
 	"requirements": [
 		[
-			"has_the_recipe",
 			"has_ingredients"
 		]
 	],

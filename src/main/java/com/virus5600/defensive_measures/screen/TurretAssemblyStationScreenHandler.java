@@ -23,6 +23,4 @@ public class TurretAssemblyStationScreenHandler extends BaseCraftingScreenHandle
 	// //////////////// //
 	// OVERRIDE METHODS //
 	// //////////////// //
-
-	// TODO: Implement populateRecipeFinder;
 }

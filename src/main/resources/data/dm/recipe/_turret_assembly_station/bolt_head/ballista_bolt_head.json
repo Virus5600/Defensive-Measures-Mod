@@ -1,5 +1,5 @@
 {
-	"type": "minecraft:crafting_shaped",
+	"type": "dm:tas_shaped",
 	"category": "misc",
 	"pattern": [
 		" f ",
@@ -9,7 +9,7 @@
 		"f": "minecraft:flint"
 	},
 	"result": {
-		"id": "dm:arrowhead",
-		"count": 1
+		"id": "dm:bolt_head",
+		"count": 2
 	}
 }

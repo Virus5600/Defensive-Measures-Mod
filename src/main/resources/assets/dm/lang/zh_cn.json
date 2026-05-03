@@ -4,7 +4,7 @@
 	"itemGroup.dm.defensive_measures.traps" : "防御建筑-陷阱",
 	"itemGroup.dm.defensive_measures.turrets" : "防御建筑-防御塔",
 
-	"block.dm.arrowhead" : "箭头",
+	"block.dm.bolt_head" : "Bolt Head",
 
 	"block.dm.turret_assembly_station": "Turret Assembly Station",
 
@@ -38,8 +38,8 @@
 	"entity.dm.mg_turret" : "机枪塔",
 	"entity.dm.mg_bullet" : "机枪子弹",
 
-	"death.attack.arrowhead" : "%1$s踩到了箭头陷阱",
-	"death.attack.arrowhead.player" : "%1$s在和与%2$s战斗时踩到了箭头陷阱",
+	"death.attack.bolt_head" : "%1$s踩到了箭头陷阱",
+	"death.attack.bolt_head.player" : "%1$s在和与%2$s战斗时踩到了箭头陷阱",
 
 	"subtitles.turret.remove.metal" : "防御塔：拆除",
 	"subtitles.turret.remove.wood" : "防御塔：拆除",

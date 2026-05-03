@@ -2,15 +2,14 @@
 	"type": "minecraft:crafting_shaped",
 	"category": "misc",
 	"pattern": [
-		"h",
-		"s",
-		"s"
+		" f ",
+		"fff"
 	],
 	"key": {
-		"h": "dm:bolt_head",
-		"s": "minecraft:stick"
+		"f": "minecraft:flint"
 	},
 	"result": {
-		"id": "dm:ballista_bolt"
+		"id": "dm:bolt_head",
+		"count": 1
 	}
 }

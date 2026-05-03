@@ -6,7 +6,7 @@
 			"entries": [
 				{
 					"type": "minecraft:item",
-					"name": "dm:arrowhead",
+					"name": "dm:bolt_head",
 					"functions": [
 						{
 							"function": "minecraft:set_count",
@@ -14,9 +14,9 @@
 							"conditions": [
 								{
 									"condition": "minecraft:block_state_property",
-									"block": "dm:arrowhead",
+									"block": "dm:bolt_head",
 									"properties": {
-										"arrowheads": "2"
+										"bolt_heads": "2"
 									}
 								}
 							]
@@ -27,9 +27,9 @@
 							"conditions": [
 								{
 									"condition": "minecraft:block_state_property",
-									"block": "dm:arrowhead",
+									"block": "dm:bolt_head",
 									"properties": {
-										"arrowheads": "3"
+										"bolt_heads": "3"
 									}
 								}
 							]
@@ -40,9 +40,9 @@
 							"conditions": [
 								{
 									"condition": "minecraft:block_state_property",
-									"block": "dm:arrowhead",
+									"block": "dm:bolt_head",
 									"properties": {
-										"arrowheads": "4"
+										"bolt_heads": "4"
 									}
 								}
 							]

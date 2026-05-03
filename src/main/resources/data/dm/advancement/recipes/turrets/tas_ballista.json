@@ -1,6 +1,22 @@
 ﻿{
 	"parent": "minecraft:recipes/root",
 	"criteria": {
+		"tas_interacted": {
+			"trigger": "minecraft:tick",
+			"conditions": {
+				"player": {
+					"stats": [
+						{
+							"type": "dm:custom",
+							"stat": "dm:interact_with_turret_assembly_station",
+							"value": {
+								"min": 1
+							}
+						}
+					]
+				}
+			}
+		},
 		"has_ingredients": {
 			"trigger": "minecraft:inventory_changed",
 			"conditions": {
@@ -18,12 +34,15 @@
 	},
 	"requirements": [
 		[
+			"tas_interacted"
+		],
+		[
 			"has_ingredients"
 		]
 	],
 	"rewards": {
 		"recipes": [
-			"dm:ballista/ballista"
+			"dm:_turret_assembly_station/ballista/ballista"
 		]
 	}
 }

@@ -112,6 +112,7 @@ public class TurretAssemblyStationBlock extends BaseFunctionalBlock {
 		);
 	}
 
+
 	// //////////////// //
 	// ABSTRACT METHODS //
 	// //////////////// //

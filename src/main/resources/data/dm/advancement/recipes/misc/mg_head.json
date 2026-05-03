@@ -1,4 +1,4 @@
-{
+﻿{
 	"parent": "minecraft:recipes/root",
 	"criteria": {
 		"has_ingredients": {
@@ -7,26 +7,19 @@
 				"items": [
 					{
 						"items": [
+							"dm:mg_ammo_case",
+							"dm:mg_ammo_rounds",
 							"minecraft:green_dye",
 							"minecraft:iron_block",
-							"minecraft:iron_ingot",
-							"dm:mg_ammo_rounds",
-							"dm:mg_ammo_case"
+							"minecraft:iron_ingot"
 						]
 					}
 				]
-			}
-		},
-		"has_the_recipe": {
-			"trigger": "minecraft:recipe_unlocked",
-			"conditions": {
-				"recipe": "dm:mg_head"
 			}
 		}
 	},
 	"requirements": [
 		[
-			"has_the_recipe",
 			"has_ingredients"
 		]
 	],

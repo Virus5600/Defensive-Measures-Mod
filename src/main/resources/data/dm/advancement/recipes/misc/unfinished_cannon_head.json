@@ -1,4 +1,4 @@
-{
+﻿{
 	"parent": "minecraft:recipes/root",
 	"criteria": {
 		"has_ingredients": {
@@ -7,24 +7,17 @@
 				"items": [
 					{
 						"items": [
+							"minecraft:gunpowder",
 							"minecraft:iron_block",
-							"minecraft:iron_ingot",
-							"minecraft:gunpowder"
+							"minecraft:iron_ingot"
 						]
 					}
 				]
-			}
-		},
-		"has_the_recipe": {
-			"trigger": "minecraft:recipe_unlocked",
-			"conditions": {
-				"recipe": "dm:unfinished_cannon_head"
 			}
 		}
 	},
 	"requirements": [
 		[
-			"has_the_recipe",
 			"has_ingredients"
 		]
 	],

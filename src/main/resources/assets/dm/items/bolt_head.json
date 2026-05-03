@@ -1,6 +1,6 @@
 {
 	"model": {
 		"type": "minecraft:model",
-		"model": "dm:item/arrowhead"
+		"model": "dm:item/bolt_head"
 	}
 }

@@ -4,7 +4,7 @@
 	"itemGroup.dm.defensive_measures.traps" : "Ловушки: Defensive Measures",
 	"itemGroup.dm.defensive_measures.turrets" : "Турели: Defensive Measures",
 
-	"block.dm.arrowhead" : "Наконечник стрелы",
+	"block.dm.bolt_head" : "Bolt Head",
 
 	"block.dm.turret_assembly_station": "Turret Assembly Station",
 
@@ -38,8 +38,8 @@
 	"entity.dm.mg_turret" : "Пулемётная турель",
 	"entity.dm.mg_bullet" : "Пуля для пулемётной турели",
 
-	"death.attack.arrowhead" : "%1$s раздавлен Наконечником стрелы",
-	"death.attack.arrowhead.player" : "%1$s раздавлен случайным Наконечником стрелы во время борьбы с %2$s",
+	"death.attack.bolt_head" : "%1$s раздавлен Наконечником стрелы",
+	"death.attack.bolt_head.player" : "%1$s раздавлен случайным Наконечником стрелы во время борьбы с %2$s",
 
 	"subtitles.turret.remove.metal" : "Металлическая турель убрана",
 	"subtitles.turret.remove.wood" : "Деревянная турель убрана",
