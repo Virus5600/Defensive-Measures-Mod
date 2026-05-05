@@ -130,6 +130,7 @@ public class CannonTurretEntity extends TurretEntity {
 			.distanceTo(target.getEntityPos());
 
 		TurretProjectileVelocity velocityData = TurretProjectileVelocity.init(this)
+			.setPower(1.375f)
 			.setVelocity(target)
 			.setUpwardVelocityMultiplier(dist * 0.1625f);
 
