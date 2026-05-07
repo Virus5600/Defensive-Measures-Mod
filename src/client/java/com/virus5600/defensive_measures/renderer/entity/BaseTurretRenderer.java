@@ -61,7 +61,9 @@ public abstract class BaseTurretRenderer<
 		turretRenderState.deathAnimationState.copyFrom(turretEntity.getDeathAnimationState());
 
 		turretRenderState.turretLvl = turretEntity.getTrackedLevel();
+		turretRenderState.hasTarget = turretEntity.getTrackedLockedButNotAttacking();
 		turretRenderState.shooting = turretEntity.getTrackedShooting();
+
 
 		turretRenderState.hurt = turretEntity.hurtTime > 0 && turretEntity.isAlive();
 	}

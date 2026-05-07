@@ -142,8 +142,7 @@ public abstract class BaseTurretModel<S extends BaseTurretRenderState> extends B
 
 		// HEAD ANGLE HANDLING
 		float headYaw = state.relativeHeadYaw + state.bodyYaw + 180;
-		float headPitch = state.idleAnimationState.isRunning() ?
-			this.getDefaultHeadPitch() : state.pitch;
+		float headPitch = state.hasTarget ? state.pitch : -this.getDefaultHeadPitch();
 
 		this.setHeadAngles(headYaw, headPitch);
 

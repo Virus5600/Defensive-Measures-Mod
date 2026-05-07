@@ -1,5 +1,6 @@
 package com.virus5600.defensive_measures.entity.turrets;
 
+import com.virus5600.defensive_measures.entity.ai.control.TurretLookControl;
 import com.virus5600.defensive_measures.sound.ModSoundEvents;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -8,7 +9,6 @@ import net.minecraft.block.Blocks;
 import net.minecraft.entity.*;
 import net.minecraft.entity.ai.RangedAttackMob;
 import net.minecraft.entity.ai.control.BodyControl;
-import net.minecraft.entity.ai.control.LookControl;
 import net.minecraft.entity.ai.goal.ActiveTargetGoal;
 import net.minecraft.entity.ai.goal.LookAroundGoal;
 import net.minecraft.entity.ai.goal.LookAtEntityGoal;
@@ -334,7 +334,7 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 		this.material = material;
 		this.itemable = itemable;
 		this.random = Random.create();
-		this.lookControl = new TurretEntity.TurretLookControl(this);
+		this.lookControl = new TurretLookControl(this);
 
 		if (this.projectile == null) {
 			this.projectile = EntityType.ARROW;
@@ -1148,6 +1148,11 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 		return 3;
 	}
 
+	@Override
+	public TurretLookControl getLookControl() {
+		return (TurretLookControl) this.lookControl;
+	}
+
 	public static float getTurretMaxHealth() {
 		return TurretEntity.MAX_HEALTH;
 	}
@@ -1218,7 +1223,7 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 		Vec3d rotated = new Vec3d(xOffset, yOffset, zOffset);
 
 		if (includePitch) {
-			float pitchRad = -this.getTrackedPitch() * (float) (Math.PI / 180.0);
+			float pitchRad = -this.getPitch() * (float) (Math.PI / 180.0);
 			rotated = rotated.rotateX(pitchRad);
 		}
 
@@ -1955,16 +1960,6 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 
 		@Override
 		public void tick() {
-		}
-	}
-
-	static class TurretLookControl extends LookControl {
-		public TurretLookControl(MobEntity entity) {
-			super(entity);
-		}
-
-		@Override
-		protected void clampHeadYaw() {
 		}
 	}
 

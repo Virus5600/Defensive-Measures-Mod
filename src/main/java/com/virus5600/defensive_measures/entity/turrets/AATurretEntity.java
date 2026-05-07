@@ -165,6 +165,20 @@ public class AATurretEntity extends TurretEntity {
 	}
 
 	@Override
+	public void tick() {
+		super.tick();
+
+		if (this.getEntityWorld() instanceof ServerWorld world) {
+			this.setTrackedLockedButNotAttacking(this.getTarget() != null);
+
+			if (this.getTarget() == null) {
+				this.setPitch(-30);
+				this.setTrackedPitch(-30);
+			}
+		}
+	}
+
+	@Override
 	public ActionResult interactMob(PlayerEntity player, Hand hand) {
 		Item usedItem = player.getStackInHand(hand).getItem();
 
@@ -227,11 +241,18 @@ public class AATurretEntity extends TurretEntity {
 				false
 			);
 
+			Vec3d barrelPos = this.getRelativePosFrom(
+				barrelOrigin, barrel,
+				true
+			);
+
+			float pitchRad = this.getPitch() * (float) (Math.PI / 180.0);
+			float yawRad = this.getHeadYaw() * (float) (Math.PI / 180.0);
+
 			barrels.add(
-				this.getRelativePosFrom(
-					barrelOrigin, barrel,
-					true
-				)
+				barrelPos.subtract(this.getEyePos())
+					.rotateY(yawRad)
+					.rotateX(pitchRad)
 			);
 		}
 
@@ -294,7 +315,7 @@ public class AATurretEntity extends TurretEntity {
 			2
 		};
 
-		HINGE_POS = new Vec3d(0, 1, -0.53125);
+		HINGE_POS = new Vec3d(0, 0.0625, -0.59375);
 
 		BARRELS = List.of(
 			new Vec3d(0, 0, 2.5)

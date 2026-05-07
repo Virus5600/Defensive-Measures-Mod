@@ -56,9 +56,9 @@ import java.util.EnumSet;
  * 			yet to be implemented as they are not yet needed.
  * @see net.minecraft.entity.ai.goal.ProjectileAttackGoal ProjectileAttackGoal
  *
- * @since 1.0.0
+ * @since 1.0.0-beta
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
- * @version 1.0.0
+ * @version 1.0.1
  */
 public class ProjectileAttackGoal extends net.minecraft.entity.ai.goal.ProjectileAttackGoal {
 	private final TurretEntity mob;
@@ -155,8 +155,17 @@ public class ProjectileAttackGoal extends net.minecraft.entity.ai.goal.Projectil
 				this.mob.getNavigation().startMovingTo(this.target, this.mobSpeed);
 			}
 
-			this.mob.getLookControl().lookAt(this.target, 30.0F, 30.0F);
+			float minPitch = -this.mob.getMaxLookPitchChange();
+			float maxPitch = -this.mob.getMinLookPitchChange();
+			float minYaw = -this.mob.getMaxHeadRotation();
+			float maxYaw = -this.mob.getMinHeadRotation();
+
 			this.mob.setTrackedShooting(false);
+			this.mob.getLookControl().lookAt(
+				this.target,
+				minYaw, maxYaw,
+				minPitch, maxPitch
+			);
 
 			if (--this.updateCountdownTicks == 0) {
 				if (!canBeSeen) {
@@ -236,7 +245,7 @@ public class ProjectileAttackGoal extends net.minecraft.entity.ai.goal.Projectil
 	 */
 	public float getShootingPitch(LivingEntity target, boolean shouldClamp) {
 		Vec3d velocity = TurretEntity.TurretProjectileVelocity
-			.init((TurretEntity) this.mob)
+			.init(this.mob)
 			.setVelocity(target)
 			.getVelocity();
 
@@ -256,7 +265,7 @@ public class ProjectileAttackGoal extends net.minecraft.entity.ai.goal.Projectil
 
 	public float getShootingYaw(LivingEntity target, boolean shouldClamp) {
 		Vec3d velocity = TurretEntity.TurretProjectileVelocity
-			.init((TurretEntity) this.mob)
+			.init(this.mob)
 			.setVelocity(target)
 			.getVelocity();
 

@@ -9,5 +9,6 @@ public class BaseTurretRenderState extends LivingEntityRenderState {
 	public final AnimationState deathAnimationState = new AnimationState();
 
 	public int turretLvl;
+	public boolean hasTarget;
 	public boolean shooting;
 }
