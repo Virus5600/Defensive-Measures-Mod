@@ -24,16 +24,19 @@ public class ModEntityModels {
 	// TURRETS //
 	// /////// //
 
-	// v1.0.0
+	// v1.0.0-beta
 	public static final EntityModelLayer CANNON_TURRET = registerMain("cannon_turret");
 	public static final EntityModelLayer BALLISTA_TURRET = registerMain("ballista");
 	public static final EntityModelLayer MG_TURRET = registerMain("mg_turret");
+
+	// v1.1.0-beta
+	public static final EntityModelLayer AA_TURRET = registerMain("aa_turret");
 
 	// /////////// //
 	// PROJECTILES //
 	// /////////// //
 
-	// v1.0.0
+	// v1.0.0-beta
 	public static final EntityModelLayer CANNONBALL = registerMain("cannonball");
 	public static final EntityModelLayer BALLISTA_BOLT = registerMain("ballista_bolt");
 	public static final EntityModelLayer MG_BULLET = registerMain("mg_bullet");
@@ -45,16 +48,19 @@ public class ModEntityModels {
 		// TURRETS //
 		// /////// //
 
-		// v1.0.0
+		// v1.0.0-beta
 		EntityModelLayerRegistry.registerModelLayer(CANNON_TURRET, CannonTurretModel::getTexturedModelData);
 		EntityModelLayerRegistry.registerModelLayer(BALLISTA_TURRET, BallistaTurretModel::getTexturedModelData);
 		EntityModelLayerRegistry.registerModelLayer(MG_TURRET, MGTurretModel::getTexturedModelData);
+
+		// v1.1.0-beta
+		EntityModelLayerRegistry.registerModelLayer(AA_TURRET, AATurretModel::getTexturedModelData);
 
 		// /////////// //
 		// PROJECTILES //
 		// /////////// //
 
-		// v1.0.0
+		// v1.0.0-beta
 		EntityModelLayerRegistry.registerModelLayer(CANNONBALL, CannonballModel::getTexturedModelData);
 		EntityModelLayerRegistry.registerModelLayer(BALLISTA_BOLT, BallistaBoltModel::getTexturedModelData);
 		EntityModelLayerRegistry.registerModelLayer(MG_BULLET, MGBulletModel::getTexturedModelData);

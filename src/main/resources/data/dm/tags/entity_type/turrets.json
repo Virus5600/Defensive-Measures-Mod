@@ -1,6 +1,7 @@
 {
 	"replace": false,
 	"values": [
-		"#dm:tier_1_turrets"
+		"#dm:tier_1_turrets",
+		"#dm:tier_2_turrets"
 	]
 }

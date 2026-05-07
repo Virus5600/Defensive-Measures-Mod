@@ -18,6 +18,7 @@ import com.virus5600.defensive_measures.item.turrets.TurretItem;
 import com.virus5600.defensive_measures.item.turrets.ballista.*;
 import com.virus5600.defensive_measures.item.turrets.cannon.*;
 import com.virus5600.defensive_measures.item.turrets.mg_turret.*;
+import com.virus5600.defensive_measures.item.turrets.aa_turret.*;
 import net.minecraft.item.ItemGroups;
 
 import java.util.Arrays;
@@ -71,6 +72,9 @@ public class ModItems {
 	public final static Item MG_BASE = registerItem("mg_base", MGBaseItem::new);
 	public final static Item MG_HEAD = registerItem("mg_head", MGHeadItem::new);
 	public final static Item MG_STAND = registerItem("mg_stand", MGStandItem::new);
+
+	// AA TURRET
+	public final static Item AA_TURRET = registerItem("aa_turret", ModEntities.AA_TURRET, AATurretItem::new);
 
 	// ////////// //
 	// EQUIPMENTS //

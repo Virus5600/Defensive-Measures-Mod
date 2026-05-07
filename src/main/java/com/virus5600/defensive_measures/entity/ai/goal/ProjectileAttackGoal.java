@@ -241,13 +241,14 @@ public class ProjectileAttackGoal extends net.minecraft.entity.ai.goal.Projectil
 			.getVelocity();
 
 		float maxPitch = this.mob.getMaxLookPitchChange();
+		float minPitch = this.mob.getMinLookPitchChange();
 
 		float vx = MathHelper.sqrt((float) (velocity.x * velocity.x + velocity.z * velocity.z));
 		float p = (float) -Math.atan2(velocity.y, vx);
 		p *= (float) (180.0 / Math.PI);
 
 		if (shouldClamp) {
-			p = MathHelper.clamp(p, -maxPitch, maxPitch);
+			p = MathHelper.clamp(p, minPitch, maxPitch);
 		}
 
 		return p;
@@ -260,12 +261,13 @@ public class ProjectileAttackGoal extends net.minecraft.entity.ai.goal.Projectil
 			.getVelocity();
 
 		float maxYaw = this.mob.getMaxHeadRotation();
+		float minYaw = this.mob.getMaxHeadRotation();
 
 		float y = (float) Math.atan2(velocity.z, velocity.x);
 		y *= (float) (180.0 / Math.PI);
 
 		if (shouldClamp) {
-			y = MathHelper.clamp(y, -maxYaw, maxYaw);
+			y = MathHelper.clamp(y, minYaw, maxYaw);
 		}
 
 		return y;
@@ -278,14 +280,16 @@ public class ProjectileAttackGoal extends net.minecraft.entity.ai.goal.Projectil
 	 * @return {@code true} if the target is within the rotation limits of the turret, {@code false} otherwise.
 	 */
 	public boolean isWithinRotationLimit(LivingEntity target) {
-		float maxPitch = this.mob.getMaxLookPitchChange();
-		float maxYaw = this.mob.getMaxHeadRotation();
+		float minPitch = -this.mob.getMaxLookPitchChange();
+		float maxPitch = -this.mob.getMinLookPitchChange();
+		float minYaw = -this.mob.getMaxHeadRotation();
+		float maxYaw = -this.mob.getMinHeadRotation();
 
 		float targetPitch = this.getShootingPitch(target, false);
 		float targetYaw = this.getShootingYaw(target, false);
 
-		boolean withinPitch = targetPitch <= maxPitch && targetPitch >= -maxPitch;
-		boolean withinYaw = targetYaw <= maxYaw && targetYaw >= -maxYaw;
+		boolean withinPitch = targetPitch <= maxPitch && targetPitch >= minPitch;
+		boolean withinYaw = targetYaw <= maxYaw && targetYaw >= minYaw;
 
 		return withinPitch && withinYaw;
 	}

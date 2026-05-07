@@ -400,8 +400,25 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 		this.goalSelector.add(8, new LookAroundGoal(this));
 
 		// Targets
-		this.targetSelector.add(1, new ActiveTargetGoal<>(this, MobEntity.class, 10, true, false, this::targetPredicate));
+		this.targetSelector.add(1, this.getActiveTargetGoal());
 		this.targetSelector.add(3, new TargetOtherTeamGoal(this));
+	}
+
+	/**
+	 * A method that returns the {@link ActiveTargetGoal} of this turret. By default, this method returns an
+	 * instance of {@link ActiveTargetGoal} that targets {@link MobEntity} with a target chance of 10
+	 * and uses the {@link #targetPredicate(LivingEntity, ServerWorld) targetPredicate} method to
+	 * identify valid targets. This method can be overridden to change the target type, target chance,
+	 * and whether to check visibility and reachability of the target.
+	 *
+	 * @return {@link ActiveTargetGoal}
+	 */
+	protected ActiveTargetGoal<?> getActiveTargetGoal() {
+		return new ActiveTargetGoal<>(
+			this, MobEntity.class, 10,
+			true, false,
+			this::targetPredicate
+		);
 	}
 
 	/**
@@ -414,7 +431,7 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 	 * This method can be overridden to add more conditions to the target predicate. For example,
 	 * you can add a condition that checks if the target is not a player or if the target is not.
 	 * Furthermore, you can completely overwrite this method to create your own custom conditions
-	 * similar to what {@code AntiAirTurret#targetPredicate(LivingEntity, ServerWorld)} did; only
+	 * similar to what {@link AATurretEntity#targetPredicate(LivingEntity, ServerWorld)} did; only
 	 * targets entities that are airborne.
 	 *
 	 * @param target The target to check.
@@ -765,16 +782,24 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 
 		// CLIENT SIDE
 		if (this.getEntityWorld().isClient()) {
+			// Play Animations
+			this.updateAnimations();
+		}
+		// SERVER SIDE
+		else {
 			// SNAPPING THE TURRET BACK IN PLACE
 			if (this.getVelocity().x == 0 && this.getVelocity().z == 0 && !this.hasVehicle()) {
+				double offset = this.getType().getDimensions().width() % 2 == 0 ?
+					0 : 0.5;
+
 				Vec3d newPos = new Vec3d(
-					(double) MathHelper.floor(this.getX()) + 0.5,
+					this.getBlockX() + offset,
 					this.getY(),
-					(double) MathHelper.floor(this.getZ()) + 0.5
+					this.getBlockZ() + offset
 				);
 
 				this.tryAttachOrFall();
-				super.setPosition(newPos);
+				this.setPosition(newPos);
 				this.getEntityWorld().emitGameEvent(this, GameEvent.TELEPORT, newPos);
 
 				if (this.getVelocity() == Vec3d.ZERO && this.getEntityWorld().isClient() && !this.hasVehicle()) {
@@ -784,14 +809,6 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 				}
 			}
 
-			// Head Pitch when shooting
-			this.setPitch(this.getTrackedPitch());
-
-			// Play Animations
-			this.updateAnimations();
-		}
-		// SERVER SIDE
-		else {
 			this.setTrackedPitch(this.getPitch());
 
 			// Adjusts the pitch when shooting
@@ -1181,6 +1198,37 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 	}
 
 	/**
+	 * Identifies the position of a point relative to the origin provided.
+	 * For reference:
+	 * <ul>
+	 * 	<li>X-Axis == Pitch: Identifies the elevation rotation (Horizontal line axis)</li>
+	 * 	<li>Y-Axis == Yaw: Identifies where you are looking (Vertical line axis)</li>
+	 * 	<li>Z-Axis == Roll: It's the one facing you (The 3D line)</li>
+	 * </ul>
+	 *
+	 * @param origin The origin that the calculations will use.
+	 * @param xOffset The offset of the point at the local X-Axis of this turret.
+	 * @param yOffset The offset of the point at the local Y-Axis of this turret.
+	 * @param zOffset The offset of the point at the local Z-Axis of this turret.
+	 * @param includePitch Whether to include the pitch rotation in the calculations or not.
+	 *
+	 * @return Vec3d the relative position of this point, assuming that the origin of the offset is at <b>[0, 0, 0]</b>
+	 */
+	public Vec3d getRelativePosFrom(Vec3d origin, double xOffset, double yOffset, double zOffset, boolean includePitch) {
+		Vec3d rotated = new Vec3d(xOffset, yOffset, zOffset);
+
+		if (includePitch) {
+			float pitchRad = -this.getTrackedPitch() * (float) (Math.PI / 180.0);
+			rotated = rotated.rotateX(pitchRad);
+		}
+
+		float yawRad = -this.getHeadYaw() * (float) (Math.PI / 180.0);
+		rotated = rotated.rotateY(yawRad);
+
+		return origin.add(rotated);
+	}
+
+	/**
 	 * Identifies the position of a point relative to this turret's rotation and
 	 * {@link #getEyePos() eye position}.
 	 * For reference:
@@ -1198,14 +1246,43 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 		return this.getRelativePos(offsets.getX(), offsets.getY(), offsets.getZ());
 	}
 
+	/**
+	 * Identifies the position of a point relative to this turret's rotation and
+	 * provided origin.
+	 * <br><br>
+	 * For reference:
+	 * <ul>
+	 * 	<li>X-Axis == Pitch: Identifies the elevation rotation (Horizontal line axis)</li>
+	 * 	<li>Y-Axis == Yaw: Identifies where you are looking (Vertical line axis)</li>
+	 * 	<li>Z-Axis == Roll: It's the one facing you (The 3D line)</li>
+	 * </ul>
+	 *
+	 * @param origin The origin that the calculations will use.
+	 * @param offsets The offsets of the point at the local X, Y, and Z-Axis of this turret.
+	 * @param includePitch Whether to include the pitch rotation in the calculations or not.
+	 *
+	 * @return Vec3d the relative position of this point, assuming that the origin of the offset is at <b>[0, 0, 0]</b>
+	 */
+	public Vec3d getRelativePosFrom(Vec3d origin, Vec3d offsets, boolean includePitch) {
+		return this.getRelativePosFrom(origin, offsets.getX(), offsets.getY(), offsets.getZ(), includePitch);
+	}
+
 	@Override
 	public int getMaxLookPitchChange() {
 		return 90;
 	}
 
+	public int getMinLookPitchChange() {
+		return -this.getMaxLookPitchChange();
+	}
+
 	@Override
 	public int getMaxHeadRotation() {
 		return 360;
+	}
+
+	public int getMinHeadRotation() {
+		return -this.getMaxHeadRotation();
 	}
 
 	@Override

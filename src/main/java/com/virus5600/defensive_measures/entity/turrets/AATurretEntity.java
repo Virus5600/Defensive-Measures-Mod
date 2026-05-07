@@ -4,6 +4,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.ai.goal.ActiveTargetGoal;
 import net.minecraft.entity.attribute.DefaultAttributeContainer;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.damage.DamageSource;
@@ -14,60 +15,68 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
 import com.virus5600.defensive_measures.entity.ModEntities;
 import com.virus5600.defensive_measures.entity.TurretMaterial;
 import com.virus5600.defensive_measures.entity.ai.goal.ProjectileAttackGoal;
 import com.virus5600.defensive_measures.item.ModItems;
 import com.virus5600.defensive_measures.particle.ModParticles;
+import com.virus5600.defensive_measures.registry.tag.ModEntityTypeTags;
 import com.virus5600.defensive_measures.sound.ModSoundEvents;
 
-import java.util.HashMap;
-import java.util.Map;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
- * Represents the Cannon Turret entity.
+ * Represents the Anti-Air (AA) Turret entity.
  * <br><br>
- * A Cannon Turret is a metal turret that shoots cannonballs at enemies. It has medium range and
- * deals a good amount of damage while dealing a good amount of damage. Albeit the longer range and
- * higher damage, the cannon turret has a longer cooldown compared to the other turrets, but with
- * its AoE damage, it can deal with multiple enemies at once.
+ * An Anti-Air Turret, or in short AA Turret, is a metal turret that shoots flak at flying enemies.
+ * However, with the developer modeling the AA Turret using the Flak 88 as a reference, the
+ * developer plans to also have the AA Turret able to target ground targets in the future.
+ * <br><br>
+ * The AA Turrets has very long ranges to accommodate the targeting of flying enemies who are mostly
+ * flying 64 blocks or more away from the ground. It deals an AoE damage capable of downing flying
+ * targets easily on direct hits while severely wounding them when the round explodes near the
+ * targets. Despite the long range, however, the AA Turret has a slow rate of fire but has increased
+ * accuracy compared to other turrets, making it a specialized turret for dealing airborne targets.
  * <hr/>
  * <b>Attributes:</b>
  * <ul>
- *     <li><b>Health:</b> 50</li>
- *     <li><b>Base Damage:</b> 10.0</li>
+ *     <li><b>Health:</b> 100</li>
+ *     <li><b>Base Damage:</b> 15.0</li>
  *     <li><b>Base Pierce Level:</b> 0</li>
- *     <li><b>Attack Cooldown:</b> 5 seconds</li>
- *     <li><b>Attack Range:</b> 24 blocks</li>
+ *     <li><b>Attack Cooldown:</b> 10 seconds</li>
+ *     <li><b>Attack Range:</b> 96 blocks</li>
  *     <li><b>X Firing Arc:</b> ±360°</li>
- *     <li><b>Y Firing Arc:</b> ±30°</li>
- *     <li><b>Armor:</b> 3</li>
- *     <li><b>Armor Toughness:</b> 2</li>
+ *     <li><b>Y Firing Arc:</b> 0 to +90°</li>
+ *     <li><b>Armor:</b> 2</li>
+ *     <li><b>Armor Toughness:</b> 1</li>
  * </ul>
  *
  * @see TurretEntity
  *
- * @since 1.0.0
+ * @since 1.1.0
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
- * @version 1.1.0
+ * @version 1.0.0
  */
-public class CannonTurretEntity extends TurretEntity {
+public class AATurretEntity extends TurretEntity {
 	/**
 	 * Defines how many seconds the cannon should wait before shooting again.
-	 * The time is calculated in ticks and by default, it's 5 seconds <b>(20 ticks times 5 seconds)</b>.
+	 * The time is calculated in ticks and by default, it's 10 seconds <b>(20 ticks times 10 seconds)</b>.
 	 */
-	private static final int TOTAL_ATT_COOLDOWN = 20 * 5;
-	private static final Map<Offsets, List<Vec3d>> OFFSETS;
+	private static final int TOTAL_ATT_COOLDOWN = 20 * 10;
+	private static final Vec3d HINGE_POS;
+	private static final List<Vec3d> BARRELS;
 	private static final Map<Item, SoundEvent> HEAL_SOUNDS;
 	private static final double[] DAMAGE;
 	private static final byte[] PIERCE_LEVELS;
@@ -83,8 +92,8 @@ public class CannonTurretEntity extends TurretEntity {
 	// //////////// //
 	// CONSTRUCTORS //
 	// //////////// //
-	public CannonTurretEntity(EntityType<? extends MobEntity> entityType, World world) {
-		super(entityType, world, TurretMaterial.METAL, ModEntities.CANNONBALL, ModItems.CANNON_TURRET);
+	public AATurretEntity(EntityType<? extends TurretEntity> entityType, World world) {
+		super(entityType, world, TurretMaterial.METAL, ModEntities.CANNONBALL, ModItems.AA_TURRET);
 
 		this.setShootSound(ModSoundEvents.TURRET_CANNON_SHOOT);
 		this.setHealSound(ModSoundEvents.TURRET_REPAIR_METAL);
@@ -96,12 +105,30 @@ public class CannonTurretEntity extends TurretEntity {
 	// INITIALIZERS //
 	// //////////// //
 	@Override
-	protected void initGoals() {
+	public void initGoals() {
 		// Goal instances
-		this.attackGoal = new ProjectileAttackGoal(this, 0, TOTAL_ATT_COOLDOWN, this.getMaxAttackRange(), this.getMinAttackRange());
+		this.attackGoal = new ProjectileAttackGoal(
+			this, 0,
+			TOTAL_ATT_COOLDOWN, this.getMaxAttackRange(), this.getMinAttackRange()
+		);
 
 		// Set the standard goals
 		super.initGoals();
+	}
+
+	@Override
+	protected ActiveTargetGoal<?> getActiveTargetGoal() {
+		return new ActiveTargetGoal<>(
+			this, MobEntity.class, 80,
+			true, false,
+			this::targetPredicate
+		);
+	}
+
+	@Override
+	protected boolean targetPredicate(LivingEntity target, ServerWorld world) {
+		return this.attackGoal.isWithinRotationLimit(target) &&
+			target.getType().isIn(ModEntityTypeTags.FLYING_HOSTILES);
 	}
 
 	@Override
@@ -111,12 +138,12 @@ public class CannonTurretEntity extends TurretEntity {
 	}
 
 	public static @NotNull DefaultAttributeContainer.Builder setAttributes() {
-		TurretEntity.setTurretMaxHealth(50);
-		TurretEntity.setTurretMaxRange(24 + ModEntities.CANNON_TURRET.getDimensions().eyeHeight());
+		TurretEntity.setTurretMaxHealth(100);
+		TurretEntity.setTurretMaxRange(96 + ModEntities.AA_TURRET.getDimensions().eyeHeight());
 
 		return TurretEntity.setAttributes()
-			.add(EntityAttributes.ARMOR, 3)
-			.add(EntityAttributes.ARMOR_TOUGHNESS, 2);
+			.add(EntityAttributes.ARMOR, 2)
+			.add(EntityAttributes.ARMOR_TOUGHNESS, 1);
 	}
 
 	// /////////////// //
@@ -129,11 +156,12 @@ public class CannonTurretEntity extends TurretEntity {
 			.distanceTo(target.getEntityPos());
 
 		TurretProjectileVelocity velocityData = TurretProjectileVelocity.init(this)
-			.setPower(1.375f)
+			.setPower(1.75f)
 			.setVelocity(target)
-			.setUpwardVelocityMultiplier(dist * 0.1625f);
+			.setUpwardVelocityMultiplier(dist * 0.125f)
+			.setUncertainty(0.025f);
 
-		super.shootAt(velocityData);
+		super.shoot(velocityData);
 	}
 
 	@Override
@@ -147,64 +175,33 @@ public class CannonTurretEntity extends TurretEntity {
 		return super.interactMob(player, hand);
 	}
 
-	@Override
-	public void tick() {
-		super.tick();
-
-		// Client Side
-		if (this.getEntityWorld().isClient()) {
-			this.updateAnimations();
-		}
-		// Server Side
-		else {
-			int updateCountdownTicks = this.attackGoal.getUpdateCountdownTicks(),
-				afterAttackTick = 5,
-				beforeAttackTick = TOTAL_ATT_COOLDOWN - afterAttackTick;
-			boolean isCharging = updateCountdownTicks > afterAttackTick && updateCountdownTicks < beforeAttackTick;
-
-			this.setTrackedLockedButNotAttacking(isCharging);
-		}
-	}
-
 	// /////////////////// //
 	// GETTERS AND SETTERS //
 	// /////////////////// //
 
-	@Override
-	public int getMaxLookPitchChange() {
-		return 30;
+	@Override @Nullable
+	protected SoundEvent getHurtSound(DamageSource src) {
+		return ModSoundEvents.TURRET_HURT_METAL;
 	}
 
-	@Nullable
-	@Override
-	protected SoundEvent getHurtSound(DamageSource source) {
-		return ModSoundEvents.TURRET_CANNON_HURT;
-	}
-
-	@Nullable
-	@Override
+	@Override @Nullable
 	protected SoundEvent getDeathSound() {
-		return ModSoundEvents.TURRET_CANNON_DESTROYED;
+		return ModSoundEvents.TURRET_ANTI_AIR_DESTROYED;
+	}
+
+	@Override
+	public int getMinLookPitchChange() {
+		return 0;
 	}
 
 	@Override
 	public ItemStack getEntityItem() {
-		return new ItemStack(ModItems.CANNON_TURRET);
+		return new ItemStack(ModItems.AA_TURRET);
 	}
 
 	@Override
 	public SoundEvent getEntityRemoveSound() {
 		return ModSoundEvents.TURRET_REMOVED_METAL;
-	}
-
-	@Override
-	public SoundEvent getHealSound() {
-		return ModSoundEvents.TURRET_REPAIR_METAL;
-	}
-
-	@Override
-	public float getMinAttackRange() {
-		return 3f;
 	}
 
 	// //////////////////////// //
@@ -215,14 +212,30 @@ public class CannonTurretEntity extends TurretEntity {
 
 	/**
 	 * {@inheritDoc}
-	 * @see {@code CannonTurretAnimation#ANIM_CANNON_DEATH}
+	 * @see {@code AATurretAnimation#ANIM_AA_TURRET_DEATH}
 	 */
 	protected int getDeathAnimDuration() {
-		return (int) (1F * 20);
+		return (int) (1.5F * 20);
 	}
 
 	protected List<Vec3d> getTurretProjectileSpawn() {
-		return OFFSETS.get(Offsets.BARREL);
+		List<Vec3d> barrels = new ArrayList<>();
+
+		for (Vec3d barrel : BARRELS) {
+			Vec3d barrelOrigin = this.getRelativePosFrom(
+				this.getEyePos(), HINGE_POS,
+				false
+			);
+
+			barrels.add(
+				this.getRelativePosFrom(
+					barrelOrigin, barrel,
+					true
+				)
+			);
+		}
+
+		return barrels;
 	}
 
 	public double getProjectileDamage() {
@@ -241,50 +254,27 @@ public class CannonTurretEntity extends TurretEntity {
 	// OVERRIDABLES //
 	// //////////// //
 
-	@Environment(EnvType.CLIENT)
-	@Override
+	@Environment(EnvType.CLIENT) @Override
 	protected void updateAnimations() {
 		// Calls all the previous animation logics first before handling
 		// particle logic
 		super.updateAnimations();
 
-		// Set variables that will be used for the logic
-		boolean isLockedButNotAttacking = this.getTrackedLockedButNotAttacking();
+		// Set variables that will be used for logic
 		boolean isShooting = this.getTrackedShooting();
 
-		// Handles Fuse particle for when locked but not yet shooting
-		if (!isShooting && isLockedButNotAttacking) {
-			Vec3d fusePos = this.getRelativePos(
-				OFFSETS.get(Offsets.FUSE).getFirst()
-			);
-
-			this.getEntityWorld()
-				.addParticleClient(
-					ModParticles.CANNON_FUSE,
-					fusePos.getX(), fusePos.getY(), fusePos.getZ(),
-					0, 0.225, -0.5
-				);
-		}
-
-		// Handles the Flash particle for when the cannon shoots
+		// Handles the Flash particle for when the AA shoots
 		if (isShooting) {
 			Vec3d barrelPos = this.getRelativePos(this.getCurrentBarrel(false)),
-				velocityModifier = this.getRelativePos(0, 0, 1.5).subtract(this.getEyePos());
+				velMod = this.getRelativePos(0, 0, 1.5).subtract(this.getEyePos());
 
 			this.getEntityWorld()
 				.addParticleClient(
 					ModParticles.CANNON_FLASH,
 					barrelPos.getX(), barrelPos.getY(), barrelPos.getZ(),
-					velocityModifier.getX(), velocityModifier.getY(), velocityModifier.getZ()
+					velMod.getX(), velMod.getY(), velMod.getZ()
 				);
 		}
-	}
-
-	// /////////////////// //
-	// LOCAL CLASSES/ENUMS //
-	// /////////////////// //
-	public enum Offsets {
-		BARREL, FUSE
 	}
 
 	// ///////////////// //
@@ -304,19 +294,16 @@ public class CannonTurretEntity extends TurretEntity {
 			2
 		};
 
-		OFFSETS = Map.of(
-			Offsets.BARREL, List.of(
-				new Vec3d(0, 0, 0.875)
-			),
-			Offsets.FUSE, List.of(
-				new Vec3d(0, 0.25, -0.55)
-			)
+		HINGE_POS = new Vec3d(0, 1, -0.53125);
+
+		BARRELS = List.of(
+			new Vec3d(0, 0, 2.5)
 		);
 
 		HEAL_SOUNDS = Map.of(
-			Items.IRON_NUGGET, ModSoundEvents.TURRET_REPAIR_METAL,
-			Items.IRON_INGOT, ModSoundEvents.TURRET_REPAIR_METAL,
-			Items.IRON_BLOCK, ModSoundEvents.TURRET_REPAIR_METAL
+				Items.IRON_NUGGET, ModSoundEvents.TURRET_REPAIR_METAL,
+				Items.IRON_INGOT, ModSoundEvents.TURRET_REPAIR_METAL,
+				Items.IRON_BLOCK, ModSoundEvents.TURRET_REPAIR_METAL
 		);
 
 		healables = Map.of(

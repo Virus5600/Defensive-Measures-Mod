@@ -26,16 +26,19 @@ public class ModEntityRenderers {
 		// TURRETS //
 		// /////// //
 
-		// v1.0.0
+		// v1.0.0-beta
 		EntityRendererFactories.register(ModEntities.CANNON_TURRET, CannonTurretRenderer::new);
 		EntityRendererFactories.register(ModEntities.BALLISTA_TURRET, BallistaTurretRenderer::new);
 		EntityRendererFactories.register(ModEntities.MG_TURRET, MGTurretRenderer::new);
+
+		// v1.1.0-beta
+		EntityRendererFactories.register(ModEntities.AA_TURRET, AATurretRenderer::new);
 
 		// /////////// //
 		// PROJECTILES //
 		// /////////// //
 
-		// v1.0.0
+		// v1.0.0-beta
 		EntityRendererFactories.register(ModEntities.CANNONBALL, CannonballRenderer::new);
 		EntityRendererFactories.register(ModEntities.BALLISTA_BOLT, BallistaBoltRenderer::new);
 		EntityRendererFactories.register(ModEntities.MG_BULLET, MGBulletRenderer::new);

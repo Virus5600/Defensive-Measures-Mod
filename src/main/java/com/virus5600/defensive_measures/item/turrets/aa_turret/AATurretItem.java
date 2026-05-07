@@ -1,4 +1,4 @@
-package com.virus5600.defensive_measures.item.turrets.mg_turret;
+package com.virus5600.defensive_measures.item.turrets.aa_turret;
 
 import net.minecraft.component.type.TooltipDisplayComponent;
 import net.minecraft.entity.EntityType;
@@ -9,7 +9,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Rarity;
 
-import com.virus5600.defensive_measures.entity.turrets.MGTurretEntity;
+import com.virus5600.defensive_measures.entity.turrets.AATurretEntity;
 import com.virus5600.defensive_measures.entity.turrets.TurretEntity;
 import com.virus5600.defensive_measures.item.turrets.TurretItem;
 
@@ -17,19 +17,19 @@ import java.lang.reflect.Type;
 import java.util.function.Consumer;
 
 /**
- * The item that spawns the {@link MGTurretEntity MG Turret}.
+ * The item thatspawns the {@link AATurretEntity AA Turret}.
  *
- * @since 1.0.0-beta
+ * @since 1.1.0-beta
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
  * @version 1.0.0
  */
-public class MGTurretItem extends TurretItem {
-	public MGTurretItem(EntityType<? extends MobEntity> type, net.minecraft.item.Item.Settings settings) {
+public class AATurretItem extends TurretItem {
+	public AATurretItem(EntityType<? extends MobEntity> type, net.minecraft.item.Item.Settings settings) {
 		super(
 			type,
 			settings
 				.maxCount(16)
-				.rarity(Rarity.UNCOMMON)
+				.rarity(Rarity.RARE)
 		);
 	}
 
@@ -39,17 +39,22 @@ public class MGTurretItem extends TurretItem {
 
 		for (int i = 1; i <= 3; i++) {
 			textConsumer.accept(
-				Text.translatable("itemTooltip.dm.mg_turret.line" + i)
+				Text.translatable("itemTooltip.dm.aa_turret.line" + i)
 					.formatted(Formatting.DARK_AQUA)
 			);
 		}
+
+		textConsumer.accept(
+			Text.translatable("itemTooltip.dm.aa_turret.line.warning")
+				.formatted(Formatting.RED)
+		);
 	}
 
 	public float getTurretMaxHealth() {
 		float maxHealth = 0;
 		Type superClass = this.type.getClass().getGenericSuperclass();
 		if (superClass instanceof TurretEntity) {
-			maxHealth = ((MGTurretEntity) superClass).getMaxHealth();
+			maxHealth = ((AATurretEntity) superClass).getMaxHealth();
 		}
 
 		return maxHealth;

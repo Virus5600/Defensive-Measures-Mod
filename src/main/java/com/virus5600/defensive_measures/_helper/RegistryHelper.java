@@ -73,7 +73,15 @@ public final class RegistryHelper {
 		return Items.register(block);
 	}
 
-	// Item Tag Registry
+	// Tag Registry
+	public static TagKey<Block> createBlockTagKey(String path) {
+		return TagKey.of(RegistryKeys.BLOCK, Identifier.of(DefensiveMeasures.MOD_ID, path));
+	}
+
+	public static TagKey<EntityType<?>> createEntityTypeTagKey(String path) {
+		return TagKey.of(RegistryKeys.ENTITY_TYPE, Identifier.of(DefensiveMeasures.MOD_ID, path));
+	}
+
 	public static TagKey<Item> createItemTagKey(String path) {
 		return TagKey.of(RegistryKeys.ITEM, Identifier.of(DefensiveMeasures.MOD_ID, path));
 	}

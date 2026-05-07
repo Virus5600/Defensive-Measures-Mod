@@ -1,4 +1,4 @@
-package com.virus5600.defensive_measures.item;
+package com.virus5600.defensive_measures.registry.tag;
 
 import net.minecraft.item.Item;
 import net.minecraft.registry.tag.TagKey;

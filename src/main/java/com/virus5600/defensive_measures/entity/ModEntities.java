@@ -46,6 +46,15 @@ public class ModEntities {
 			.eyeHeight(0.4275F)
 	);
 
+	// v1.1.0-beta
+	public static final EntityType<AATurretEntity> AA_TURRET = RegistryHelper.registerEntity(
+		"aa_turret",
+		Builder.
+			create(AATurretEntity::new, SpawnGroup.MISC)
+			.dimensions(2F, 2F)
+			.eyeHeight(0.96875F)
+	);
+
 	// PROJECTILES //
 	// v1.0.0-beta
 	public static final EntityType<CannonballEntity> CANNONBALL = RegistryHelper.registerEntity(
@@ -90,5 +99,8 @@ public class ModEntities {
 		FabricDefaultAttributeRegistry.register(ModEntities.CANNON_TURRET, CannonTurretEntity.setAttributes());
 		FabricDefaultAttributeRegistry.register(ModEntities.BALLISTA_TURRET, BallistaTurretEntity.setAttributes());
 		FabricDefaultAttributeRegistry.register(ModEntities.MG_TURRET, MGTurretEntity.setAttributes());
+
+		// v1.1.0-beta
+		FabricDefaultAttributeRegistry.register(ModEntities.AA_TURRET, AATurretEntity.setAttributes());
 	}
 }

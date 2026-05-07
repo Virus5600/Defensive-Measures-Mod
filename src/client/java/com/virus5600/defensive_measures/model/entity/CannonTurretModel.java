@@ -6,7 +6,7 @@ import com.virus5600.defensive_measures.animations.entity.CannonTurretAnimation;
 import com.virus5600.defensive_measures.renderer.entity.state.BaseTurretRenderState;
 
 public class CannonTurretModel extends BaseTurretModel<BaseTurretRenderState> {
-	protected final static String[] TEXTURES = new String[] {
+	protected final static String[] TEXTURES = new String[]{
 		"cannon_turret.png"
 	};
 
@@ -26,6 +26,7 @@ public class CannonTurretModel extends BaseTurretModel<BaseTurretRenderState> {
 	public static TexturedModelData getTexturedModelData() {
 		ModelData modelData = new ModelData();
 		ModelPartData modelPartData = modelData.getRoot();
+
 		ModelPartData base = modelPartData.addChild("base", ModelPartBuilder.create().uv(0, 47).cuboid(-8.0F, -1.0F, -8.0F, 16.0F, 1.0F, 16.0F, new Dilation(0.0F)), ModelTransform.origin(0.0F, 24.0F, 0.0F));
 
 		ModelPartData stand = modelPartData.addChild("stand", ModelPartBuilder.create().uv(8, 33).cuboid(-6.0F, -1.5F, -6.0F, 12.0F, 1.0F, 12.0F, new Dilation(0.0F)), ModelTransform.origin(0.0F, 23.5F, 0.0F));

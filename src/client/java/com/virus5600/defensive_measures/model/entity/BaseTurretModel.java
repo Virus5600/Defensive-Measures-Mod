@@ -142,7 +142,10 @@ public abstract class BaseTurretModel<S extends BaseTurretRenderState> extends B
 
 		// HEAD ANGLE HANDLING
 		float headYaw = state.relativeHeadYaw + state.bodyYaw + 180;
-		this.setHeadAngles(headYaw, state.pitch);
+		float headPitch = state.idleAnimationState.isRunning() ?
+			this.getDefaultHeadPitch() : state.pitch;
+
+		this.setHeadAngles(headYaw, headPitch);
 
 		// ANIMATION HANDLING
 		if (this.shootAnim != null) {
@@ -165,12 +168,31 @@ public abstract class BaseTurretModel<S extends BaseTurretRenderState> extends B
 	protected void setHeadAngles(float headYaw, float headPitch) {
 		headPitch = MathHelper.clamp(
 			headPitch,
-			this.getMinPitch(),
-			this.getMaxPitch()
+			-this.getMaxPitch(),
+			-this.getMinPitch()
 		);
 
 		this.stand.yaw = headYaw * ((float)Math.PI / 180F);
 		this.head.pitch = headPitch * ((float)Math.PI / 180F);
+	}
+
+	// /////////////////// //
+	// OVERRIDABLE METHODS //
+	// /////////////////// //
+
+	/**
+	 * Defines the default head pitch the turret uses. This is to render the model
+	 * with their guns in their resting pose. A good example is the {@link AATurretModel} which
+	 * has a 30 degree tilt upward when in rest, allowing the turret to portray the constant state
+	 * of monitoring the air for targets.
+	 *
+	 * @return The default head pitch in degrees. By default, this is 0, meaning the turret will be
+	 * rendered with its gun parallel to the ground when in rest.
+	 *
+	 * @see AATurretModel#getDefaultHeadPitch()
+	 */
+	protected float getDefaultHeadPitch() {
+		return 0;
 	}
 
 	// //////////////// //

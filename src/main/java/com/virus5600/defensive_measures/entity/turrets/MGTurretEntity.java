@@ -147,8 +147,7 @@ public class MGTurretEntity extends TurretEntity {
 		return ModSoundEvents.TURRET_MG_HURT;
 	}
 
-	@Nullable
-	@Override
+	@Override @Nullable
 	protected SoundEvent getDeathSound() {
 		return ModSoundEvents.TURRET_MG_DESTROYED;
 	}

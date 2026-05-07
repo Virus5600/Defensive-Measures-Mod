@@ -19,7 +19,7 @@ import java.util.function.Consumer;
 /**
  * The item that spawns the {@link BallistaTurretEntity Ballista Turret}.
  *
- * @since 1.0.0
+ * @since 1.0.0-beta
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
  * @version 1.0.0
  */
@@ -28,8 +28,8 @@ public class BallistaTurretItem extends TurretItem {
 		super(
 			type,
 			settings
-				.maxCount(16)			// MAX STACK SIZE
-				.rarity(Rarity.RARE)	// RARITY
+				.maxCount(16)
+				.rarity(Rarity.UNCOMMON)
 		);
 	}
 

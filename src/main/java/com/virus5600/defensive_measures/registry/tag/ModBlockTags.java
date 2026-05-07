@@ -1,5 +1,6 @@
 package com.virus5600.defensive_measures.registry.tag;
 
+import com.virus5600.defensive_measures._helper.RegistryHelper;
 import net.minecraft.block.Block;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.tag.TagKey;
@@ -9,23 +10,15 @@ import com.virus5600.defensive_measures.DefensiveMeasures;
 
 public class ModBlockTags {
 	// Categories
-	public static final TagKey<Block> DIRT = createTag("dirt");
-	public static final TagKey<Block> GLASS = createTag("glass");
-	public static final TagKey<Block> GRAINY = createTag("grainy");
-	public static final TagKey<Block> GREENERY = createTag("greenery");
-	public static final TagKey<Block> METAL = createTag("metal");
-	public static final TagKey<Block> STONE = createTag("stone");
-	public static final TagKey<Block> TRAPS = createTag("traps");
-	public static final TagKey<Block> WOOD = createTag("wood");
+	public static final TagKey<Block> DIRT = RegistryHelper.createBlockTagKey("dirt");
+	public static final TagKey<Block> GLASS = RegistryHelper.createBlockTagKey("glass");
+	public static final TagKey<Block> GRAINY = RegistryHelper.createBlockTagKey("grainy");
+	public static final TagKey<Block> GREENERY = RegistryHelper.createBlockTagKey("greenery");
+	public static final TagKey<Block> METAL = RegistryHelper.createBlockTagKey("metal");
+	public static final TagKey<Block> STONE = RegistryHelper.createBlockTagKey("stone");
+	public static final TagKey<Block> TRAPS = RegistryHelper.createBlockTagKey("traps");
+	public static final TagKey<Block> WOOD = RegistryHelper.createBlockTagKey("wood");
 
 	// Groups
-	public static final TagKey<Block> ELECTRIC_FENCE = createTag("electric_fence");
-
-
-	private static TagKey<Block> createTag(String name) {
-		return TagKey.of(
-			RegistryKeys.BLOCK,
-			Identifier.of(DefensiveMeasures.MOD_ID, name)
-		);
-	}
+	public static final TagKey<Block> ELECTRIC_FENCE = RegistryHelper.createBlockTagKey("electric_fence");
 }
