@@ -20,13 +20,14 @@ public abstract class BaseTurretRenderer<
 
 	private final Supplier<S> renderStateFactory;
 	private boolean deathRotEnabled = false;
+	private boolean lookControlOnDeath = false;
 
 	public BaseTurretRenderer(
 		EntityRendererFactory.Context context,
 		M entityModel,
 		Supplier<S> renderStateFactory
 	) {
-		this(context, entityModel, 0.5F, renderStateFactory);;
+		this(context, entityModel, 0.5F, renderStateFactory);
 	}
 
 	public BaseTurretRenderer(
@@ -64,8 +65,17 @@ public abstract class BaseTurretRenderer<
 		turretRenderState.hasTarget = turretEntity.getTrackedLockedButNotAttacking();
 		turretRenderState.shooting = turretEntity.getTrackedShooting();
 
-
 		turretRenderState.hurt = turretEntity.hurtTime > 0 && turretEntity.isAlive();
+
+		if (!this.lookControlOnDeath && !turretEntity.isAlive()) {
+			float idlePitch = turretEntity.getPitch();
+
+			if (turretEntity.getIdlePitch().isPresent()) {
+				idlePitch = turretEntity.getIdlePitch().get();
+			}
+
+			turretRenderState.pitch = idlePitch;
+		}
 	}
 
 	@Override
@@ -88,6 +98,7 @@ public abstract class BaseTurretRenderer<
 
 	// DEATH RELATED //
 
+	// DEATH ROTATION
 	protected void setDeathRotation(boolean deathRotationEnabled) {
 		this.deathRotEnabled = deathRotationEnabled;
 	}
@@ -107,5 +118,23 @@ public abstract class BaseTurretRenderer<
 
 	protected boolean isDeathRotationEnabled() {
 		return this.deathRotEnabled;
+	}
+
+	// LOOK CONTROL
+	protected void enableLookControlOnDeath() {
+		this.lookControlOnDeath = true;
+	}
+
+	protected void disableLookControlOnDeath() {
+		this.lookControlOnDeath = false;
+	}
+
+	protected boolean toggleLookControlOnDeath() {
+		this.lookControlOnDeath = !this.lookControlOnDeath;
+		return this.lookControlOnDeath;
+	}
+
+	protected boolean isLookControlOnDeathEnabled() {
+		return this.lookControlOnDeath;
 	}
 }

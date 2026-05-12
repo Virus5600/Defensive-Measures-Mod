@@ -12,4 +12,6 @@ TODO: TurretEntity
 		- Properly calculate the parabolic trajectory (low priority) - Apparently, it was because of the "acceleration" modifier in the "ExplosiveProjectileEntity" class. Fuck.
 
 TODO:
-- Implement Anti-Air Turret (and projectile)
+- Implement Death Animation FX
+- Implement AA Turret recipe, icon, and recipe related advancements
+- Add tags to the mod tags

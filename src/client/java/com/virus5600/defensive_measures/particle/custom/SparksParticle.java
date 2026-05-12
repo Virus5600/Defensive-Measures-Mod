@@ -9,24 +9,24 @@ import net.minecraft.client.particle.SpriteProvider;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.particle.SimpleParticleType;
 
-import com.virus5600.defensive_measures.particle.custom.emitters.CannonFlash;
+import com.virus5600.defensive_measures.particle.custom.emitters.CannonFlashEmitter;
 import net.minecraft.util.math.random.Random;
 
 /**
  * Defines the particles emitted by certain turrets that creates sparks when they
  * shoot. This particle is the base particle for some spark-based particles such
- * as the {@link CannonFlash Cannon Flash Emitter}.
+ * as the {@link CannonFlashEmitter Cannon Flash Emitter}.
  *
- * @since 1.0.0
+ * @since 1.0.0-beta
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
  * @version 1.0.0
  */
 @Environment(EnvType.CLIENT)
-public class Sparks extends BillboardParticle {
+public class SparksParticle extends BillboardParticle {
 	protected boolean isSuspended = false;
 
 	// CONSTRUCTORS //
-	public Sparks(ClientWorld level, double x, double y, double z, SpriteProvider spriteSet, double xd, double yd, double zd) {
+	public SparksParticle(ClientWorld level, double x, double y, double z, SpriteProvider spriteSet, double xd, double yd, double zd) {
 		super(level, x, y, z, xd, yd, zd, spriteSet.getFirst());
 
 		this.velocityMultiplier = 1f;
@@ -44,7 +44,7 @@ public class Sparks extends BillboardParticle {
 		this.blue = 1f;
 	}
 
-	/// METHODS ///
+	// METHODS //
 	// PRIVATE
 	private void fadeOut() {
 		// Turns the particle black (Simulates tar color)
@@ -112,7 +112,7 @@ public class Sparks extends BillboardParticle {
 		}
 
 		public Particle createParticle(SimpleParticleType type, ClientWorld level, double x, double y, double z, double xd, double yd, double zd, Random random) {
-			return new Sparks(level, x, y, z, this.sprites, xd, yd, zd);
+			return new SparksParticle(level, x, y, z, this.sprites, xd, yd, zd);
 		}
 	}
 
@@ -125,7 +125,7 @@ public class Sparks extends BillboardParticle {
 		}
 
 		public Particle createParticle(SimpleParticleType type, ClientWorld level, double x, double y, double z, double xd, double yd, double zd, Random random) {
-			Sparks particle = new Sparks(level, x, y, z, this.sprites, xd, yd, zd);
+			SparksParticle particle = new SparksParticle(level, x, y, z, this.sprites, xd, yd, zd);
 			particle.isSuspended = true;
 			particle.gravityStrength = 0.0f;
 			return particle;

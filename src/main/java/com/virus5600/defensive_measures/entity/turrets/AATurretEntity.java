@@ -36,6 +36,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Represents the Anti-Air (AA) Turret entity.
@@ -93,9 +94,9 @@ public class AATurretEntity extends TurretEntity {
 	// CONSTRUCTORS //
 	// //////////// //
 	public AATurretEntity(EntityType<? extends TurretEntity> entityType, World world) {
-		super(entityType, world, TurretMaterial.METAL, ModEntities.CANNONBALL, ModItems.AA_TURRET);
+		super(entityType, world, TurretMaterial.METAL, ModEntities.FLAK_PROJECTILE, ModItems.AA_TURRET);
 
-		this.setShootSound(ModSoundEvents.TURRET_CANNON_SHOOT);
+		this.setShootSound(ModSoundEvents.TURRET_ANTI_AIR_SHOOT);
 		this.setHealSound(ModSoundEvents.TURRET_REPAIR_METAL);
 		this.addHealables(healables);
 		this.addEffectSource(effectSource);
@@ -152,16 +153,12 @@ public class AATurretEntity extends TurretEntity {
 
 	@Override
 	public void shootAt(LivingEntity target, float pullProgress) {
-		float dist = (float) getEntityPos()
-			.distanceTo(target.getEntityPos());
-
 		TurretProjectileVelocity velocityData = TurretProjectileVelocity.init(this)
-			.setPower(1.75f)
-			.setVelocity(target)
-			.setUpwardVelocityMultiplier(dist * 0.125f)
-			.setUncertainty(0.025f);
+			.setPower(5f)
+			.setUpwardVelocityMultiplier(0.1f)
+			.setVelocity(target);
 
-		super.shoot(velocityData);
+		super.shootAt(velocityData);
 	}
 
 	@Override
@@ -169,11 +166,8 @@ public class AATurretEntity extends TurretEntity {
 		super.tick();
 
 		if (this.getEntityWorld() instanceof ServerWorld world) {
-			this.setTrackedLockedButNotAttacking(this.getTarget() != null);
-
-			if (this.getTarget() == null) {
-				this.setPitch(-30);
-				this.setTrackedPitch(-30);
+			if (this.isDead()) {
+				System.out.println("Death Time: " + this.deathTime);
 			}
 		}
 	}
@@ -195,7 +189,7 @@ public class AATurretEntity extends TurretEntity {
 
 	@Override @Nullable
 	protected SoundEvent getHurtSound(DamageSource src) {
-		return ModSoundEvents.TURRET_HURT_METAL;
+		return ModSoundEvents.TURRET_ANTI_AIR_HURT;
 	}
 
 	@Override @Nullable
@@ -216,6 +210,15 @@ public class AATurretEntity extends TurretEntity {
 	@Override
 	public SoundEvent getEntityRemoveSound() {
 		return ModSoundEvents.TURRET_REMOVED_METAL;
+	}
+
+	/**
+	 * Sets the minimum attack range of the AA Turret to 8 blocks.
+	 *
+	 * @return The minimum attack range of the AA Turret, which is 8 blocks.
+	 */
+	public float getMinAttackRange() {
+		return 8f;
 	}
 
 	// //////////////////////// //
@@ -269,6 +272,10 @@ public class AATurretEntity extends TurretEntity {
 
 	public int getTotalAttCooldown() {
 		return TOTAL_ATT_COOLDOWN;
+	}
+
+	public Optional<Float> getIdlePitch() {
+		return Optional.of(-30f);
 	}
 
 	// //////////// //

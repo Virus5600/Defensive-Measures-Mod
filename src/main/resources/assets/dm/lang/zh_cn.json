@@ -30,6 +30,8 @@
 	"item.dm.mg_stand" : "机枪支架",
 	"item.dm.mg_turret" : "设置机枪塔",
 
+	"item.dm.aa_turret": "Place Anti-Air (AA) Turret",
+
 	"itemTooltip.dm.generic.health" : "Health: %s / %s",
 
 	"itemTooltip.dm.cannon_turret.line1" : "Range: 3-24 blocks",
@@ -44,10 +46,10 @@
 	"itemTooltip.dm.mg_turret.line2" : "Firing Arc: X: ±360° | Y: ±27.5°",
 	"itemTooltip.dm.mg_turret.line3" : "Reload Time: 0.15 seconds (burst) | 3.75 seconds (cooldown)",
 
-	"itemTooltip.dm.aa_turret.line1" : "Range: 96 blocks",
+	"itemTooltip.dm.aa_turret.line1" : "Range: 8-96 blocks",
 	"itemTooltip.dm.aa_turret.line2" : "Firing Arc: X: ±360° | Y: +90°",
 	"itemTooltip.dm.aa_turret.line3" : "Reload Time: 10 seconds",
-	"itemTooltip.dm.aa_turret.line.warning" : "Explodes on death (entity damage)",
+	"itemTooltip.dm.aa_turret.line.warning" : "Could explode on death (entity damage)",
 
 	"entity.dm.cannon_turret" : "炮塔",
 	"entity.dm.cannonball" : "炮弹",
@@ -57,6 +59,9 @@
 
 	"entity.dm.mg_turret" : "机枪塔",
 	"entity.dm.mg_bullet" : "机枪子弹",
+
+	"entity.dm.aa_turret": "Anti-Air Turret",
+	"entity.dm.flak_projectile": "Flak Projectile",
 
 	"death.attack.bolt_head" : "%1$s踩到了箭头陷阱",
 	"death.attack.bolt_head.player" : "%1$s在和与%2$s战斗时踩到了箭头陷阱",
@@ -75,6 +80,14 @@
 	"subtitles.turret.mg_turret.hurt" : "机枪塔：受损",
 	"subtitles.turret.mg_turret.destroyed" : "机枪塔：被摧毁",
 	"subtitles.turret.mg_turret.shoot" : "机枪塔：开火",
+
+	"subtitles.turret.anti_air.hurt" : "AA Turret damaged",
+	"subtitles.turret.anti_air.destroyed" : "AA Turret destroyed",
+	"subtitles.turret.anti_air.shoot" : "AA Turret shoots",
+
+	"tag.item.dm.turret_remover_repairable" : "Turret Remover Repairable",
+	"tag.item.dm.turret_removers" : "Turret Removers",
+	"tag.item.dm.turrets" : "Turrets",
 
 	"container.dm.turret_assembly_station": "Assembling",
 

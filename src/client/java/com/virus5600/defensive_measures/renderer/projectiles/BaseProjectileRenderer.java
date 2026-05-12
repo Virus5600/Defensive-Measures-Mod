@@ -1,5 +1,6 @@
 package com.virus5600.defensive_measures.renderer.projectiles;
 
+import com.virus5600.defensive_measures.entity.projectiles.ExplosiveProjectileEntity;
 import net.minecraft.client.render.OverlayTexture;
 import net.minecraft.client.render.RenderLayers;
 import net.minecraft.client.render.command.OrderedRenderCommandQueue;
@@ -53,6 +54,8 @@ public abstract class BaseProjectileRenderer<
 
 		state.pitch = entity.getLerpedPitch(tickProgress);
 		state.yaw = entity.getLerpedYaw(tickProgress);
+
+		state.pitch *= entity instanceof ExplosiveProjectileEntity ? -1 : 1;
 	}
 
 	@Override

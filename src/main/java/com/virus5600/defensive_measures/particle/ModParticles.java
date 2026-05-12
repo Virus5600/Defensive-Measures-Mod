@@ -22,9 +22,12 @@ public class ModParticles {
 	public static final SimpleParticleType SPARKS = register("sparks", false);
 	public static final SimpleParticleType SUSPENDED_SPARKS = register("suspended_sparks", false);
 	public static final SimpleParticleType CANNON_FUSE = register("cannon_fuse", true);
+	public static final SimpleParticleType FLAK = register("flak", true);
+	public static final SimpleParticleType FLAK_CLOUD = register("flak_cloud", true);
 
 	// EMITTERS
 	public static final SimpleParticleType CANNON_FLASH = register("cannon_flash", false);
+	public static final SimpleParticleType FLAK_EXPLOSION = register("flak_explosion", true);
 
 	private static SimpleParticleType register(String identifier, boolean shouldAlwaysSpawn) {
 		return Registry.register(

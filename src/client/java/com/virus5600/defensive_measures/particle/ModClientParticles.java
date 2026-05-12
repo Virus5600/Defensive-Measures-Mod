@@ -26,11 +26,14 @@ public class ModClientParticles {
 		ParticleFactoryRegistry registry = ParticleFactoryRegistry.getInstance();
 
 		// PARTICLES
-		registry.register(ModParticles.CANNON_FUSE, CannonFuse.Factory::new);
-		registry.register(ModParticles.SPARKS, Sparks.Factory::new);
-		registry.register(ModParticles.SUSPENDED_SPARKS, Sparks.SuspendedFactory::new);
+		registry.register(ModParticles.CANNON_FUSE, CannonFuseParticle.Factory::new);
+		registry.register(ModParticles.SPARKS, SparksParticle.Factory::new);
+		registry.register(ModParticles.SUSPENDED_SPARKS, SparksParticle.SuspendedFactory::new);
+		registry.register(ModParticles.FLAK, FlakParticle.Factory::new);
+		registry.register(ModParticles.FLAK_CLOUD, FlakCloudParticle.Factory::new);
 
 		// EMITTERS
-		registry.register(ModParticles.CANNON_FLASH, new CannonFlash.Factory());
+		registry.register(ModParticles.CANNON_FLASH, new CannonFlashEmitter.Factory());
+		registry.register(ModParticles.FLAK_EXPLOSION, new FlakExplosionEmitter.Factory());
 	}
 }

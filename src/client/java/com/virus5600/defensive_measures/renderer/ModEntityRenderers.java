@@ -42,5 +42,8 @@ public class ModEntityRenderers {
 		EntityRendererFactories.register(ModEntities.CANNONBALL, CannonballRenderer::new);
 		EntityRendererFactories.register(ModEntities.BALLISTA_BOLT, BallistaBoltRenderer::new);
 		EntityRendererFactories.register(ModEntities.MG_BULLET, MGBulletRenderer::new);
+
+		// v1.1.0-beta
+		EntityRendererFactories.register(ModEntities.FLAK_PROJECTILE, FlakProjectileRenderer::new);
 	}
 }

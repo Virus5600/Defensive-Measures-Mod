@@ -41,6 +41,9 @@ public class ModEntityModels {
 	public static final EntityModelLayer BALLISTA_BOLT = registerMain("ballista_bolt");
 	public static final EntityModelLayer MG_BULLET = registerMain("mg_bullet");
 
+	// v1.1.0-beta
+	public static final EntityModelLayer FLAK_PROJECTILE = registerMain("flak_projectile");
+
 	public static void registerEntityModels() {
 		DefensiveMeasures.LOGGER.info("REGISTERING ENTITY MODELS FOR {}...", DefensiveMeasures.MOD_NAME);
 
@@ -64,6 +67,9 @@ public class ModEntityModels {
 		EntityModelLayerRegistry.registerModelLayer(CANNONBALL, CannonballModel::getTexturedModelData);
 		EntityModelLayerRegistry.registerModelLayer(BALLISTA_BOLT, BallistaBoltModel::getTexturedModelData);
 		EntityModelLayerRegistry.registerModelLayer(MG_BULLET, MGBulletModel::getTexturedModelData);
+
+		// v1.1.0-beta
+		EntityModelLayerRegistry.registerModelLayer(FLAK_PROJECTILE, FlakProjectileModel::getTexturedModelData);
 	}
 
 	private static EntityModelLayer registerMain(String id) {
@@ -73,7 +79,7 @@ public class ModEntityModels {
 	private static EntityModelLayer register(String id, String layer) {
 		EntityModelLayer entityModelLayer = create(id, layer);
 		if (!LAYERS.add(entityModelLayer)) {
-			throw new IllegalStateException("Duplicate registration for " + String.valueOf(entityModelLayer));
+			throw new IllegalStateException("Duplicate registration for " + entityModelLayer);
 		} else {
 			return entityModelLayer;
 		}

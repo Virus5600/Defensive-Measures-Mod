@@ -1,6 +1,7 @@
 package com.virus5600.defensive_measures.entity.turrets;
 
 import com.virus5600.defensive_measures.entity.ai.control.TurretLookControl;
+import com.virus5600.defensive_measures.entity.projectiles.TurretProjectileEntity;
 import com.virus5600.defensive_measures.sound.ModSoundEvents;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -809,8 +810,6 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 				}
 			}
 
-			this.setTrackedPitch(this.getPitch());
-
 			// Adjusts the pitch when shooting
 			if (this.getTarget() != null) {
 				Vec3d velocity = TurretEntity.TurretProjectileVelocity
@@ -869,6 +868,20 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 					}
 				}
 			}
+
+			// Using the idle pitch
+			if (this.getIdlePitch().isPresent()) {
+				this.setTrackedLockedButNotAttacking(this.getTarget() != null);
+
+				float idlePitch = this.getIdlePitch().get();
+
+				if (this.getTarget() == null) {
+					this.setPitch(idlePitch);
+					this.setTrackedPitch(idlePitch);
+				}
+			}
+
+			this.setTrackedPitch(this.getPitch());
 		}
 	}
 
@@ -1889,13 +1902,23 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 			}
 
 			Vec3d pos = this.getRelativePos(this.getCurrentBarrel(true));
-			projectile.setPosition(pos);
-			projectile.setOwner(this);
+
+			if (projectile instanceof TurretProjectileEntity turretProjectile) {
+				turretProjectile.setSpawnPos(pos);
+			}
+			else {
+				projectile.setPosition(pos);
+				projectile.updateTrackedPosition(pos);
+			}
+
+			projectile.setPitch(this.getPitch());
 			this.setProjectileVelocity(projectile, velocityData);
+
+			projectile.setOwner(this);
 
 			this.playSound(this.getShootSound(), 1.0f, 1.0f / (this.getRandom().nextFloat() * 0.4f + 0.8f));
 			this.getEntityWorld().spawnEntity(projectile);
-//			System.out.println("[" + projectile.getName().getString() + "] Gravity: " + projectile.getFinalGravity());
+//			System.out.println("[" + projectile.getName().getString() + "] Gravity: " + projectile.getFinalGravity() + " | Velocity: " + projectile.getVelocity());
 		} catch (IllegalArgumentException | SecurityException e) {
 			DefensiveMeasures.printErr(e);
 		}
@@ -1947,6 +1970,20 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 	 */
 	public boolean isHeldInPlace() {
 		return true;
+	}
+
+	/**
+	 * An overridable method that determines the idle pitch of the turret. By default,
+	 * this returns an empty {@code Optional<Float>}, letting the turret look up and down on idle.
+	 * This can be overridden to make the turret look up or down when idle.
+	 * <br><br>
+	 * Do note that when this method is overriden and returns a non-empty value, the turret will
+	 * always look at the specified pitch when idle and has no targets.
+	 *
+	 * @return {@code Optional<Float>} The idle pitch of the turret. If empty, the turret will look up and down when idle.
+	 */
+	public Optional<Float> getIdlePitch() {
+		return Optional.empty();
 	}
 
 	// ///////////// //

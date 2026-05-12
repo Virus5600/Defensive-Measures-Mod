@@ -21,14 +21,15 @@ import net.minecraft.util.math.random.Random;
  *
  * @see CustomEmitter
  *
- * @since 1.0.0
+ * @since 1.0.0-beta
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
  * @version 1.0.0
  */
 @Environment(EnvType.CLIENT)
-public class CannonFlash extends CustomEmitter {
-	/// CONSTRUCTORS ///
-	public CannonFlash(ClientWorld world, double x, double y, double z, double vx, double vy, double vz) {
+public class CannonFlashEmitter extends CustomEmitter {
+	// CONSTRUCTORS //
+
+	public CannonFlashEmitter(ClientWorld world, double x, double y, double z, double vx, double vy, double vz) {
 		super(world, ModParticles.SPARKS, x, y, z, 9);
 		this.velocityX = vx;
 		this.velocityY = vy;
@@ -36,7 +37,7 @@ public class CannonFlash extends CustomEmitter {
 		this.setCustomEmitterCode();
 	}
 
-	public CannonFlash(ClientWorld world, Entity entity, double vx, double vy, double vz) {
+	public CannonFlashEmitter(ClientWorld world, Entity entity, double vx, double vy, double vz) {
 		super(world, entity, ModParticles.SPARKS, 9);
 		this.velocityX = vx;
 		this.velocityY = vy;
@@ -89,11 +90,11 @@ public class CannonFlash extends CustomEmitter {
 		};
 	}
 
-	///  FACTORY ///
+	//  FACTORY //
 	@Environment(EnvType.CLIENT)
 	public static class Factory implements ParticleFactory<SimpleParticleType> {
 		public Particle createParticle(SimpleParticleType simpleParticleType, ClientWorld world, double x, double y, double z, double vx, double vy, double vz, Random random) {
-			return new CannonFlash(world, x, y, z, vx, vy, vz);
+			return new CannonFlashEmitter(world, x, y, z, vx, vy, vz);
 		}
 	}
 }

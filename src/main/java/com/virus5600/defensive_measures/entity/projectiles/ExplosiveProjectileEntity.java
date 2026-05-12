@@ -9,11 +9,15 @@ import net.minecraft.entity.projectile.ProjectileUtil;
 import net.minecraft.network.listener.ClientPlayPacketListener;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket;
+import net.minecraft.particle.BlockParticleEffect;
 import net.minecraft.particle.ParticleEffect;
+import net.minecraft.particle.ParticleTypes;
 import net.minecraft.server.network.EntityTrackerEntry;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.storage.ReadView;
 import net.minecraft.storage.WriteView;
+import net.minecraft.util.collection.Pool;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
@@ -23,6 +27,7 @@ import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
 
 import net.minecraft.world.explosion.ExplosionBehavior;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -64,7 +69,9 @@ import java.util.List;
  * @since 1.0.0
  */
 public abstract class ExplosiveProjectileEntity extends TurretProjectileEntity {
-	protected ParticleEffect particleTrail;
+	protected static final Pool<BlockParticleEffect> EXPLOSION_BLOCK_PARTICLES;
+	protected static final Pool<BlockParticleEffect> EMPTY_EXPLOSION_BLOCK_PARTICLES;
+
 	public double accelerationPower = 0.1;
 
 	// //////////// //
@@ -72,27 +79,10 @@ public abstract class ExplosiveProjectileEntity extends TurretProjectileEntity {
 	// //////////// //
 	protected ExplosiveProjectileEntity(EntityType<? extends TurretProjectileEntity> entityType, World world) {
 		super(entityType, world);
+
 		this.setDamage(5);
 		this.setPierceLevel(this.getMaxPierceLevel());
 		this.setSpeedAffectsDamage(false);
-	}
-
-	protected ExplosiveProjectileEntity(EntityType<? extends ExplosiveProjectileEntity> type, double x, double y, double z, World world) {
-		this(type, world);
-		this.setPosition(x, y, z);
-	}
-
-	public ExplosiveProjectileEntity(EntityType<? extends ExplosiveProjectileEntity> type, double x, double y, double z, Vec3d velocity, World world) {
-		this(type, world);
-		this.refreshPositionAndAngles(x, y, z, this.getYaw(), this.getPitch());
-		this.refreshPosition();
-		this.setVelocityWithAcceleration(velocity, this.accelerationPower);
-	}
-
-	public ExplosiveProjectileEntity(EntityType<? extends ExplosiveProjectileEntity> type, LivingEntity owner, Vec3d velocity, World world) {
-		this(type, owner.getX(), owner.getY(), owner.getZ(), velocity, world);
-		this.setOwner(owner);
-		this.setRotation(owner.getYaw(), owner.getPitch());
 	}
 
 	// //////////// //
@@ -184,8 +174,25 @@ public abstract class ExplosiveProjectileEntity extends TurretProjectileEntity {
 				this.getZ(),
 				1.25F,
 				false,
-				World.ExplosionSourceType.NONE
+				World.ExplosionSourceType.NONE,
+				this.getSmallExplosionParticleType(),
+				this.getLargeExplosionParticleType(),
+				EMPTY_EXPLOSION_BLOCK_PARTICLES,
+				SoundEvents.ENTITY_GENERIC_EXPLODE
 			);
+
+//		this.getEntityWorld()
+//			.createExplosion(
+//				this,
+//				dmgSrc,
+//				new ExplosionBehavior(),
+//				this.getX(),
+//				this.getBodyY(0.0625),
+//				this.getZ(),
+//				1.25F,
+//				false,
+//				World.ExplosionSourceType.NONE
+//			);
 
 		// Damaging entities within a radius.
 		double effectiveRadius = this.getEffectiveRadius();
@@ -203,6 +210,7 @@ public abstract class ExplosiveProjectileEntity extends TurretProjectileEntity {
 			this.getZ() + effectiveRadius
 		);
 
+		// Entities receives full damage
 		List<LivingEntity> damagedEntities = new ArrayList<>();
 		this.getEntityWorld()
 			.getOtherEntities(this, fullDmgReceiver)
@@ -237,7 +245,9 @@ public abstract class ExplosiveProjectileEntity extends TurretProjectileEntity {
 				.forEach(entity -> {
 					if (entity instanceof LivingEntity && !damagedEntities.contains(entity)) {
 						float normalizedRadius = (float) ((radius - effectiveRadius) / (maxDmgRadius - effectiveRadius));
-						float formula = (float) (Math.exp(-dmgReduction * normalizedRadius) - Math.exp(-dmgReduction) / (1 - Math.exp(-dmgReduction)));
+						float numerator = (float) (Math.exp(-dmgReduction * normalizedRadius) - Math.exp(-dmgReduction));
+						float denominator = (float) (1 - Math.exp(-dmgReduction));
+						float formula = numerator / denominator;
 						float dmg = (float) (baseDmg * formula);
 
 						entity.damage(
@@ -281,19 +291,21 @@ public abstract class ExplosiveProjectileEntity extends TurretProjectileEntity {
 	/**
 	 * Adds particles to the projectile. It uses the provided position
 	 * as the position of where the particle will appear. If the
-	 * {@link #getParticleType() particle type} is {@code null},
+	 * {@link #getTrailParticleType() particle type} is {@code null},
 	 * this method will not add any particles.
 	 *
 	 * @param pos The position of the particle.
 	 */
 	protected void addParticles(Vec3d pos) {
-		this.addParticles(pos, this.getParticleType());
+		if (this.getTrailParticleType() != null) {
+			this.addParticles(pos, this.getTrailParticleType());
+		}
 	}
 
 	/**
 	 * Adds particles to the projectile. It uses the current position
 	 * of the projectile as the position of the particle. If the
-	 * {@link #getParticleType() particle type} is {@code null},
+	 * {@link #getTrailParticleType() particle type} is {@code null},
 	 * this method will not add any particles.
 	 */
 	protected void addParticles() {
@@ -337,6 +349,7 @@ public abstract class ExplosiveProjectileEntity extends TurretProjectileEntity {
 				this.hitOrDeflect(hitResult);
 			}
 
+			// Trail Particle
 			this.addParticles(pos.add(0, 0.25, 0));
 		}
 		else {
@@ -366,9 +379,39 @@ public abstract class ExplosiveProjectileEntity extends TurretProjectileEntity {
 		return RaycastContext.ShapeType.COLLIDER;
 	}
 
+	/**
+	 * Defines the trailing particle this projectile will use. By default, this method returns {@code null},
+	 * which means this projectile won't leave a trailing particle in its wake.
+	 *
+	 * @return The particle effect to use for the projectile's trail, or {@code null} if no trail should be rendered.
+	 */
 	@Nullable
-	protected ParticleEffect getParticleType() {
-		return this.particleTrail;
+	protected ParticleEffect getTrailParticleType() {
+		return null;
+	}
+
+	/**
+	 * Defines the particle effect to use for the small explosion when the projectile hits a blockor
+	 * an entity. By default, this method returns {@link ParticleTypes#EXPLOSION}, which is also the
+	 * default explosion particle used by vanilla explosions.
+	 *
+	 * @return The particle effect to use for the small explosion. This method should not return {@code null} as the small explosion particle is essential for the explosion effect.
+	 */
+	@NotNull
+	protected ParticleEffect getSmallExplosionParticleType() {
+		return ParticleTypes.EXPLOSION;
+	}
+
+	/**
+	 * Defines the particle effect to use for the large explosion when the projectile hits a block or
+	 * an entity. By default, this method returns {@link ParticleTypes#EXPLOSION_EMITTER}, which is
+	 * also the default large explosion particle used by vanilla explosions.
+	 *
+	 * @return The particle effect to use for the large explosion. This method should not return {@code null} as the large explosion particle is essential for the explosion effect.
+	 */
+	@NotNull
+	protected ParticleEffect getLargeExplosionParticleType() {
+		return ParticleTypes.EXPLOSION_EMITTER;
 	}
 
 	@Override
@@ -525,5 +568,18 @@ public abstract class ExplosiveProjectileEntity extends TurretProjectileEntity {
 	@Override
 	public boolean armorAffectsDamage() {
 		return false;
+	}
+
+	// ///////////////////// //
+	// STATIC INITIALIZATION //
+	// ///////////////////// //
+	static {
+		EXPLOSION_BLOCK_PARTICLES = Pool.<BlockParticleEffect>builder()
+			.add(new BlockParticleEffect(ParticleTypes.POOF, 0.5F, 1.0F))
+			.add(new BlockParticleEffect(ParticleTypes.SMOKE, 1.0F, 1.0F))
+			.build();
+
+		EMPTY_EXPLOSION_BLOCK_PARTICLES = Pool.<BlockParticleEffect>builder()
+			.build();
 	}
 }

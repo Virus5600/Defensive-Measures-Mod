@@ -27,12 +27,12 @@ import org.jspecify.annotations.Nullable;
  * @version 1.0.0
  */
 @Environment(EnvType.CLIENT)
-public class CannonFuse extends BillboardParticle {
+public class CannonFuseParticle extends BillboardParticle {
 	private final Vec3d source;
 	private final float maxParticleAge = 25;
 
 	// CONSTRUCTORS //
-	protected CannonFuse(ClientWorld level, double x, double y, double z, SpriteProvider spriteSet, double xd, double yd, double zd) {
+	protected CannonFuseParticle(ClientWorld level, double x, double y, double z, SpriteProvider spriteSet, double xd, double yd, double zd) {
 		super(level, x, y, z, xd, yd, zd, spriteSet.getFirst());
 
 		this.velocityMultiplier = 0.75f;
@@ -130,7 +130,7 @@ public class CannonFuse extends BillboardParticle {
 		}
 
 		public @Nullable Particle createParticle(SimpleParticleType type, ClientWorld level, double x, double y, double z, double xd, double yd, double zd, Random random) {
-			return new CannonFuse(level, x, y, z, this.sprites, xd, yd, zd);
+			return new CannonFuseParticle(level, x, y, z, this.sprites, xd, yd, zd);
 		}
 	}
 }

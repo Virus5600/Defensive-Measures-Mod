@@ -89,6 +89,17 @@ public class ModEntities {
 			.trackingTickInterval(10)
 	);
 
+	// v1.1.0-beta
+	public static final EntityType<FlakProjectileEntity> FLAK_PROJECTILE = RegistryHelper.registerEntity(
+		"flak_projectile",
+		Builder
+			.<FlakProjectileEntity>create(FlakProjectileEntity::new, SpawnGroup.MISC)
+			.dropsNothing()
+			.dimensions(0.125f, 0.125f)
+			.maxTrackingRange(4)
+			.trackingTickInterval(10)
+	);
+
 	// REGISTRY //
 	@SuppressWarnings("ConstantConditions")
 	public static void registerModEntityAttributes() {

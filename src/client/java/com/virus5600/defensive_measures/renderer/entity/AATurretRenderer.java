@@ -19,5 +19,7 @@ public class AATurretRenderer extends BaseTurretRenderer<
 			new AATurretModel(ctx.getPart(ModEntityModels.AA_TURRET)),
 			BaseTurretRenderState::new
 		);
+
+		this.disableLookControlOnDeath();
 	}
 }

@@ -63,6 +63,8 @@ public abstract class TurretProjectileEntity extends ProjectileEntity {
 	protected static final int CRITICAL_FLAG = 1;
 	protected static final int NO_CLIP_FLAG = 2;
 
+	public final AnimationState loopAnimationState = new AnimationState();
+
 	/** Defines the current sound this projectile will play when it hit something */
 	private SoundEvent sound = this.getHitSound();
 	/** Defines the item stack this projectile is. Used when picking up the projectile to turn into items. */
@@ -78,6 +80,11 @@ public abstract class TurretProjectileEntity extends ProjectileEntity {
 	protected IntOpenHashSet piercedEntities;
 	/** Identifies if this projectile can be picked up or not. */
 	protected PickupPermission pickupType = PickupPermission.DISALLOWED;
+	/**
+	 * Defines the position this projectile is spawned at. Used for calculating the distance
+	 * traveled by this projectile.
+	 */
+	protected Vec3d spawnPos = Vec3d.ZERO;
 	/** Defines how long the shaking animation will play (in ticks). */
 	protected int shake;
 	/** Determines how long this projectile have been stuck "**in**" the ground. */
@@ -86,8 +93,6 @@ public abstract class TurretProjectileEntity extends ProjectileEntity {
 	protected double damage = 2.0;
 	/** Determines whether this projectile scales its damage based on its speed. */
 	protected boolean speedAffectDamage = true;
-
-	public final AnimationState loopAnimationState = new AnimationState();
 
 	// //////////// //
 	// CONSTRUCTORS //
@@ -587,6 +592,13 @@ public abstract class TurretProjectileEntity extends ProjectileEntity {
 		return didPickedUp;
 	}
 
+	@Override
+	public void tick() {
+		super.tick();
+
+		this.updateAnimations();
+	}
+
 	// //////////////////////////////// //
 	// QUESTION METHODS (True or False) //
 	// //////////////////////////////// //
@@ -787,6 +799,24 @@ public abstract class TurretProjectileEntity extends ProjectileEntity {
 			this.setDamage(turret.getProjectileDamage());
 			this.setPierceLevel(turret.getProjectilePierceLevel());
 		}
+	}
+
+	public void setSpawnPos(double x, double y, double z) {
+		this.setSpawnPos(new Vec3d(x, y, z));
+	}
+
+	public void setSpawnPos(Vec3d spawnPos) {
+		this.spawnPos = spawnPos;
+		this.setPosition(spawnPos);
+		this.updateTrackedPosition(spawnPos);
+	}
+
+	public Vec3d getSpawnPos() {
+		return new Vec3d(
+			this.spawnPos.getX(),
+			this.spawnPos.getY(),
+			this.spawnPos.getZ()
+		);
 	}
 
 	// ///////////////////////// //
