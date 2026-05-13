@@ -1,5 +1,6 @@
 package com.virus5600.defensive_measures.entity.turrets;
 
+import com.virus5600.defensive_measures._util.MathUtil;
 import com.virus5600.defensive_measures.entity.ai.control.TurretLookControl;
 import com.virus5600.defensive_measures.entity.projectiles.TurretProjectileEntity;
 import com.virus5600.defensive_measures.sound.ModSoundEvents;
@@ -1204,15 +1205,11 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 	 * @return Vec3d the relative position of this point, assuming that the origin of the offset is at <b>[0, 0, 0]</b>
 	 */
 	public Vec3d getRelativePos(double xOffset, double yOffset, double zOffset) {
-		float pitchRad = -this.getPitch() * (float) (Math.PI / 180.0);
-		float yawRad = -this.getHeadYaw() * (float) (Math.PI / 180.0);
-
-		Vec3d rotated = new Vec3d(xOffset, yOffset, zOffset)
-			.rotateX(pitchRad)
-			.rotateY(yawRad);
-
-		return this.getEyePos()
-			.add(rotated);
+		return MathUtil.getRelativePos(
+			this.getEyePos(),
+			xOffset, yOffset, zOffset,
+			-this.getHeadYaw(), -this.getPitch()
+		);
 	}
 
 	/**
@@ -1233,17 +1230,19 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 	 * @return Vec3d the relative position of this point, assuming that the origin of the offset is at <b>[0, 0, 0]</b>
 	 */
 	public Vec3d getRelativePosFrom(Vec3d origin, double xOffset, double yOffset, double zOffset, boolean includePitch) {
-		Vec3d rotated = new Vec3d(xOffset, yOffset, zOffset);
-
 		if (includePitch) {
-			float pitchRad = -this.getPitch() * (float) (Math.PI / 180.0);
-			rotated = rotated.rotateX(pitchRad);
+			return MathUtil.getRelativePos(
+				origin,
+				xOffset, yOffset, zOffset,
+				-this.getHeadYaw(), -this.getPitch()
+			);
 		}
 
-		float yawRad = -this.getHeadYaw() * (float) (Math.PI / 180.0);
-		rotated = rotated.rotateY(yawRad);
-
-		return origin.add(rotated);
+		return MathUtil.getRelativePos(
+			origin,
+			xOffset, yOffset, zOffset,
+			-this.getHeadYaw()
+		);
 	}
 
 	/**

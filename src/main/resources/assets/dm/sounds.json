@@ -250,21 +250,21 @@
 		"subtitle": "subtitles.turret.mg_turret.shoot"
 	},
 
-	"turret.anti_air_turret.hurt": {
+	"turret.aa_turret.hurt": {
 		"sounds": [
 			"dm:turrets/hurt/metal_hurt1",
 			"dm:turrets/hurt/metal_hurt2"
 		],
 		"subtitle": "subtitles.turret.aa_turret.hurt"
 	},
-	"turret.anti_air_turret.destroyed": {
+	"turret.aa_turret.destroyed": {
 		"sounds": [
 			"dm:turrets/crumbling_turrets/metal_crumbling1",
 			"dm:turrets/crumbling_turrets/metal_crumbling2"
 		],
 		"subtitle": "subtitles.turret.aa_turret.destroyed"
 	},
-	"turret.anti_air_turret.shoot": {
+	"turret.aa_turret.shoot": {
 		"sounds": [
 			"dm:anti_air_turret/shoot1",
 			"dm:anti_air_turret/shoot2"

@@ -15,6 +15,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.particle.ParticleTypes;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.util.ActionResult;
@@ -22,6 +23,7 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
+import com.virus5600.defensive_measures._util.MathUtil;
 import com.virus5600.defensive_measures.entity.ModEntities;
 import com.virus5600.defensive_measures.entity.TurretMaterial;
 import com.virus5600.defensive_measures.entity.ai.goal.ProjectileAttackGoal;
@@ -66,7 +68,7 @@ import java.util.Optional;
  *
  * @see TurretEntity
  *
- * @since 1.1.0
+ * @since 1.1.0-beta
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
  * @version 1.0.0
  */
@@ -164,12 +166,6 @@ public class AATurretEntity extends TurretEntity {
 	@Override
 	public void tick() {
 		super.tick();
-
-		if (this.getEntityWorld() instanceof ServerWorld world) {
-			if (this.isDead()) {
-				System.out.println("Death Time: " + this.deathTime);
-			}
-		}
 	}
 
 	@Override
@@ -249,8 +245,8 @@ public class AATurretEntity extends TurretEntity {
 				true
 			);
 
-			float pitchRad = this.getPitch() * (float) (Math.PI / 180.0);
-			float yawRad = this.getHeadYaw() * (float) (Math.PI / 180.0);
+			float pitchRad = MathUtil.degToRad(this.getPitch());
+			float yawRad = MathUtil.degToRad(this.getHeadYaw());
 
 			barrels.add(
 				barrelPos.subtract(this.getEyePos())

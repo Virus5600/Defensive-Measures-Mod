@@ -33,6 +33,7 @@ import com.virus5600.defensive_measures.sound.ModSoundEvents;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Represents the Cannon Turret entity.
@@ -235,6 +236,10 @@ public class CannonTurretEntity extends TurretEntity {
 
 	public int getTotalAttCooldown() {
 		return TOTAL_ATT_COOLDOWN;
+	}
+
+	public Optional<Float> getIdlePitch() {
+		return Optional.of(-15f);
 	}
 
 	// //////////// //

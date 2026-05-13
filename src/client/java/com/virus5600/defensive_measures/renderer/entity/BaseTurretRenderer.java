@@ -61,12 +61,17 @@ public abstract class BaseTurretRenderer<
 		turretRenderState.shootAnimationState.copyFrom(turretEntity.getShootAnimationState());
 		turretRenderState.deathAnimationState.copyFrom(turretEntity.getDeathAnimationState());
 
+		turretRenderState.eyePos = turretEntity.getEyePos();
+
+		turretRenderState.id = turretEntity.getUuid();
 		turretRenderState.turretLvl = turretEntity.getTrackedLevel();
 		turretRenderState.hasTarget = turretEntity.getTrackedLockedButNotAttacking();
 		turretRenderState.shooting = turretEntity.getTrackedShooting();
 
+		turretRenderState.dead = turretEntity.isDead();
 		turretRenderState.hurt = turretEntity.hurtTime > 0 && turretEntity.isAlive();
 
+		// Death look-control handling
 		if (!this.lookControlOnDeath && !turretEntity.isAlive()) {
 			float idlePitch = turretEntity.getPitch();
 

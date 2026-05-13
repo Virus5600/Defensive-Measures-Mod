@@ -101,9 +101,27 @@
 	"subtitles.turret.aa_turret.destroyed" : "Anti-Air Turret destroyed",
 	"subtitles.turret.aa_turret.shoot" : "Anti-Air Turret shoots",
 
-	"tag.item.dm.turret_remover_repairable" : "Turret Remover Repairable",
-	"tag.item.dm.turret_removers" : "Turret Removers",
+	"tag.item.dm.tier_1_turrets" : "Tier 1 Turrets",
+	"tag.item.dm.tier_2_turrets" : "Tier 2 Turrets",
 	"tag.item.dm.turrets" : "Turrets",
+	"tag.item.dm.turret_removers" : "Turret Removers",
+	"tag.item.dm.turret_remover_repairable" : "Turret Remover Repairable",
+
+	"tag.entity.dm.flying_hostiles" : "Flying Hostiles",
+	"tag.entity.dm.projectiles" : "Defensive Measures Projectiles",
+	"tag.entity.dm.tier_1_turrets" : "Tier 1 Turrets",
+	"tag.entity.dm.tier_2_turrets" : "Tier 2 Turrets",
+	"tag.entity.dm.turrets" : "Turrets",
+
+	"tag.block.dm.dirt" : "Soil/Earth Blocks",
+	"tag.block.dm.glass" : "Vitreous Blocks",
+	"tag.block.dm.grainy" : "Grainy Blocks",
+	"tag.block.dm.greenery" : "Shrub/Fauna Blocks",
+	"tag.block.dm.metal" : "Metallic Blocks",
+	"tag.block.dm.stone" : "Stone Blocks",
+	"tag.block.dm.traps" : "Trap Blocks",
+	"tag.block.dm.wood" : "Wooden Blocks",
+	"tag.block.dm.electric_fence" : "Electric Fence",
 
 	"container.dm.turret_assembly_station": "Assembling",
 

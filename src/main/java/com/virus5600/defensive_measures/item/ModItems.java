@@ -234,9 +234,13 @@ public class ModItems {
 		};
 
 		DM_TURRETS = new Item[] {
+			// TIER 1
 			CANNON_TURRET,
 			BALLISTA_TURRET,
-			MG_TURRET
+			MG_TURRET,
+
+			// TIER 2
+			AA_TURRET
 		};
 
 		FUEL_ITEMS = new Item[] {

@@ -39,6 +39,13 @@ public class AATurretAnimation {
 		))
 		.build();
 
+	/**
+	 * <b>NOTE:</b> The AA Turret death's animation has the following particle effects:
+	 * <ul>
+	 * 	<li>Small explosion at 0.0s</li>
+	 * 	<li>Another small explosion at 0.5s</li>
+	 * </ul>
+	 */
 	public static final AnimationDefinition ANIM_AA_TURRET_DEATH = AnimationDefinition.Builder.create(1.5F)
 		.addBoneAnimation("horizontal_traverse", new Transformation(Transformation.Targets.ROTATE,
 			new Keyframe(0.5F, AnimationHelper.createRotationalVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),

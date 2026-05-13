@@ -1,11 +1,22 @@
 package com.virus5600.defensive_measures.model.entity;
 
+import com.virus5600.defensive_measures._util.MathUtil;
 import net.minecraft.client.model.*;
+import net.minecraft.entity.AnimationState;
+import net.minecraft.particle.ParticleTypes;
+import net.minecraft.sound.SoundEvents;
+import net.minecraft.util.math.Vec3d;
 
+import com.virus5600.defensive_measures.animations.FXKeyframe;
 import com.virus5600.defensive_measures.animations.entity.AATurretAnimation;
 import com.virus5600.defensive_measures.renderer.entity.state.BaseTurretRenderState;
 
+import java.util.PriorityQueue;
+import java.util.Queue;
+
 public class AATurretModel extends BaseTurretModel<BaseTurretRenderState> {
+	private final static Queue<FXKeyframe> DEATH_KEYFRAMES;
+
 	protected final static String[] TEXTURES = new String[]{
 		"aa_turret.png"
 	};
@@ -99,6 +110,20 @@ public class AATurretModel extends BaseTurretModel<BaseTurretRenderState> {
 	// /////////////////// //
 
 	@Override
+	public Queue<FXKeyframe> getDeathAnimProcedureInstance() {
+		if (MathUtil.randomBool()) {
+			return new PriorityQueue<>(DEATH_KEYFRAMES);
+		}
+
+		return new PriorityQueue<>();
+	}
+
+	@Override
+	protected void additionalDeathAnimProcedures(AnimationState animState, BaseTurretRenderState state) {
+		super.additionalDeathAnimProcedures(animState, state);
+	}
+
+	@Override
 	protected float getDefaultHeadPitch() {
 		return 30f;
 	}
@@ -115,5 +140,17 @@ public class AATurretModel extends BaseTurretModel<BaseTurretRenderState> {
 	@Override
 	protected float getMaxPitch() {
 		return 90f;
+	}
+
+	// ////// //
+	// STATIC //
+	// ////// //
+	static {
+		DEATH_KEYFRAMES = new PriorityQueue<>() {
+			{
+				add(FXKeyframe.of(0.0, ParticleTypes.EXPLOSION, SoundEvents.ENTITY_GENERIC_EXPLODE.value(), new Vec3d(0, 0, -1.125)));
+				add(FXKeyframe.of(0.5, ParticleTypes.EXPLOSION, SoundEvents.ENTITY_GENERIC_EXPLODE.value(), new Vec3d(0, 0, 0.3125)));
+			}
+		};
 	}
 }
