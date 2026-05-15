@@ -40,7 +40,7 @@ public class BallistaTurretItem extends TurretItem {
 		for (int i = 1; i <= 3; i++) {
 			textConsumer.accept(
 				Text.translatable("itemTooltip.dm.ballista.line" + i)
-					.formatted(Formatting.DARK_AQUA)
+					.formatted(Formatting.GRAY)
 			);
 		}
 	}

@@ -1,15 +1,15 @@
 package com.virus5600.defensive_measures.model.entity;
 
-import com.virus5600.defensive_measures.animations.FXKeyframe;
-import com.virus5600.defensive_measures.animations.Keyframe;
 import net.minecraft.client.model.ModelPart;
 import net.minecraft.client.render.entity.animation.Animation;
+import net.minecraft.client.render.entity.state.EntityRenderState;
 import net.minecraft.entity.AnimationState;
 import net.minecraft.util.math.MathHelper;
 
-import com.virus5600.defensive_measures.renderer.entity.state.BaseTurretRenderState;
+import com.virus5600.defensive_measures.animations.Keyframe;
 import com.virus5600.defensive_measures.entity.turrets.TurretEntity;
 import com.virus5600.defensive_measures.model.BaseModel;
+import com.virus5600.defensive_measures.renderer.entity.state.BaseTurretRenderState;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -67,6 +67,19 @@ public abstract class BaseTurretModel<S extends BaseTurretRenderState> extends B
 	 * when it dies.
 	 */
 	protected final Animation deathAnim;
+
+	protected final static Queue<? extends Keyframe> DEFAULT_EMPTY_KEYFRAME = new PriorityQueue<>() {
+		{
+			add(
+				new Keyframe() {
+					@Override public int compareTo(@NotNull Keyframe o) { return 0; }
+					@Override public double getTime() { return 0; }
+					@Override public void apply(AnimationState animState, EntityRenderState state) { }
+					@Override public int getTimeMS() { return 0; }
+				}
+			);
+		}
+	};
 
 	// //////////// //
 	// CONSTRUCTORS //
@@ -179,7 +192,8 @@ public abstract class BaseTurretModel<S extends BaseTurretRenderState> extends B
 				state.deathAnimationState.getTimeInMilliseconds(state.age) > 0 &&
 				!state.deathAnimationState.isRunning()
 			) {
-				this.setDeathAnimProcedure(state.id, this.getDeathAnimProcedureInstance());
+				Queue<? extends Keyframe> procedure = this.getDeathAnimProcedureInstance();
+				this.setDeathAnimProcedure(state.id, procedure);
 			}
 
 			this.deathAnim.apply(state.deathAnimationState, state.age);
@@ -326,11 +340,9 @@ public abstract class BaseTurretModel<S extends BaseTurretRenderState> extends B
 		Keyframe keyframe = procedure == null ? null : procedure.peek();
 
 		if (animState.isRunning() && keyframe != null) {
-			if (keyframe instanceof FXKeyframe fxKeyframe) {
-				if (fxKeyframe.getTimeMS() <= ms) {
-					fxKeyframe.apply(animState, state);
-					procedure.remove();
-				}
+			if (keyframe.getTimeMS() <= ms) {
+				keyframe.apply(animState, state);
+				procedure.remove();
 			}
 		}
 

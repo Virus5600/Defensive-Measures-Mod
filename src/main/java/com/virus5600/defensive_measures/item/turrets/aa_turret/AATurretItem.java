@@ -40,13 +40,14 @@ public class AATurretItem extends TurretItem {
 		for (int i = 1; i <= 3; i++) {
 			textConsumer.accept(
 				Text.translatable("itemTooltip.dm.aa_turret.line" + i)
-					.formatted(Formatting.DARK_AQUA)
+					.formatted(Formatting.GRAY)
 			);
 		}
 
 		textConsumer.accept(
 			Text.translatable("itemTooltip.dm.aa_turret.line.warning")
-				.formatted(Formatting.RED)
+				.formatted(Formatting.DARK_RED)
+				.formatted(Formatting.ITALIC)
 		);
 	}
 

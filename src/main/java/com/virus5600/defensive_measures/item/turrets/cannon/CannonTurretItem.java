@@ -40,7 +40,7 @@ public class CannonTurretItem extends TurretItem {
 		for (int i = 1; i <= 3; i++) {
 			textConsumer.accept(
 				Text.translatable("itemTooltip.dm.cannon_turret.line" + i)
-					.formatted(Formatting.DARK_AQUA)
+					.formatted(Formatting.GRAY)
 			);
 		}
 	}

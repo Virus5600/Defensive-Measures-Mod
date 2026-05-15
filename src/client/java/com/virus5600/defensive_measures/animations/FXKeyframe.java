@@ -14,12 +14,8 @@ import com.virus5600.defensive_measures.renderer.entity.state.BaseTurretRenderSt
 
 import org.jetbrains.annotations.Nullable;
 
-public class FXKeyframe implements Keyframe {
-	protected final double time;
-	protected final ParticleEffect particle;
-	protected final SoundEvent sound;
-	protected final Vec3d pos;
-
+public record FXKeyframe(double getTime, ParticleEffect particle, SoundEvent sound,
+                         Vec3d pos) implements Keyframe {
 	// //////////// //
 	// CONSTRUCTORS //
 	// //////////// //
@@ -29,7 +25,7 @@ public class FXKeyframe implements Keyframe {
 	 * sets the position to the origin {@code (0, 0, 0)} (or {@code (0.5, 0.5, 0.5)} in block
 	 * position relative ) of the target entity by default.
 	 *
-	 * @param time The specified time in seconds when the particle effect should be applied.
+	 * @param time     The specified time in seconds when the particle effect should be applied.
 	 * @param particle The particle effect to be applied at the specified time.
 	 */
 	public FXKeyframe(double time, ParticleEffect particle) {
@@ -41,7 +37,7 @@ public class FXKeyframe implements Keyframe {
 	 * sets the position to the origin {@code (0, 0, 0)} (or {@code (0.5, 0.5, 0.5)} in block
 	 * position relative ) of the target entity by default.
 	 *
-	 * @param time The specified time in seconds when the sound event should be played.
+	 * @param time  The specified time in seconds when the sound event should be played.
 	 * @param sound The sound event to be played at the specified time.
 	 */
 	public FXKeyframe(double time, SoundEvent sound) {
@@ -53,9 +49,9 @@ public class FXKeyframe implements Keyframe {
 	 * and sound event. This sets the position to the origin {@code (0, 0, 0)} (or
 	 * {@code (0.5, 0.5, 0.5)} in block position relative ) of the target entity by default.
 	 *
-	 * @param time The specified time in seconds when the particle effect and sound event should be applied.
+	 * @param time     The specified time in seconds when the particle effect and sound event should be applied.
 	 * @param particle The particle effect to be applied at the specified time.
-	 * @param sound The sound event to be played at the specified time.
+	 * @param sound    The sound event to be played at the specified time.
 	 */
 	public FXKeyframe(double time, ParticleEffect particle, SoundEvent sound) {
 		this(time, particle, sound, Vec3d.ZERO);
@@ -68,9 +64,9 @@ public class FXKeyframe implements Keyframe {
 	 * specified, it defaults to the origin {@code (0, 0, 0)} (or {@code (0.5, 0.5, 0.5)} in block
 	 * position relative) of the target entity.
 	 *
-	 * @param time The specified time in seconds when the particle effect should be applied.
+	 * @param time     The specified time in seconds when the particle effect should be applied.
 	 * @param particle The particle effect to be applied at the specified time.
-	 * @param pos The position relative to the target entity where the particle effect should be applied.
+	 * @param pos      The position relative to the target entity where the particle effect should be applied.
 	 */
 	public FXKeyframe(double time, ParticleEffect particle, Vec3d pos) {
 		this(time, particle, null, pos);
@@ -83,9 +79,9 @@ public class FXKeyframe implements Keyframe {
 	 * specified, it defaults to the origin {@code (0, 0, 0)} (or {@code (0.5, 0.5, 0.5)} in block
 	 * position relative) of the target entity.
 	 *
-	 * @param time The specified time in seconds when the sound event should be applied.
+	 * @param time  The specified time in seconds when the sound event should be applied.
 	 * @param sound The sound event to be played at the specified time.
-	 * @param pos The position relative to the target entity where the sound event should be applied.
+	 * @param pos   The position relative to the target entity where the sound event should be applied.
 	 */
 	public FXKeyframe(double time, SoundEvent sound, Vec3d pos) {
 		this(time, null, sound, pos);
@@ -99,16 +95,12 @@ public class FXKeyframe implements Keyframe {
 	 * {@code (0, 0, 0)} (or {@code (0.5, 0.5, 0.5)} in block position relative) of the target
 	 * entity.
 	 *
-	 * @param time The specified time in seconds when the particle effect and sound event should be applied.
+	 * @param getTime     The specified time in seconds when the particle effect and sound event should be applied.
 	 * @param particle The particle effect to be applied at the specified time.
-	 * @param sound The sound event to be played at the specified time.
-	 * @param pos The position relative to the target entity where the particle effect and sound event should be applied.
+	 * @param sound    The sound event to be played at the specified time.
+	 * @param pos      The position relative to the target entity where the particle effect and sound event should be applied.
 	 */
-	public FXKeyframe(double time, ParticleEffect particle, SoundEvent sound, Vec3d pos) {
-		this.time = time;
-		this.particle = particle;
-		this.sound = sound;
-		this.pos = pos;
+	public FXKeyframe {
 	}
 
 	// ///////// //
@@ -120,14 +112,9 @@ public class FXKeyframe implements Keyframe {
 	 * sets the position to the origin {@code (0, 0, 0)} (or {@code (0.5, 0.5, 0.5)} in block
 	 * position relative ) of the target entity by default.
 	 *
-	 * @param time The specified time in seconds when the particle effect should be applied.
+	 * @param time     The specified time in seconds when the particle effect should be applied.
 	 * @param particle The particle effect to be applied at the specified time.
-	 *
 	 * @return A new instance of {@code FXKeyframe}.
-	 *
-	 * @see #FXKeyframe(double, ParticleEffect)
-	 * @see #FXKeyframe(double, ParticleEffect)
-	 * @see #of(double, ParticleEffect)
 	 */
 	public static FXKeyframe of(double time, ParticleEffect particle) {
 		return of(time, particle, Vec3d.ZERO);
@@ -140,15 +127,10 @@ public class FXKeyframe implements Keyframe {
 	 * specified, it defaults to the origin {@code (0, 0, 0)} (or {@code (0.5, 0.5, 0.5)} in block
 	 * position relative) of the target entity.
 	 *
-	 * @param time The specified time in seconds when the particle effect should be applied.
+	 * @param time     The specified time in seconds when the particle effect should be applied.
 	 * @param particle The particle effect to be applied at the specified time.
-	 * @param pos The position relative to the target entity where the particle effect should be applied.
-	 *
+	 * @param pos      The position relative to the target entity where the particle effect should be applied.
 	 * @return A new instance of {@code FXKeyframe}.
-	 *
-	 * @see #FXKeyframe(double, ParticleEffect)
-	 * @see #FXKeyframe(double, ParticleEffect)
-	 * @see #of(double, ParticleEffect)
 	 */
 	public static FXKeyframe of(double time, ParticleEffect particle, Vec3d pos) {
 		return new FXKeyframe(time, particle, pos);
@@ -159,9 +141,8 @@ public class FXKeyframe implements Keyframe {
 	 * sets the position to the origin {@code (0, 0, 0)} (or {@code (0.5, 0.5, 0.5)} in block
 	 * position relative ) of the target entity by default.
 	 *
-	 * @param time The specified time in seconds when the sound event should be applied.
+	 * @param time  The specified time in seconds when the sound event should be applied.
 	 * @param sound The sound event to be played at the specified time.
-	 *
 	 * @return A new instance of {@code FXKeyframe}.
 	 */
 	public static FXKeyframe of(double time, SoundEvent sound) {
@@ -175,10 +156,9 @@ public class FXKeyframe implements Keyframe {
 	 * specified, it defaults to the origin {@code (0, 0, 0)} (or {@code (0.5, 0.5, 0.5)} in block
 	 * position relative) of the target entity.
 	 *
-	 * @param time The specified time in seconds when the sound event should be applied.
+	 * @param time  The specified time in seconds when the sound event should be applied.
 	 * @param sound The sound event to be played at the specified time.
-	 * @param pos The position relative to the target entity where the sound event should be applied
-	 *
+	 * @param pos   The position relative to the target entity where the sound event should be applied
 	 * @return A new instance of {@code FXKeyframe}.
 	 */
 	public static FXKeyframe of(double time, SoundEvent sound, Vec3d pos) {
@@ -190,10 +170,9 @@ public class FXKeyframe implements Keyframe {
 	 * and sound event. This sets the position to the origin {@code (0, 0, 0)} (or
 	 * {@code (0.5, 0.5, 0.5)} in block position relative ) of the target entity by default.
 	 *
-	 * @param time The specified time in seconds when the particle effect and sound event should be applied.
+	 * @param time     The specified time in seconds when the particle effect and sound event should be applied.
 	 * @param particle The particle effect to be applied at the specified time.
-	 * @param sound The sound event to be played at the specified time.
-	 *
+	 * @param sound    The sound event to be played at the specified time.
 	 * @return A new instance of {@code FXKeyframe}.
 	 */
 	public static FXKeyframe of(double time, ParticleEffect particle, SoundEvent sound) {
@@ -208,11 +187,10 @@ public class FXKeyframe implements Keyframe {
 	 * {@code (0, 0, 0)} (or {@code (0.5, 0.5, 0.5)} in block position relative) of the target
 	 * entity.
 	 *
-	 * @param time The specified time in seconds when the particle effect and sound event should be applied.
+	 * @param time     The specified time in seconds when the particle effect and sound event should be applied.
 	 * @param particle The particle effect to be applied at the specified time.
-	 * @param sound The sound event to be played at the specified time.
-	 * @param pos The position relative to the target entity where the particle effect and sound event should be applied.
-	 *
+	 * @param sound    The sound event to be played at the specified time.
+	 * @param pos      The position relative to the target entity where the particle effect and sound event should be applied.
 	 * @return A new instance of {@code FXKeyframe}.
 	 */
 	public static FXKeyframe of(double time, ParticleEffect particle, SoundEvent sound, Vec3d pos) {
@@ -222,33 +200,27 @@ public class FXKeyframe implements Keyframe {
 	// /////// //
 	// METHODS //
 	// /////// //
-	public int getTimeMS()  {
+	public int getTimeMS() {
 		return (int) (this.getTime() * 1000);
 	}
 
+	@Override
 	@Nullable
-	public ParticleEffect getParticle() {
+	public ParticleEffect particle() {
 		return this.particle;
 	}
 
+	@Override
 	@Nullable
-	public SoundEvent getSound() {
+	public SoundEvent sound() {
 		return this.sound;
 	}
 
-	public Vec3d getPos() {
-		return this.pos;
-	}
 
 	// ///////////////// //
 	// INTERFACE METHODS //
 	// ///////////////// //
 
-	// KEYFRAME METHODS //
-	@Override
-	public double getTime() {
-		return this.time;
-	}
 
 	@Override
 	public void apply(AnimationState animState, EntityRenderState s) {
@@ -258,24 +230,24 @@ public class FXKeyframe implements Keyframe {
 
 			if (world != null) {
 				Vec3d pos = MathUtil.getRelativePos(
-					origin, this.getPos(),
+					origin, this.pos(),
 					state.relativeHeadYaw, state.pitch
 				);
 
 				// Handles particle frames
-				if (this.getParticle() != null) {
+				if (this.particle() != null) {
 					world.addParticleClient(
-						this.getParticle(),
+						this.particle(),
 						pos.getX(), pos.getY(), pos.getZ(),
 						0, 0, 0
 					);
 				}
 
 				// Handles sound frames
-				if (this.getSound() != null) {
+				if (this.sound() != null) {
 					world.playSoundClient(
 						pos.getX(), pos.getY(), pos.getZ(),
-						this.getSound(), SoundCategory.NEUTRAL,
+						this.sound(), SoundCategory.NEUTRAL,
 						1, 1, true
 					);
 				}

@@ -69,8 +69,27 @@
 	"death.attack.electricity": "%1$s learned that quartz conducts electricity the hard way.",
 	"death.attack.electricity.player": "%1$s was piezoelectrically persuaded to let go by %2$s",
 
+	"death.attack.secondary_explosion": "%1$1 died from a secondary explosion.",
+	"death.attack.secondary_explosion.player": "%1$1 died standing near %2$s.",
+
 	"subtitles.turret.remove.metal" : "Металлическая турель убрана",
 	"subtitles.turret.remove.wood" : "Деревянная турель убрана",
+
+	"subtitles.turret.iron.repair" : "Repaired Iron Turret",
+	"subtitles.turret.bow.repair" : "Repaired Bow Turret",
+	"subtitles.turret.wood.repair" : "Repaired Wooden Turret",
+
+	"subtitles.generic.impact.bullet.default" : "Bullet impacted",
+	"subtitles.generic.impact.bullet.flesh" : "Bullet hit an entity",
+	"subtitles.generic.impact.bullet.glass" : "Bullet impacted on glass",
+	"subtitles.generic.impact.bullet.grainy" : "Bullet impacted on a grainy block",
+	"subtitles.generic.impact.bullet.metal" : "Bullet impacted on metal",
+	"subtitles.generic.impact.bullet.stone" : "Bullet impacted on stone",
+	"subtitles.generic.impact.bullet.wood" : "Bullet impacted on wood",
+
+	"subtitles.turret.hurt.metal" : "Metal turret damaged",
+	"subtitles.turret.hurt.wood" : "Wooden turret damaged",
+
 	"subtitles.turret.cannon.hurt" : "Турельная башня повреждена",
 	"subtitles.turret.cannon.destroyed" : "Турельная башня уничтожена",
 	"subtitles.turret.cannon.shoot" : "Турельная башня стреляет",
@@ -81,9 +100,31 @@
 	"subtitles.turret.mg_turret.destroyed" : "Пулемётная турель уничтожена",
 	"subtitles.turret.mg_turret.shoot" : "Пулемётная турель стреляет",
 
-	"subtitles.turret.anti_air.hurt" : "AA Turret damaged",
-	"subtitles.turret.anti_air.destroyed" : "AA Turret destroyed",
-	"subtitles.turret.anti_air.shoot" : "AA Turret shoots",
+	"subtitles.turret.aa_turret.hurt" : "Anti-Air Turret damaged",
+	"subtitles.turret.aa_turret.destroyed" : "Anti-Air Turret destroyed",
+	"subtitles.turret.aa_turret.shoot" : "Anti-Air Turret shoots",
+
+	"tag.item.dm.tier_1_turrets" : "Tier 1 Turrets",
+	"tag.item.dm.tier_2_turrets" : "Tier 2 Turrets",
+	"tag.item.dm.turrets" : "Turrets",
+	"tag.item.dm.turret_removers" : "Turret Removers",
+	"tag.item.dm.turret_remover_repairable" : "Turret Remover Repairable",
+
+	"tag.entity.dm.flying_hostiles" : "Flying Hostiles",
+	"tag.entity.dm.projectiles" : "Defensive Measures Projectiles",
+	"tag.entity.dm.tier_1_turrets" : "Tier 1 Turrets",
+	"tag.entity.dm.tier_2_turrets" : "Tier 2 Turrets",
+	"tag.entity.dm.turrets" : "Turrets",
+
+	"tag.block.dm.dirt" : "Soil/Earth Blocks",
+	"tag.block.dm.glass" : "Vitreous Blocks",
+	"tag.block.dm.grainy" : "Grainy Blocks",
+	"tag.block.dm.greenery" : "Shrub/Fauna Blocks",
+	"tag.block.dm.metal" : "Metallic Blocks",
+	"tag.block.dm.stone" : "Stone Blocks",
+	"tag.block.dm.traps" : "Trap Blocks",
+	"tag.block.dm.wood" : "Wooden Blocks",
+	"tag.block.dm.electric_fence" : "Electric Fence",
 
 	"container.dm.turret_assembly_station": "Assembling",
 

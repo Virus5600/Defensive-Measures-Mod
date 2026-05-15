@@ -1,21 +1,25 @@
 package com.virus5600.defensive_measures.model.entity;
 
-import com.virus5600.defensive_measures._util.MathUtil;
 import net.minecraft.client.model.*;
 import net.minecraft.entity.AnimationState;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.Vec3d;
 
+import com.virus5600.defensive_measures._util.MathUtil;
 import com.virus5600.defensive_measures.animations.FXKeyframe;
+import com.virus5600.defensive_measures.animations.Keyframe;
+import com.virus5600.defensive_measures.animations.ScriptKeyframe;
 import com.virus5600.defensive_measures.animations.entity.AATurretAnimation;
 import com.virus5600.defensive_measures.renderer.entity.state.BaseTurretRenderState;
 
 import java.util.PriorityQueue;
 import java.util.Queue;
 
+import static com.virus5600.defensive_measures.animations.KeyframeScripts.EXPLODE_SCRIPT;
+
 public class AATurretModel extends BaseTurretModel<BaseTurretRenderState> {
-	private final static Queue<FXKeyframe> DEATH_KEYFRAMES;
+	private final static Queue<? extends Keyframe> DEATH_KEYFRAMES;
 
 	protected final static String[] TEXTURES = new String[]{
 		"aa_turret.png"
@@ -70,8 +74,7 @@ public class AATurretModel extends BaseTurretModel<BaseTurretRenderState> {
 			.uv(24, 84).cuboid(-3.0F, -4.0F, -9.0F, 1.0F, 1.0F, 11.0F, new Dilation(0.25F))
 			.uv(70, 84).cuboid(2.0F, -3.0F, -5.0F, 1.0F, 2.0F, 1.0F, new Dilation(0.0F))
 			.uv(104, 20).cuboid(-3.0F, -3.0F, -5.0F, 1.0F, 2.0F, 1.0F, new Dilation(0.0F)), ModelTransform.origin(0.0F, 0.0F, 0.0F));
-
-		ModelPartData springs = balancer.addChild("springs", ModelPartBuilder.create().uv(70, 100).cuboid(2.0F, -0.5F, 0.0F, 1.0F, 1.0F, 7.0F, new Dilation(0.0F))
+		balancer.addChild("springs", ModelPartBuilder.create().uv(70, 100).cuboid(2.0F, -0.5F, 0.0F, 1.0F, 1.0F, 7.0F, new Dilation(0.0F))
 			.uv(100, 70).cuboid(-3.0F, -0.5F, 0.0F, 1.0F, 1.0F, 7.0F, new Dilation(0.0F)), ModelTransform.origin(0.0F, -3.5F, 2.0F));
 
 		ModelPartData gun = horizontal_traverse.addChild("gun", ModelPartBuilder.create().uv(0, 34).cuboid(-1.0F, 1.0F, -19.0F, 2.0F, 2.0F, 25.0F, new Dilation(0.0F)), ModelTransform.of(0.0F, -6.5F, 8.5F, -0.5236F, 0.0F, 0.0F));
@@ -110,12 +113,12 @@ public class AATurretModel extends BaseTurretModel<BaseTurretRenderState> {
 	// /////////////////// //
 
 	@Override
-	public Queue<FXKeyframe> getDeathAnimProcedureInstance() {
-		if (MathUtil.randomBool()) {
+	public Queue<? extends Keyframe> getDeathAnimProcedureInstance() {
+		if (MathUtil.randomBool(25)) {
 			return new PriorityQueue<>(DEATH_KEYFRAMES);
 		}
 
-		return new PriorityQueue<>();
+		return BaseTurretModel.DEFAULT_EMPTY_KEYFRAME;
 	}
 
 	@Override
@@ -150,6 +153,7 @@ public class AATurretModel extends BaseTurretModel<BaseTurretRenderState> {
 			{
 				add(FXKeyframe.of(0.0, ParticleTypes.EXPLOSION, SoundEvents.ENTITY_GENERIC_EXPLODE.value(), new Vec3d(0, 0, -1.125)));
 				add(FXKeyframe.of(0.5, ParticleTypes.EXPLOSION, SoundEvents.ENTITY_GENERIC_EXPLODE.value(), new Vec3d(0, 0, 0.3125)));
+				add(ScriptKeyframe.of(0.5, EXPLODE_SCRIPT, new Vec3d(0, 0, 0.3125)));
 			}
 		};
 	}

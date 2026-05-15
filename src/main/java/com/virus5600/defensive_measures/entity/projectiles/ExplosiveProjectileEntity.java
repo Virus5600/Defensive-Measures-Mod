@@ -181,19 +181,6 @@ public abstract class ExplosiveProjectileEntity extends TurretProjectileEntity {
 				SoundEvents.ENTITY_GENERIC_EXPLODE
 			);
 
-//		this.getEntityWorld()
-//			.createExplosion(
-//				this,
-//				dmgSrc,
-//				new ExplosionBehavior(),
-//				this.getX(),
-//				this.getBodyY(0.0625),
-//				this.getZ(),
-//				1.25F,
-//				false,
-//				World.ExplosionSourceType.NONE
-//			);
-
 		// Damaging entities within a radius.
 		double effectiveRadius = this.getEffectiveRadius();
 		double maxDmgRadius = this.getMaxDamageRadius();

@@ -20,6 +20,7 @@ import com.virus5600.defensive_measures._helper.RegistryHelper;
 public class ModDamageTypes {
 	public static final RegistryKey<DamageType> BOLT_HEAD = RegistryHelper.getDamageTypeKey("bolt_head");
 	public static final RegistryKey<DamageType> ELECTRICITY = RegistryHelper.getDamageTypeKey("electricity");
+	public static final RegistryKey<DamageType> SECONDARY_EXPLOSION = RegistryHelper.getDamageTypeKey("secondary_explosion");
 
 	public static void registerDamageTypes() {
 		DefensiveMeasures.LOGGER.info("REGISTERING DAMAGE TYPES FOR {}...", DefensiveMeasures.MOD_NAME);

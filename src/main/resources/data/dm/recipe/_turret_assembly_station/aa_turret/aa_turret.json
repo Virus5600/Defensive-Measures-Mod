@@ -1,0 +1,24 @@
+{
+	"type": "dm:tas_shaped",
+	"category": "turrets",
+	"pattern": [
+		"      i",
+		"   d i ",
+		"  iii  ",
+		" dbtid ",
+		" cibic ",
+		"   i   ",
+		"  iii  "
+	],
+	"key": {
+		"b": "minecraft:iron_block",
+		"i": "minecraft:iron_ingot",
+		"c": "minecraft:iron_chain",
+		"t": "minecraft:tnt",
+		"d": "minecraft:gray_dye"
+	},
+	"result": {
+		"id": "dm:aa_turret",
+		"count": 1
+	}
+}

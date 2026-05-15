@@ -40,7 +40,7 @@ public class MGTurretItem extends TurretItem {
 		for (int i = 1; i <= 3; i++) {
 			textConsumer.accept(
 				Text.translatable("itemTooltip.dm.mg_turret.line" + i)
-					.formatted(Formatting.DARK_AQUA)
+					.formatted(Formatting.GRAY)
 			);
 		}
 	}

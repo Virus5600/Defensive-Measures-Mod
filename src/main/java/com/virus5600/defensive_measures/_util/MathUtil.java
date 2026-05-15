@@ -134,11 +134,59 @@ public class MathUtil {
 		return deg * ((float) Math.PI / 180.0f);
 	}
 
+	/**
+	 * Returns a random boolean value with a 50% chance of being true and a 50% chance of being false.
+	 *
+	 * @return {@code boolean} a random boolean value with a 50% chance of being true and a 50% chance of being false.
+	 */
 	public static boolean randomBool() {
-		return Math.random() < 0.5;
+		return Math.random() > 0.5;
 	}
 
+	/**
+	 * Returns a random boolean value based on the provided chance. For example, if the chance is
+	 * 30, there is a 30% chance that this method will return true and a 70% chance that it will
+	 * return false. A chance of more than 100 will be treated as 100, and a chance of less than 0
+	 * will be treated as 0.
+	 *
+	 * @param chance The percentage chance that this method will return true. Must be between 0 and 100.
+	 *
+	 * @return {@code boolean} a random boolean value based on the provided chance.
+	 */
 	public static boolean randomBool(double chance) {
-		return Math.random() < chance;
+		chance = clamp(chance, 0.0, 100.0);
+
+		double percentageChance = chance / 100;
+		double oppositeChance = 1 - percentageChance;
+
+		if (randomBool()) {
+			return Math.random() > percentageChance;
+		}
+
+		return Math.random() < oppositeChance;
+	}
+
+	public static double clamp(double value, double min, double max) {
+		return Math.max(min, Math.min(max, value));
+	}
+
+	public static float clamp(float value, float min, float max) {
+		return Math.max(min, Math.min(max, value));
+	}
+
+	public static int clamp(int value, int min, int max) {
+		return Math.max(min, Math.min(max, value));
+	}
+
+	public static long clamp(long value, long min, long max) {
+		return Math.max(min, Math.min(max, value));
+	}
+
+	public static short clamp(short value, short min, short max) {
+		return (short) Math.max(min, Math.min(max, value));
+	}
+
+	public static byte clamp(byte value, byte min, byte max) {
+		return (byte) Math.max(min, Math.min(max, value));
 	}
 }
