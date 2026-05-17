@@ -59,7 +59,7 @@ import org.jspecify.annotations.Nullable;
  *
  * @param <T> the screen handler type
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
- * @since 1.0.0
+ * @since 1.0.0-beta
  */
 public abstract class BaseRecipeBookWidget<T extends AbstractRecipeScreenHandler> implements Drawable, Element, Selectable {
 	private static final Identifier TEXTURE = Identifier.ofVanilla("textures/gui/recipe_book.png");

@@ -44,9 +44,8 @@ import java.util.Objects;
  * be changed by any subclass of this block by simply changing the value of
  * the {@link #damageDealt} field.
  *
- * @since 1.0.0
+ * @since 1.0.0-beta
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
- * @version 1.1.0
  */
 public class BoltHeadBlock extends Block implements Waterloggable {
 	public static final MapCodec<BoltHeadBlock> CODEC = createCodec(BoltHeadBlock::new);

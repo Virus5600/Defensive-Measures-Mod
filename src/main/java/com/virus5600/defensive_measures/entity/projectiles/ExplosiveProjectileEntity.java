@@ -65,8 +65,8 @@ import java.util.List;
  *
  * @see #doDamage()
  *
+ * @since 1.0.0-beta
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
- * @since 1.0.0
  */
 public abstract class ExplosiveProjectileEntity extends TurretProjectileEntity {
 	protected static final Pool<BlockParticleEffect> EXPLOSION_BLOCK_PARTICLES;

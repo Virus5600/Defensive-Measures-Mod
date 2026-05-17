@@ -12,7 +12,6 @@ import net.minecraft.util.math.random.Random;
  *
  * @since 1.1.0-beta
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
- * @version 1.0.0
  */
 @Environment(EnvType.CLIENT)
 public class FlakParticle extends BillboardParticle {

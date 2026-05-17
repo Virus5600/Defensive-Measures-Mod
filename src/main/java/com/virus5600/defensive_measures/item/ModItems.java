@@ -31,9 +31,8 @@ import java.util.function.Function;
  * ingredients, etc. This class is also used to register the items to their respective item groups to categorize
  * them in the creative inventory.
  *
- * @since 1.0.0
+ * @since 1.0.0-beta
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
- * @version 1.0.0
  */
 public class ModItems {
 	// VANILLA GROUPS

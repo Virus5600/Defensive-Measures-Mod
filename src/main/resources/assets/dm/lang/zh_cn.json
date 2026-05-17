@@ -35,21 +35,20 @@
 	"itemTooltip.dm.generic.health" : "Health: %s / %s",
 
 	"itemTooltip.dm.cannon_turret.line1" : "Range: 3-24 blocks",
-	"itemTooltip.dm.cannon_turret.line2" : "Firing Arc: X: ±360° | Y: ±30°",
+	"itemTooltip.dm.cannon_turret.line2" : "Firing Arc: X: ±360° | Y: -20° to 22.5°",
 	"itemTooltip.dm.cannon_turret.line3" : "Reload Time: 5 seconds",
 
 	"itemTooltip.dm.ballista.line1" : "Range: 16 blocks",
-	"itemTooltip.dm.ballista.line2" : "Firing Arc: X: ±360° | Y: ±25°",
+	"itemTooltip.dm.ballista.line2" : "Firing Arc: X: ±360° | Y: ±20°",
 	"itemTooltip.dm.ballista.line3" : "Reload Time: 2.5 seconds",
 
 	"itemTooltip.dm.mg_turret.line1" : "Range: 20 blocks",
-	"itemTooltip.dm.mg_turret.line2" : "Firing Arc: X: ±360° | Y: ±27.5°",
+	"itemTooltip.dm.mg_turret.line2" : "Firing Arc: X: ±360° | Y: -27.5° to +90°",
 	"itemTooltip.dm.mg_turret.line3" : "Reload Time: 0.15 seconds (burst) | 3.75 seconds (cooldown)",
 
 	"itemTooltip.dm.aa_turret.line1" : "Range: 8-96 blocks",
-	"itemTooltip.dm.aa_turret.line2" : "Firing Arc: X: ±360° | Y: +90°",
+	"itemTooltip.dm.aa_turret.line2" : "Firing Arc: X: ±360° | Y: 0° to +90°",
 	"itemTooltip.dm.aa_turret.line3" : "Reload Time: 10 seconds",
-	"itemTooltip.dm.aa_turret.line.warning" : "Could explode on death (entity damage)",
 
 	"entity.dm.cannon_turret" : "炮塔",
 	"entity.dm.cannonball" : "炮弹",

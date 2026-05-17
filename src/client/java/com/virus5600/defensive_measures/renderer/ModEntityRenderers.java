@@ -14,9 +14,8 @@ import com.virus5600.defensive_measures.renderer.projectiles.*;
  * entities on the screen; and since this is client side,
  * texture packs can be used to modify how the entities look.
  *
- * @since 1.0.0
+ * @since 1.0.0-beta
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
- * @version 1.0.0
  */
 public class ModEntityRenderers {
 	public static void registerEntityRenderers() {

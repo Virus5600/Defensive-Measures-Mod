@@ -18,9 +18,8 @@ import com.virus5600.defensive_measures.block.ModBlocks;
  * traps, turrets, etc. This class is also used to register the item groups to the registry so
  * that they can be used in the creative inventory.
  *
- * @since 1.0.0
+ * @since 1.0.0-beta
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
- * @version 1.0.0
  */
 public class ModItemGroups {
 	public static final RegistryKey<ItemGroup> DMI_KEY = RegistryKey.of(Registries.ITEM_GROUP.getKey(), Identifier.of(DefensiveMeasures.MOD_ID, "defensive_measures_items"));

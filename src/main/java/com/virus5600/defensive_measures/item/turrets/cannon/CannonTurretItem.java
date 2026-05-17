@@ -21,7 +21,6 @@ import java.util.function.Consumer;
  *
  * @since 1.0.0-beta
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
- * @version 1.0.0
  */
 public class CannonTurretItem extends TurretItem {
 	public CannonTurretItem(EntityType<? extends MobEntity> type, net.minecraft.item.Item.Settings settings) {

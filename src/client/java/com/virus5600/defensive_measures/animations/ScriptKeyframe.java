@@ -17,7 +17,6 @@ import org.jetbrains.annotations.Nullable;
  * custom behavior during an animation, such modifying entity state or creating explosions on death.
  *
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
- * @version 1.0.0
  * @see KeyframeAction
  * @since 1.1.0-beta
  */

@@ -58,7 +58,7 @@ import java.util.Optional;
  *     <li><b>Base Damage:</b> 15.0</li>
  *     <li><b>Base Pierce Level:</b> 0</li>
  *     <li><b>Attack Cooldown:</b> 10 seconds</li>
- *     <li><b>Attack Range:</b> 96 blocks</li>
+ *     <li><b>Attack Range:</b> 8-96 blocks</li>
  *     <li><b>X Firing Arc:</b> ±360°</li>
  *     <li><b>Y Firing Arc:</b> 0 to +90°</li>
  *     <li><b>Armor:</b> 2</li>
@@ -69,7 +69,6 @@ import java.util.Optional;
  *
  * @since 1.1.0-beta
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
- * @version 1.0.0
  */
 public class AATurretEntity extends TurretEntity {
 	/**

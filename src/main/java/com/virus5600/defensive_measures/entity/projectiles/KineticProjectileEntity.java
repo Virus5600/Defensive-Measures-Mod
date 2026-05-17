@@ -27,9 +27,8 @@ import net.minecraft.world.World;
  *     <li>Base damage is set to 4.</li>
  * </ul>
  *
- * @since 1.0.0
+ * @since 1.0.0-beta
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
- * @version 1.0.0
  */
 public abstract class KineticProjectileEntity extends TurretProjectileEntity {
 

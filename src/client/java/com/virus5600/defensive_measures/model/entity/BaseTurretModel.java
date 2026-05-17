@@ -39,7 +39,6 @@ import java.util.*;
  *
  * @since 1.0.0-beta
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
- * @version 2.1.0
  */
 public abstract class BaseTurretModel<S extends BaseTurretRenderState> extends BaseModel<S> {
 	private final Map<UUID, Queue<? extends Keyframe>> shootAnimProcedure = new HashMap<>();
@@ -165,12 +164,6 @@ public abstract class BaseTurretModel<S extends BaseTurretRenderState> extends B
 	public void setAngles(S state) {
 		super.setAngles(state);
 
-		// HEAD ANGLE HANDLING
-		float headYaw = state.relativeHeadYaw + state.bodyYaw + 180;
-		float headPitch = state.hasTarget ? state.pitch : -this.getDefaultHeadPitch();
-
-		this.setHeadAngles(headYaw, headPitch);
-
 		// ANIMATION HANDLING (& ADDITIONAL PROCEDURES)
 		if (this.shootAnim != null) {
 			if (this.getShootAnimProcedure(state.id) == null &&
@@ -209,6 +202,12 @@ public abstract class BaseTurretModel<S extends BaseTurretRenderState> extends B
 			this.setShootAnimProcedure(state.id, null);
 			this.setDeathAnimProcedure(state.id, null);
 		}
+
+		// HEAD ANGLE HANDLING
+		float headYaw = state.relativeHeadYaw + state.bodyYaw + 180;
+		float headPitch = state.hasTarget ? state.pitch : -this.getDefaultHeadPitch();
+
+		this.setHeadAngles(headYaw, headPitch);
 	}
 
 	/**

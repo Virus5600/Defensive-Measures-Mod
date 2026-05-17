@@ -29,9 +29,8 @@ import com.virus5600.defensive_measures.entity.ModEntities;
  * @see TurretProjectileEntity
  * @see TurretProjectileEntity#onEntityHit(EntityHitResult)
  *
- * @since 1.0.0
+ * @since 1.0.0-beta
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
- * @version 1.0.1
  */
 public class BallistaBoltEntity extends KineticProjectileEntity {
 	// ////////////// //

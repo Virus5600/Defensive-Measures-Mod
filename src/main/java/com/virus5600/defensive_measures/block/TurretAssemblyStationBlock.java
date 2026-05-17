@@ -42,7 +42,6 @@ import com.virus5600.defensive_measures.stat.ModStats;
  *
  * @since 1.1.0
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
- * @version 1.0.0
  */
 public class TurretAssemblyStationBlock extends BaseFunctionalBlock {
 	public static final MapCodec<TurretAssemblyStationBlock> CODEC = createCodec(TurretAssemblyStationBlock::new);

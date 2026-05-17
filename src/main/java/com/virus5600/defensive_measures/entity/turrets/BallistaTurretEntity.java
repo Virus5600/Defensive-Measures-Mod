@@ -45,14 +45,13 @@ import java.util.Map;
  *     <li><b>Attack Cooldown:</b> 2.5 seconds</li>
  *     <li><b>Attack Range:</b> 16 blocks</li>
  *     <li><b>X Firing Arc:</b> ±360°</li>
- *     <li><b>Y Firing Arc:</b> ±25°</li>
+ *     <li><b>Y Firing Arc:</b> ±20°</li>
  * </ul>
  *
  * @see TurretEntity
  *
- * @since 1.0.0
+ * @since 1.0.0-beta
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
- * @version 1.1.0
  */
 public class BallistaTurretEntity extends TurretEntity {
 	/**
@@ -166,7 +165,7 @@ public class BallistaTurretEntity extends TurretEntity {
 
 	@Override
 	public int getMaxLookPitchChange() {
-		return 25;
+		return 20;
 	}
 
 	@Nullable

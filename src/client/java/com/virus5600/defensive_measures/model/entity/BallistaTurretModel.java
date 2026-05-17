@@ -119,11 +119,11 @@ public class BallistaTurretModel extends BaseTurretModel<BaseTurretRenderState> 
 
 	@Override
 	protected float getMinPitch() {
-		return -22.5f;
+		return -20f;
 	}
 
 	@Override
 	protected float getMaxPitch() {
-		return 22.5f;
+		return 20f;
 	}
 }

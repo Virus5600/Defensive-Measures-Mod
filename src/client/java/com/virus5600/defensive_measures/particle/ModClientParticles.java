@@ -14,9 +14,8 @@ import net.fabricmc.fabric.api.client.particle.v1.ParticleFactoryRegistry;
  * <br><br>
  * All custom particles are registered here, even if they are not used by the client.
  *
- * @since 1.0.0
+ * @since 1.0.0-beta
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
- * @version 1.0.0
  */
 @Environment(EnvType.CLIENT)
 public class ModClientParticles {

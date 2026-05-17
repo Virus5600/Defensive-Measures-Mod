@@ -13,9 +13,8 @@ import net.minecraft.util.Identifier;
  * usually used register the particles defined in the client-side
  * of the mod.
  *
- * @since 1.0.0
+ * @since 1.0.0-beta
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
- * @version 1.0.0
  */
 public class ModParticles {
 	// PARTICLES

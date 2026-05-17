@@ -25,9 +25,8 @@ import org.slf4j.LoggerFactory;
  * This class holds the Mod ID, name, and Logger instances, along with common initialization processes and
  * utility methods that can be used throughout the mod's development.
  *
- * @since 1.0.0
+ * @since 1.0.0-beta
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
- * @version 1.0.0
  */
 public class DefensiveMeasures implements ModInitializer {
 	/**

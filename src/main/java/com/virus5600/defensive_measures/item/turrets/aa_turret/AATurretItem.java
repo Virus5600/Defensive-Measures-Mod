@@ -21,7 +21,6 @@ import java.util.function.Consumer;
  *
  * @since 1.1.0-beta
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
- * @version 1.0.0
  */
 public class AATurretItem extends TurretItem {
 	public AATurretItem(EntityType<? extends MobEntity> type, net.minecraft.item.Item.Settings settings) {
@@ -42,13 +41,7 @@ public class AATurretItem extends TurretItem {
 				Text.translatable("itemTooltip.dm.aa_turret.line" + i)
 					.formatted(Formatting.GRAY)
 			);
-		}
-
-		textConsumer.accept(
-			Text.translatable("itemTooltip.dm.aa_turret.line.warning")
-				.formatted(Formatting.DARK_RED)
-				.formatted(Formatting.ITALIC)
-		);
+		};
 	}
 
 	public float getTurretMaxHealth() {

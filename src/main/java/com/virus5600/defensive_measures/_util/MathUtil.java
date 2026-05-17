@@ -1,6 +1,8 @@
 package com.virus5600.defensive_measures._util;
 
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.random.Random;
 
 /**
  * Contains all related math utility methods that can be used almost everywhere. This is to
@@ -11,9 +13,13 @@ import net.minecraft.util.math.Vec3d;
  *
  * @since 1.1.0-beta
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
- * @version 1.0.0
  */
 public class MathUtil {
+
+	// ///////////////// //
+	// RELATIVE POSITION //
+	// ///////////////// //
+
 	/**
 	 * Identifies the position of a point relative to the origin provided.
 	 * <br><br>
@@ -112,6 +118,10 @@ public class MathUtil {
 		return getRelativePos(origin, offsets.getX(), offsets.getY(), offsets.getZ(), yaw);
 	}
 
+	// ///////////////////// //
+	// ANGLE UNIT CONVERSION //
+	// ///////////////////// //
+
 	/**
 	 * Converts radians to degrees.
 	 *
@@ -133,6 +143,10 @@ public class MathUtil {
 	public static float degToRad(float deg) {
 		return deg * ((float) Math.PI / 180.0f);
 	}
+
+	// ////////////// //
+	// RANDOM BOOLEAN //
+	// ////////////// //
 
 	/**
 	 * Returns a random boolean value with a 50% chance of being true and a 50% chance of being false.
@@ -156,15 +170,12 @@ public class MathUtil {
 	public static boolean randomBool(double chance) {
 		chance = clamp(chance, 0.0, 100.0);
 
-		double percentageChance = chance / 100;
-		double oppositeChance = 1 - percentageChance;
-
-		if (randomBool()) {
-			return Math.random() > percentageChance;
-		}
-
-		return Math.random() < oppositeChance;
+		return random() <= chance;
 	}
+
+	// ////// //
+	// CLAMPS //
+	// ////// //
 
 	public static double clamp(double value, double min, double max) {
 		return Math.max(min, Math.min(max, value));
@@ -188,5 +199,42 @@ public class MathUtil {
 
 	public static byte clamp(byte value, byte min, byte max) {
 		return (byte) Math.max(min, Math.min(max, value));
+	}
+
+	// ///////////// //
+	// RANDOM NUMBER //
+	// ///////////// //
+
+	/**
+	 * Returns a random integer between 0 and 100 (inclusive).
+	 *
+	 * @return {@code int} a random integer between 0 and 100 (inclusive).
+	 */
+	public static int random() {
+		return MathHelper.nextInt(Random.create(), 0, 100);
+	}
+
+	public static double random(double min, double max) {
+		return MathHelper.nextDouble(Random.create(), min, max);
+	}
+
+	public static float random(float min, float max) {
+		return MathHelper.nextFloat(Random.create(), min, max);
+	}
+
+	public static int random(int min, int max) {
+		return MathHelper.nextInt(Random.create(), min, max);
+	}
+
+	public static long random(long min, long max) {
+		return (long) (Math.random() * (max - min) + min);
+	}
+
+	public static short random(short min, short max) {
+		return (short) (Math.random() * (max - min) + min);
+	}
+
+	public static byte random(byte min, byte max) {
+		return (byte) (Math.random() * (max - min) + min);
 	}
 }

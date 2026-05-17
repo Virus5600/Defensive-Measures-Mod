@@ -13,9 +13,8 @@ import net.minecraft.util.Identifier;
  * mod needs to sync data between the server and the client and the data is
  * one that doesn't have a vanilla packet to handle it.
  *
- * @since 1.0.0
+ * @since 1.0.0-beta
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
- * @version 1.0.0
  */
 public class ModPackets {
 }

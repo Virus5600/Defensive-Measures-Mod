@@ -42,17 +42,16 @@ import java.util.Map;
  *     <li><b>Health:</b> 25</li>
  *     <li><b>Base Damage:</b> 5.0</li>
  *     <li><b>Base Pierce Level:</b> 5</li>
- *     <li><b>Attack Cooldown:</b> 0.125 seconds per bullets / 3.75 seconds per burst</li>
+ *     <li><b>Attack Cooldown:</b> 0.15 seconds per bullets / 3.75 seconds per burst</li>
  *     <li><b>Attack Range:</b> 20 blocks</li>
  *     <li><b>X Firing Arc:</b> ±360°</li>
- *     <li><b>Y Firing Arc:</b> ±27.5°</li>
+ *     <li><b>Y Firing Arc:</b> -27.5 to 90°</li>
  * </ul>
  *
  * @see TurretEntity
  *
- * @since 1.0.0
+ * @since 1.0.0-beta
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
- * @version 1.0.0
  */
 public class MGTurretEntity extends TurretEntity {
 	/**
@@ -137,8 +136,8 @@ public class MGTurretEntity extends TurretEntity {
 	// /////////////////// //
 
 	@Override
-	public int getMaxLookPitchChange() {
-		return 27;
+	public int getMinLookPitchChange() {
+		return -28;
 	}
 
 	@Nullable

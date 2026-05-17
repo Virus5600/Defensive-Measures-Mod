@@ -14,7 +14,6 @@ import com.virus5600.defensive_measures.renderer.entity.state.BaseTurretRenderSt
  *
  * @since 1.1.0-beta
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
- * @version 1.0.0
  */
 @FunctionalInterface
 public interface KeyframeAction {

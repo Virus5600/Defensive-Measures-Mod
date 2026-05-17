@@ -52,9 +52,8 @@ import com.virus5600.defensive_measures.entity.turrets.TurretEntity;
  * For a more basic projectile entity or one that can be shot by a player, use the {@link PersistentProjectileEntity}
  * class.
  *
- * @since 1.0.0
+ * @since 1.0.0-beta
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
- * @version 1.0.0
  */
 public abstract class TurretProjectileEntity extends ProjectileEntity {
 	protected static final TrackedData<Byte> PROJECTILE_FLAGS = DataTracker.registerData(TurretProjectileEntity.class, TrackedDataHandlerRegistry.BYTE);

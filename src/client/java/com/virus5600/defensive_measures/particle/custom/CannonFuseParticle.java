@@ -22,9 +22,8 @@ import org.jspecify.annotations.Nullable;
  * The particle is a small flame that fades out over time, emitting from the back
  * of the cannon.
  *
- * @since 1.0.0
+ * @since 1.0.0-beta
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
- * @version 1.0.0
  */
 @Environment(EnvType.CLIENT)
 public class CannonFuseParticle extends BillboardParticle {

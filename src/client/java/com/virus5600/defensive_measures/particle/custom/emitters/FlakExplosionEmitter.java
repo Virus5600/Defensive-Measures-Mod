@@ -21,7 +21,6 @@ import com.virus5600.defensive_measures.particle.custom.FlakParticle;
  * pattern, creating a more natural and chaotic explosion effect.
  *
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
- * @version 1.0.0
  * @see CustomEmitter
  * @since 1.0.0-beta
  */

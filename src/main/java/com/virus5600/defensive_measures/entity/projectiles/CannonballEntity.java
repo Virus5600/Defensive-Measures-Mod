@@ -54,9 +54,8 @@ import com.virus5600.defensive_measures.entity.ModEntities;
  *
  * @see ExplosiveProjectileEntity
  *
- * @since 1.0.0
+ * @since 1.0.0-beta
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
- * @version 1.0.0
  */
 public class CannonballEntity extends ExplosiveProjectileEntity {
 	// ////////////// //

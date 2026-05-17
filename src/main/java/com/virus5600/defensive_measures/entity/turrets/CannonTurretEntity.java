@@ -49,18 +49,17 @@ import java.util.Optional;
  *     <li><b>Base Damage:</b> 10.0</li>
  *     <li><b>Base Pierce Level:</b> 0</li>
  *     <li><b>Attack Cooldown:</b> 5 seconds</li>
- *     <li><b>Attack Range:</b> 24 blocks</li>
+ *     <li><b>Attack Range:</b> 3-24 blocks</li>
  *     <li><b>X Firing Arc:</b> ±360°</li>
- *     <li><b>Y Firing Arc:</b> ±30°</li>
+ *     <li><b>Y Firing Arc:</b> -20 to 22.5°</li>
  *     <li><b>Armor:</b> 3</li>
  *     <li><b>Armor Toughness:</b> 2</li>
  * </ul>
  *
  * @see TurretEntity
  *
- * @since 1.0.0
+ * @since 1.0.0-beta
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
- * @version 1.1.0
  */
 public class CannonTurretEntity extends TurretEntity {
 	/**
@@ -173,7 +172,12 @@ public class CannonTurretEntity extends TurretEntity {
 
 	@Override
 	public int getMaxLookPitchChange() {
-		return 30;
+		return 23;
+	}
+
+	@Override
+	public int getMinLookPitchChange() {
+		return -20;
 	}
 
 	@Nullable

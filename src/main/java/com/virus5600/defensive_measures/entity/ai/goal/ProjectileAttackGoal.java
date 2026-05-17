@@ -58,7 +58,6 @@ import java.util.EnumSet;
  *
  * @since 1.0.0-beta
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
- * @version 1.0.1
  */
 public class ProjectileAttackGoal extends net.minecraft.entity.ai.goal.ProjectileAttackGoal {
 	private final TurretEntity mob;
