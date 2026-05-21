@@ -1,7 +1,9 @@
 package com.virus5600.defensive_measures;
 
+import com.virus5600.defensive_measures.command.ModClientCommands;
 import com.virus5600.defensive_measures.gui.screen.ingame.ModHandledScreens;
 import com.virus5600.defensive_measures.model.ModEntityModels;
+import com.virus5600.defensive_measures.networking.ModClientPackets;
 import com.virus5600.defensive_measures.particle.ModClientParticles;
 import com.virus5600.defensive_measures.renderer.ModEntityRenderers;
 import net.fabricmc.api.ClientModInitializer;
@@ -33,6 +35,12 @@ public class DefensiveMeasuresClient implements ClientModInitializer {
 
 		// Screens
 		ModHandledScreens.registerScreens();
+
+		// Commands
+		ModClientCommands.registerCommands();
+
+		// Networking
+		ModClientPackets.registerClientPackets();
 
 		DefensiveMeasures.LOGGER.info("{} CLIENT ENTRY POINT INITIALIZED.", DefensiveMeasures.MOD_NAME);
 	}

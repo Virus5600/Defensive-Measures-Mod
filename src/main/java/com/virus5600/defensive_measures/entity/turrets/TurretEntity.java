@@ -139,6 +139,7 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 	protected static final TrackedData<Integer> BURST_DELAY;
 	protected static final TrackedData<Boolean> SHOOTING;
 	protected static final TrackedData<Boolean> IS_LOCKED_BUT_NOT_ATTACKING;
+	protected static final TrackedData<Boolean> HAS_TARGET;
 	/**
 	 * The maximum health of this turret entity. Change this value using the {@link #setTurretMaxHealth(float)}
 	 * method before calling the {@link TurretEntity#setAttributes()} method to set the max health
@@ -466,6 +467,7 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 			.add(BURST_DELAY, 0)
 			.add(SHOOTING, false)
 			.add(IS_LOCKED_BUT_NOT_ATTACKING, false)
+			.add(HAS_TARGET, false)
 		;
 	}
 
@@ -561,6 +563,55 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 	// /////////////// //
 	// PROCESS METHODS //
 	// /////////////// //
+
+	/**
+	 * Updates the tracked data for whether this turret is locked but not attacking. This is used
+	 * to determine whether the turret is in the "charging" state, which is when the turret is
+	 * locked on to a target but has not yet attacked. The default value for the
+	 * {@code afterAttackTick} parameter is 5, which means that the turret will be considered as
+	 * "charging" if it is locked on to a target for more than 5 ticks after the last attack.
+	 *
+	 * @see #updateTrackedLockedButNotAttacking(int)
+	 *
+	 * @apiNote This method can be overloaded to change the default value of the {@code afterAttackTick}
+	 * parameter. To change the said value, simply override this method and call the overloaded
+	 * version with the desired value for the {@code afterAttackTick} parameter.
+	 */
+	protected void updateTrackedLockedButNotAttacking() {
+		this.updateTrackedLockedButNotAttacking(5);
+	}
+
+	/**
+	 * Updates the tracked data for whether this turret is locked but not attacking. This is used
+	 * to determine whether the turret is in the "charging" state, which is when the turret is
+	 * locked on to a target but has not yet attacked. The default value for the
+	 * {@code afterAttackTick} parameter is 5 (defined via the
+	 * {@link #updateTrackedLockedButNotAttacking()}), which means that the turret will be
+	 * considered as "charging" if it is locked on to a target for more than 5 ticks after the last
+	 * attack.
+	 *
+	 * @param afterAttackTick The number of ticks after the last attack before the turret is
+	 *                           considered as "charging". The default value is 5 ticks.
+	 *
+	 * @see #updateTrackedLockedButNotAttacking()
+	 *
+	 * @apiNote This method is considered final and designed to only be called by the overloaded
+	 * version with no parameter. This method should also not be called again inside the
+	 * {@link #tick()} method as the overloaded one is the method being called inside said method. To
+	 * change the {@code afterAttackTick} value, override the overload method and call this inside
+	 * said method, passing the desired value for the {@code afterAttackTick} parameter.
+	 */
+	protected final void updateTrackedLockedButNotAttacking(int afterAttackTick) {
+		int updateCountdownTicks = this.attackGoal.getUpdateCountdownTicks(),
+			beforeAttackTick = this.getTotalAttCooldown() - afterAttackTick;
+
+		// Marked as charging if the countdown ticks is larger than the designated "shoot" time
+		// which is defined as afterAttackTick.
+		boolean isCharging = updateCountdownTicks > afterAttackTick &&
+			updateCountdownTicks < beforeAttackTick;
+
+		this.setTrackedLockedButNotAttacking(isCharging);
+	}
 
 	@Override
 	protected void updatePostDeath() {
@@ -789,6 +840,14 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 		}
 		// SERVER SIDE
 		else {
+			// Handles the "locked but not attacking" data.
+			this.updateTrackedLockedButNotAttacking();
+
+			boolean hasTarget = this.getTarget() != null;
+			if (this.hasTarget() == hasTarget) {
+				this.setHasTarget(hasTarget);
+			}
+
 			// SNAPPING THE TURRET BACK IN PLACE
 			if (this.getVelocity().x == 0 && this.getVelocity().z == 0 && !this.hasVehicle()) {
 				double offset = this.getType().getDimensions().width() % 2 == 0 ?
@@ -1119,12 +1178,12 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 		this.dataTracker.set(ATTACHED_FACE, dir);
 	}
 
-	public boolean getTrackedShooting() {
-		return this.dataTracker.get(SHOOTING);
-	}
-
 	public void setTrackedShooting(boolean shooting) {
 		this.dataTracker.set(SHOOTING, shooting);
+	}
+
+	public boolean getTrackedShooting() {
+		return this.dataTracker.get(SHOOTING);
 	}
 
 	public void setTrackedLockedButNotAttacking(boolean locked) {
@@ -1133,6 +1192,14 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 
 	public boolean getTrackedLockedButNotAttacking() {
 		return this.dataTracker.get(IS_LOCKED_BUT_NOT_ATTACKING);
+	}
+
+	public void setHasTarget(boolean locked) {
+		this.dataTracker.set(HAS_TARGET, locked);
+	}
+
+	public boolean hasTarget() {
+		return this.dataTracker.get(HAS_TARGET);
 	}
 
 	// ///////////////// //
@@ -1692,7 +1759,7 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 	public abstract double getProjectileDamage();
 
 	/**
-	 * Determines the knockback this turret's projectile will deal. This only
+	 * Determines the number of entities this turret's projectile can pierce. This only
 	 * works for instances of {@link com.virus5600.defensive_measures.entity.projectiles.TurretProjectileEntity TurretProjectileEntity}
 	 * or its subclasses due to the overridden methods and tailored behavior.
 	 *
@@ -2374,6 +2441,7 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 		SHOOTING_PITCH = DataTracker.registerData(TurretEntity.class, TrackedDataHandlerRegistry.FLOAT);
 		USE_BURST = DataTracker.registerData(TurretEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
 		IS_LOCKED_BUT_NOT_ATTACKING = DataTracker.registerData(TurretEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
+		HAS_TARGET = DataTracker.registerData(TurretEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
 
 		ATTACHED_FACE = DataTracker.registerData(TurretEntity.class, TrackedDataHandlerRegistry.FACING);
 		X = DataTracker.registerData(TurretEntity.class, TrackedDataHandlerRegistry.FLOAT);

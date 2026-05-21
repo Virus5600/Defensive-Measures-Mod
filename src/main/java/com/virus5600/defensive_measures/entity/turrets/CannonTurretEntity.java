@@ -88,8 +88,10 @@ public class CannonTurretEntity extends TurretEntity {
 
 		this.setShootSound(ModSoundEvents.TURRET_CANNON_SHOOT);
 		this.setHealSound(ModSoundEvents.TURRET_REPAIR_METAL);
-		this.addHealables(healables);
-		this.addEffectSource(effectSource);
+
+		this.addHealables(healables)
+			.addEffectSource(effectSource)
+		;
 	}
 
 	// //////////// //
@@ -154,15 +156,6 @@ public class CannonTurretEntity extends TurretEntity {
 		// Client Side
 		if (this.getEntityWorld().isClient()) {
 			this.updateAnimations();
-		}
-		// Server Side
-		else {
-			int updateCountdownTicks = this.attackGoal.getUpdateCountdownTicks(),
-				afterAttackTick = 5,
-				beforeAttackTick = TOTAL_ATT_COOLDOWN - afterAttackTick;
-			boolean isCharging = updateCountdownTicks > afterAttackTick && updateCountdownTicks < beforeAttackTick;
-
-			this.setTrackedLockedButNotAttacking(isCharging);
 		}
 	}
 

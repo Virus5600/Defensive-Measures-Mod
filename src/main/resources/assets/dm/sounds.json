@@ -270,5 +270,53 @@
 			"dm:anti_air_turret/shoot2"
 		],
 		"subtitle": "subtitles.turret.aa_turret.shoot"
+	},
+
+	"turret.flame_turret.hurt": {
+		"sounds": [
+			"dm:turrets/hurt/metal_hurt1",
+			"dm:turrets/hurt/metal_hurt2"
+		],
+		"subtitle": "subtitles.turret.aa_turret.hurt"
+	},
+	"turret.flame_turret.destroyed": {
+		"sounds": [
+			"dm:turrets/crumbling_turrets/metal_crumbling1",
+			"dm:turrets/crumbling_turrets/metal_crumbling2"
+		],
+		"subtitle": "subtitles.turret.aa_turret.destroyed"
+	},
+	"turret.flame_turret.shoot.start": {
+		"sounds": [
+			"dm:flame_turret/start"
+		],
+		"subtitle": "subtitles.turret.flame_turret.shoot.start"
+	},
+	"turret.flame_turret.shoot.loop": {
+		"sounds": [
+			{
+				"name": "dm:flame_turret/shoot1",
+				"volume": 0.55,
+				"pitch": 1
+			},
+			{
+				"name": "dm:flame_turret/shoot2",
+				"volume":  0.55,
+				"pitch": 1
+			},
+			{
+				"name": "dm:flame_turret/shoot3",
+				"volume":  0.55,
+				"pitch": 1
+			}
+		],
+		"pitch": 1,
+		"subtitle": "subtitles.turret.flame_turret.shoot.loop"
+	},
+	"turret.flame_turret.shoot.end": {
+		"sounds": [
+			"dm:flame_turret/end"
+		],
+		"subtitle": "subtitles.turret.flame_turret.shoot.end"
 	}
 }

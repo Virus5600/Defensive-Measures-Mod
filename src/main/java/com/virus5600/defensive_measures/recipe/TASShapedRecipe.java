@@ -78,7 +78,7 @@ public class TASShapedRecipe extends BaseCraftingRecipe<CraftingRecipeInput> {
 
 		PACKET_CODEC = PacketCodec.tuple(
 			PacketCodecs.STRING, BaseCraftingRecipe::getGroup,
-			ModCraftingRecipeCategory.PACKET_CODEC, BaseCraftingRecipe::getCategory, // *See note below
+			ModCraftingRecipeCategory.PACKET_CODEC, BaseCraftingRecipe::getCategory,
 			CustomShapedRecipe.PACKET_CODEC, recipe -> recipe.recipe,
 			ItemStack.PACKET_CODEC, recipe -> recipe.result,
 			PacketCodecs.BOOLEAN, BaseCraftingRecipe::showNotification,

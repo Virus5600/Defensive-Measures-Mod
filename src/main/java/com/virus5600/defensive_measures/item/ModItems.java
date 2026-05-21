@@ -5,8 +5,9 @@ import net.fabricmc.fabric.api.registry.FuelRegistryEvents;
 import net.minecraft.block.Block;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.mob.MobEntity;
-import net.minecraft.item.Item;
 import net.minecraft.item.Item.Settings;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemGroups;
 
 import com.virus5600.defensive_measures.DefensiveMeasures;
 import com.virus5600.defensive_measures._helper.RegistryHelper;
@@ -15,11 +16,11 @@ import com.virus5600.defensive_measures.entity.ModEntities;
 import com.virus5600.defensive_measures.item.equipments.TurretRemoverItem;
 import com.virus5600.defensive_measures.item.interfaces.FuelItem;
 import com.virus5600.defensive_measures.item.turrets.TurretItem;
+import com.virus5600.defensive_measures.item.turrets.aa_turret.*;
 import com.virus5600.defensive_measures.item.turrets.ballista.*;
 import com.virus5600.defensive_measures.item.turrets.cannon.*;
+import com.virus5600.defensive_measures.item.turrets.flame_turret.*;
 import com.virus5600.defensive_measures.item.turrets.mg_turret.*;
-import com.virus5600.defensive_measures.item.turrets.aa_turret.*;
-import net.minecraft.item.ItemGroups;
 
 import java.util.Arrays;
 import java.util.function.Function;
@@ -74,6 +75,9 @@ public class ModItems {
 
 	// AA TURRET
 	public final static Item AA_TURRET = registerItem("aa_turret", ModEntities.AA_TURRET, AATurretItem::new);
+
+	// FLAME TURRET
+	public final static Item FLAME_TURRET = registerItem("flame_turret", ModEntities.FLAME_TURRET, FlameTurretItem::new);
 
 	// ////////// //
 	// EQUIPMENTS //
@@ -239,7 +243,8 @@ public class ModItems {
 			MG_TURRET,
 
 			// TIER 2
-			AA_TURRET
+			AA_TURRET,
+			FLAME_TURRET
 		};
 
 		FUEL_ITEMS = new Item[] {

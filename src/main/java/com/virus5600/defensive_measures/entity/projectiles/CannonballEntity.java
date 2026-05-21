@@ -73,22 +73,6 @@ public class CannonballEntity extends ExplosiveProjectileEntity {
 		this.setDamage(10);
 	}
 
-	public CannonballEntity(LivingEntity owner, World world) {
-		this(ModEntities.CANNONBALL, world);
-		this.setOwner(owner);
-	}
-
-	public CannonballEntity(
-		LivingEntity owner,
-		double directionX,
-		double directionY,
-		double directionZ,
-		World world
-	) {
-		this(owner, world);
-		this.setVelocity(directionX, directionY, directionZ);
-	}
-
 	// ///////// //
 	//  METHODS  //
 	// ///////// //

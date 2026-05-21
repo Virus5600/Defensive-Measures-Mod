@@ -56,6 +56,13 @@ public class ModSoundEvents {
 	public static final SoundEvent TURRET_ANTI_AIR_DESTROYED = ModSoundEvents.registerSoundEvent("turret.aa_turret.destroyed");
 	public static final SoundEvent TURRET_ANTI_AIR_SHOOT = ModSoundEvents.registerSoundEvent("turret.aa_turret.shoot");
 
+	// FLAME TURRET
+	public static final SoundEvent TURRET_FLAME_HURT = ModSoundEvents.registerSoundEvent("turret.flame_turret.hurt");
+	public static final SoundEvent TURRET_FLAME_DESTROYED = ModSoundEvents.registerSoundEvent("turret.flame_turret.destroyed");
+	public static final SoundEvent TURRET_FLAME_SHOOT_START = ModSoundEvents.registerSoundEvent("turret.flame_turret.shoot.start");
+	public static final SoundEvent TURRET_FLAME_SHOOT_LOOP = ModSoundEvents.registerSoundEvent("turret.flame_turret.shoot.loop");
+	public static final SoundEvent TURRET_FLAME_SHOOT_END = ModSoundEvents.registerSoundEvent("turret.flame_turret.shoot.end");
+
 	private static SoundEvent registerSoundEvent(final String soundID) {
 		Identifier identifier = Identifier.of(DefensiveMeasures.MOD_ID, soundID);
 		return Registry.register(

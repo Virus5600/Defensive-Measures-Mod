@@ -2,10 +2,12 @@ package com.virus5600.defensive_measures;
 
 import com.virus5600.defensive_measures.advancement.criterion.ModCriterion;
 import com.virus5600.defensive_measures.block.ModBlocks;
+import com.virus5600.defensive_measures.command.ModCommands;
 import com.virus5600.defensive_measures.entity.ModEntities;
 import com.virus5600.defensive_measures.entity.damage.ModDamageTypes;
 import com.virus5600.defensive_measures.item.ModItemGroups;
 import com.virus5600.defensive_measures.item.ModItems;
+import com.virus5600.defensive_measures.network.ModPackets;
 import com.virus5600.defensive_measures.particle.ModParticles;
 import com.virus5600.defensive_measures.recipe.ModRecipeDisplays;
 import com.virus5600.defensive_measures.recipe.ModRecipeSerializers;
@@ -66,6 +68,8 @@ public class DefensiveMeasures implements ModInitializer {
 		ModRecipeSerializers.registerModRecipeSerializers();
 		ModRecipeTypes.registerModRecipesTypes();
 		ModRecipeBookCategories.registerBookCategories();
+		ModCommands.registerCommands();
+		ModPackets.registerModPackets();
 
 		LOGGER.info("{} MAIN ENTRY POINT INITIALIZED.", MOD_NAME);
 	}

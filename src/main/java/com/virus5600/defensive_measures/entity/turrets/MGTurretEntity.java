@@ -84,8 +84,10 @@ public class MGTurretEntity extends TurretEntity {
 
 		this.setShootSound(ModSoundEvents.TURRET_MG_SHOOT);
 		this.setHealSound(ModSoundEvents.TURRET_REPAIR_METAL);
-		this.addHealables(healables);
-		this.addEffectSource(effectSource);
+
+		this.addHealables(healables)
+			.addEffectSource(effectSource)
+		;
 	}
 
 	// //////////// //

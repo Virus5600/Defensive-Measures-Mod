@@ -240,6 +240,8 @@ public class ProjectileAttackGoal extends net.minecraft.entity.ai.goal.Projectil
 	 * shoot.
 	 *
 	 * @param target The target on which the shooter will aim at.
+	 * @param shouldClamp Whether to clamp the pitch angle to the rotation limits of the turret. If true, the pitch angle will be clamped to the rotation limits of the turret. If false, the pitch angle will not be clamped and may exceed the rotation limits of the turret.
+	 *
 	 * @return The pitch angle in degrees.
 	 */
 	public float getShootingPitch(LivingEntity target, boolean shouldClamp) {
@@ -262,6 +264,15 @@ public class ProjectileAttackGoal extends net.minecraft.entity.ai.goal.Projectil
 		return p;
 	}
 
+	/**
+	 * Calculates the initial yaw angle in degrees for the shooter to aim at the target. This
+	 * allows the shooter to align its yaw angle to the trajectory of the projectile it will shoot.
+	 *
+	 * @param target The target on which the shooter will aim at.
+	 * @param shouldClamp Whether to clamp the yaw angle to the rotation limits of the turret. If true, the pitch angle will be clamped to the rotation limits of the turret. If false, the yaw angle will not be clamped and may exceed the rotation limits of the turret.
+	 *
+	 * @return The yaw angle in degrees.
+	 */
 	public float getShootingYaw(LivingEntity target, boolean shouldClamp) {
 		Vec3d velocity = TurretEntity.TurretProjectileVelocity
 			.init(this.mob)

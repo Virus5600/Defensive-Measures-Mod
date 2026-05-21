@@ -80,8 +80,10 @@ public class BallistaTurretEntity extends TurretEntity {
 		super(entityType, world, TurretMaterial.WOOD, ModEntities.BALLISTA_BOLT, ModItems.BALLISTA_TURRET);
 
 		this.setShootSound(ModSoundEvents.TURRET_BALLISTA_SHOOT);
-		this.addHealables(healables);
-		this.addEffectSource(effectSource);
+
+		this.addHealables(healables)
+			.addEffectSource(effectSource)
+		;
 	}
 
 	// //////////// //

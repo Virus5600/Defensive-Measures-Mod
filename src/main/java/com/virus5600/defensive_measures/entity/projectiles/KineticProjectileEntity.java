@@ -27,6 +27,10 @@ import net.minecraft.world.World;
  *     <li>Base damage is set to 4.</li>
  * </ul>
  *
+ * @see TurretProjectileEntity
+ * @see ExplosiveProjectileEntity
+ * @see AreaCloudEntity
+ *
  * @since 1.0.0-beta
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
  */

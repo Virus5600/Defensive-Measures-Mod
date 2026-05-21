@@ -48,7 +48,7 @@ public abstract class BaseTurretModel<S extends BaseTurretRenderState> extends B
 	 * Identifies the bone that serves as the neck of the turret so that it can
 	 * rotate along the yaw axis. This part is basically the stand of a turret.
 	 */
-	protected final ModelPart stand;
+	protected final ModelPart neck;
 	/**
 	 * Identifies the bone that serves as the head of the turret so that it can
 	 * rotate along the pitch axis.
@@ -96,7 +96,7 @@ public abstract class BaseTurretModel<S extends BaseTurretRenderState> extends B
 	 * @param root The root model part of this model.
 	 * @param texturePath The path of the texture this model will use.
 	 * @param textures The file name(s) that this model will use.
-	 * @param stand The model part that serves as the stand of the turret. This part will rotate along the yaw axis.
+	 * @param neck The model part that serves as the neck of the turret. This part will rotate along the yaw axis.
 	 * @param head The model part that servesas the head of the turret. This part will rotate along the pitch axis.
 	 *
 	 * @see #texturePath
@@ -104,9 +104,9 @@ public abstract class BaseTurretModel<S extends BaseTurretRenderState> extends B
 	 */
 	public BaseTurretModel(
 		@NotNull ModelPart root, @NotNull String texturePath, @NotNull String[] textures,
-		@NotNull ModelPart stand, @NotNull ModelPart head
+		@NotNull ModelPart neck, @NotNull ModelPart head
 	) {
-		this(root, texturePath, textures, stand, head, null, null);
+		this(root, texturePath, textures, neck, head, null, null);
 	}
 
 	/**
@@ -117,7 +117,7 @@ public abstract class BaseTurretModel<S extends BaseTurretRenderState> extends B
 	 * @param root The root model part of this model.
 	 * @param texturePath The path of the texture this model will use.
 	 * @param textures The file name(s) that this model will use.
-	 * @param stand The model part that serves as the stand of the turret. This part will rotate along the yaw axis.
+	 * @param neck The model part that serves as the neck of the turret. This part will rotate along the yaw axis.
 	 * @param head The model part that servesas the head of the turret. This part will rotate along the pitch axis.
 	 * @param shootAnim The shoot animation. {@code null} if none.
 	 * @param deathAnim The death animation. {@code null} if none.
@@ -127,13 +127,13 @@ public abstract class BaseTurretModel<S extends BaseTurretRenderState> extends B
 	 */
 	public BaseTurretModel(
 		@NotNull ModelPart root, @NotNull String texturePath, @NotNull String[] textures,
-		@NotNull ModelPart stand, @NotNull ModelPart head,
+		@NotNull ModelPart neck, @NotNull ModelPart head,
 		@Nullable Animation shootAnim, @Nullable Animation deathAnim
 	) {
 		super(root, texturePath, textures);
 
 		// Set the common model parts used by all turret models
-		this.stand = stand;
+		this.neck = neck;
 		this.head = head;
 
 		// Sets the common animation parts that may/not be used by all turret models
@@ -225,7 +225,7 @@ public abstract class BaseTurretModel<S extends BaseTurretRenderState> extends B
 			-this.getMinPitch()
 		);
 
-		this.stand.yaw = headYaw * ((float)Math.PI / 180F);
+		this.neck.yaw = headYaw * ((float)Math.PI / 180F);
 		this.head.pitch = headPitch * ((float)Math.PI / 180F);
 	}
 

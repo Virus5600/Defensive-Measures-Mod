@@ -31,6 +31,7 @@ public class ModEntityModels {
 
 	// v1.1.0-beta
 	public static final EntityModelLayer AA_TURRET = registerMain("aa_turret");
+	public static final EntityModelLayer FLAME_TURRET = registerMain("flame_turret");
 
 	// /////////// //
 	// PROJECTILES //
@@ -58,6 +59,7 @@ public class ModEntityModels {
 
 		// v1.1.0-beta
 		EntityModelLayerRegistry.registerModelLayer(AA_TURRET, AATurretModel::getTexturedModelData);
+		EntityModelLayerRegistry.registerModelLayer(FLAME_TURRET, FlameTurretModel::getTexturedModelData);
 
 		// /////////// //
 		// PROJECTILES //

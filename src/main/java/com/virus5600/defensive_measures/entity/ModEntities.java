@@ -54,12 +54,20 @@ public class ModEntities {
 			.eyeHeight(0.96875F)
 	);
 
+	public static final EntityType<FlameTurretEntity> FLAME_TURRET = RegistryHelper.registerEntity(
+		"flame_turret",
+		Builder.
+			create(FlameTurretEntity::new, SpawnGroup.MISC)
+			.dimensions(2F, 2F)
+			.eyeHeight(1.1875F)
+	);
+
 	// PROJECTILES //
 	// v1.0.0-beta
 	public static final EntityType<CannonballEntity> CANNONBALL = RegistryHelper.registerEntity(
 		"cannonball",
 		Builder
-			.<CannonballEntity>create(CannonballEntity::new, SpawnGroup.MISC)
+			.create(CannonballEntity::new, SpawnGroup.MISC)
 			.dropsNothing()
 			.dimensions(0.5f, 0.5f)
 			.maxTrackingRange(4)
@@ -95,8 +103,20 @@ public class ModEntities {
 			.<FlakProjectileEntity>create(FlakProjectileEntity::new, SpawnGroup.MISC)
 			.dropsNothing()
 			.dimensions(0.125f, 0.125f)
+			.maxTrackingRange(8)
+			.trackingTickInterval(10)
+	);
+
+	public static final EntityType<FlammableAerosolEntity> FLAMMABLE_AEROSOL = RegistryHelper.registerEntity(
+		"flammable_aerosol",
+		Builder
+			.create(FlammableAerosolEntity::new, SpawnGroup.MISC)
+			.dropsNothing()
+			.dimensions(0.125f, 0.5f)
 			.maxTrackingRange(4)
 			.trackingTickInterval(10)
+			.makeFireImmune()
+
 	);
 
 	// REGISTRY //
@@ -112,5 +132,6 @@ public class ModEntities {
 
 		// v1.1.0-beta
 		FabricDefaultAttributeRegistry.register(ModEntities.AA_TURRET, AATurretEntity.setAttributes());
+		FabricDefaultAttributeRegistry.register(ModEntities.FLAME_TURRET, FlameTurretEntity.setAttributes());
 	}
 }

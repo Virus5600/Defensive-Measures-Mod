@@ -11,14 +11,11 @@ import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.data.DataTracker.Builder;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.mob.MobEntity;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvent;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
@@ -78,7 +75,6 @@ public class AATurretEntity extends TurretEntity {
 	private static final int TOTAL_ATT_COOLDOWN = 20 * 10;
 	private static final Vec3d HINGE_POS;
 	private static final List<Vec3d> BARRELS;
-	private static final Map<Item, SoundEvent> HEAL_SOUNDS;
 	private static final double[] DAMAGE;
 	private static final byte[] PIERCE_LEVELS;
 	/**
@@ -98,8 +94,10 @@ public class AATurretEntity extends TurretEntity {
 
 		this.setShootSound(ModSoundEvents.TURRET_ANTI_AIR_SHOOT);
 		this.setHealSound(ModSoundEvents.TURRET_REPAIR_METAL);
-		this.addHealables(healables);
-		this.addEffectSource(effectSource);
+
+		this.addHealables(healables)
+			.addEffectSource(effectSource)
+		;
 	}
 
 	// //////////// //
@@ -164,17 +162,6 @@ public class AATurretEntity extends TurretEntity {
 	@Override
 	public void tick() {
 		super.tick();
-	}
-
-	@Override
-	public ActionResult interactMob(PlayerEntity player, Hand hand) {
-		Item usedItem = player.getStackInHand(hand).getItem();
-
-		if (this.isHealableItem(usedItem) && this.getHealSound() != ModSoundEvents.TURRET_REPAIR_WOOD) {
-			this.setHealSound(HEAL_SOUNDS.get(usedItem));
-		}
-
-		return super.interactMob(player, hand);
 	}
 
 	// /////////////////// //
@@ -320,12 +307,6 @@ public class AATurretEntity extends TurretEntity {
 
 		BARRELS = List.of(
 			new Vec3d(0, 0, 2.5)
-		);
-
-		HEAL_SOUNDS = Map.of(
-				Items.IRON_NUGGET, ModSoundEvents.TURRET_REPAIR_METAL,
-				Items.IRON_INGOT, ModSoundEvents.TURRET_REPAIR_METAL,
-				Items.IRON_BLOCK, ModSoundEvents.TURRET_REPAIR_METAL
 		);
 
 		healables = Map.of(

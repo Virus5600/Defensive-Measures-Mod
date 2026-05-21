@@ -62,6 +62,7 @@ import java.util.List;
  *
  * @see TurretProjectileEntity
  * @see KineticProjectileEntity
+ * @see AreaCloudEntity
  *
  * @see #doDamage()
  *

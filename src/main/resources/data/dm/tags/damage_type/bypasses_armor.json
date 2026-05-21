@@ -1,6 +1,7 @@
 {
 	"replace": false,
 	"values": [
-		"dm:bolt_head"
+		"dm:bolt_head",
+		"dm:thrown_flame"
 	]
 }

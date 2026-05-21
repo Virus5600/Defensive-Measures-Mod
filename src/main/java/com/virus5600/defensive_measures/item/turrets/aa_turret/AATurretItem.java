@@ -17,7 +17,7 @@ import java.lang.reflect.Type;
 import java.util.function.Consumer;
 
 /**
- * The item thatspawns the {@link AATurretEntity AA Turret}.
+ * The item that spawns the {@link AATurretEntity AA Turret}.
  *
  * @since 1.1.0-beta
  * @author <a href="https://github.com/Virus5600">Virus5600</a>

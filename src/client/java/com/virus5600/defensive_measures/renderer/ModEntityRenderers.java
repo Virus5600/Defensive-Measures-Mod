@@ -32,6 +32,7 @@ public class ModEntityRenderers {
 
 		// v1.1.0-beta
 		EntityRendererFactories.register(ModEntities.AA_TURRET, AATurretRenderer::new);
+		EntityRendererFactories.register(ModEntities.FLAME_TURRET, FlameTurretRenderer::new);
 
 		// /////////// //
 		// PROJECTILES //

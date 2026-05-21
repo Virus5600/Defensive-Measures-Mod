@@ -31,6 +31,7 @@
 	"item.dm.mg_turret" : "Место для пулемётной турели",
 
 	"item.dm.aa_turret": "Place Anti-Air (AA) Turret",
+	"item.dm.flame_turret": "Place Flame Turret",
 
 	"itemTooltip.dm.generic.health" : "Health: %s / %s",
 
@@ -50,6 +51,10 @@
 	"itemTooltip.dm.aa_turret.line2" : "Firing Arc: X: ±360° | Y: 0° to +90°",
 	"itemTooltip.dm.aa_turret.line3" : "Reload Time: 10 seconds",
 
+	"itemTooltip.dm.flame_turret.line1" : "Range: 8 blocks",
+	"itemTooltip.dm.flame_turret.line2" : "Firing Arc: X: ±360° | Y: -30° to +22.5°",
+	"itemTooltip.dm.flame_turret.line3" : "Reload Time: 1 second",
+
 	"entity.dm.cannon_turret" : "Турельная башня",
 	"entity.dm.cannonball" : "Пушечное ядро",
 
@@ -61,6 +66,9 @@
 
 	"entity.dm.aa_turret": "Anti-Air Turret",
 	"entity.dm.flak_projectile": "Flak Projectile",
+
+	"entity.dm.flame_turret": "Flame Turret",
+	"entity.dm.flammable_aerosol": "Flammable Aerosol",
 
 	"death.attack.bolt_head" : "%1$s раздавлен Наконечником стрелы",
 	"death.attack.bolt_head.player" : "%1$s раздавлен случайным Наконечником стрелы во время борьбы с %2$s",
@@ -102,6 +110,11 @@
 	"subtitles.turret.aa_turret.hurt" : "Anti-Air Turret damaged",
 	"subtitles.turret.aa_turret.destroyed" : "Anti-Air Turret destroyed",
 	"subtitles.turret.aa_turret.shoot" : "Anti-Air Turret shoots",
+	"subtitles.turret.flame_turret.hurt" : "Flame Turret damaged",
+	"subtitles.turret.flame_turret.destroyed" : "Flame Turret destroyed",
+	"subtitles.turret.flame_turret.shoot.start" : "Flame Turret charging up",
+	"subtitles.turret.flame_turret.shoot.loop" : "Flame Turret shoots",
+	"subtitles.turret.flame_turret.shoot.end" : "Flame Turret disengaging",
 
 	"tag.item.dm.tier_1_turrets" : "Tier 1 Turrets",
 	"tag.item.dm.tier_2_turrets" : "Tier 2 Turrets",
@@ -127,5 +140,12 @@
 
 	"container.dm.turret_assembly_station": "Assembling",
 
-	"stat.dm.interact_with_turret_assembly_station": "Interactions with Turret Assembly Station"
+	"stat.dm.interact_with_turret_assembly_station": "Interactions with Turret Assembly Station",
+
+	"commands.getpose.not_living_entity": "Target is not a living entity",
+	"commands.getpose.success": "%s pose: %s",
+
+	"commands.setpose.not_living_entity": "Target is not a living entity",
+	"commands.setpose.failed": "Could not set pose of %s to %s",
+	"commands.setpose.success": "Changed %s pose to %s"
 }

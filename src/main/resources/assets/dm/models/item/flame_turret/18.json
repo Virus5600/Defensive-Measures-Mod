@@ -1,0 +1,80 @@
+{
+	"textures": {
+		"particle": "dm:item/flame_turret/flame_turret"
+	},
+	"elements": [
+		{
+			"from": [7.60175, 6.80524, 7.60175],
+			"to": [8.39825, 9.19476, 8.39825],
+			"light_emission": 0,
+			"faces": {
+				"north": {
+					"uv": [6.625, 12.125, 6.75, 12.5],
+					"texture": "#particle"
+				},
+				"east": {
+					"uv": [6.5, 12.125, 6.625, 12.5],
+					"texture": "#particle"
+				},
+				"south": {
+					"uv": [6.875, 12.125, 7, 12.5],
+					"texture": "#particle"
+				},
+				"west": {
+					"uv": [6.75, 12.125, 6.875, 12.5],
+					"texture": "#particle"
+				},
+				"up": {
+					"uv": [6.75, 12.125, 6.625, 12],
+					"texture": "#particle"
+				},
+				"down": {
+					"uv": [6.875, 12, 6.75, 12.125],
+					"texture": "#particle"
+				}
+			}
+		}
+	],
+	"display": {
+		"thirdperson_righthand": {
+			"rotation": [-60, 0, 0],
+			"translation": [0, 2.02, -7.35981],
+			"scale": [0.30132, 0.30132, 0.30132]
+		},
+		"thirdperson_lefthand": {
+			"rotation": [-60, 0, 0],
+			"translation": [0, 2.02, -7.35981],
+			"scale": [0.30132, 0.30132, 0.30132]
+		},
+		"firstperson_righthand": {
+			"rotation": [-60, 0, 0],
+			"translation": [-4, 4.84375, -3.14563],
+			"scale": [0.31387, 0.31387, 0.31387]
+		},
+		"firstperson_lefthand": {
+			"rotation": [-60, 0, 0],
+			"translation": [-4, 4.84375, -3.14563],
+			"scale": [0.31387, 0.31387, 0.31387]
+		},
+		"ground": {
+			"rotation": [-60, 0, 0],
+			"translation": [0, 2.71875, -7.14563],
+			"scale": [0.31387, 0.31387, 0.31387]
+		},
+		"gui": {
+			"rotation": [-89.70765, 20.70481, 139.10661],
+			"translation": [-6.31591, -1.78774, 6.7171],
+			"scale": [0.39234, 0.39234, 0.39234]
+		},
+		"head": {
+			"rotation": [-60, 0, 0],
+			"translation": [0, 10.09375, -7.14563],
+			"scale": [0.31387, 0.31387, 0.31387]
+		},
+		"fixed": {
+			"rotation": [-150, 0, 0],
+			"translation": [0, -17.86408, -10.10938],
+			"scale": [0.78468, 0.78468, 0.78468]
+		}
+	}
+}
