@@ -1,11 +1,24 @@
 package com.virus5600.defensive_measures.model.entity;
 
 import net.minecraft.client.model.*;
+import net.minecraft.particle.ParticleTypes;
+import net.minecraft.sound.SoundEvents;
+import net.minecraft.util.math.Vec3d;
 
+import com.virus5600.defensive_measures._util.MathUtil;
+import com.virus5600.defensive_measures.animations.FXKeyframe;
+import com.virus5600.defensive_measures.animations.Keyframe;
+import com.virus5600.defensive_measures.animations.ScriptKeyframe;
 import com.virus5600.defensive_measures.animations.entity.FlameTurretAnimation;
 import com.virus5600.defensive_measures.renderer.entity.state.BaseTurretRenderState;
 
+import java.util.PriorityQueue;
+import java.util.Queue;
+
+import static com.virus5600.defensive_measures.animations.KeyframeScripts.EXPLODE_SCRIPT;
+
 public class FlameTurretModel extends BaseTurretModel<BaseTurretRenderState> {
+	private final static Queue<? extends Keyframe> DEATH_KEYFRAMES;
 
 	protected final static String[] TEXTURES = new String[]{
 		"flame_turret.png"
@@ -18,8 +31,8 @@ public class FlameTurretModel extends BaseTurretModel<BaseTurretRenderState> {
 			root.getChild("base").getChild("neck"),
 			root.getChild("base").getChild("neck").getChild("head").getChild("nozzle"),
 
-			FlameTurretAnimation.ANIM_FLAME_SHOOT.createAnimation(root),
-			FlameTurretAnimation.ANIM_FLAME_DEATH.createAnimation(root)
+			FlameTurretAnimation.ANIM_FLAME_SHOOT,
+			FlameTurretAnimation.ANIM_FLAME_DEATH
 		);
 	}
 
@@ -60,6 +73,19 @@ public class FlameTurretModel extends BaseTurretModel<BaseTurretRenderState> {
 		return TexturedModelData.of(modelData, 128, 128);
 	}
 
+	// /////////////////// //
+	// OVERRIDABLE METHODS //
+	// /////////////////// //
+
+	@Override
+	public Queue<? extends Keyframe> getDeathAnimProcedureInstance() {
+		if (MathUtil.randomBool(50)) {
+			return new PriorityQueue<>(DEATH_KEYFRAMES);
+		}
+
+		return BaseTurretModel.DEFAULT_EMPTY_KEYFRAME;
+	}
+
 	// //////////////// //
 	// ABSTRACT METHODS //
 	// //////////////// //
@@ -72,5 +98,36 @@ public class FlameTurretModel extends BaseTurretModel<BaseTurretRenderState> {
 	@Override
 	protected float getMaxPitch() {
 		return 22.5f;
+	}
+
+	// ////// //
+	// STATIC //
+	// ////// //
+	static {
+		DEATH_KEYFRAMES = new PriorityQueue<>() {
+			{
+				add(FXKeyframe.of(0.0, ParticleTypes.EXPLOSION, SoundEvents.ENTITY_GENERIC_EXPLODE.value(), new Vec3d(MathUtil.random(-1.125, 1.125), 0, MathUtil.random(-1.125, 1.125))));
+				add(FXKeyframe.of(0.0, ParticleTypes.FLAME, new Vec3d(MathUtil.random(-1.125, 1.125), 0, MathUtil.random(-1.125, 1.125))));
+				add(FXKeyframe.of(0.0, ParticleTypes.FLAME, new Vec3d(MathUtil.random(-1.125, 1.125), 0, MathUtil.random(-1.125, 1.125))));
+				add(FXKeyframe.of(0.0, ParticleTypes.FLAME, new Vec3d(MathUtil.random(-1.125, 1.125), 0, MathUtil.random(-1.125, 1.125))));
+				add(FXKeyframe.of(0.25, ParticleTypes.EXPLOSION, SoundEvents.ENTITY_GENERIC_EXPLODE.value(), new Vec3d(MathUtil.random(-1.125, 1.125), 0, MathUtil.random(-1.125, 1.125))));
+				add(FXKeyframe.of(0.25, ParticleTypes.FLAME, new Vec3d(MathUtil.random(-1.125, 1.125), 0, MathUtil.random(-1.125, 1.125))));
+				add(FXKeyframe.of(0.25, ParticleTypes.FLAME, new Vec3d(MathUtil.random(-1.125, 1.125), 0, MathUtil.random(-1.125, 1.125))));
+				add(FXKeyframe.of(0.25, ParticleTypes.FLAME, new Vec3d(MathUtil.random(-1.125, 1.125), 0, MathUtil.random(-1.125, 1.125))));
+				add(FXKeyframe.of(0.375, ParticleTypes.EXPLOSION, SoundEvents.ENTITY_GENERIC_EXPLODE.value(), new Vec3d(MathUtil.random(-1.125, 1.125), 0, MathUtil.random(-1.125, 1.125))));
+				add(FXKeyframe.of(0.375, ParticleTypes.FLAME, new Vec3d(MathUtil.random(-1.125, 1.125), 0, MathUtil.random(-1.125, 1.125))));
+				add(FXKeyframe.of(0.375, ParticleTypes.FLAME, new Vec3d(MathUtil.random(-1.125, 1.125), 0, MathUtil.random(-1.125, 1.125))));
+				add(FXKeyframe.of(0.375, ParticleTypes.FLAME, new Vec3d(MathUtil.random(-1.125, 1.125), 0, MathUtil.random(-1.125, 1.125))));
+				add(FXKeyframe.of(0.5, ParticleTypes.EXPLOSION, SoundEvents.ENTITY_GENERIC_EXPLODE.value(), new Vec3d(0, 0, 0.3125)));
+				add(FXKeyframe.of(0.5, ParticleTypes.FLAME, new Vec3d(MathUtil.random(-1.125, 1.125), 0, MathUtil.random(-1.125, 1.125))));
+				add(FXKeyframe.of(0.5, ParticleTypes.FLAME, new Vec3d(MathUtil.random(-1.125, 1.125), 0, MathUtil.random(-1.125, 1.125))));
+				add(FXKeyframe.of(0.5, ParticleTypes.FLAME, new Vec3d(MathUtil.random(-1.125, 1.125), 0, MathUtil.random(-1.125, 1.125))));
+				add(FXKeyframe.of(0.625, ParticleTypes.EXPLOSION, SoundEvents.ENTITY_GENERIC_EXPLODE.value(), new Vec3d(0, 0, 0.3125)));
+				add(FXKeyframe.of(0.625, ParticleTypes.FLAME, new Vec3d(MathUtil.random(-1.125, 1.125), 0, MathUtil.random(-1.125, 1.125))));
+				add(FXKeyframe.of(0.625, ParticleTypes.FLAME, new Vec3d(MathUtil.random(-1.125, 1.125), 0, MathUtil.random(-1.125, 1.125))));
+				add(FXKeyframe.of(0.625, ParticleTypes.FLAME, new Vec3d(MathUtil.random(-1.125, 1.125), 0, MathUtil.random(-1.125, 1.125))));
+				add(ScriptKeyframe.of(0.75, EXPLODE_SCRIPT, new Vec3d(0, 0, 0.3125)));
+			}
+		};
 	}
 }

@@ -2,11 +2,9 @@ package com.virus5600.defensive_measures.model;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.model.ModelPart;
 import net.minecraft.client.render.entity.model.EntityModel;
 import net.minecraft.client.render.entity.state.EntityRenderState;
-import net.minecraft.resource.ResourceManager;
 import net.minecraft.util.Identifier;
 
 import com.virus5600.defensive_measures.DefensiveMeasures;
@@ -15,6 +13,7 @@ import com.virus5600.defensive_measures.model.projectiles.BaseProjectileModel;
 import com.virus5600.defensive_measures.renderer.entity.state.BaseTurretRenderState;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
 
@@ -51,6 +50,20 @@ public class BaseModel<T extends EntityRenderState> extends EntityModel<T> {
 	// //////////// //
 
 	/**
+	 * Constructs a new {@link BaseModel} with a specified root model part but without any texture
+	 * for entities that has to be rendered invisible.
+	 *
+	 * @param root The root model part of this model.
+	 */
+	public BaseModel(@NotNull ModelPart root) {
+		super(root);
+
+		this.texturePath = null;
+		this.textures = null;
+		this.baseTexture = null;
+	}
+
+	/**
 	 * Constructs a new {@link BaseModel} with the specified root model part and texture path. The
 	 * constructor will use
 	 *
@@ -81,14 +94,17 @@ public class BaseModel<T extends EntityRenderState> extends EntityModel<T> {
 	// CUSTOM METHODS //
 	// ////////////// //
 
+	@Nullable
 	protected Identifier getTexturePath() {
 		return this.texturePath;
 	}
 
+	@Nullable
 	public Identifier[] getTextures() {
 		return this.textures;
 	}
 
+	@Nullable
 	public Identifier getBaseTexture() {
 		return this.baseTexture;
 	}

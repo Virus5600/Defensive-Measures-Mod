@@ -112,7 +112,7 @@ public class ModEntities {
 		Builder
 			.create(FlammableAerosolEntity::new, SpawnGroup.MISC)
 			.dropsNothing()
-			.dimensions(0.125f, 0.5f)
+			.dimensions(0.5f, 0.5f)
 			.maxTrackingRange(4)
 			.trackingTickInterval(10)
 			.makeFireImmune()

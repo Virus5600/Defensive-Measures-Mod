@@ -114,55 +114,45 @@ public interface LoopableShootingSound {
 			boolean isShootingNow = turret.getTrackedLockedButNotAttacking() || turret.getTrackedShooting();
 
 			// Starts playing the loopSound loop if the turret is shooting now but wasn't shooting in the last tick
-			if (isShootingNow && !this.wasShootingLastTick() && turret.getTarget() != null) {
-				this.setShootingLastTick(true);
+			if (isShootingNow) {
+				if (turret.getTarget() != null) {
+					this.setShootingLastTick(true);
 
-				// Play the Start loopSound normally (Fire & Forget)
-//				world.playSound(
-//					turret, turret.getX(), turret.getY(), turret.getZ(),
-//					this.getShootStartSound(), this.getSoundCategory(),
-//					1.0F, 1.0F
-//				);
-
-				for (ServerPlayerEntity player : PlayerLookup.tracking(turret)) {
-					ServerPlayNetworking.send(
-						player,
-						new TurretLoopSoundPacket(
-							turret.getId(),
-							true,
-							this.getShootStartSound(),
-							this.getShootLoopSound(),
-							this.getShootEndSound(),
-							this.getSoundCategory()
-						)
-					);
+					for (ServerPlayerEntity player : PlayerLookup.tracking(turret)) {
+						ServerPlayNetworking.send(
+							player,
+							new TurretLoopSoundPacket(
+								turret.getId(),
+								true,
+								this.getShootStartSound(),
+								this.getShootLoopSound(),
+								this.getShootEndSound(),
+								this.getSoundCategory()
+							)
+						);
+					}
 				}
 			}
 			// If the turret is not shooting now but was shooting in the last tick, stop the loopSound loop
-			else if (!isShootingNow && this.wasShootingLastTick()) {
-				this.setShootingLastTick(false);
+			else {
+				if (this.wasShootingLastTick()) {
+					this.setShootingLastTick(false);
 
-				// Send the STOP packet to every player tracking this turret
-				for (ServerPlayerEntity player : PlayerLookup.tracking(turret)) {
-					ServerPlayNetworking.send(
-						player,
-						new TurretLoopSoundPacket(
-							turret.getId(),
-							false,
-							this.getShootStartSound(),
-							this.getShootLoopSound(),
-							this.getShootEndSound(),
-							this.getSoundCategory()
-						)
-					);
+					// Send the STOP packet to every player tracking this turret
+					for (ServerPlayerEntity player : PlayerLookup.tracking(turret)) {
+						ServerPlayNetworking.send(
+							player,
+							new TurretLoopSoundPacket(
+								turret.getId(),
+								false,
+								this.getShootStartSound(),
+								this.getShootLoopSound(),
+								this.getShootEndSound(),
+								this.getSoundCategory()
+							)
+						);
+					}
 				}
-
-				// Play the End loopSound globally on the server
-				world.playSound(
-					turret, turret.getX(), turret.getY(), turret.getZ(),
-					this.getShootEndSound(), this.getSoundCategory(),
-					1.0F, 1.0F
-				);
 			}
 		}
 	}

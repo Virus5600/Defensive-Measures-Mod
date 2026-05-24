@@ -2,6 +2,7 @@ package com.virus5600.defensive_measures.entity.projectiles;
 
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.particle.ParticleEffect;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.world.World;
@@ -32,11 +33,14 @@ import com.virus5600.defensive_measures.entity.turrets.FlameTurretEntity;
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
  */
 public class FlammableAerosolEntity extends AreaCloudEntity {
+	protected static final ParticleEffect DEFAULT_PARTICLE = ParticleTypes.FLAME;
+	protected static final int DEFAULT_FIRE_DURATION = 50;
+
 	/**
 	 * Determines how long the entity will be set on fire. In this case, the default duration is
 	 * 2.5 seconds ({@code 50 / 20} ticks).
 	 */
-	protected float fireDuration = 50;
+	protected int fireDuration = DEFAULT_FIRE_DURATION;
 
 	// //////////// //
 	// CONSTRUCTORS //
@@ -45,16 +49,29 @@ public class FlammableAerosolEntity extends AreaCloudEntity {
 		super(entityType, world);
 
 		// Sets the base attribute of this area cloud...
-		this.setParticleType(ParticleTypes.FLAME);
-		this.setTargetRadius(2);						// Diameter of 4 meters; d = 2r
-		this.setTargetAge(20);							// Lasts for 1 second; age is in ticks, so 20 ticks times 1 second
-		this.setRadiusGrowth((float) (2 / 5 / 20));		// Grows to 2 blocks in 5 seconds; growth = (finalRadius - initialRadius) / (growthTime * ticksPerSecond)
-		this.setReApplicationDelay(20);					// Re-applies every second
-		this.setDamage(15);								// Deals 7.5 hearts of damage every second
+		// ALWAYS GETS CALLED JUST IN CASE. Attributes can be overriden by simply using the
+		// setters after creating the entity.
+		setDefaultAttr(this);
+	}
 
-		this.setCloudAction((cloud, target) -> {
-			if (target.getEntityWorld() instanceof ServerWorld serverWorld) {
-				target.setOnFireFor(this.fireDuration);
+	// /////////////// //
+	// PROCESS METHODS //
+	// /////////////// //
+	public static void setDefaultAttr(FlammableAerosolEntity cloud) {
+		cloud.setParticleType(DEFAULT_PARTICLE);
+		cloud.setRadius(0.5f);
+		cloud.setTargetRadius(2f);						// Diameter of 4 meters; d = 2r
+		cloud.setTargetAge(30);							// Lasts for 1.5 seconds; age is in ticks, so 20 ticks times 1.5 second
+		cloud.setRadiusGrowth((2.0f / 1.5f / 20.0f));	// Grows to 2 blocks in 5 seconds; growth = (finalRadius - initialRadius) / (growthTime * ticksPerSecond)
+		cloud.setReApplicationDelay(10);				// Re-applies every 0.5 seconds
+		cloud.setDamage(15);							// Deals 7.5 hearts of damage every second
+
+		// Sets the action of this cloud to damaging the entity and setting it on fire for a short
+		// period of time...
+		cloud.setCloudAction((cloudEntity, target) -> {
+			if (target.getEntityWorld() instanceof ServerWorld serverWorld &&
+			cloudEntity instanceof FlammableAerosolEntity ce) {
+				target.setOnFireFor(ce.getFireDuration() / 20f);
 
 				DamageSource src = ModDamageSources.create(
 					serverWorld,
@@ -63,9 +80,34 @@ public class FlammableAerosolEntity extends AreaCloudEntity {
 
 				target.damage(
 					serverWorld, src,
-					(float) this.getDamage()
+					(float) ce.getDamage()
 				);
 			}
 		});
+	}
+
+	// ///////////////// //
+	// GETTERS & SETTERS //
+	// ///////////////// //
+
+	@Override
+	protected ParticleEffect getDefaultParticle() {
+		return DEFAULT_PARTICLE;
+	}
+
+	/**
+	 * Sets the duration of the fire that this entity applies to its targets (in ticks). The
+	 * default duration is 2.5 seconds.
+	 *
+	 * @param duration the duration of the fire in ticks
+	 *
+	 * @see #DEFAULT_FIRE_DURATION
+	 */
+	public void setFireDuration(int duration) {
+		this.fireDuration = duration;
+	}
+
+	public int getFireDuration() {
+		return this.fireDuration;
 	}
 }

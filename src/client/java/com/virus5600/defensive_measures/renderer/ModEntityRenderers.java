@@ -45,5 +45,6 @@ public class ModEntityRenderers {
 
 		// v1.1.0-beta
 		EntityRendererFactories.register(ModEntities.FLAK_PROJECTILE, FlakProjectileRenderer::new);
+		EntityRendererFactories.register(ModEntities.FLAMMABLE_AEROSOL, FlammableAerosolRenderer::new);
 	}
 }

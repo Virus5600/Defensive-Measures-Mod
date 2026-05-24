@@ -44,6 +44,19 @@ public abstract class BaseProjectileModel<S extends BaseProjectileRenderState> e
 	// //////////// //
 
 	/**
+	 * Constructs a new {@link BaseProjectileModel} with a specified model part. This constructor
+	 * is used when the model does not have any texture to render, such as the invisible projectile
+	 * used by the flame turret.
+	 *
+	 * @param root The root model part of this model.
+	 */
+	public BaseProjectileModel(@NotNull ModelPart root) {
+		super(root);
+
+		this.loopAnim = null;
+	}
+
+	/**
 	 * Constructs a new {@link BaseProjectileModel} with a specified model part and texture path.
 	 * These paths will be used by this model renderer to render the projectile entity.
 	 *

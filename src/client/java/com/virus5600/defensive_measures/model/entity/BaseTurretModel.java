@@ -2,6 +2,7 @@ package com.virus5600.defensive_measures.model.entity;
 
 import net.minecraft.client.model.ModelPart;
 import net.minecraft.client.render.entity.animation.Animation;
+import net.minecraft.client.render.entity.animation.AnimationDefinition;
 import net.minecraft.client.render.entity.state.EntityRenderState;
 import net.minecraft.entity.AnimationState;
 import net.minecraft.util.math.MathHelper;
@@ -66,6 +67,8 @@ public abstract class BaseTurretModel<S extends BaseTurretRenderState> extends B
 	 * when it dies.
 	 */
 	protected final Animation deathAnim;
+	protected final float shootAnimLen;
+	protected final float deathAnimLen;
 
 	protected final static Queue<? extends Keyframe> DEFAULT_EMPTY_KEYFRAME = new PriorityQueue<>() {
 		{
@@ -90,7 +93,7 @@ public abstract class BaseTurretModel<S extends BaseTurretRenderState> extends B
 	 * render the turret entity and apply default configurations.
 	 * <br><br>
 	 * Using this overloaded constructor will set the shooting and death animation to {@code null}.
-	 * Use {@link BaseTurretModel#BaseTurretModel(ModelPart, String, String[], ModelPart, ModelPart, Animation, Animation)}
+	 * Use {@link BaseTurretModel#BaseTurretModel(ModelPart, String, String[], ModelPart, ModelPart, AnimationDefinition, AnimationDefinition)}
 	 * if a shooting or death, or both animation exists.
 	 *
 	 * @param root The root model part of this model.
@@ -128,7 +131,7 @@ public abstract class BaseTurretModel<S extends BaseTurretRenderState> extends B
 	public BaseTurretModel(
 		@NotNull ModelPart root, @NotNull String texturePath, @NotNull String[] textures,
 		@NotNull ModelPart neck, @NotNull ModelPart head,
-		@Nullable Animation shootAnim, @Nullable Animation deathAnim
+		@Nullable AnimationDefinition shootAnim, @Nullable AnimationDefinition deathAnim
 	) {
 		super(root, texturePath, textures);
 
@@ -136,9 +139,13 @@ public abstract class BaseTurretModel<S extends BaseTurretRenderState> extends B
 		this.neck = neck;
 		this.head = head;
 
+		// Stores the animation lengths first...
+		this.shootAnimLen = shootAnim == null ? 0 : shootAnim.lengthInSeconds();
+		this.deathAnimLen = deathAnim == null ? 0 : deathAnim.lengthInSeconds();
+
 		// Sets the common animation parts that may/not be used by all turret models
-		this.shootAnim = shootAnim;
-		this.deathAnim = deathAnim;
+		this.shootAnim = shootAnim == null ? null :shootAnim.createAnimation(root);
+		this.deathAnim = deathAnim == null ? null :deathAnim.createAnimation(root);
 	}
 
 	// /////////////// //

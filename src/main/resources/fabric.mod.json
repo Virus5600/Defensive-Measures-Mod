@@ -18,6 +18,9 @@
 	"accessWidener": "dm.accesswidener",
 
 	"environment": "*",
+	"mixins": [
+		"dm.client.mixins.json"
+	],
 	"entrypoints": {
 		"main": [
 			"com.virus5600.defensive_measures.DefensiveMeasures"

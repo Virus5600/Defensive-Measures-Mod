@@ -835,7 +835,13 @@ public abstract class TurretProjectileEntity extends ProjectileEntity {
 	// ABSTRACT & OVERRIDABLE METHODS //
 	// ////////////////////////////// //
 
-	// ABSTRACTS //
+	// ABSTRACT METHODS //
+
+	/**
+	 * Defines the logic on how to move the projectile. This includes what happens when the
+	 * projectile hits a block and/or an entity.
+ 	 */
+	protected abstract void move();
 
 	/**
 	 * Defines this projectile's maximum allowed piercing level.

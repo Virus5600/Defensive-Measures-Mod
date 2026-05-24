@@ -46,9 +46,9 @@ public abstract class KineticProjectileEntity extends TurretProjectileEntity {
 		this.setSpeedAffectsDamage(false);
 	}
 
-	// /////////////// //
-	// PROCESS METHODS //
-	// /////////////// //
+	// ////////////// //
+	// INITIALIZATION //
+	// ////////////// //
 
 	// PROTECTED
 	@Override
@@ -61,18 +61,24 @@ public abstract class KineticProjectileEntity extends TurretProjectileEntity {
 	// /////////////// //
 
 	@Override
-	public void tick() {
+	protected void move() {
 		boolean isClipping = !this.isNoClip();
 		Vec3d velocity = this.getVelocity();
 		BlockPos blockPos = this.getBlockPos();
 		BlockState blockState = this.getEntityWorld().getBlockState(blockPos);
 
+		// If this projectile is clipping and colliding with a block...
 		if (!blockState.isAir() && isClipping) {
 			VoxelShape voxelShape = blockState.getCollisionShape(this.getEntityWorld(), blockPos);
 
+			// ... and if the block has a collision shape (i.e. it's not a block like tall grass or
+			// flowers that have no collision shape)...
 			if (!voxelShape.isEmpty()) {
 				Vec3d pos = this.getEntityPos();
 
+				// ... and if the projectile's position is within any of the collision boxes of the
+				// block, then the projectile is considered to be in the ground, and its velocity
+				// is set to zero.
 				for (Box box : voxelShape.getBoundingBoxes()) {
 					if (box.offset(blockPos).contains(pos)) {
 						this.setVelocity(Vec3d.ZERO);
@@ -83,40 +89,46 @@ public abstract class KineticProjectileEntity extends TurretProjectileEntity {
 			}
 		}
 
-		if (this.shake > 0) {
-			--this.shake;
-		}
-
-		if (this.isTouchingWaterOrRain() || blockState.isOf(Blocks.POWDER_SNOW)) {
-			this.extinguish();
-		}
-
+		// If this projectile is in ground and clipping it...
 		if (this.isInGround() && isClipping) {
+			// ... and the the world isn't client...
 			if (!this.getEntityWorld().isClient()) {
+				// ... and if the block state that the projectile is in is different from the block
+				// state that it was in when it first collided with the block, and if the
+				// projectile should fall, then the projectile falls.
 				if (this.inBlockState != blockState && this.shouldFall()) {
 					this.fall();
-				} else {
+				}
+				// ... else, this just ages.
+				else {
 					this.age();
 				}
+
+				// ... finally, set this on fire if fire ticks is more than 0.
+				this.setOnFire(this.getFireTicks() > 0);
 			}
 
 			++this.inGroundTime;
+			// ... and if it is stil alive, then tick the block collision logic.
 			if (this.isAlive()) {
 				this.tickBlockCollision();
 			}
-
-			if (!this.getEntityWorld().isClient()) {
-				this.setOnFire(this.getFireTicks() > 0);
-			}
 		}
+		// ... else...
 		else {
 			this.inGroundTime = 0;
 			Vec3d pos = this.getEntityPos();
 
+			// ... if it is touching water, spawn bubble particles at the projectile's position.
 			if (this.isTouchingWater()) {
 				this.spawnBubbleParticles(pos);
 			}
 
+			// ... if it is critical, spawn critical hit particles along the projectile's path. The
+			// particles are spawned at the projectile's position and along its velocity vector,
+			// with a spacing of 0.25 blocks between each particle, and the particles have a
+			// velocity opposite to the projectile's velocity, with a slight upward velocity added
+			// to make them more visible.
 			if (this.isCritical()) {
 				for (int i = 0; i < 4; i++) {
 					this.getEntityWorld()
@@ -132,10 +144,15 @@ public abstract class KineticProjectileEntity extends TurretProjectileEntity {
 				}
 			}
 
+			// ... and if this is not clipping, set the yaw to the angle of the velocity vector,
+			// and the pitch to the angle between the velocity vector and the horizontal plane.
 			float yawDeg;
 			if (!isClipping) {
-				yawDeg = (float)(MathHelper.atan2(-velocity.x, -velocity.z) * 180.0F / (float)Math.PI);
+				yawDeg = (float) (MathHelper.atan2(-velocity.x, -velocity.z) * 180.0F / (float) Math.PI);
 			}
+			// ... otherwise, set the yaw to the angle of the velocity vector, but without negating
+			// the x and z components, since the projectile is clipping and thus, the yaw should be
+			// based on the direction of the velocity vector rather than the opposite direction.
 			else {
 				yawDeg = (float) (MathHelper.atan2(velocity.x, velocity.z) * 180.0F / (float) Math.PI);
 			}
@@ -146,6 +163,9 @@ public abstract class KineticProjectileEntity extends TurretProjectileEntity {
 			this.setYaw(updateRotation(this.getYaw(), yawDeg));
 			this.tickLeftOwner();
 
+			// ... and if it is clipping, perform a raycast to check for collisions with blocks
+			// along the projectile's path, and if there is a collision, apply the collision logic
+			// to the hit result.
 			if (isClipping) {
 				BlockHitResult hitResult = this.getEntityWorld()
 					.getCollisionsIncludingWorldBorder(
@@ -160,18 +180,37 @@ public abstract class KineticProjectileEntity extends TurretProjectileEntity {
 
 				this.applyCollision(hitResult);
 			}
+			// ... otherwise, just move the projectile by its velocity and tick the block collision logic.
 			else {
 				this.setPosition(pos.add(velocity));
 				this.tickBlockCollision();
 			}
 
+			// ... and if it is clipping, apply drag to the velocity, and if it is also not in
+			// ground, apply gravity to the velocity as well, causing the projectile to slow down
+			// and fall over time.
 			this.applyDrag();
 			if (isClipping && !this.isInGround()) {
 				this.applyGravity();
 			}
-
-			super.tick();
 		}
+	}
+
+	@Override
+	public void tick() {
+		BlockPos blockPos = this.getBlockPos();
+		BlockState blockState = this.getEntityWorld().getBlockState(blockPos);
+
+		if (this.shake > 0) {
+			--this.shake;
+		}
+
+		if (this.isTouchingWaterOrRain() || blockState.isOf(Blocks.POWDER_SNOW)) {
+			this.extinguish();
+		}
+
+		this.move();
+		super.tick();
 	}
 
 	// ///////////////////////// //

@@ -300,12 +300,28 @@ public abstract class ExplosiveProjectileEntity extends TurretProjectileEntity {
 		this.addParticles(this.getTrackedPosition().getPos());
 	}
 
+	protected void move() {
+		this.applyDrag();
+
+		HitResult hitResult = ProjectileUtil.getCollision(this, this::canHit, this.getRaycastShapeType());
+
+		Vec3d pos = this.getEntityPos();
+		if (hitResult.getType() != HitResult.Type.MISS) {
+			pos = hitResult.getPos();
+		} else {
+			pos = pos.add(this.getVelocity());
+		}
+
+		ProjectileUtil.setRotationFromVelocity(this, 0.2F);
+		this.setPosition(pos);
+		this.tickBlockCollision();
+		this.applyGravity();
+	}
+
 	@Override
 	public void tick() {
 		Entity owner = this.getOwner();
 		Vec3d pos = this.getEntityPos();
-
-		this.applyDrag();
 
 		int[] xz = new int[] {
 			this.getChunkPos().x,
@@ -316,19 +332,11 @@ public abstract class ExplosiveProjectileEntity extends TurretProjectileEntity {
 			|| (owner == null || !owner.isRemoved())
 			&& this.getEntityWorld().getChunkManager().isChunkLoaded(xz[0], xz[1])
 		) {
-			HitResult hitResult = ProjectileUtil.getCollision(this, this::canHit, this.getRaycastShapeType());
-			Vec3d vec3d = pos;
-			if (hitResult.getType() != HitResult.Type.MISS) {
-				vec3d = hitResult.getPos();
-			} else {
-				vec3d = vec3d.add(this.getVelocity());
-			}
-
-			ProjectileUtil.setRotationFromVelocity(this, 0.2F);
-			this.setPosition(vec3d);
-			this.tickBlockCollision();
-			this.applyGravity();
+			this.move();
 			super.tick();
+
+			HitResult hitResult = ProjectileUtil.getCollision(this, this::canHit, this.getRaycastShapeType());
+
 			if (this.isBurning()) {
 				this.setOnFireFor(1.0F);
 			}
@@ -341,7 +349,6 @@ public abstract class ExplosiveProjectileEntity extends TurretProjectileEntity {
 			this.addParticles(pos.add(0, 0.25, 0));
 		}
 		else {
-//			System.out.println("Projectile is removed.");
 			this.discard();
 		}
 	}

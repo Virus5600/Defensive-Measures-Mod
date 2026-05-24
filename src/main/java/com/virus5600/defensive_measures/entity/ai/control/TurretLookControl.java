@@ -49,7 +49,7 @@ public class TurretLookControl extends LookControl {
 				.ifPresent((pitch) ->
 					this.entity.setPitch(this.changeAngleMinMax(
 						this.entity.getPitch(), pitch,
-						this.minYawChange, this.maxPitchChange
+						this.minPitchChange, this.maxPitchChange
 					))
 				);
 		} else {

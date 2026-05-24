@@ -238,6 +238,10 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 	 */
 	protected int idleAnimationTimeout = 0;
 	/**
+	 * Plays the shoot sound when shooting. {@code true} by default.
+	 */
+	protected boolean playShootSound = true;
+	/**
 	 * A randomizer for this turret's instance.
 	 */
 	protected final Random random;
@@ -553,6 +557,7 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 		if (spawnReason == SpawnReason.SPAWN_ITEM_USE) {
 			this.setFromItem((byte) 1);
 			this.setPersistent();
+
 			return entityData;
 		}
 
@@ -563,6 +568,21 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 	// /////////////// //
 	// PROCESS METHODS //
 	// /////////////// //
+
+	/**
+	 * An optional overridable method that is called when a projectile is created by this turret.
+	 * This method can be used to modify attributes and various aspects of the assigned projectile
+	 * that this turret shoots.<br>
+	 * <br>
+	 * By default, the base method ({@link TurretEntity#onProjectileCreateCallback(ProjectileEntity)})
+	 * does nothing.
+	 *
+	 * @param projectile The projectile that is created by this turret.
+	 * @param <P>        The type of the projectile, which must be a subclass of {@link ProjectileEntity}.
+	 */
+	@SuppressWarnings("JavadocDeclaration")
+	protected <P extends ProjectileEntity> void onProjectileCreateCallback(P projectile) {
+	}
 
 	/**
 	 * Updates the tracked data for whether this turret is locked but not attacking. This is used
@@ -1982,7 +2002,14 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 
 			projectile.setOwner(this);
 
-			this.playSound(this.getShootSound(), 1.0f, 1.0f / (this.getRandom().nextFloat() * 0.4f + 0.8f));
+			// Calls the callback.
+			this.onProjectileCreateCallback(projectile);
+
+			// Plays shooting sound by default (via the this.playShootSound)
+			if (this.playShootSound) {
+				this.playSound(this.getShootSound(), 1.0f, 1.0f / (this.getRandom().nextFloat() * 0.4f + 0.8f));
+			}
+
 			this.getEntityWorld().spawnEntity(projectile);
 //			System.out.println("[" + projectile.getName().getString() + "] Gravity: " + projectile.getFinalGravity() + " | Velocity: " + projectile.getVelocity());
 		} catch (IllegalArgumentException | SecurityException e) {

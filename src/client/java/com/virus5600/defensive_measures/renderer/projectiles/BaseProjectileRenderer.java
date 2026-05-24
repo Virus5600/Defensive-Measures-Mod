@@ -14,6 +14,7 @@ import com.virus5600.defensive_measures.entity.projectiles.TurretProjectileEntit
 import com.virus5600.defensive_measures.model.projectiles.BaseProjectileModel;
 import com.virus5600.defensive_measures.renderer.projectiles.state.BaseProjectileRenderState;
 import net.minecraft.util.math.RotationAxis;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Supplier;
 
@@ -67,14 +68,17 @@ public abstract class BaseProjectileRenderer<
 			stack.multiply(RotationAxis.POSITIVE_X.rotationDegrees(state.pitch));
 		}
 
-		queue.submitModel(
-			this.getModel(), state, stack,
-			RenderLayers.entityCutout(this.getTexture(state)),
-			state.light,
-			OverlayTexture.DEFAULT_UV,
-			state.outlineColor,
-			null
-		);
+		Identifier textureId = this.getTexture(state);
+		if (textureId != null) {
+			queue.submitModel(
+				this.getModel(), state, stack,
+				RenderLayers.entityCutout(textureId),
+				state.light,
+				OverlayTexture.DEFAULT_UV,
+				state.outlineColor,
+				null
+			);
+		}
 
 		stack.pop();
 		super.render(state, stack, queue, camState);
@@ -112,6 +116,7 @@ public abstract class BaseProjectileRenderer<
 		this.lookAtDirection = shouldLookAtDir;
 	}
 
+	@Nullable
 	public Identifier getTexture(S state) {
 		return this.getModel().getBaseTexture();
 	}

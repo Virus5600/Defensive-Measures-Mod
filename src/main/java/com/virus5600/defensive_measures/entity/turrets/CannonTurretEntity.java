@@ -200,6 +200,11 @@ public class CannonTurretEntity extends TurretEntity {
 		return ModSoundEvents.TURRET_REPAIR_METAL;
 	}
 
+	/**
+	 * Sets the minimum attack range of the Cannon Turret to 3 blocks.
+	 *
+	 * @return The minimum attack range of the Cannon Turret, which is 3 blocks.
+	 */
 	@Override
 	public float getMinAttackRange() {
 		return 3f;

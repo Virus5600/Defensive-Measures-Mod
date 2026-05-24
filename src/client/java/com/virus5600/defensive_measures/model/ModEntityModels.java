@@ -44,6 +44,7 @@ public class ModEntityModels {
 
 	// v1.1.0-beta
 	public static final EntityModelLayer FLAK_PROJECTILE = registerMain("flak_projectile");
+	public static final EntityModelLayer FLAMMABLE_AEROSOL = registerMain("flammable_aerosol");
 
 	public static void registerEntityModels() {
 		DefensiveMeasures.LOGGER.info("REGISTERING ENTITY MODELS FOR {}...", DefensiveMeasures.MOD_NAME);
@@ -72,6 +73,7 @@ public class ModEntityModels {
 
 		// v1.1.0-beta
 		EntityModelLayerRegistry.registerModelLayer(FLAK_PROJECTILE, FlakProjectileModel::getTexturedModelData);
+		EntityModelLayerRegistry.registerModelLayer(FLAMMABLE_AEROSOL, FlammableAerosolModel::getTexturedModelData);
 	}
 
 	private static EntityModelLayer registerMain(String id) {

@@ -3,10 +3,11 @@ package com.virus5600.defensive_measures.animations.entity;
 import net.minecraft.client.render.entity.animation.*;
 
 public class FlameTurretAnimation {
-	public static final AnimationDefinition ANIM_FLAME_SHOOT = AnimationDefinition.Builder.create(0.25F)
+	public static final AnimationDefinition ANIM_FLAME_SHOOT = AnimationDefinition.Builder.create(0.5F)
 		.addBoneAnimation("tip", new Transformation(Transformation.Targets.ROTATE,
 			new Keyframe(0.0F, AnimationHelper.createRotationalVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.CUBIC),
-			new Keyframe(0.25F, AnimationHelper.createRotationalVector(-30.0F, 0.0F, 0.0F), Transformation.Interpolations.CUBIC)
+			new Keyframe(0.25F, AnimationHelper.createRotationalVector(-30.0F, 0.0F, 0.0F), Transformation.Interpolations.CUBIC),
+			new Keyframe(0.5F, AnimationHelper.createRotationalVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.CUBIC)
 		))
 		.build();
 

@@ -51,7 +51,7 @@
 	"itemTooltip.dm.aa_turret.line2" : "Firing Arc: X: ±360° | Y: 0° to +90°",
 	"itemTooltip.dm.aa_turret.line3" : "Reload Time: 10 seconds",
 
-	"itemTooltip.dm.flame_turret.line1" : "Range: 8 blocks",
+	"itemTooltip.dm.flame_turret.line1" : "Range: 2-10 blocks",
 	"itemTooltip.dm.flame_turret.line2" : "Firing Arc: X: ±360° | Y: -30° to +22.5°",
 	"itemTooltip.dm.flame_turret.line3" : "Reload Time: 1 second",
 
@@ -77,7 +77,10 @@
 	"death.attack.electricity.player": "%1$s was piezoelectrically persuaded to let go by %2$s",
 
 	"death.attack.secondary_explosion": "%1$1 died from a secondary explosion.",
-	"death.attack.secondary_explosion.player": "%1$1 died standing near %2$s.",
+	"death.attack.secondary_explosion.player": "%1$s died standing near %2$s.",
+
+	"death.attack.thrown_flame": "%1$s got turned to ashes.",
+	"death.attack.thrown_flame.player": "%1$s got cooked by %2$s.",
 
 	"subtitles.turret.remove.metal" : "防御塔：拆除",
 	"subtitles.turret.remove.wood" : "防御塔：拆除",

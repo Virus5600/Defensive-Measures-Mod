@@ -9,23 +9,30 @@ import net.minecraft.entity.attribute.DefaultAttributeContainer;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.data.DataTracker;
+import net.minecraft.entity.data.TrackedData;
+import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.mob.MobEntity;
+import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.particle.ParticleEffect;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
 
 import com.virus5600.defensive_measures._util.MathUtil;
 import com.virus5600.defensive_measures.entity.ModEntities;
 import com.virus5600.defensive_measures.entity.TurretMaterial;
 import com.virus5600.defensive_measures.entity.ai.goal.ProjectileAttackGoal;
+import com.virus5600.defensive_measures.entity.projectiles.FlammableAerosolEntity;
 import com.virus5600.defensive_measures.entity.turrets.interfaces.LoopableShootingSound;
 import com.virus5600.defensive_measures.item.ModItems;
+import com.virus5600.defensive_measures.particle.ModParticles;
 import com.virus5600.defensive_measures.registry.tag.ModEntityTypeTags;
 import com.virus5600.defensive_measures.sound.ModSoundEvents;
 
@@ -53,16 +60,25 @@ import java.util.Map;
  * <b>Attributes:</b>
  * <ul>
  *     <li><b>Health:</b> 150</li>
- *     <li><b>Base Damage:</b> 15.0</li>
+ *     <li><b>Base Damage:</b> 5.0 (10 per second)</li>
  *     <li><b>Base Pierce Level:</b> 0</li>
  *     <li><b>Attack Cooldown:</b> 1 second</li>
- *     <li><b>Attack Range:</b> 8 blocks</li>
+ *     <li><b>Attack Range:</b> 2 to 10 blocks</li>
  *     <li><b>X Firing Arc:</b> ±360°</li>
  *     <li><b>Y Firing Arc:</b> -30 to 22.5°</li>
  *     <li><b>Armor:</b> 5</li>
  *     <li><b>Armor Toughness:</b> 3</li>
  * </ul>
- *
+ * <br><br>
+ * In addition to the above attributes, the flame it spews also has its own attributes:
+ * <ul>
+ *     <li><b>Initial Radius:</b> 0.5 blocks</li>
+ *     <li><b>Max Radius:</b> 2 blocks</li>
+ *     <li><b>Fire Ticks:</b> 2.5 seconds</li>
+ *     <li><b>Flame Duration:</b> 1.5 seconds</li>
+ *     <li><b>Damage Interval:</b> 0.5 seconds</li>
+ *     <li><b>Ignore Armore:</b> Yes</li>
+ * </ul>
  *
  * @see TurretEntity
  *
@@ -70,6 +86,7 @@ import java.util.Map;
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
  */
 public class FlameTurretEntity extends TurretEntity implements LoopableShootingSound {
+	private static final TrackedData<Boolean> IS_PRIMED;
 	/**
 	 * Defines how many seconds the cannon should wait before shooting again.
 	 * The time is calculated in ticks and by default, it's 1 second <b>(20 ticks times 1 second)</b>.
@@ -106,17 +123,16 @@ public class FlameTurretEntity extends TurretEntity implements LoopableShootingS
 	 * Contains all the items that can give effect to this entity
 	 */
 	protected static final Map<Item, List<Object[]>> effectSource;
-	protected static final int LIGHTER_PARTICLE_SPAWN_DELAY = MathUtil.random(10, 15);
 
-	private int lighterParticleSpawnDelayTimer = 0;
+	private float currentLighterPos = 0;
 	private boolean wasShooting = false;
+
 
 	// //////////// //
 	// CONSTRUCTORS //
 	// //////////// //
 	public FlameTurretEntity(EntityType<? extends MobEntity> entityType, World world) {
-//		super(entityType, world, TurretMaterial.METAL, ModEntities.FLAMMABLE_AEROSOL, ModItems.FLAME_TURRET);
-		super(entityType, world, TurretMaterial.METAL, ModItems.FLAME_TURRET);
+		super(entityType, world, TurretMaterial.METAL, ModEntities.FLAMMABLE_AEROSOL, ModItems.FLAME_TURRET);
 
 		this.setShootSound(ModSoundEvents.TURRET_FLAME_SHOOT_LOOP);
 		this.setHealSound(ModSoundEvents.TURRET_REPAIR_METAL);
@@ -163,23 +179,96 @@ public class FlameTurretEntity extends TurretEntity implements LoopableShootingS
 	protected void initDataTracker(DataTracker.Builder builder) {
 		// Initialize standard data trackers
 		super.initDataTracker(builder);
+
+		builder
+			.add(IS_PRIMED, false)
+		;
 	}
 
 	public static @NotNull DefaultAttributeContainer.Builder setAttributes() {
 		TurretEntity.setTurretMaxHealth(150);
-		TurretEntity.setTurretMaxRange(8 + ModEntities.FLAME_TURRET.getDimensions().eyeHeight());
+		TurretEntity.setTurretMaxRange(10 + ModEntities.FLAME_TURRET.getDimensions().eyeHeight());
 
 		return TurretEntity.setAttributes()
 			.add(EntityAttributes.ARMOR, 5)
 			.add(EntityAttributes.ARMOR_TOUGHNESS, 3);
 	}
 
+	// //////////// //
+	// TRACKED DATA //
+	// //////////// //
+
+	/**
+	 * Identifies whether the turret is primed and ready to shoot or not.
+	 *
+	 * @param isPrimed whether the turret is primed and ready to shoot or not
+	 */
+	public void setIsPrimed(boolean isPrimed) {
+		this.dataTracker.set(IS_PRIMED, isPrimed);
+	}
+
+	public boolean isPrimed() {
+		return this.dataTracker.get(IS_PRIMED);
+	}
+
 	// /////////////// //
 	// PROCESS METHODS //
 	// /////////////// //
 
-	protected void adjustLighterTo(Vec3d newPos) {
+	protected void lightLighter() {
+		Vec3d barrelOrigin = this.getRelativePosFrom(
+			this.getEyePos(), HINGE_POS,
+			false
+		);
 
+		Vec3d lighterPos = this.getRelativePosFrom(
+			barrelOrigin, LIGHTER_POS,
+			true
+		);
+		Vec3d lighterAttPos = this.getRelativePosFrom(
+			barrelOrigin, LIGHTER_ATT_POS,
+			true
+		);
+
+		Vec3d newPos = lighterPos.lerp(lighterAttPos, this.currentLighterPos / 20f);
+		if (this.isPrimed()) {
+			this.currentLighterPos = MathUtil.clamp(
+				this.currentLighterPos + 1, 0, 20
+			);
+		} else {
+			this.currentLighterPos = MathUtil.clamp(
+				this.currentLighterPos - 1, 0, 20
+			);
+		}
+
+		this.getEntityWorld()
+			.addParticleClient(
+				ModParticles.LIGHTER_FLAME,
+				newPos.getX(), newPos.getY(), newPos.getZ(),
+				0, 0, 0
+			);
+	}
+
+	@Override
+	protected <P extends ProjectileEntity> void onProjectileCreateCallback(P projectile) {
+		FlammableAerosolEntity fae = (FlammableAerosolEntity) projectile;
+
+		int fireDuration = (int) (2.5 * 20);
+		float initRad = 0.5f;
+		float targetRad = 2f;
+		float radGrowth = ((targetRad - initRad) / 1.5f) / 20;
+
+		fae.setTargetAge(0);
+		fae.setDamage(15);
+		fae.setRadius(initRad);
+		fae.setTargetRadius(targetRad);
+		fae.setFireDuration(fireDuration);
+		fae.setRadiusGrowth(radGrowth);
+		fae.setReApplicationDelay(10);
+
+		if (!this.getEntityWorld().isClient() && !this.isPrimed()) {
+			this.setIsPrimed(true);
+		}
 	}
 
 	@Override
@@ -202,6 +291,43 @@ public class FlameTurretEntity extends TurretEntity implements LoopableShootingS
 		super.tick();
 
 		this.playShootSound(this);
+
+		World world = this.getEntityWorld();
+
+		if (!world.isClient()) {
+			this.setHasTarget(this.getTarget() != null);
+
+			if (!this.hasTarget() && this.isPrimed()) {
+				this.setIsPrimed(false);
+			}
+		}
+
+		if (world.isClient()) {
+			if (this.isPrimed()) {
+				Random rand = this.getRandom();
+				Vec3d barrelPos = this.getRelativePos(this.getCurrentBarrel(false));
+				Vec3d direction = Vec3d.fromPolar(
+					this.getPitch(),
+					this.getHeadYaw()
+				);
+				Vec3d vel = direction.multiply(
+					rand.nextBetween(25, 50) / 100f,
+					rand.nextBetween(25, 50) / 100f,
+					rand.nextBetween(25, 50) / 100f
+				);
+
+				for (int i = 0; i < rand.nextBetween(5, 10); i++) {
+					ParticleEffect particle = rand.nextBoolean() ?
+						ParticleTypes.FLAME : ParticleTypes.SMALL_FLAME;
+
+					world.addImportantParticleClient(
+						particle,
+						barrelPos.getX(), barrelPos.getY(), barrelPos.getZ(),
+						vel.getX(), vel.getY(), vel.getZ()
+					);
+				}
+			}
+		}
 	}
 
 	// /////////////////// //
@@ -220,12 +346,12 @@ public class FlameTurretEntity extends TurretEntity implements LoopableShootingS
 
 	@Override
 	public int getMaxLookPitchChange() {
-		return 23;
+		return 25;
 	}
 
 	@Override
 	public int getMinLookPitchChange() {
-		return -30;
+		return -35;
 	}
 
 	@Override
@@ -236,6 +362,16 @@ public class FlameTurretEntity extends TurretEntity implements LoopableShootingS
 	@Override
 	public SoundEvent getEntityRemoveSound() {
 		return ModSoundEvents.TURRET_REMOVED_METAL;
+	}
+
+	/**
+	 * Sets the minimum attack range of the Flame Turret to 2 blocks.
+	 *
+	 * @return The minimum attack range of the Flame Turret, which is 2 blocks.
+	 */
+	@Override
+	public float getMinAttackRange() {
+		return 2f;
 	}
 
 	// //////////////////////// //
@@ -299,42 +435,7 @@ public class FlameTurretEntity extends TurretEntity implements LoopableShootingS
 	protected void updateAnimations() {
 		super.updateAnimations();
 
-		Vec3d barrelPos = this.getRelativePos(this.getCurrentBarrel(false));
-
-		if (--this.lighterParticleSpawnDelayTimer <= 0) {
-			Vec3d lighterPos = barrelPos.add(LIGHTER_POS);
-			Vec3d lighterAttPos = barrelPos.add(LIGHTER_ATT_POS);
-
-			boolean isTargeting = this.getTrackedShooting() || this.getTrackedLockedButNotAttacking();
-
-			if (isTargeting) {
-				lighterPos = lighterPos.lerp(lighterAttPos, this.age);
-			}
-
-			this.getEntityWorld()
-				.addParticleClient(
-					ParticleTypes.SMALL_FLAME,
-					lighterPos.getX(), lighterPos.getY(), lighterPos.getZ(),
-					0, 0, 0
-				);
-
-			this.lighterParticleSpawnDelayTimer = LIGHTER_PARTICLE_SPAWN_DELAY;
-		}
-
-		// TEST BARREL POS
-//		for (Vec3d pos : getTurretProjectileSpawn()) {
-//			pos = this.getRelativePosFrom(
-//				t
-//				new Vec3d(0, 0.2, 0.575)
-//			);
-//		}
-//
-//		this.getEntityWorld()
-//			.addParticleClient(
-//				ParticleTypes.ELECTRIC_SPARK,
-//				pos.getX(), pos.getY(), pos.getZ(),
-//				0, 0, 0
-//			);
+		this.lightLighter();
 	}
 
 	// ///////////////// //
@@ -371,6 +472,8 @@ public class FlameTurretEntity extends TurretEntity implements LoopableShootingS
 	// ///////////////// //
 
 	static {
+		IS_PRIMED = DataTracker.registerData(FlameTurretEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
+
 		DAMAGE = new double[] {
 			15.00,
 			16.25,
@@ -380,7 +483,7 @@ public class FlameTurretEntity extends TurretEntity implements LoopableShootingS
 		HINGE_POS = new Vec3d(0, 0, 0.575);
 
 		LIGHTER_POS = new Vec3d(0, -0.125, 1.3125);
-		LIGHTER_ATT_POS = new Vec3d(0, -0.125, 1.3125);
+		LIGHTER_ATT_POS = new Vec3d(0, 0, 1.275);
 
 		BARRELS = List.of(
 			new Vec3d(0, 0, 1.3125)

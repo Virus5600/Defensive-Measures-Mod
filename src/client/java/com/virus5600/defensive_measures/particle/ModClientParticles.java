@@ -30,6 +30,7 @@ public class ModClientParticles {
 		registry.register(ModParticles.SUSPENDED_SPARKS, SparksParticle.SuspendedFactory::new);
 		registry.register(ModParticles.FLAK, FlakParticle.Factory::new);
 		registry.register(ModParticles.FLAK_CLOUD, FlakCloudParticle.Factory::new);
+		registry.register(ModParticles.LIGHTER_FLAME, LighterFlameParticle.Factory::new);
 
 		// EMITTERS
 		registry.register(ModParticles.CANNON_FLASH, new CannonFlashEmitter.Factory());
