@@ -6,14 +6,15 @@ import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.world.World;
 
 import com.virus5600.defensive_measures.entity.ModEntities;
+import com.virus5600.defensive_measures.entity.turrets.tier1.BallistaTurretEntity;
 
 /**
- * The projectile used by {@link com.virus5600.defensive_measures.entity.turrets.BallistaTurretEntity Ballista Turret}.
+ * The projectile used by {@link BallistaTurretEntity Ballista Turret}.
  *
  * <p>Represents a ballista arrow projectile entity that pierces through multiple entities.</p>
  * <p>
  *     The ballista arrow is a {@link KineticProjectileEntity kinetic projectile}
- *     that is fired from a {@link com.virus5600.defensive_measures.entity.turrets.BallistaTurretEntity ballista turret}.
+ *     that is fired from a {@link BallistaTurretEntity ballista turret}.
  * </p>
  * <p>
  *     This projectile can pierce through multiple entities, dealing 4 hearts of damage to each

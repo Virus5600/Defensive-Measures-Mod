@@ -2,7 +2,7 @@ package com.virus5600.defensive_measures.renderer.entity;
 
 import net.minecraft.client.render.entity.EntityRendererFactory;
 
-import com.virus5600.defensive_measures.entity.turrets.FlameTurretEntity;
+import com.virus5600.defensive_measures.entity.turrets.tier2.FlameTurretEntity;
 import com.virus5600.defensive_measures.model.ModEntityModels;
 import com.virus5600.defensive_measures.model.entity.FlameTurretModel;
 import com.virus5600.defensive_measures.renderer.entity.state.BaseTurretRenderState;

@@ -14,6 +14,19 @@ import com.virus5600.defensive_measures.renderer.entity.state.BaseTurretRenderSt
 
 import org.jetbrains.annotations.Nullable;
 
+/**
+ * A keyframe specially designed to run particle and sound event keyframes. This class was born out
+ * of spite due to the lack of support for particle and sound keyframes, making life miserable when
+ * implementing effects for animations.
+ *
+ * @param getTime  The time (in seconds) when this keyframe will take effect.
+ * @param particle The particle it will emit when the keyframe is executed.
+ * @param sound    The sound event it will play when the keyframe is executed.
+ * @param pos      The position at where this keyframe will emit the particle and/or play the sound event.
+ *
+ * @since 1.1.0-beta
+ * @author <a href="https://github.com/Virus5600">Virus5600</a>
+ */
 public record FXKeyframe(double getTime, ParticleEffect particle, SoundEvent sound,
                          Vec3d pos) implements Keyframe {
 	// //////////// //

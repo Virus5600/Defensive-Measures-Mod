@@ -1,5 +1,6 @@
 package com.virus5600.defensive_measures.entity.damage;
 
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.damage.DamageType;
 import net.minecraft.registry.Registry;
@@ -7,6 +8,8 @@ import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.world.World;
+
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
 
@@ -23,10 +26,17 @@ public class ModDamageSources {
 	 *
 	 * @param world The world to create the {@link DamageSource} in
 	 * @param type The {@link RegistryKey<DamageType>} to create the {@link DamageSource} from
+	 * @param source The source where the damage is coming from.
+	 * @param attacker The entity from which the source of the damage came from.
+	 *
 	 * @return The created {@link DamageSource}
+	 *
 	 * @throws IllegalStateException If the {@link Registry<DamageType>} is not present in the world
 	 */
-	public static DamageSource create(World world, RegistryKey<DamageType> type) throws IllegalStateException {
+	public static DamageSource create(
+		World world, RegistryKey<DamageType> type,
+		@Nullable Entity source, @Nullable Entity attacker
+		) throws IllegalStateException {
 		Optional<Registry<DamageType>> optionalRegistry = world.getRegistryManager()
 			.getOptional(RegistryKeys.DAMAGE_TYPE);
 
@@ -36,6 +46,6 @@ public class ModDamageSources {
 		Registry<DamageType> registry = optionalRegistry.get();
 		RegistryEntry<DamageType> dmgEntry = registry.getEntry(registry.get(type));
 
-		return new DamageSource(dmgEntry);
+		return new DamageSource(dmgEntry, source, attacker);
 	}
 }

@@ -1,7 +1,6 @@
 package com.virus5600.defensive_measures.entity.projectiles;
 
 import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.particle.ParticleEffect;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.sound.SoundEvent;
@@ -11,15 +10,15 @@ import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.world.World;
 
-import com.virus5600.defensive_measures.entity.ModEntities;
+import com.virus5600.defensive_measures.entity.turrets.tier1.CannonTurretEntity;
 
 /**
- * The projectile used by {@link com.virus5600.defensive_measures.entity.turrets.CannonTurretEntity Cannon Turret}.
+ * The projectile used by {@link CannonTurretEntity Cannon Turret}.
  *
  * <p>Represents a cannonball projectile entity that explodes on impact.</p>
  * <p>
  *     The cannonball is an {@link ExplosiveProjectileEntity explosive projectile}
- *     that is fired from a {@link com.virus5600.defensive_measures.entity.turrets.CannonTurretEntity cannon turret}.
+ *     that is fired from a {@link CannonTurretEntity cannon turret}.
  * </p>
  * <p>
  *     This projectile is set to explode upon impact, causing 10 hearts of damage to entities

@@ -1,5 +1,6 @@
 package com.virus5600.defensive_measures.particle.custom;
 
+import com.virus5600.defensive_measures.entity.turrets.tier1.CannonTurretEntity;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.particle.Particle;
@@ -17,7 +18,7 @@ import net.minecraft.util.math.random.Random;
 import org.jspecify.annotations.Nullable;
 
 /**
- * Defines the particles emitted by the {@link com.virus5600.defensive_measures.entity.turrets.CannonTurretEntity Cannon Turret}
+ * Defines the particles emitted by the {@link CannonTurretEntity Cannon Turret}
  * when charging up to fire.
  * The particle is a small flame that fades out over time, emitting from the back
  * of the cannon.

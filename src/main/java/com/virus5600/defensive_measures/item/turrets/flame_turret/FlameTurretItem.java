@@ -9,7 +9,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Rarity;
 
-import com.virus5600.defensive_measures.entity.turrets.FlameTurretEntity;
+import com.virus5600.defensive_measures.entity.turrets.tier2.FlameTurretEntity;
 import com.virus5600.defensive_measures.entity.turrets.TurretEntity;
 import com.virus5600.defensive_measures.item.turrets.TurretItem;
 

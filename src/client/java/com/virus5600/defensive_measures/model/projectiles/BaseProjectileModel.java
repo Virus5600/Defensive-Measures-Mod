@@ -6,6 +6,7 @@ import net.minecraft.entity.projectile.ProjectileEntity;
 
 import com.virus5600.defensive_measures.renderer.projectiles.state.BaseProjectileRenderState;
 import com.virus5600.defensive_measures.model.BaseModel;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

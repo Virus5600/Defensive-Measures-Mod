@@ -82,7 +82,7 @@ public class ElectricFenceBlock extends HorizontalConnectingBlock {
 		if (entity instanceof LivingEntity) {
 			if (world instanceof ServerWorld serverWorld) {
 				// Damage the entity
-				DamageSource dmgSrc = ModDamageSources.create(world, ModDamageTypes.ELECTRICITY);
+				DamageSource dmgSrc = ModDamageSources.create(world, ModDamageTypes.ELECTRICITY, null, null);
 				entity.damage(serverWorld, dmgSrc, this.getDamageDealt(state));
 
 				// Spawn Electric Particles

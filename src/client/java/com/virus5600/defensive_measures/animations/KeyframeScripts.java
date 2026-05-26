@@ -16,6 +16,7 @@ import com.virus5600.defensive_measures.entity.damage.ModDamageTypes;
 import com.virus5600.defensive_measures.particle.ModParticles;
 
 public class KeyframeScripts {
+	/** An explosion effect for VFX. Does not deal damage nor destroy environment. */
 	public static KeyframeAction EXPLODE_SCRIPT;
 
 	static {
@@ -25,7 +26,7 @@ public class KeyframeScripts {
 			if (world == null) { return; }
 
 			Entity entity = world.getEntity(state.id);
-			DamageSource src = ModDamageSources.create(world, ModDamageTypes.SECONDARY_EXPLOSION);
+			DamageSource src = ModDamageSources.create(world, ModDamageTypes.SECONDARY_EXPLOSION, entity, null);
 
 			EntityDimensions dim = EntityDimensions.fixed(1, 1);
 

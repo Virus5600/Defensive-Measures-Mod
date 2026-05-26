@@ -1,0 +1,24 @@
+{
+	"type": "dm:tas_shaped",
+	"category": "turrets",
+	"pattern": [
+		"riiir  ",
+		"iccci  ",
+		"icpciii",
+		"ibpbi  ",
+		"icpci  ",
+		"sssss  "
+	],
+	"key": {
+		"p": "minecraft:blaze_powder",
+		"s": "minecraft:smooth_stone_slab",
+		"c": "minecraft:copper_ingot",
+		"b": "minecraft:iron_block",
+		"i": "minecraft:iron_ingot",
+		"r": "minecraft:red_dye"
+	},
+	"result": {
+		"id": "dm:flame_turret",
+		"count": 1
+	}
+}

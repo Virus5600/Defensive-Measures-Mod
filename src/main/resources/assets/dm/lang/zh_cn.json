@@ -79,8 +79,8 @@
 	"death.attack.secondary_explosion": "%1$1 died from a secondary explosion.",
 	"death.attack.secondary_explosion.player": "%1$s died standing near %2$s.",
 
-	"death.attack.thrown_flame": "%1$s got turned to ashes.",
-	"death.attack.thrown_flame.player": "%1$s got cooked by %2$s.",
+	"death.attack.thrown_flame": "%1$s got cooked by %2$s.",
+	"death.attack.thrown_flame.player": "%1$s got turned to ashes thanks %2$s.",
 
 	"subtitles.turret.remove.metal" : "防御塔：拆除",
 	"subtitles.turret.remove.wood" : "防御塔：拆除",

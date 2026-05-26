@@ -1,5 +1,6 @@
-package com.virus5600.defensive_measures.entity.turrets;
+package com.virus5600.defensive_measures.entity.turrets.tier1;
 
+import com.virus5600.defensive_measures.entity.turrets.TurretEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;

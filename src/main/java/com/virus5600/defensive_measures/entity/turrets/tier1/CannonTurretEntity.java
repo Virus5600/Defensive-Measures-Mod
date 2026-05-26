@@ -1,5 +1,6 @@
-package com.virus5600.defensive_measures.entity.turrets;
+package com.virus5600.defensive_measures.entity.turrets.tier1;
 
+import com.virus5600.defensive_measures.entity.turrets.TurretEntity;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.entity.EntityType;
@@ -30,7 +31,6 @@ import com.virus5600.defensive_measures.item.ModItems;
 import com.virus5600.defensive_measures.particle.ModParticles;
 import com.virus5600.defensive_measures.sound.ModSoundEvents;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
 import java.util.Optional;

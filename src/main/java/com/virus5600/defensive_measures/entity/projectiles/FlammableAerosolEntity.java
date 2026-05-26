@@ -9,7 +9,7 @@ import net.minecraft.world.World;
 
 import com.virus5600.defensive_measures.entity.damage.ModDamageSources;
 import com.virus5600.defensive_measures.entity.damage.ModDamageTypes;
-import com.virus5600.defensive_measures.entity.turrets.FlameTurretEntity;
+import com.virus5600.defensive_measures.entity.turrets.tier2.FlameTurretEntity;
 
 /**
  * The "projectile" used by {@link FlameTurretEntity}.
@@ -75,7 +75,8 @@ public class FlammableAerosolEntity extends AreaCloudEntity {
 
 				DamageSource src = ModDamageSources.create(
 					serverWorld,
-					ModDamageTypes.THROWN_FLAME
+					ModDamageTypes.THROWN_FLAME,
+					cloudEntity, cloudEntity.getOwner()
 				);
 
 				target.damage(

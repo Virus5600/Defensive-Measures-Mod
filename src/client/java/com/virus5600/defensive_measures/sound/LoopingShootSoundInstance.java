@@ -1,6 +1,7 @@
 package com.virus5600.defensive_measures.sound;
 
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.sound.*;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
@@ -100,7 +101,9 @@ public class LoopingShootSoundInstance extends MovingSoundInstance {
 
 	@Override
 	public void tick() {
-		if (this.turret == null) {
+		ClientPlayerEntity player = MinecraftClient.getInstance().player;
+
+		if (this.turret == null || (player != null && player.isDead()) && !this.isEndLoopTriggered) {
 			this.endLoop();
 			return;
 		}
@@ -113,7 +116,7 @@ public class LoopingShootSoundInstance extends MovingSoundInstance {
 			this.turret.hasTarget();
 
 		// Once the start sound is done...
-		if (this.startSoundInstance.isDone()) {
+		if (this.startSoundInstance != null && this.startSoundInstance.isDone()) {
 			// Start playing the loop by setting the volume to 100.
 			if (!this.isLoopPlaying) {
 				// If the end loop is already triggered...

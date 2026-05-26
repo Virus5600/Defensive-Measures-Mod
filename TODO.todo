@@ -12,10 +12,11 @@ TODO: TurretEntity
 		- Properly calculate the parabolic trajectory (low priority) - Apparently, it was because of the "acceleration" modifier in the "ExplosiveProjectileEntity" class. Fuck.
 
 TODO:
-- Implement Flame Turret (#36)
+- Implement Missile Turret (#33)
  - Recipe and recipe related advancements
  - Item icon
  - Entity texture
+ - Implement variable radar spin amount
 
-- Implement Flame (#37)
- - Use flame particle
+- Implement Micro Missile (#34)
+  - Entity texture

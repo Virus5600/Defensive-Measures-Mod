@@ -3,6 +3,8 @@ package com.virus5600.defensive_measures.entity.turrets;
 import com.virus5600.defensive_measures._util.MathUtil;
 import com.virus5600.defensive_measures.entity.ai.control.TurretLookControl;
 import com.virus5600.defensive_measures.entity.projectiles.TurretProjectileEntity;
+import com.virus5600.defensive_measures.entity.turrets.tier1.CannonTurretEntity;
+import com.virus5600.defensive_measures.entity.turrets.tier2.AATurretEntity;
 import com.virus5600.defensive_measures.sound.ModSoundEvents;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;

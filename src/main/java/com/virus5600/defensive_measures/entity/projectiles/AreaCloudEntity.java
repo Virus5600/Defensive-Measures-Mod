@@ -19,7 +19,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
 
-import com.virus5600.defensive_measures.entity.turrets.FlameTurretEntity;
+import com.virus5600.defensive_measures.entity.turrets.tier2.FlameTurretEntity;
 import com.virus5600.defensive_measures.entity.projectiles.interfaces.CloudAction;
 
 import java.util.List;

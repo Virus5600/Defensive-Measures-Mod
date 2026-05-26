@@ -171,7 +171,7 @@ public class BoltHeadBlock extends Block implements Waterloggable {
 	public void onSteppedOn(World world, BlockPos pos, BlockState state, Entity entity) {
 		if (!entity.bypassesSteppingEffects() && entity instanceof LivingEntity) {
 			if (world instanceof ServerWorld serverWorld) {
-				DamageSource dmgSrc = ModDamageSources.create(world, ModDamageTypes.BOLT_HEAD);
+				DamageSource dmgSrc = ModDamageSources.create(world, ModDamageTypes.BOLT_HEAD, null, null);
 				entity.damage(serverWorld, dmgSrc, this.getDamageDealt(state));
 			}
 		}

@@ -1,16 +1,15 @@
 package com.virus5600.defensive_measures.entity;
 
-import com.virus5600.defensive_measures.DefensiveMeasures;
-
-import com.virus5600.defensive_measures.entity.projectiles.*;
-import com.virus5600.defensive_measures.entity.turrets.*;
-import com.virus5600.defensive_measures._helper.RegistryHelper;
-
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
-
-import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EntityType.Builder;
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnGroup;
+
+import com.virus5600.defensive_measures.DefensiveMeasures;
+import com.virus5600.defensive_measures._helper.RegistryHelper;
+import com.virus5600.defensive_measures.entity.projectiles.*;
+import com.virus5600.defensive_measures.entity.turrets.tier1.*;
+import com.virus5600.defensive_measures.entity.turrets.tier2.*;
 
 /**
  * Register and store all custom entities for the mod.

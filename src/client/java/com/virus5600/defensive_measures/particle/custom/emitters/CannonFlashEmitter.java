@@ -1,5 +1,6 @@
 package com.virus5600.defensive_measures.particle.custom.emitters;
 
+import com.virus5600.defensive_measures.entity.turrets.tier1.CannonTurretEntity;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.particle.Particle;
@@ -14,7 +15,7 @@ import com.virus5600.defensive_measures.particle.ModParticles;
 import net.minecraft.util.math.random.Random;
 
 /**
- * Defines the particles emitted by the {@link com.virus5600.defensive_measures.entity.turrets.CannonTurretEntity Cannon Turret}
+ * Defines the particles emitted by the {@link CannonTurretEntity Cannon Turret}
  * when it fires.
  * The particle shots out in a cone shape and fades out over time. The direction is
  * determined by the direction the turret is facing.

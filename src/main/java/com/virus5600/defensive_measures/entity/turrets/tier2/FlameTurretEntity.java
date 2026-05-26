@@ -1,5 +1,6 @@
-package com.virus5600.defensive_measures.entity.turrets;
+package com.virus5600.defensive_measures.entity.turrets.tier2;
 
+import com.virus5600.defensive_measures.entity.turrets.TurretEntity;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.entity.EntityType;

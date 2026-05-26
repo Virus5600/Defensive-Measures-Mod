@@ -277,14 +277,14 @@
 			"dm:turrets/hurt/metal_hurt1",
 			"dm:turrets/hurt/metal_hurt2"
 		],
-		"subtitle": "subtitles.turret.aa_turret.hurt"
+		"subtitle": "subtitles.turret.flame_turret.hurt"
 	},
 	"turret.flame_turret.destroyed": {
 		"sounds": [
 			"dm:turrets/crumbling_turrets/metal_crumbling1",
 			"dm:turrets/crumbling_turrets/metal_crumbling2"
 		],
-		"subtitle": "subtitles.turret.aa_turret.destroyed"
+		"subtitle": "subtitles.turret.flame_turret.destroyed"
 	},
 	"turret.flame_turret.shoot.start": {
 		"sounds": [

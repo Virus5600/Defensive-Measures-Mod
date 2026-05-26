@@ -11,6 +11,14 @@ import net.minecraft.particle.SimpleParticleType;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.random.Random;
 
+import com.virus5600.defensive_measures.entity.turrets.tier2.FlameTurretEntity;
+
+/**
+ * The small flame emitted at the mouth of the {@link FlameTurretEntity Flame Turret}'s barrel.
+ *
+ * @since 1.1.0-beta
+ * @author <a href="https://github.com/Virus5600">Virus5600</a>
+ */
 @Environment(EnvType.CLIENT)
 public class LighterFlameParticle extends BillboardParticle {
 	// CONSTRUCTORS //

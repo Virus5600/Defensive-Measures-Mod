@@ -15,18 +15,19 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraft.world.rule.GameRules;
 
-import com.virus5600.defensive_measures.entity.ModEntities;
-import com.virus5600.defensive_measures.sound.ModSoundEvents;
 import com.virus5600.defensive_measures._helper.BlockHelper.BlockCategory;
 import com.virus5600.defensive_measures._helper.BlockHelper;
+import com.virus5600.defensive_measures.entity.ModEntities;
+import com.virus5600.defensive_measures.entity.turrets.tier1.MGTurretEntity;
+import com.virus5600.defensive_measures.sound.ModSoundEvents;
 
 /**
- * The projectile used by {@link com.virus5600.defensive_measures.entity.turrets.MGTurretEntity MG Turret}.
+ * The projectile used by {@link MGTurretEntity MG Turret}.
  *
  * <p>Represents a machine gun bullet projectile entity that pierces through multiple unarmored entities.</p>
  * <p>
  *     The machine gun bullet is a {@link KineticProjectileEntity kinetic projectile}
- *     that is fired from a {@link com.virus5600.defensive_measures.entity.turrets.MGTurretEntity MG turret}.
+ *     that is fired from a {@link MGTurretEntity MG turret}.
  * </p>
  * <p>
  *     This projectile can pierce through multiple unarmored entities, dealing 5 hearts of damage to each
