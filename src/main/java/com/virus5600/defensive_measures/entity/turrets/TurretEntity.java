@@ -1806,6 +1806,10 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 
 	// OVERRIDABLES //
 
+	protected double getTargetHeightScale() {
+		return (double) (1 / 3);
+	}
+
 	/**
 	 * Sets the velocity of a projectile, along with the power and uncertainty of the projectile.
 	 * <br><br>
@@ -2319,7 +2323,7 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 		public TurretProjectileVelocity setVelocity(LivingEntity target) {
 			return this.setVelocityFromPos(
 				target.getX(),
-				target.getBodyY((double) 1 / 3),
+				target.getBodyY(this.turret.getTargetHeightScale()),
 				target.getZ()
 			);
 		}

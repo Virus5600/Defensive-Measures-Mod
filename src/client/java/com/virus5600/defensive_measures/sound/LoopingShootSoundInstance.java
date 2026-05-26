@@ -83,6 +83,7 @@ public class LoopingShootSoundInstance extends MovingSoundInstance {
 		this.pitch = 0.9F + this.random.nextFloat() * 0.2F;
 
 		this.updateSound();
+		this.updateSoundPos();
 	}
 
 	// /////////////// //
@@ -124,6 +125,7 @@ public class LoopingShootSoundInstance extends MovingSoundInstance {
 					// ... and if the end sound is finished, mark this instance as done.
 					if (this.endSoundInstance.isDone() && this.getSoundSystem().dm$isStopped(endSoundInstance)) {
 						this.setDone();
+						return;
 					}
 				}
 				// If the end loop isn't triggered yet, then start playing the loop.
@@ -169,8 +171,8 @@ public class LoopingShootSoundInstance extends MovingSoundInstance {
 	}
 
 	public void endLoop() {
-		this.isLoopPlaying = false;
 		this.isEndLoopTriggered = true;
+		this.isLoopPlaying = false;
 		this.volume = 0f;
 
 		this.endSoundInstance = this.queueSound(this.endSound, false);

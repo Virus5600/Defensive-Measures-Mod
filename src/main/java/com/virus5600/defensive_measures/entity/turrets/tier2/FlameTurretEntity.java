@@ -432,6 +432,11 @@ public class FlameTurretEntity extends TurretEntity implements LoopableShootingS
 	// OVERRIDABLES //
 	// //////////// //
 
+	@Override
+	protected double getTargetHeightScale() {
+		return (double) 1 / 10;
+	}
+
 	@Environment(EnvType.CLIENT) @Override
 	protected void updateAnimations() {
 		super.updateAnimations();

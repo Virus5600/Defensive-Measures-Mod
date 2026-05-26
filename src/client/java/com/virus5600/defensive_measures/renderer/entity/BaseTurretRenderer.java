@@ -65,7 +65,8 @@ public abstract class BaseTurretRenderer<
 
 		turretRenderState.id = turretEntity.getUuid();
 		turretRenderState.turretLvl = turretEntity.getTrackedLevel();
-		turretRenderState.hasTarget = turretEntity.getTrackedLockedButNotAttacking();
+		turretRenderState.hasTarget = turretEntity.hasTarget();
+		turretRenderState.isLockedButNotAttacking = turretEntity.getTrackedLockedButNotAttacking();
 		turretRenderState.shooting = turretEntity.getTrackedShooting();
 
 		turretRenderState.dead = turretEntity.isDead();

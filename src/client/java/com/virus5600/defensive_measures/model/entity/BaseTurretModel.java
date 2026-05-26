@@ -1,5 +1,6 @@
 package com.virus5600.defensive_measures.model.entity;
 
+import com.virus5600.defensive_measures._util.MathUtil;
 import net.minecraft.client.model.ModelPart;
 import net.minecraft.client.render.entity.animation.Animation;
 import net.minecraft.client.render.entity.animation.AnimationDefinition;
@@ -212,7 +213,12 @@ public abstract class BaseTurretModel<S extends BaseTurretRenderState> extends B
 
 		// HEAD ANGLE HANDLING
 		float headYaw = state.relativeHeadYaw + state.bodyYaw + 180;
-		float headPitch = state.hasTarget ? state.pitch : -this.getDefaultHeadPitch();
+		float headPitch = state.pitch;
+
+		// If default head pitch is not 0, use it when it's idle.
+		if (this.getDefaultHeadPitch() != 0 && state.hasTarget) {
+			headPitch = this.getDefaultHeadPitch();
+		}
 
 		this.setHeadAngles(headYaw, headPitch);
 	}
@@ -232,8 +238,8 @@ public abstract class BaseTurretModel<S extends BaseTurretRenderState> extends B
 			-this.getMinPitch()
 		);
 
-		this.neck.yaw = headYaw * ((float)Math.PI / 180F);
-		this.head.pitch = headPitch * ((float)Math.PI / 180F);
+		this.neck.yaw = MathUtil.degToRad(headYaw);
+		this.head.pitch = MathUtil.degToRad(headPitch);
 	}
 
 	// ///////////////// //

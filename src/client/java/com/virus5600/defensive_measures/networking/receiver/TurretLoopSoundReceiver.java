@@ -63,7 +63,7 @@ public final class TurretLoopSoundReceiver {
 					);
 
 					if (ACTIVE_SOUNDS.putIfAbsent(payload.entityId(), instance) == null) {
-						manager.play(instance);
+						instance.startLoop();
 					}
 				}
 				else {

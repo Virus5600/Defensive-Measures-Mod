@@ -15,6 +15,7 @@ public class BaseTurretRenderState extends LivingEntityRenderState {
 	public Vec3d eyePos;
 	public int turretLvl;
 	public boolean hasTarget;
+	public boolean isLockedButNotAttacking;
 	public boolean shooting;
 	public boolean dead;
 }

@@ -1,6 +1,5 @@
 package com.virus5600.defensive_measures.entity.turrets.tier2;
 
-import com.virus5600.defensive_measures.entity.turrets.TurretEntity;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.entity.EntityType;
@@ -24,6 +23,7 @@ import com.virus5600.defensive_measures._util.MathUtil;
 import com.virus5600.defensive_measures.entity.ModEntities;
 import com.virus5600.defensive_measures.entity.TurretMaterial;
 import com.virus5600.defensive_measures.entity.ai.goal.ProjectileAttackGoal;
+import com.virus5600.defensive_measures.entity.turrets.TurretEntity;
 import com.virus5600.defensive_measures.item.ModItems;
 import com.virus5600.defensive_measures.particle.ModParticles;
 import com.virus5600.defensive_measures.registry.tag.ModEntityTypeTags;

@@ -626,20 +626,18 @@ public abstract class AreaCloudEntity extends TurretProjectileEntity {
 					}
 				}
 
-				if (this.age % 5 == 0) {
-					// 1. Clean the global cooldown map
-					this.affectedEntities
-						.entrySet()
-						.removeIf((entry) -> this.age >= entry.getValue());
+				// 1. Clean the global cooldown map
+				this.affectedEntities
+					.entrySet()
+					.removeIf((entry) -> this.age >= entry.getValue());
 
-					// 2. Grab everything in the general area
-					List<LivingEntity> targets = this.getEntityWorld().getNonSpectatingEntities(LivingEntity.class, this.getBoundingBox());
+				// 2. Grab everything in the general area
+				List<LivingEntity> targets = this.getEntityWorld().getNonSpectatingEntities(LivingEntity.class, this.getBoundingBox());
 
-					// 3. Process them cleanly
-					for (LivingEntity target : targets) {
-						if (this.isEntityInside(target)) {
-							this.processEntity(target);
-						}
+				// 3. Process them cleanly
+				for (LivingEntity target : targets) {
+					if (this.isEntityInside(target)) {
+						this.processEntity(target);
 					}
 				}
 			}
