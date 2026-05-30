@@ -267,13 +267,4 @@ public record FXKeyframe(double getTime, ParticleEffect particle, SoundEvent sou
 			}
 		}
 	}
-
-	// COMPARABLE METHODS //
-	@Override
-	public int compareTo(Keyframe other) {
-		return Double.compare(
-			this.getTime(),
-			other.getTime()
-		);
-	}
 }

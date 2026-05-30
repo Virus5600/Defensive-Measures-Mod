@@ -1,5 +1,6 @@
 package com.virus5600.defensive_measures._util;
 
+import net.minecraft.entity.Entity;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.random.Random;
@@ -118,6 +119,44 @@ public class MathUtil {
 		return getRelativePos(origin, offsets.getX(), offsets.getY(), offsets.getZ(), yaw);
 	}
 
+	// ///////// //
+	// DIRECTION //
+	// ///////// //
+
+	/**
+	 * Gets the movement direction of an entity.
+	 *
+	 * @param mob The entity to get the movement direction of.
+	 *
+	 * @return {@code Vec3d} the movement direction of the entity.
+	 */
+	public static Vec3d getMovementDirection(Entity mob) {
+		return getMovementDirection(mob.getYaw(), mob.getPitch());
+	}
+
+	/**
+	 * Gets the movement direction of an entity based on its yaw and pitch.
+	 *
+	 * @param yaw The yaw rotation of the entity in degrees.
+	 * @param pitch The pitch rotation of the entity in degrees.
+	 *
+	 * @return {@code Vec3d} the movement direction of the entity.
+	 */
+	public static Vec3d getMovementDirection(double yaw, double pitch) {
+		double yawRad = degToRad(yaw);
+		double pitchRad = degToRad(pitch);
+
+		double x = -Math.sin(yawRad) * Math.cos(pitchRad);
+		double y = -Math.sin(pitchRad);
+		double z = Math.cos(yawRad) * Math.cos(pitchRad);
+
+		return new Vec3d(x, y, z).normalize();
+	}
+
+	public static Vec3d getTargetDirection(Entity origin, Entity target) {
+		return target.getEntityPos().subtract(origin.getEntityPos()).normalize();
+	}
+
 	// ///////////////////// //
 	// ANGLE UNIT CONVERSION //
 	// ///////////////////// //
@@ -134,6 +173,17 @@ public class MathUtil {
 	}
 
 	/**
+	 * Converts radians to degrees.
+	 *
+	 * @param rad The angle in radians to be converted to degrees.
+	 *
+	 * @return {@code double} the angle in degrees.
+	 */
+	public static double radToDeg(double rad) {
+		return rad * (180.0 / Math.PI);
+	}
+
+	/**
 	 * Converts degrees to radians.
 	 *
 	 * @param deg The angle in degrees to be converted to radians.
@@ -142,6 +192,17 @@ public class MathUtil {
 	 */
 	public static float degToRad(float deg) {
 		return deg * ((float) Math.PI / 180.0f);
+	}
+
+	/**
+	 * Converts degrees to radians.
+	 *
+	 * @param deg The angle in degrees to be converted to radians.
+	 *
+	 * @return {@code double} the angle in radians.
+	 */
+	public static double degToRad(double deg) {
+		return deg * (Math.PI / 180.0);
 	}
 
 	// ////////////// //

@@ -47,6 +47,8 @@ import java.util.Map;
  *     <li><b>Attack Range:</b> 16 blocks</li>
  *     <li><b>X Firing Arc:</b> ±360°</li>
  *     <li><b>Y Firing Arc:</b> ±20°</li>
+ *     <li><b>Armor:</b> 0</li>
+ *     <li><b>Armor Toughness:</b> 0</li>
  * </ul>
  *
  * @see TurretEntity

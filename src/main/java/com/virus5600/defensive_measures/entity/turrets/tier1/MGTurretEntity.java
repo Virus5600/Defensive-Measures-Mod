@@ -47,6 +47,8 @@ import java.util.Map;
  *     <li><b>Attack Range:</b> 20 blocks</li>
  *     <li><b>X Firing Arc:</b> ±360°</li>
  *     <li><b>Y Firing Arc:</b> -27.5 to 90°</li>
+ *     <li><b>Armor:</b> 2</li>
+ *     <li><b>Armor Toughness:</b> 1</li>
  * </ul>
  *
  * @see TurretEntity
@@ -138,13 +140,7 @@ public class MGTurretEntity extends TurretEntity {
 	// GETTERS AND SETTERS //
 	// /////////////////// //
 
-	@Override
-	public int getMinLookPitchChange() {
-		return -28;
-	}
-
-	@Nullable
-	@Override
+	@Override @Nullable
 	protected SoundEvent getHurtSound(DamageSource source) {
 		return ModSoundEvents.TURRET_MG_HURT;
 	}
@@ -152,6 +148,11 @@ public class MGTurretEntity extends TurretEntity {
 	@Override @Nullable
 	protected SoundEvent getDeathSound() {
 		return ModSoundEvents.TURRET_MG_DESTROYED;
+	}
+
+	@Override
+	public int getMinLookPitchChange() {
+		return -28;
 	}
 
 	@Override

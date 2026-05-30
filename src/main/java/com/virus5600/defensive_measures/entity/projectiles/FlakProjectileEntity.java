@@ -6,13 +6,11 @@ import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.damage.DamageTypes;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.particle.ParticleEffect;
-import net.minecraft.particle.ParticleTypes;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 
 import com.virus5600.defensive_measures.particle.ModParticles;
-import com.virus5600.defensive_measures.entity.ModEntities;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -28,11 +26,6 @@ public class FlakProjectileEntity extends CannonballEntity {
 		World world
 	) {
 		super(entityType, world);
-	}
-
-	public FlakProjectileEntity(LivingEntity owner, World world) {
-		this(ModEntities.CANNONBALL, world);
-		this.setOwner(owner);
 	}
 
 	// /////// //
@@ -56,7 +49,7 @@ public class FlakProjectileEntity extends CannonballEntity {
 	 */
 	@Override @NotNull
 	protected ParticleEffect getSmallExplosionParticleType() {
-		return ParticleTypes.EXPLOSION;
+		return ModParticles.FLAK_EXPLOSION;
 	}
 
 	/**
@@ -65,7 +58,7 @@ public class FlakProjectileEntity extends CannonballEntity {
 	 */
 	@Override @NotNull
 	protected ParticleEffect getLargeExplosionParticleType() {
-		return ParticleTypes.EXPLOSION;
+		return ModParticles.FLAK_EXPLOSION;
 	}
 
 	@Override
@@ -149,6 +142,10 @@ public class FlakProjectileEntity extends CannonballEntity {
 			);
 		}
 	}
+
+	// //////////////// //
+	// ABSTRACT METHODS //
+	// //////////////// //
 
 	// EplosiveProjectileEntity //
 	@Override

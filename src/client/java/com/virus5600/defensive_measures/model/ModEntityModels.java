@@ -32,6 +32,7 @@ public class ModEntityModels {
 	// v1.1.0-beta
 	public static final EntityModelLayer AA_TURRET = registerMain("aa_turret");
 	public static final EntityModelLayer FLAME_TURRET = registerMain("flame_turret");
+	public static final EntityModelLayer MISSILE_TURRET = registerMain("missile_turret");
 
 	// /////////// //
 	// PROJECTILES //
@@ -45,6 +46,7 @@ public class ModEntityModels {
 	// v1.1.0-beta
 	public static final EntityModelLayer FLAK_PROJECTILE = registerMain("flak_projectile");
 	public static final EntityModelLayer FLAMMABLE_AEROSOL = registerMain("flammable_aerosol");
+	public static final EntityModelLayer MICRO_MISSILE = registerMain("micro_missile");
 
 	public static void registerEntityModels() {
 		DefensiveMeasures.LOGGER.info("REGISTERING ENTITY MODELS FOR {}...", DefensiveMeasures.MOD_NAME);
@@ -61,6 +63,7 @@ public class ModEntityModels {
 		// v1.1.0-beta
 		EntityModelLayerRegistry.registerModelLayer(AA_TURRET, AATurretModel::getTexturedModelData);
 		EntityModelLayerRegistry.registerModelLayer(FLAME_TURRET, FlameTurretModel::getTexturedModelData);
+		EntityModelLayerRegistry.registerModelLayer(MISSILE_TURRET, MissileTurretModel::getTexturedModelData);
 
 		// /////////// //
 		// PROJECTILES //
@@ -74,6 +77,7 @@ public class ModEntityModels {
 		// v1.1.0-beta
 		EntityModelLayerRegistry.registerModelLayer(FLAK_PROJECTILE, FlakProjectileModel::getTexturedModelData);
 		EntityModelLayerRegistry.registerModelLayer(FLAMMABLE_AEROSOL, FlammableAerosolModel::getTexturedModelData);
+		EntityModelLayerRegistry.registerModelLayer(MICRO_MISSILE, MicroMissileModel::getTexturedModelData);
 	}
 
 	private static EntityModelLayer registerMain(String id) {

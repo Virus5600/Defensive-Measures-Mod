@@ -35,5 +35,6 @@ public class ModClientParticles {
 		// EMITTERS
 		registry.register(ModParticles.CANNON_FLASH, new CannonFlashEmitter.Factory());
 		registry.register(ModParticles.FLAK_EXPLOSION, new FlakExplosionEmitter.Factory());
+		registry.register(ModParticles.ROCKET_THRUSTER, new CannonFlashEmitter.ThrusterFactory());
 	}
 }

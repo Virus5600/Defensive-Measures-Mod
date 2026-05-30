@@ -140,13 +140,38 @@ public abstract class BaseTurretModel<S extends BaseTurretRenderState> extends B
 		this.neck = neck;
 		this.head = head;
 
+		// Identify the procedures' length
+		Keyframe lastKF;
+		lastKF = this.getShootAnimProcedureInstance()
+			.stream()
+			.max(Comparator.comparingDouble(Keyframe::getTime))
+			.orElse(null);
+		int shootProcLenMS = lastKF == null ? 0 : lastKF.getTimeMS();
+
+		lastKF = this.getDeathAnimProcedureInstance()
+			.stream()
+			.max(Comparator.comparingDouble(Keyframe::getTime))
+			.orElse(null);
+		int deathProcLenMS = lastKF == null ? 0 : lastKF.getTimeMS();
+
 		// Stores the animation lengths first...
-		this.shootAnimLen = shootAnim == null ? 0 : shootAnim.lengthInSeconds();
-		this.deathAnimLen = deathAnim == null ? 0 : deathAnim.lengthInSeconds();
+		this.shootAnimLen = shootAnim == null ? shootProcLenMS : shootAnim.lengthInSeconds();
+		this.deathAnimLen = deathAnim == null ? deathProcLenMS : deathAnim.lengthInSeconds();
 
 		// Sets the common animation parts that may/not be used by all turret models
-		this.shootAnim = shootAnim == null ? null :shootAnim.createAnimation(root);
-		this.deathAnim = deathAnim == null ? null :deathAnim.createAnimation(root);
+		this.shootAnim = shootAnim != null ?
+			shootAnim.createAnimation(root) :
+			AnimationDefinition.Builder
+				.create(this.shootAnimLen / 1000)
+				.build()
+				.createAnimation(root);
+
+		this.deathAnim = deathAnim != null ?
+			deathAnim.createAnimation(root) :
+			AnimationDefinition.Builder
+				.create(this.deathAnimLen / 1000)
+				.build()
+				.createAnimation(root);
 	}
 
 	// /////////////// //
@@ -174,9 +199,9 @@ public abstract class BaseTurretModel<S extends BaseTurretRenderState> extends B
 
 		// ANIMATION HANDLING (& ADDITIONAL PROCEDURES)
 		if (this.shootAnim != null) {
-			if (this.getShootAnimProcedure(state.id) == null &&
+			if ((this.getShootAnimProcedure(state.id) == null &&
 				state.shootAnimationState.getTimeInMilliseconds(state.age) > 0 &&
-				!state.shootAnimationState.isRunning()
+				!state.shootAnimationState.isRunning())
 			) {
 				this.setShootAnimProcedure(state.id, this.getShootAnimProcedureInstance());
 			}

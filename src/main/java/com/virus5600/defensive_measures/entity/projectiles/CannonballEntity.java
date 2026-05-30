@@ -67,7 +67,6 @@ public class CannonballEntity extends ExplosiveProjectileEntity {
 		super(entityType, world);
 		this.setFireTicks(0);
 		this.setOnFire(false);
-		this.setNoGravity(false);
 
 		this.setDamage(10);
 	}
@@ -88,6 +87,8 @@ public class CannonballEntity extends ExplosiveProjectileEntity {
 
 	@Override
 	protected void onEntityHit(EntityHitResult entityHitResult) {
+		super.onEntityHit(entityHitResult);
+
 		if (!this.getEntityWorld().isClient()) {
 			this.doDamage();
 		}

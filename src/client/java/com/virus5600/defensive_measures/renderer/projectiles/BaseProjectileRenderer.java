@@ -54,10 +54,11 @@ public abstract class BaseProjectileRenderer<
 
 		state.loopAnimationState.copyFrom(entity.getLoopAnimationState());
 
-		state.pitch = entity.getLerpedPitch(tickProgress);
+		state.pitch = -entity.getLerpedPitch(tickProgress);
 		state.yaw = entity.getLerpedYaw(tickProgress);
 
-		state.pitch *= entity instanceof ExplosiveProjectileEntity ? -1 : 1;
+		state.yaw *= entity instanceof ExplosiveProjectileEntity ? -1 : 1;
+		state.yaw += entity instanceof ExplosiveProjectileEntity ? 180 : 0;
 	}
 
 	@Override
@@ -65,8 +66,8 @@ public abstract class BaseProjectileRenderer<
 		stack.push();
 
 		if (this.shouldLookAtDir()) {
-			stack.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(state.yaw - 180F));
 			stack.multiply(RotationAxis.POSITIVE_X.rotationDegrees(state.pitch));
+			stack.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(state.yaw - 180F));
 		}
 
 		Identifier textureId = this.getTexture(state);

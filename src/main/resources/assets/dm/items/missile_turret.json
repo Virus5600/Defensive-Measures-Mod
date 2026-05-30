@@ -1,0 +1,143 @@
+{
+	"model": {
+		"type": "composite",
+		"models": [
+			{
+				"type": "model",
+				"model": "dm:item/missile_turret/0"
+			},
+			{
+				"type": "model",
+				"model": "dm:item/missile_turret/1"
+			},
+			{
+				"type": "model",
+				"model": "dm:item/missile_turret/2"
+			},
+			{
+				"type": "model",
+				"model": "dm:item/missile_turret/3"
+			},
+			{
+				"type": "model",
+				"model": "dm:item/missile_turret/4"
+			},
+			{
+				"type": "model",
+				"model": "dm:item/missile_turret/5"
+			},
+			{
+				"type": "model",
+				"model": "dm:item/missile_turret/6"
+			},
+			{
+				"type": "model",
+				"model": "dm:item/missile_turret/7"
+			},
+			{
+				"type": "model",
+				"model": "dm:item/missile_turret/8"
+			},
+			{
+				"type": "model",
+				"model": "dm:item/missile_turret/9"
+			},
+			{
+				"type": "model",
+				"model": "dm:item/missile_turret/10"
+			},
+			{
+				"type": "model",
+				"model": "dm:item/missile_turret/11"
+			},
+			{
+				"type": "model",
+				"model": "dm:item/missile_turret/12"
+			},
+			{
+				"type": "model",
+				"model": "dm:item/missile_turret/13"
+			},
+			{
+				"type": "model",
+				"model": "dm:item/missile_turret/14"
+			},
+			{
+				"type": "model",
+				"model": "dm:item/missile_turret/15"
+			},
+			{
+				"type": "model",
+				"model": "dm:item/missile_turret/16"
+			},
+			{
+				"type": "model",
+				"model": "dm:item/missile_turret/17"
+			},
+			{
+				"type": "model",
+				"model": "dm:item/missile_turret/18"
+			},
+			{
+				"type": "model",
+				"model": "dm:item/missile_turret/19"
+			},
+			{
+				"type": "model",
+				"model": "dm:item/missile_turret/20"
+			},
+			{
+				"type": "model",
+				"model": "dm:item/missile_turret/21"
+			},
+			{
+				"type": "model",
+				"model": "dm:item/missile_turret/22"
+			},
+			{
+				"type": "model",
+				"model": "dm:item/missile_turret/23"
+			},
+			{
+				"type": "model",
+				"model": "dm:item/missile_turret/24"
+			},
+			{
+				"type": "model",
+				"model": "dm:item/missile_turret/25"
+			},
+			{
+				"type": "model",
+				"model": "dm:item/missile_turret/26"
+			},
+			{
+				"type": "model",
+				"model": "dm:item/missile_turret/27"
+			},
+			{
+				"type": "model",
+				"model": "dm:item/missile_turret/28"
+			},
+			{
+				"type": "model",
+				"model": "dm:item/missile_turret/29"
+			},
+			{
+				"type": "model",
+				"model": "dm:item/missile_turret/30"
+			},
+			{
+				"type": "model",
+				"model": "dm:item/missile_turret/31"
+			},
+			{
+				"type": "model",
+				"model": "dm:item/missile_turret/32"
+			},
+			{
+				"type": "model",
+				"model": "dm:item/missile_turret/33"
+			}
+		]
+	}
+}

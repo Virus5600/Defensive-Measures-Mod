@@ -27,6 +27,9 @@ import net.minecraft.util.math.random.Random;
  */
 @Environment(EnvType.CLIENT)
 public class CannonFlashEmitter extends CustomEmitter {
+	protected double flashDuration = 3;
+	protected double variance = 0.75;
+
 	// CONSTRUCTORS //
 
 	public CannonFlashEmitter(ClientWorld world, double x, double y, double z, double vx, double vy, double vz) {
@@ -37,20 +40,12 @@ public class CannonFlashEmitter extends CustomEmitter {
 		this.setCustomEmitterCode();
 	}
 
-	public CannonFlashEmitter(ClientWorld world, Entity entity, double vx, double vy, double vz) {
-		super(world, entity, ModParticles.SPARKS, 9);
-		this.velocityX = vx;
-		this.velocityY = vy;
-		this.velocityZ = vz;
-		this.setCustomEmitterCode();
-	}
-
 	// CUSTOM EMITTER CODE //
 	private void setCustomEmitterCode() {
 		this.customEmitterCode = (particle) -> {
 			// Flash
-			if (this.age < 3) {
-				double variance = 0.75;
+			if (this.age < this.flashDuration) {
+				double variance = this.variance;
 				double minX = this.velocityX - variance,
 					maxX = this.velocityX + variance,
 					minY = this.velocityY - variance,
@@ -95,6 +90,19 @@ public class CannonFlashEmitter extends CustomEmitter {
 	public static class Factory implements ParticleFactory<SimpleParticleType> {
 		public Particle createParticle(SimpleParticleType simpleParticleType, ClientWorld world, double x, double y, double z, double vx, double vy, double vz, Random random) {
 			return new CannonFlashEmitter(world, x, y, z, vx, vy, vz);
+		}
+	}
+
+	@Environment(EnvType.CLIENT)
+	public static class ThrusterFactory implements ParticleFactory<SimpleParticleType> {
+		public Particle createParticle(SimpleParticleType simpleParticleType, ClientWorld world, double x, double y, double z, double vx, double vy, double vz, Random random) {
+			CannonFlashEmitter particle = new CannonFlashEmitter(world, x, y, z, vx, vy, vz);
+
+			particle.setMaxAge(1);
+			particle.flashDuration = 1;
+			particle.variance = 0.125;
+
+			return particle;
 		}
 	}
 }

@@ -318,5 +318,47 @@
 			"dm:flame_turret/end"
 		],
 		"subtitle": "subtitles.turret.flame_turret.shoot.end"
+	},
+
+	"turret.missile_turret.hurt": {
+		"sounds": [
+			"dm:turrets/hurt/metal_hurt1",
+			"dm:turrets/hurt/metal_hurt2"
+		],
+		"subtitle": "subtitles.turret.missile_turret.hurt"
+	},
+	"turret.missile_turret.destroyed": {
+		"sounds": [
+			"dm:turrets/crumbling_turrets/metal_crumbling1",
+			"dm:turrets/crumbling_turrets/metal_crumbling2"
+		],
+		"subtitle": "subtitles.turret.missile_turret.destroyed"
+	},
+	"turret.missile_turret.shoot": {
+		"sounds": [
+			"dm:missile_turret/shoot1"
+		],
+		"subtitle": "subtitles.turret.missile_turret.shoot"
+	},
+	"generic.rocket.engine.loop": {
+		"sounds": [
+			"dm:turrets/rocket/engine_loop1"
+		],
+		"subtitle": "subtitles.generic.rocket.engine.loop"
+	},
+	"generic.rocket.explode": {
+		"sounds": [
+			"dm:turrets/rocket/explosion1"
+		],
+		"subtitle": "subtitles.generic.rocket.explode"
+	},
+	"generic.missile.explode": {
+		"sounds": [
+			{
+				"name": "dm:turrets/rocket/explosion1",
+				"volume": 0.55
+			}
+		],
+		"subtitle": "subtitles.generic.missile.explode"
 	}
 }

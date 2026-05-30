@@ -32,6 +32,7 @@
 
 	"item.dm.aa_turret": "Place Anti-Air (AA) Turret",
 	"item.dm.flame_turret": "Place Flame Turret",
+	"item.dm.missile_turret": "Place Missile Turret",
 
 	"itemTooltip.dm.generic.health" : "Health: %s / %s",
 
@@ -55,6 +56,10 @@
 	"itemTooltip.dm.flame_turret.line2" : "Firing Arc: X: ±360° | Y: -30° to +22.5°",
 	"itemTooltip.dm.flame_turret.line3" : "Reload Time: 1 second",
 
+	"itemTooltip.dm.missile_turret.line1" : "Range: 64 blocks",
+	"itemTooltip.dm.missile_turret.line2" : "Firing Arc: X: ±360° | Y: ±12°",
+	"itemTooltip.dm.missile_turret.line3" : "Reload Time: 0.34 seconds (burst) | 5 seconds (cooldown)",
+
 	"entity.dm.cannon_turret" : "Турельная башня",
 	"entity.dm.cannonball" : "Пушечное ядро",
 
@@ -69,6 +74,9 @@
 
 	"entity.dm.flame_turret": "Flame Turret",
 	"entity.dm.flammable_aerosol": "Flammable Aerosol",
+
+	"entity.dm.missile_turret": "Missile Turret",
+	"entity.dm.micro_missile": "Micro Missile",
 
 	"death.attack.bolt_head" : "%1$s раздавлен Наконечником стрелы",
 	"death.attack.bolt_head.player" : "%1$s раздавлен случайным Наконечником стрелы во время борьбы с %2$s",
@@ -97,6 +105,10 @@
 	"subtitles.generic.impact.bullet.stone" : "Bullet impacted on stone",
 	"subtitles.generic.impact.bullet.wood" : "Bullet impacted on wood",
 
+	"subtitles.generic.rocket.engine.loop": "Rocket Engine firing",
+	"subtitles.generic.rocket.explode": "Rocket explodes",
+	"subtitles.generic.missile.explode": "Missile explodes",
+
 	"subtitles.turret.hurt.metal" : "Metal turret damaged",
 	"subtitles.turret.hurt.wood" : "Wooden turret damaged",
 
@@ -118,6 +130,9 @@
 	"subtitles.turret.flame_turret.shoot.start" : "Flame Turret charging up",
 	"subtitles.turret.flame_turret.shoot.loop" : "Flame Turret shoots",
 	"subtitles.turret.flame_turret.shoot.end" : "Flame Turret disengaging",
+	"subtitles.turret.missile_turret.hurt" : "Missile Turret damaged",
+	"subtitles.turret.missile_turret.destroyed" : "Missile Turret destroyed",
+	"subtitles.turret.missile_turret.shoot" : "Missile Turret shoots",
 
 	"tag.item.dm.tier_1_turrets" : "Tier 1 Turrets",
 	"tag.item.dm.tier_2_turrets" : "Tier 2 Turrets",

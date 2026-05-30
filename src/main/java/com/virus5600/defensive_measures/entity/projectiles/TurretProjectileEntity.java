@@ -30,9 +30,7 @@ import net.minecraft.util.Unit;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.*;
 import net.minecraft.world.World;
 
 import org.jetbrains.annotations.NotNull;
@@ -181,6 +179,29 @@ public abstract class TurretProjectileEntity extends ProjectileEntity {
 	// /////////////// //
 	// PROCESS METHODS //
 	// /////////////// //
+	protected HitResult getZeroVelocityCollision() {
+		Box box = this.getBoundingBox()
+			.expand(0.2);
+
+		EntityHitResult entityHitResult = ProjectileUtil.getEntityCollision(
+			this.getEntityWorld(),
+			this,
+			box.getMinPos(),
+			box.getMaxPos(),
+			box,
+			this::canHit
+		);
+
+		if (entityHitResult != null) {
+			return entityHitResult;
+		}
+
+		return BlockHitResult.createMissed(
+			this.getEntityPos(),
+			Direction.DOWN,
+			BlockPos.ofFloored(this.getEntityPos())
+		);
+	}
 
 	/**
 	 * This method is called when the projectile hits an entity, handling the logic

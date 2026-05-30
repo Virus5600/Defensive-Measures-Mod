@@ -61,6 +61,14 @@ public class ModEntities {
 			.eyeHeight(1.1875F)
 	);
 
+	public static final EntityType<MissileTurretEntity> MISSILE_TURRET = RegistryHelper.registerEntity(
+		"missile_turret",
+		Builder.
+			create(MissileTurretEntity::new, SpawnGroup.MISC)
+			.dimensions(2F, 2F)
+			.eyeHeight(1.5625F)
+	);
+
 	// PROJECTILES //
 	// v1.0.0-beta
 	public static final EntityType<CannonballEntity> CANNONBALL = RegistryHelper.registerEntity(
@@ -115,7 +123,17 @@ public class ModEntities {
 			.maxTrackingRange(4)
 			.trackingTickInterval(10)
 			.makeFireImmune()
+	);
 
+	public static final EntityType<MicroMissileEntity> MICRO_MISSILE = RegistryHelper.registerEntity(
+		"micro_missile",
+		Builder
+			.create(MicroMissileEntity::new, SpawnGroup.MISC)
+			.dropsNothing()
+			.dimensions(0.125f, 0.125f)
+			.maxTrackingRange(8)
+			.trackingTickInterval(10)
+			.eyeHeight(0.0625f)
 	);
 
 	// REGISTRY //
@@ -132,5 +150,6 @@ public class ModEntities {
 		// v1.1.0-beta
 		FabricDefaultAttributeRegistry.register(ModEntities.AA_TURRET, AATurretEntity.setAttributes());
 		FabricDefaultAttributeRegistry.register(ModEntities.FLAME_TURRET, FlameTurretEntity.setAttributes());
+		FabricDefaultAttributeRegistry.register(ModEntities.MISSILE_TURRET, MissileTurretEntity.setAttributes());
 	}
 }

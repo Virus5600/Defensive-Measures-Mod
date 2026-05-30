@@ -3,6 +3,9 @@
 	"values": [
 		"dm:cannonball",
 		"dm:ballista_bolt",
-		"dm:mg_bullet"
+		"dm:mg_bullet",
+		"dm:flak_projectile",
+		"dm:flammable_aerosol",
+		"dm:micro_missile"
 	]
 }

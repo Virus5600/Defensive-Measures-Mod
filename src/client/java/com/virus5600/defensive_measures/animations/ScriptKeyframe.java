@@ -135,13 +135,4 @@ public record ScriptKeyframe(double getTime, KeyframeAction script, Vec3d pos) i
 			}
 		}
 	}
-
-	// COMPARABLE METHODS //
-	@Override
-	public int compareTo(Keyframe other) {
-		return Double.compare(
-			this.getTime(),
-			other.getTime()
-		);
-	}
 }

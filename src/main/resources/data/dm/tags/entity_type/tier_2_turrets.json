@@ -2,6 +2,7 @@
 	"replace": false,
 	"values": [
 		"dm:aa_turret",
-		"dm:flame_turret"
+		"dm:flame_turret",
+		"dm:missile_turret"
 	]
 }

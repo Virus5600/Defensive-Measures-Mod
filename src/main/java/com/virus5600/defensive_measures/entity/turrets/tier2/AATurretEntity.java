@@ -45,7 +45,7 @@ import java.util.Optional;
  * developer plans to also have the AA Turret able to target ground targets in the future.
  * <br><br>
  * The AA Turrets has very long ranges to accommodate the targeting of flying enemies who are mostly
- * flying 64 blocks or more away from the ground. It deals an AoE damage capable of downing flying
+ * flying 96 blocks or more away from the ground. It deals an AoE damage capable of downing flying
  * targets easily on direct hits while severely wounding them when the round explodes near the
  * targets. Despite the long range, however, the AA Turret has a slow rate of fire but has increased
  * accuracy compared to other turrets, making it a specialized turret for dealing airborne targets.

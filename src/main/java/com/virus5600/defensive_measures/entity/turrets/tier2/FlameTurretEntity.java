@@ -1,6 +1,5 @@
 package com.virus5600.defensive_measures.entity.turrets.tier2;
 
-import com.virus5600.defensive_measures.entity.turrets.TurretEntity;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.entity.EntityType;
@@ -31,6 +30,7 @@ import com.virus5600.defensive_measures.entity.ModEntities;
 import com.virus5600.defensive_measures.entity.TurretMaterial;
 import com.virus5600.defensive_measures.entity.ai.goal.ProjectileAttackGoal;
 import com.virus5600.defensive_measures.entity.projectiles.FlammableAerosolEntity;
+import com.virus5600.defensive_measures.entity.turrets.TurretEntity;
 import com.virus5600.defensive_measures.entity.turrets.interfaces.LoopableShootingSound;
 import com.virus5600.defensive_measures.item.ModItems;
 import com.virus5600.defensive_measures.particle.ModParticles;
@@ -496,14 +496,20 @@ public class FlameTurretEntity extends TurretEntity implements LoopableShootingS
 		);
 
 		healables = Map.of(
+			Items.COPPER_NUGGET, 1f,
 			Items.IRON_NUGGET, 1f,
+			Items.COPPER_INGOT, 5f,
 			Items.IRON_INGOT, 10f,
+			Items.COPPER_BLOCK, 50f,
 			Items.IRON_BLOCK, 100f
 		);
 
 		effectSource = Map.of(
 			Items.IRON_BLOCK, List.<Object[]>of(
 				new Object[] { StatusEffects.RESISTANCE, 60, 2 }
+			),
+			Items.COPPER_BLOCK, List.<Object[]>of(
+				new Object[] { StatusEffects.RESISTANCE, 60, 1 }
 			)
 		);
 	}

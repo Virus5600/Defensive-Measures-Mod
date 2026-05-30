@@ -1,9 +1,11 @@
 package com.virus5600.defensive_measures.networking;
 
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 
 import com.virus5600.defensive_measures.DefensiveMeasures;
 import com.virus5600.defensive_measures.network.clientbound.sounds.TurretLoopSoundPacket;
+import com.virus5600.defensive_measures.networking.receiver.MicroMissileSpawnPacketReceiver;
 import com.virus5600.defensive_measures.networking.receiver.TurretLoopSoundReceiver;
 
 /**
@@ -27,5 +29,7 @@ public class ModClientPackets {
 
 		// v1.1.0-beta
 		ClientPlayNetworking.registerGlobalReceiver(TurretLoopSoundPacket.PAYLOAD_ID, TurretLoopSoundReceiver::handle);
+
+		ClientTickEvents.END_CLIENT_TICK.register(MicroMissileSpawnPacketReceiver::handle);
 	}
 }

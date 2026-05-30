@@ -2,6 +2,7 @@ package com.virus5600.defensive_measures.entity.turrets;
 
 import com.virus5600.defensive_measures._util.MathUtil;
 import com.virus5600.defensive_measures.entity.ai.control.TurretLookControl;
+import com.virus5600.defensive_measures.entity.projectiles.ExplosiveProjectileEntity;
 import com.virus5600.defensive_measures.entity.projectiles.TurretProjectileEntity;
 import com.virus5600.defensive_measures.entity.turrets.tier1.CannonTurretEntity;
 import com.virus5600.defensive_measures.entity.turrets.tier2.AATurretEntity;
@@ -31,6 +32,7 @@ import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.entity.mob.Monster;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.ProjectileEntity;
+import net.minecraft.entity.projectile.ProjectileUtil;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -1993,7 +1995,8 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 				return;
 			}
 
-			Vec3d pos = this.getRelativePos(this.getCurrentBarrel(true));
+			Vec3d barrelPos = this.getCurrentBarrel(true);
+			Vec3d pos = this.getRelativePos(barrelPos);
 
 			if (projectile instanceof TurretProjectileEntity turretProjectile) {
 				turretProjectile.setSpawnPos(pos);
@@ -2003,8 +2006,20 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 				projectile.updateTrackedPosition(pos);
 			}
 
-			projectile.setPitch(this.getPitch());
 			this.setProjectileVelocity(projectile, velocityData);
+
+			// Set projectile direction
+			Vec3d dir = velocityData.getVelocity().normalize();
+			float pitch = -MathUtil.radToDeg((float) MathHelper.atan2(dir.getY(), Math.sqrt(dir.getX() * dir.getX() + dir.getZ() * dir.getZ())));
+			float yaw = MathUtil.radToDeg((float) MathHelper.atan2(dir.getX(), dir.getZ()));
+
+			yaw *= projectile instanceof ExplosiveProjectileEntity ? -1 : 1;
+			yaw += projectile instanceof ExplosiveProjectileEntity ? 180 : 0;
+
+			projectile.setYaw(yaw);
+			projectile.setPitch(pitch);
+			projectile.setHeadYaw(yaw);
+			projectile.setBodyYaw(yaw);
 
 			projectile.setOwner(this);
 

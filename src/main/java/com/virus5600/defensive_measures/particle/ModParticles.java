@@ -28,6 +28,7 @@ public class ModParticles {
 	public static final SimpleParticleType CANNON_FLASH = register("cannon_flash", false);
 	public static final SimpleParticleType FLAK_EXPLOSION = register("flak_explosion", true);
 	public static final SimpleParticleType LIGHTER_FLAME = register("lighter_flame", true);
+	public static final SimpleParticleType ROCKET_THRUSTER = register("rocket_thruster", false);
 
 	private static SimpleParticleType register(String identifier, boolean shouldAlwaysSpawn) {
 		return Registry.register(

@@ -47,4 +47,13 @@ public interface Keyframe extends Comparable<Keyframe>{
 	 * @see #getTime()
 	 */
 	int getTimeMS();
+
+	// COMPARABLE METHODS //
+	@Override
+	default int compareTo(Keyframe other) {
+		return Double.compare(
+			this.getTime(),
+			other.getTime()
+		);
+	}
 }

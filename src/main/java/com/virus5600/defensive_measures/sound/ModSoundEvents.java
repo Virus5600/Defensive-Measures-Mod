@@ -4,8 +4,10 @@ import com.virus5600.defensive_measures.DefensiveMeasures;
 
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.util.Identifier;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Class that holds all the sound events for the mod. This is used to
@@ -51,6 +53,8 @@ public class ModSoundEvents {
 	public static final SoundEvent BULLET_IMPACT_STONE = ModSoundEvents.registerSoundEvent("generic.impact.bullet.stone");
 	public static final SoundEvent BULLET_IMPACT_WOOD = ModSoundEvents.registerSoundEvent("generic.impact.bullet.wood");
 
+	// v1.1.0-beta
+
 	// ANTI-AIR TURRET
 	public static final SoundEvent TURRET_ANTI_AIR_HURT = ModSoundEvents.registerSoundEvent("turret.aa_turret.hurt");
 	public static final SoundEvent TURRET_ANTI_AIR_DESTROYED = ModSoundEvents.registerSoundEvent("turret.aa_turret.destroyed");
@@ -63,6 +67,14 @@ public class ModSoundEvents {
 	public static final SoundEvent TURRET_FLAME_SHOOT_LOOP = ModSoundEvents.registerSoundEvent("turret.flame_turret.shoot.loop");
 	public static final SoundEvent TURRET_FLAME_SHOOT_END = ModSoundEvents.registerSoundEvent("turret.flame_turret.shoot.end");
 
+	// MISSILE TURRET
+	public static final SoundEvent TURRET_MISSILE_HURT = ModSoundEvents.registerSoundEvent("turret.missile_turret.hurt");
+	public static final SoundEvent TURRET_MISSILE_DESTROYED = ModSoundEvents.registerSoundEvent("turret.missile_turret.destroyed");
+	public static final SoundEvent TURRET_MISSILE_SHOOT = ModSoundEvents.registerSoundEvent("turret.missile_turret.shoot");
+
+	public static final SoundEvent ROCKET_ENGINE_LOOP = ModSoundEvents.registerSoundEvent("generic.rocket.engine.loop");
+	public static final SoundEvent ROCKET_EXPLOSION = ModSoundEvents.registerSoundEvent("generic.rocket.explode");
+
 	private static SoundEvent registerSoundEvent(final String soundID) {
 		Identifier identifier = Identifier.of(DefensiveMeasures.MOD_ID, soundID);
 		return Registry.register(
@@ -70,6 +82,10 @@ public class ModSoundEvents {
 			identifier,
 			SoundEvent.of(identifier)
 		);
+	}
+
+	public static RegistryEntry<SoundEvent> asRegistryEntry(@NotNull SoundEvent sound) {
+		return Registries.SOUND_EVENT.getEntry(sound);
 	}
 
 	public static void registerSoundEvents() {

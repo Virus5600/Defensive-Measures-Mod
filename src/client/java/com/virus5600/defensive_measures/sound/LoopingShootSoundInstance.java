@@ -17,11 +17,12 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Optional;
 
 /**
- * A custom loopSound instance that plays a looping shooting loopSound for a turret. This loopSound instance is
- * anchored to the turret's position and will automatically stop playing when the turret is removed,
- * dead, or no longer has a target to shoot at. This allows for a more immersive and dynamic loopSound
- * experience, as the shooting loopSound will only play while the turret is actively shooting and will
- * not continue to play indefinitely if the turret is destroyed or removed from the world.<br>
+ * A custom loop sound instance that plays a looping shoot sound for a turret. This loop sound
+ * instance is anchored to the turret's position and will automatically stop playing when the
+ * turret is removed, dead, or no longer has a target to shoot at. This allows for a more immersive
+ * and dynamic loop sound experience, as the shooting loop sound will only play while the turret is
+ * actively shooting and will not continue to play indefinitely if the turret is destroyed or
+ * removed from the world.<br>
  * <br>
  * When starting this instance, do not use the {@link SoundManager#play(SoundInstance)} or the
  * {@link SoundManager#play(SoundInstance, int)}. Instead, use the {@link #startLoop()}

@@ -12,8 +12,10 @@ import net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket;
 import net.minecraft.particle.BlockParticleEffect;
 import net.minecraft.particle.ParticleEffect;
 import net.minecraft.particle.ParticleTypes;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.server.network.EntityTrackerEntry;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.storage.ReadView;
 import net.minecraft.storage.WriteView;
@@ -179,7 +181,7 @@ public abstract class ExplosiveProjectileEntity extends TurretProjectileEntity {
 				this.getSmallExplosionParticleType(),
 				this.getLargeExplosionParticleType(),
 				EMPTY_EXPLOSION_BLOCK_PARTICLES,
-				SoundEvents.ENTITY_GENERIC_EXPLODE
+				this.getExplosionSoundEvent()
 			);
 
 		// Damaging entities within a radius.
@@ -328,25 +330,34 @@ public abstract class ExplosiveProjectileEntity extends TurretProjectileEntity {
 			this.getChunkPos().z
 		};
 
-		if (this.getEntityWorld().isClient()
-			|| (owner == null || !owner.isRemoved())
+		if ((owner == null || !owner.isRemoved())
 			&& this.getEntityWorld().getChunkManager().isChunkLoaded(xz[0], xz[1])
 		) {
 			this.move();
 			super.tick();
 
-			HitResult hitResult = ProjectileUtil.getCollision(this, this::canHit, this.getRaycastShapeType());
-
-			if (this.isBurning()) {
-				this.setOnFireFor(1.0F);
+			if (this.getEntityWorld().isClient()) {
+				// Trail Particle
+				this.addParticles(pos.add(0, 0.25, 0));
 			}
+			else {
+				HitResult hitResult;
 
-			if (hitResult.getType() != HitResult.Type.MISS && this.isAlive()) {
-				this.hitOrDeflect(hitResult);
+				if (this.getVelocity().lengthSquared() > 1.0E-7) {
+					hitResult = ProjectileUtil.getCollision(this, this::canHit, this.getRaycastShapeType());
+				}
+				else {
+					hitResult = this.getZeroVelocityCollision();
+				}
+
+				if (this.isBurning()) {
+					this.setOnFireFor(1.0F);
+				}
+
+				if (hitResult.getType() != HitResult.Type.MISS && this.isAlive()) {
+					this.hitOrDeflect(hitResult);
+				}
 			}
-
-			// Trail Particle
-			this.addParticles(pos.add(0, 0.25, 0));
 		}
 		else {
 			this.discard();
@@ -407,6 +418,16 @@ public abstract class ExplosiveProjectileEntity extends TurretProjectileEntity {
 	@NotNull
 	protected ParticleEffect getLargeExplosionParticleType() {
 		return ParticleTypes.EXPLOSION_EMITTER;
+	}
+
+	/**
+	 * Defines the sound event to play when this projectile explodes.
+	 *
+	 * @return {@link SoundEvents#ENTITY_GENERIC_EXPLODE}
+	 */
+	@NotNull
+	protected RegistryEntry<SoundEvent> getExplosionSoundEvent() {
+		return SoundEvents.ENTITY_GENERIC_EXPLODE;
 	}
 
 	@Override

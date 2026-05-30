@@ -33,6 +33,7 @@ public class ModEntityRenderers {
 		// v1.1.0-beta
 		EntityRendererFactories.register(ModEntities.AA_TURRET, AATurretRenderer::new);
 		EntityRendererFactories.register(ModEntities.FLAME_TURRET, FlameTurretRenderer::new);
+		EntityRendererFactories.register(ModEntities.MISSILE_TURRET, MissileTurretRenderer::new);
 
 		// /////////// //
 		// PROJECTILES //
@@ -46,5 +47,6 @@ public class ModEntityRenderers {
 		// v1.1.0-beta
 		EntityRendererFactories.register(ModEntities.FLAK_PROJECTILE, FlakProjectileRenderer::new);
 		EntityRendererFactories.register(ModEntities.FLAMMABLE_AEROSOL, FlammableAerosolRenderer::new);
+		EntityRendererFactories.register(ModEntities.MICRO_MISSILE, MicroMissileRenderer::new);
 	}
 }
