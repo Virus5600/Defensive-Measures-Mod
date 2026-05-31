@@ -47,6 +47,7 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.math.*;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.LocalDifficulty;
+import net.minecraft.world.RaycastContext;
 import net.minecraft.world.ServerWorldAccess;
 import net.minecraft.world.World;
 import net.minecraft.world.event.GameEvent;
@@ -1083,6 +1084,21 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 	}
 
 	@Override
+	public boolean canSee(Entity entity, RaycastContext.ShapeType shapeType, RaycastContext.FluidHandling fluidHandling, double entityY) {
+		if (entity.getEntityWorld() != this.getEntityWorld()) {
+			return false;
+		} else {
+			Vec3d vec3d = new Vec3d(this.getX(), this.getEyeY(), this.getZ());
+			Vec3d vec3d2 = new Vec3d(entity.getX(), entityY, entity.getZ());
+			if (vec3d2.distanceTo(vec3d) > this.getMaxAttackRange()) {
+				return false;
+			} else {
+				return this.getEntityWorld().raycast(new RaycastContext(vec3d, vec3d2, shapeType, fluidHandling, this)).getType() == net.minecraft.util.hit.HitResult.Type.MISS;
+			}
+		}
+	}
+
+	@Override
 	public boolean canBeLeashed() {
 		return false;
 	}
@@ -1652,7 +1668,7 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 	public float getMaxAttackRange() {
 		return (float) Math.floor(
 			this.getAttributes()
-				.getBaseValue(EntityAttributes.FOLLOW_RANGE)
+				.getValue(EntityAttributes.FOLLOW_RANGE)
 		) + this.getStandingEyeHeight();
 	}
 
@@ -2224,13 +2240,22 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 		 * Retrieves the power of the projectile's velocity.
 		 * The power scales by 1.5 times the value set as this
 		 * was the most optimal value for the projectile's velocity.
+		 * <br><br>
+		 * However, if this instance is set to be a parabolic velocity,
+		 * then the power will instead be calculated based on the magnitude
+		 * of the velocity vector, allowing for more dynamic power values that
+		 * are based on the velocity. This means that providing a power to a
+		 * parabolic velocity will have no effect on the actual power of the
+		 * projectile's velocity.
 		 *
 		 * @return float The power of the projectile's velocity
 		 *
 		 * @see #power
 		 */
 		public float getPower() {
-			return this.power * 1.5f;
+			return this.isParabolic ?
+				(float) this.velocity.length() :
+				this.power * 1.5f;
 		}
 
 		/**
@@ -2426,44 +2451,91 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 		}
 
 		private void calculateVelocity(Vec3d v3d, boolean isPos) {
-			if (isPos) {
-				Vec3d barrel = this.turret
-					.getRelativePos(this.turret.getCurrentBarrel(false));
+			if (!isPos) {
+				this.lastTargetPos = null;
+				this.velocity = v3d;
+				return;
+			}
 
+			Vec3d barrel = this.turret
+				.getRelativePos(this.turret.getCurrentBarrel(false));
+
+			this.lastTargetPos = v3d;
+
+			if (this.isParabolic) {
+				this.power = 0;
+
+				double rawVx = v3d.getX() - barrel.getX();
+				double rawVz = v3d.getZ() - barrel.getZ();
+				double dy = v3d.getY() - barrel.getY();
+
+				double horizontalDist = Math.sqrt(rawVx * rawVx + rawVz * rawVz);
+				double dirX = rawVx / horizontalDist;
+				double dirZ = rawVz / horizontalDist;
+
+				Entity projectile = turret.projectile
+					.create(this.turret.getEntityWorld(), SpawnReason.TRIGGERED);
+				double g = 0.05;
+				double drag = 0.95;
+
+				if (projectile != null) {
+					g = projectile.getFinalGravity();
+					projectile.discard();
+
+					if (projectile instanceof TurretProjectileEntity tpe) {
+						drag = tpe.getFinalDrag();
+					}
+				}
+
+				// Fixed 55° launch angle for visible arc
+				double theta = 45 * Math.PI / 180;
+				double tanTheta = Math.tan(theta);
+
+				// Scale iterations and ticks based on distance
+				// Close range = less iterations/ticks needed
+				// Far range = more iterations/ticks needed
+				int iterations = (int) Math.clamp(horizontalDist * 0.5, 16, 32);
+				int maxTicks = (int) Math.clamp(horizontalDist * 3, 100, 600);
+
+				// Binary search for vH that lands on target
+				double lo = 0.01, hi = 50.0, vH = 1.0;
+
+				for (int i = 0; i < iterations; i++) {
+					vH = (lo + hi) / 2.0;
+					double vyInit = vH * tanTheta;
+
+					double simX = 0, simY = 0, simVY = vyInit;
+					double simVH = vH;
+
+					for (int t = 0; t < maxTicks; t++) {
+						simVY -= g;
+						simVY *= drag;
+						simVH *= drag;
+						simY += simVY;
+						simX += simVH;
+						if (simVY < 0 && simY <= dy) break;
+					}
+
+					if (simX < horizontalDist - 0.1) lo = vH;
+					else hi = vH;
+				}
+
+				double vyApplied = vH * tanTheta;
+
+				this.velocity = new Vec3d(
+					dirX * vH,
+					vyApplied,
+					dirZ * vH
+				);
+			}
+			else {
+				// Straight Trajectory — untouched
 				double vx = (v3d.getX() - barrel.getX()) * 1.0625;
 				double vy = (v3d.getY() - barrel.getY());
 				double vz = (v3d.getZ() - barrel.getZ()) * 1.0625;
 
-				this.lastTargetPos = v3d;
-
-				// Parabolic Trajectory
-				if (this.isParabolic) {
-					double d3D = Math.sqrt(vx * vx + vy * vy + vz * vz);
-
-					double minAngle = 45 * Math.PI / 180;
-					double maxAngle = 80 * Math.PI / 180;
-					double angleFactor = Math.clamp(d3D / (d3D + vy), 0.0, 1.0);
-					float theta = (float) (minAngle + angleFactor * (maxAngle - minAngle));
-					double scalingFactor = Math.tan(theta);
-					double scalingFactorSqrd = scalingFactor * scalingFactor;
-
-					vx = (vx / scalingFactorSqrd);
-					vy += (Math.abs(vy) * scalingFactor) - vy;
-					vz = (vz / scalingFactorSqrd);
-
-					vy *= this.power;
-					System.out.println(
-						"VY: " + vy +
-						" | Power: " + this.getPower() +
-						" | rawPower: " + this.power +
-						" | scalingFactor: " + scalingFactor
-					);
-				}
-				// Straight Trajectory
-				else {
-					double variance = Math.sqrt(vx * vx + vz * vz);
-					vy += variance * this.getUpwardVelocityMultiplier();
-				}
+				double variance = Math.sqrt(vx * vx + vz * vz);
+				vy += variance * this.getUpwardVelocityMultiplier();
 
 				// Applies a scale factor to make sure that when the power
 				// is applied, it will still be around its target's position.
@@ -2471,10 +2543,6 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 				double magnitude = rawV.length();
 				double scaleFactor = magnitude / this.getPower();
 				this.velocity = rawV.multiply(scaleFactor);
-			}
-			else {
-				this.lastTargetPos = null;
-				this.velocity = v3d;
 			}
 		}
 	}

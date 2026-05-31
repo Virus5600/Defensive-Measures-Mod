@@ -710,6 +710,11 @@ public abstract class TurretProjectileEntity extends ProjectileEntity {
 		return 0.6F;
 	}
 
+	public float getFinalDrag() {
+		return this.submergedInWater ?
+			this.getDragInWater() : this.getDrag();
+	}
+
 	/**
 	 * {@return the read-only item stack representing the projectile}
 	 *

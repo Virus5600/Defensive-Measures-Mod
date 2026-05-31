@@ -25,6 +25,7 @@ public class ModEntities {
 		Builder
 			.create(CannonTurretEntity::new, SpawnGroup.MISC)
 			.dimensions(1F, 1F)
+			.maxTrackingRange(32)
 			.eyeHeight(0.51F)
 	);
 
@@ -33,6 +34,7 @@ public class ModEntities {
 		Builder
 			.create(BallistaTurretEntity::new, SpawnGroup.MISC)
 			.dimensions(1F, 1F)
+			.maxTrackingRange(16)
 			.eyeHeight(0.71F)
 	);
 
@@ -41,6 +43,7 @@ public class ModEntities {
 		Builder
 			.create(MGTurretEntity::new, SpawnGroup.MISC)
 			.dimensions(1F, 0.625F)
+			.maxTrackingRange(32)
 			.eyeHeight(0.4275F)
 	);
 
@@ -50,6 +53,7 @@ public class ModEntities {
 		Builder.
 			create(AATurretEntity::new, SpawnGroup.MISC)
 			.dimensions(2F, 2F)
+			.maxTrackingRange(96)
 			.eyeHeight(0.96875F)
 	);
 
@@ -58,6 +62,7 @@ public class ModEntities {
 		Builder.
 			create(FlameTurretEntity::new, SpawnGroup.MISC)
 			.dimensions(2F, 2F)
+			.maxTrackingRange(16)
 			.eyeHeight(1.1875F)
 	);
 
@@ -66,6 +71,7 @@ public class ModEntities {
 		Builder.
 			create(MissileTurretEntity::new, SpawnGroup.MISC)
 			.dimensions(2F, 2F)
+			.maxTrackingRange(64)
 			.eyeHeight(1.5625F)
 	);
 
