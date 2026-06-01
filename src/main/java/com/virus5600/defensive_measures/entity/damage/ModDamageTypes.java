@@ -13,12 +13,17 @@ import com.virus5600.defensive_measures._helper.RegistryHelper;
  * constants here, allowing other classes to reference or
  * use them.
  *
- * @since 1.0.0
+ * @since 1.0.0-beta
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
- * @version 1.0.0
  */
 public class ModDamageTypes {
-	public static final RegistryKey<DamageType> ARROWHEAD = RegistryHelper.getDamageTypeKey("arrowhead");
+	// v1.0.0-beta
+	public static final RegistryKey<DamageType> BOLT_HEAD = RegistryHelper.getDamageTypeKey("bolt_head");
+
+	// v1.1.0-beta
+	public static final RegistryKey<DamageType> ELECTRICITY = RegistryHelper.getDamageTypeKey("electricity");
+	public static final RegistryKey<DamageType> THROWN_FLAME = RegistryHelper.getDamageTypeKey("thrown_flame");
+	public static final RegistryKey<DamageType> SECONDARY_EXPLOSION = RegistryHelper.getDamageTypeKey("secondary_explosion");
 
 	public static void registerDamageTypes() {
 		DefensiveMeasures.LOGGER.info("REGISTERING DAMAGE TYPES FOR {}...", DefensiveMeasures.MOD_NAME);

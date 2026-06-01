@@ -1,6 +1,9 @@
 package com.virus5600.defensive_measures;
 
+import com.virus5600.defensive_measures.command.ModClientCommands;
+import com.virus5600.defensive_measures.gui.screen.ingame.ModHandledScreens;
 import com.virus5600.defensive_measures.model.ModEntityModels;
+import com.virus5600.defensive_measures.networking.ModClientPackets;
 import com.virus5600.defensive_measures.particle.ModClientParticles;
 import com.virus5600.defensive_measures.renderer.ModEntityRenderers;
 import net.fabricmc.api.ClientModInitializer;
@@ -11,9 +14,8 @@ import net.fabricmc.api.ClientModInitializer;
  * This class holds the client-specific initialization processes
  * along with the needed C2S packet registrations, if there are any.
  *
- * @since 1.0.0
+ * @since 1.0.0-beta
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
- * @version 1.0.0
  */
 public class DefensiveMeasuresClient implements ClientModInitializer {
 
@@ -31,7 +33,14 @@ public class DefensiveMeasuresClient implements ClientModInitializer {
 		// Models
 		ModEntityModels.registerEntityModels();
 
+		// Screens
+		ModHandledScreens.registerScreens();
+
+		// Commands
+		ModClientCommands.registerCommands();
+
 		// Networking
+		ModClientPackets.registerClientPackets();
 
 		DefensiveMeasures.LOGGER.info("{} CLIENT ENTRY POINT INITIALIZED.", DefensiveMeasures.MOD_NAME);
 	}

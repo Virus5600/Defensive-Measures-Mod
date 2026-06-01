@@ -1,0 +1,29 @@
+﻿{
+	"parent": "minecraft:recipes/root",
+	"criteria": {
+		"has_ingredients": {
+			"trigger": "minecraft:inventory_changed",
+			"conditions": {
+				"items": [
+					{
+						"items": [
+							"minecraft:gold_ingot",
+							"minecraft:iron_nugget",
+							"minecraft:redstone_block"
+						]
+					}
+				]
+			}
+		}
+	},
+	"requirements": [
+		[
+			"has_ingredients"
+		]
+	],
+	"rewards": {
+		"recipes": [
+			"dm:turret_remover"
+		]
+	}
+}

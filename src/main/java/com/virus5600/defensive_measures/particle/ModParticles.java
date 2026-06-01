@@ -13,18 +13,22 @@ import net.minecraft.util.Identifier;
  * usually used register the particles defined in the client-side
  * of the mod.
  *
- * @since 1.0.0
+ * @since 1.0.0-beta
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
- * @version 1.0.0
  */
 public class ModParticles {
 	// PARTICLES
 	public static final SimpleParticleType SPARKS = register("sparks", false);
 	public static final SimpleParticleType SUSPENDED_SPARKS = register("suspended_sparks", false);
 	public static final SimpleParticleType CANNON_FUSE = register("cannon_fuse", true);
+	public static final SimpleParticleType FLAK = register("flak", true);
+	public static final SimpleParticleType FLAK_CLOUD = register("flak_cloud", true);
 
 	// EMITTERS
 	public static final SimpleParticleType CANNON_FLASH = register("cannon_flash", false);
+	public static final SimpleParticleType FLAK_EXPLOSION = register("flak_explosion", true);
+	public static final SimpleParticleType LIGHTER_FLAME = register("lighter_flame", true);
+	public static final SimpleParticleType ROCKET_THRUSTER = register("rocket_thruster", false);
 
 	private static SimpleParticleType register(String identifier, boolean shouldAlwaysSpawn) {
 		return Registry.register(

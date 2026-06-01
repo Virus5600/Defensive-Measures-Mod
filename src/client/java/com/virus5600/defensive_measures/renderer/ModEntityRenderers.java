@@ -14,9 +14,8 @@ import com.virus5600.defensive_measures.renderer.projectiles.*;
  * entities on the screen; and since this is client side,
  * texture packs can be used to modify how the entities look.
  *
- * @since 1.0.0
+ * @since 1.0.0-beta
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
- * @version 1.0.0
  */
 public class ModEntityRenderers {
 	public static void registerEntityRenderers() {
@@ -26,18 +25,28 @@ public class ModEntityRenderers {
 		// TURRETS //
 		// /////// //
 
-		// v1.0.0
+		// v1.0.0-beta
 		EntityRendererFactories.register(ModEntities.CANNON_TURRET, CannonTurretRenderer::new);
 		EntityRendererFactories.register(ModEntities.BALLISTA_TURRET, BallistaTurretRenderer::new);
 		EntityRendererFactories.register(ModEntities.MG_TURRET, MGTurretRenderer::new);
+
+		// v1.1.0-beta
+		EntityRendererFactories.register(ModEntities.AA_TURRET, AATurretRenderer::new);
+		EntityRendererFactories.register(ModEntities.FLAME_TURRET, FlameTurretRenderer::new);
+		EntityRendererFactories.register(ModEntities.MISSILE_TURRET, MissileTurretRenderer::new);
 
 		// /////////// //
 		// PROJECTILES //
 		// /////////// //
 
-		// v1.0.0
+		// v1.0.0-beta
 		EntityRendererFactories.register(ModEntities.CANNONBALL, CannonballRenderer::new);
 		EntityRendererFactories.register(ModEntities.BALLISTA_BOLT, BallistaBoltRenderer::new);
 		EntityRendererFactories.register(ModEntities.MG_BULLET, MGBulletRenderer::new);
+
+		// v1.1.0-beta
+		EntityRendererFactories.register(ModEntities.FLAK_PROJECTILE, FlakProjectileRenderer::new);
+		EntityRendererFactories.register(ModEntities.FLAMMABLE_AEROSOL, FlammableAerosolRenderer::new);
+		EntityRendererFactories.register(ModEntities.MICRO_MISSILE, MicroMissileRenderer::new);
 	}
 }

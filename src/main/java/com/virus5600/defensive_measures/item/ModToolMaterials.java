@@ -6,15 +6,16 @@ import net.minecraft.item.ToolMaterial;
 import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.registry.tag.TagKey;
 
+import com.virus5600.defensive_measures.registry.tag.ModItemTags;
+
 /**
  * An enum representing the materials that a modded tool can be made of.
  * <br><br>
  * This enum is used to determine the material of a modded tool, which can affect the durability,
  * mining speed, attack damage bonus, enchantability, and the repair ingredients.
  *
- * @since 1.0.0
+ * @since 1.0.0-beta
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
- * @version 1.0.0
  */
 public final class ModToolMaterials {
 	public static final ToolMaterial TURRET_REMOVER;

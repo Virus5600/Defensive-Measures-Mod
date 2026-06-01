@@ -6,6 +6,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.entity.*;
 import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.entity.damage.DamageType;
 import net.minecraft.entity.damage.DamageTypes;
 import net.minecraft.entity.data.DataTracker.Builder;
 import net.minecraft.entity.data.DataTracker;
@@ -19,6 +20,7 @@ import net.minecraft.inventory.StackReference;
 import net.minecraft.item.ItemStack;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.registry.Registries;
+import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.tag.EntityTypeTags;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvent;
@@ -30,9 +32,7 @@ import net.minecraft.util.Unit;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.*;
 import net.minecraft.world.World;
 
 import org.jetbrains.annotations.NotNull;
@@ -52,9 +52,8 @@ import com.virus5600.defensive_measures.entity.turrets.TurretEntity;
  * For a more basic projectile entity or one that can be shot by a player, use the {@link PersistentProjectileEntity}
  * class.
  *
- * @since 1.0.0
+ * @since 1.0.0-beta
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
- * @version 1.0.0
  */
 public abstract class TurretProjectileEntity extends ProjectileEntity {
 	protected static final TrackedData<Byte> PROJECTILE_FLAGS = DataTracker.registerData(TurretProjectileEntity.class, TrackedDataHandlerRegistry.BYTE);
@@ -62,6 +61,8 @@ public abstract class TurretProjectileEntity extends ProjectileEntity {
 	protected static final TrackedData<Boolean> IN_GROUND = DataTracker.registerData(TurretProjectileEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
 	protected static final int CRITICAL_FLAG = 1;
 	protected static final int NO_CLIP_FLAG = 2;
+
+	public final AnimationState loopAnimationState = new AnimationState();
 
 	/** Defines the current sound this projectile will play when it hit something */
 	private SoundEvent sound = this.getHitSound();
@@ -78,6 +79,11 @@ public abstract class TurretProjectileEntity extends ProjectileEntity {
 	protected IntOpenHashSet piercedEntities;
 	/** Identifies if this projectile can be picked up or not. */
 	protected PickupPermission pickupType = PickupPermission.DISALLOWED;
+	/**
+	 * Defines the position this projectile is spawned at. Used for calculating the distance
+	 * traveled by this projectile.
+	 */
+	protected Vec3d spawnPos = Vec3d.ZERO;
 	/** Defines how long the shaking animation will play (in ticks). */
 	protected int shake;
 	/** Determines how long this projectile have been stuck "**in**" the ground. */
@@ -86,8 +92,6 @@ public abstract class TurretProjectileEntity extends ProjectileEntity {
 	protected double damage = 2.0;
 	/** Determines whether this projectile scales its damage based on its speed. */
 	protected boolean speedAffectDamage = true;
-
-	public final AnimationState loopAnimationState = new AnimationState();
 
 	// //////////// //
 	// CONSTRUCTORS //
@@ -177,6 +181,29 @@ public abstract class TurretProjectileEntity extends ProjectileEntity {
 	// /////////////// //
 	// PROCESS METHODS //
 	// /////////////// //
+	protected HitResult getZeroVelocityCollision() {
+		Box box = this.getBoundingBox()
+			.expand(0.2);
+
+		EntityHitResult entityHitResult = ProjectileUtil.getEntityCollision(
+			this.getEntityWorld(),
+			this,
+			box.getMinPos(),
+			box.getMaxPos(),
+			box,
+			this::canHit
+		);
+
+		if (entityHitResult != null) {
+			return entityHitResult;
+		}
+
+		return BlockHitResult.createMissed(
+			this.getEntityPos(),
+			Direction.DOWN,
+			BlockPos.ofFloored(this.getEntityPos())
+		);
+	}
 
 	/**
 	 * This method is called when the projectile hits an entity, handling the logic
@@ -226,7 +253,8 @@ public abstract class TurretProjectileEntity extends ProjectileEntity {
 		World world = this.getEntityWorld();
 
 		// Handles the damage calculation
-		DamageSource dmgSrc = this.getDamageSources().create(DamageTypes.ARROW, this, owner != null ? owner : this);
+		DamageSource dmgSrc = this.getDamageSources()
+			.create(this.getDamageType(), this, owner != null ? owner : this);
 		float velocityMagnitude = (float) this.getVelocity().length();
 		double damage = this.getDamage();
 		int damageToDeal = MathHelper.ceil(
@@ -587,6 +615,13 @@ public abstract class TurretProjectileEntity extends ProjectileEntity {
 		return didPickedUp;
 	}
 
+	@Override
+	public void tick() {
+		super.tick();
+
+		this.updateAnimations();
+	}
+
 	// //////////////////////////////// //
 	// QUESTION METHODS (True or False) //
 	// //////////////////////////////// //
@@ -648,6 +683,18 @@ public abstract class TurretProjectileEntity extends ProjectileEntity {
 	// GETTERS & SETTERS //
 	// ///////////////// //
 
+	/**
+	 * Returns this projectile's damage type. Used for when damaging entities for custom message
+	 * and exhaustion.
+	 *
+	 * @return The damage type of this projectile.
+	 *
+	 * @implNote By default, this returns {@link DamageTypes#ARROW}, but it can be overridden to return a custom damage type if needed.
+	 */
+	public RegistryKey<DamageType> getDamageType() {
+		return DamageTypes.ARROW;
+	}
+
 	/** Overridable method that defines the sound played when this projectile hits something. **/
 	public SoundEvent getHitSound() {
 		return SoundEvents.ENTITY_ARROW_HIT;
@@ -676,6 +723,11 @@ public abstract class TurretProjectileEntity extends ProjectileEntity {
 
 	protected float getDragInWater() {
 		return 0.6F;
+	}
+
+	public float getFinalDrag() {
+		return this.submergedInWater ?
+			this.getDragInWater() : this.getDrag();
 	}
 
 	/**
@@ -789,6 +841,24 @@ public abstract class TurretProjectileEntity extends ProjectileEntity {
 		}
 	}
 
+	public void setSpawnPos(double x, double y, double z) {
+		this.setSpawnPos(new Vec3d(x, y, z));
+	}
+
+	public void setSpawnPos(Vec3d spawnPos) {
+		this.spawnPos = spawnPos;
+		this.setPosition(spawnPos);
+		this.updateTrackedPosition(spawnPos);
+	}
+
+	public Vec3d getSpawnPos() {
+		return new Vec3d(
+			this.spawnPos.getX(),
+			this.spawnPos.getY(),
+			this.spawnPos.getZ()
+		);
+	}
+
 	// ///////////////////////// //
 	// INTERFACE IMPLEMENTATIONS //
 	// ///////////////////////// //
@@ -806,7 +876,13 @@ public abstract class TurretProjectileEntity extends ProjectileEntity {
 	// ABSTRACT & OVERRIDABLE METHODS //
 	// ////////////////////////////// //
 
-	// ABSTRACTS //
+	// ABSTRACT METHODS //
+
+	/**
+	 * Defines the logic on how to move the projectile. This includes what happens when the
+	 * projectile hits a block and/or an entity.
+ 	 */
+	protected abstract void move();
 
 	/**
 	 * Defines this projectile's maximum allowed piercing level.

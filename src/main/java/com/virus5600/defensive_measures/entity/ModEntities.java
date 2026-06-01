@@ -1,32 +1,31 @@
 package com.virus5600.defensive_measures.entity;
 
-import com.virus5600.defensive_measures.DefensiveMeasures;
-
-import com.virus5600.defensive_measures.entity.projectiles.*;
-import com.virus5600.defensive_measures.entity.turrets.*;
-import com.virus5600.defensive_measures._helper.RegistryHelper;
-
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
-
-import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EntityType.Builder;
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnGroup;
+
+import com.virus5600.defensive_measures.DefensiveMeasures;
+import com.virus5600.defensive_measures._helper.RegistryHelper;
+import com.virus5600.defensive_measures.entity.projectiles.*;
+import com.virus5600.defensive_measures.entity.turrets.tier1.*;
+import com.virus5600.defensive_measures.entity.turrets.tier2.*;
 
 /**
  * Register and store all custom entities for the mod.
  *
- * @since 1.0.0
+ * @since 1.0.0-beta
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
- * @version 1.0.0
  */
 public class ModEntities {
 	// TURRETS //
-	// v1.0.0
+	// v1.0.0-beta
 	public static final EntityType<CannonTurretEntity> CANNON_TURRET = RegistryHelper.registerEntity(
 		"cannon_turret",
 		Builder
 			.create(CannonTurretEntity::new, SpawnGroup.MISC)
 			.dimensions(1F, 1F)
+			.maxTrackingRange(32)
 			.eyeHeight(0.51F)
 	);
 
@@ -35,6 +34,7 @@ public class ModEntities {
 		Builder
 			.create(BallistaTurretEntity::new, SpawnGroup.MISC)
 			.dimensions(1F, 1F)
+			.maxTrackingRange(16)
 			.eyeHeight(0.71F)
 	);
 
@@ -43,15 +43,44 @@ public class ModEntities {
 		Builder
 			.create(MGTurretEntity::new, SpawnGroup.MISC)
 			.dimensions(1F, 0.625F)
+			.maxTrackingRange(32)
 			.eyeHeight(0.4275F)
 	);
 
+	// v1.1.0-beta
+	public static final EntityType<AATurretEntity> AA_TURRET = RegistryHelper.registerEntity(
+		"aa_turret",
+		Builder.
+			create(AATurretEntity::new, SpawnGroup.MISC)
+			.dimensions(2F, 2F)
+			.maxTrackingRange(96)
+			.eyeHeight(0.96875F)
+	);
+
+	public static final EntityType<FlameTurretEntity> FLAME_TURRET = RegistryHelper.registerEntity(
+		"flame_turret",
+		Builder.
+			create(FlameTurretEntity::new, SpawnGroup.MISC)
+			.dimensions(2F, 2F)
+			.maxTrackingRange(16)
+			.eyeHeight(1.1875F)
+	);
+
+	public static final EntityType<MissileTurretEntity> MISSILE_TURRET = RegistryHelper.registerEntity(
+		"missile_turret",
+		Builder.
+			create(MissileTurretEntity::new, SpawnGroup.MISC)
+			.dimensions(2F, 2F)
+			.maxTrackingRange(64)
+			.eyeHeight(1.5625F)
+	);
+
 	// PROJECTILES //
-	// v1.0.0
+	// v1.0.0-beta
 	public static final EntityType<CannonballEntity> CANNONBALL = RegistryHelper.registerEntity(
 		"cannonball",
 		Builder
-			.<CannonballEntity>create(CannonballEntity::new, SpawnGroup.MISC)
+			.create(CannonballEntity::new, SpawnGroup.MISC)
 			.dropsNothing()
 			.dimensions(0.5f, 0.5f)
 			.maxTrackingRange(4)
@@ -80,15 +109,53 @@ public class ModEntities {
 			.trackingTickInterval(10)
 	);
 
+	// v1.1.0-beta
+	public static final EntityType<FlakProjectileEntity> FLAK_PROJECTILE = RegistryHelper.registerEntity(
+		"flak_projectile",
+		Builder
+			.<FlakProjectileEntity>create(FlakProjectileEntity::new, SpawnGroup.MISC)
+			.dropsNothing()
+			.dimensions(0.125f, 0.125f)
+			.maxTrackingRange(8)
+			.trackingTickInterval(10)
+	);
+
+	public static final EntityType<FlammableAerosolEntity> FLAMMABLE_AEROSOL = RegistryHelper.registerEntity(
+		"flammable_aerosol",
+		Builder
+			.create(FlammableAerosolEntity::new, SpawnGroup.MISC)
+			.dropsNothing()
+			.dimensions(0.5f, 0.5f)
+			.maxTrackingRange(4)
+			.trackingTickInterval(10)
+			.makeFireImmune()
+	);
+
+	public static final EntityType<MicroMissileEntity> MICRO_MISSILE = RegistryHelper.registerEntity(
+		"micro_missile",
+		Builder
+			.create(MicroMissileEntity::new, SpawnGroup.MISC)
+			.dropsNothing()
+			.dimensions(0.125f, 0.125f)
+			.maxTrackingRange(8)
+			.trackingTickInterval(10)
+			.eyeHeight(0.0625f)
+	);
+
 	// REGISTRY //
 	@SuppressWarnings("ConstantConditions")
 	public static void registerModEntityAttributes() {
 		DefensiveMeasures.LOGGER.info("REGISTERING ENTITY ATTRIBUTES FOR {}...", DefensiveMeasures.MOD_NAME);
 
 		// TURRETS //
-		// v1.0.0
+		// v1.0.0-beta
 		FabricDefaultAttributeRegistry.register(ModEntities.CANNON_TURRET, CannonTurretEntity.setAttributes());
 		FabricDefaultAttributeRegistry.register(ModEntities.BALLISTA_TURRET, BallistaTurretEntity.setAttributes());
 		FabricDefaultAttributeRegistry.register(ModEntities.MG_TURRET, MGTurretEntity.setAttributes());
+
+		// v1.1.0-beta
+		FabricDefaultAttributeRegistry.register(ModEntities.AA_TURRET, AATurretEntity.setAttributes());
+		FabricDefaultAttributeRegistry.register(ModEntities.FLAME_TURRET, FlameTurretEntity.setAttributes());
+		FabricDefaultAttributeRegistry.register(ModEntities.MISSILE_TURRET, MissileTurretEntity.setAttributes());
 	}
 }

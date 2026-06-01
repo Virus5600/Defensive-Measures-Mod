@@ -17,46 +17,39 @@ public class CannonTurretModel extends BaseTurretModel<BaseTurretRenderState> {
 			root.getChild("stand"),
 			root.getChild("stand").getChild("head"),
 
-			CannonTurretAnimation.ANIM_CANNON_SHOOT.createAnimation(root),
-			CannonTurretAnimation.ANIM_CANNON_DEATH.createAnimation(root)
+			CannonTurretAnimation.ANIM_CANNON_SHOOT,
+			CannonTurretAnimation.ANIM_CANNON_DEATH
 		);
 	}
 
-	@SuppressWarnings("unused")
 	public static TexturedModelData getTexturedModelData() {
 		ModelData modelData = new ModelData();
 		ModelPartData modelPartData = modelData.getRoot();
-		ModelPartData base = modelPartData.addChild("base", ModelPartBuilder.create().uv(0, 47).cuboid(-8.0F, -1.0F, -8.0F, 16.0F, 1.0F, 16.0F, new Dilation(0.0F)), ModelTransform.origin(0.0F, 24.0F, 0.0F));
+		modelPartData.addChild("base", ModelPartBuilder.create().uv(0, 0).cuboid(-8.0F, -1.0F, -8.0F, 16.0F, 2.0F, 16.0F, new Dilation(0.0F)), ModelTransform.origin(0.0F, 24.0F, 0.0F));
 
-		ModelPartData stand = modelPartData.addChild("stand", ModelPartBuilder.create().uv(8, 33).cuboid(-6.0F, -1.5F, -6.0F, 12.0F, 1.0F, 12.0F, new Dilation(0.0F)), ModelTransform.origin(0.0F, 23.5F, 0.0F));
+		ModelPartData stand = modelPartData.addChild("stand", ModelPartBuilder.create().uv(44, 45).cuboid(-6.0F, -1.5F, -6.0F, 12.0F, 1.0F, 12.0F, new Dilation(0.0F)), ModelTransform.origin(0.0F, 23.5F, 0.0F));
+		stand.addChild("stand_r1", ModelPartBuilder.create().uv(54, 32).cuboid(-4.975F, 0.0F, -1.0F, 10.0F, 3.0F, 1.0F, new Dilation(0.0F)), ModelTransform.of(0.0F, -1.6572F, -5.6744F, 0.8727F, 0.0F, 0.0F));
 
-		ModelPartData rightStand = stand.addChild("rightStand", ModelPartBuilder.create().uv(42, 33).cuboid(0.0F, -1.0F, -6.0F, 1.0F, 1.0F, 10.0F, new Dilation(0.0F))
-			.uv(44, 34).cuboid(0.0F, -2.0F, -5.0F, 1.0F, 1.0F, 8.0F, new Dilation(0.0F))
-			.uv(48, 35).cuboid(0.0F, -3.0F, -4.0F, 1.0F, 1.0F, 7.0F, new Dilation(0.0F))
-			.uv(50, 33).cuboid(0.0F, -4.0F, -3.0F, 1.0F, 1.0F, 5.0F, new Dilation(0.0F))
-			.uv(54, 33).cuboid(0.0F, -5.0F, -2.0F, 1.0F, 1.0F, 4.0F, new Dilation(0.0F))
-			.uv(58, 39).cuboid(0.0F, -6.0F, -1.0F, 1.0F, 1.0F, 2.0F, new Dilation(0.0F)), ModelTransform.origin(-6.0F, -1.5F, 1.0F));
+		ModelPartData right_stand = stand.addChild("right_stand", ModelPartBuilder.create().uv(26, 67).cuboid(0.0F, -9.0F, 0.0F, 1.0F, 9.0F, 3.0F, new Dilation(0.0F))
+			.uv(76, 32).cuboid(0.0F, -4.0F, -3.0F, 1.0F, 4.0F, 3.0F, new Dilation(0.0F)), ModelTransform.origin(-6.0F, -1.5F, 1.0F));
+		right_stand.addChild("right_stand_r1", ModelPartBuilder.create().uv(55, 0).cuboid(-0.025F, -2.0F, -9.0F, 1.0F, 3.0F, 12.0F, new Dilation(0.0F)), ModelTransform.of(0.0F, -5.0F, 0.0F, 0.8727F, 0.0F, 0.0F));
 
-		ModelPartData leftStand = stand.addChild("leftStand", ModelPartBuilder.create().uv(42, 33).mirrored().cuboid(-1.0F, -1.0F, -6.0F, 1.0F, 1.0F, 10.0F, new Dilation(0.0F)).mirrored(false)
-			.uv(44, 34).cuboid(-1.0F, -2.0F, -5.0F, 1.0F, 1.0F, 8.0F, new Dilation(0.0F))
-			.uv(48, 35).mirrored().cuboid(-1.0F, -3.0F, -4.0F, 1.0F, 1.0F, 7.0F, new Dilation(0.0F)).mirrored(false)
-			.uv(50, 33).mirrored().cuboid(-1.0F, -4.0F, -3.0F, 1.0F, 1.0F, 5.0F, new Dilation(0.0F)).mirrored(false)
-			.uv(54, 33).mirrored().cuboid(-1.0F, -5.0F, -2.0F, 1.0F, 1.0F, 4.0F, new Dilation(0.0F)).mirrored(false)
-			.uv(58, 39).cuboid(-1.0F, -6.0F, -1.0F, 1.0F, 1.0F, 2.0F, new Dilation(0.0F)), ModelTransform.origin(6.0F, -1.5F, 1.0F));
+		ModelPartData left_stand = stand.addChild("left_stand", ModelPartBuilder.create().uv(34, 67).cuboid(-1.0F, -9.0F, 0.0F, 1.0F, 9.0F, 3.0F, new Dilation(0.0F))
+			.uv(42, 76).cuboid(-1.0F, -4.0F, -3.0F, 1.0F, 4.0F, 3.0F, new Dilation(0.0F)), ModelTransform.origin(6.0F, -1.5F, 1.0F));
+		left_stand.addChild("left_stand_r1", ModelPartBuilder.create().uv(0, 67).cuboid(-0.975F, -2.0F, -9.0F, 1.0F, 3.0F, 12.0F, new Dilation(0.0F)), ModelTransform.of(0.0F, -5.0F, 0.0F, 0.8727F, 0.0F, 0.0F));
 
-		ModelPartData head = stand.addChild("head", ModelPartBuilder.create().uv(12, 0).cuboid(-5.0F, -4.5F, -3.0F, 10.0F, 6.0F, 8.0F, new Dilation(0.0F))
-			.uv(20, 0).cuboid(-4.0F, -5.5F, -8.0F, 8.0F, 8.0F, 14.0F, new Dilation(0.0F))
-			.uv(0, 0).mirrored().cuboid(-3.0F, -6.5F, -3.0F, 6.0F, 10.0F, 8.0F, new Dilation(0.0F)).mirrored(false)
-			.uv(16, 0).cuboid(-3.0F, -4.5F, -11.0F, 6.0F, 6.0F, 18.0F, new Dilation(0.0F))
-			.uv(54, 0).cuboid(-2.0F, -3.5F, 7.0F, 4.0F, 4.0F, 1.0F, new Dilation(0.0F))
-			.uv(56, 5).cuboid(-1.0F, -3.5F, -13.0F, 2.0F, 1.0F, 2.0F, new Dilation(0.0F))
-			.uv(56, 10).cuboid(-1.0F, -0.5F, -13.0F, 2.0F, 1.0F, 2.0F, new Dilation(0.0F))
-			.uv(48, 9).cuboid(1.0F, -3.5F, -13.0F, 1.0F, 4.0F, 2.0F, new Dilation(0.0F))
-			.uv(2, 2).mirrored().cuboid(-2.0F, -3.5F, -13.0F, 1.0F, 4.0F, 2.0F, new Dilation(0.0F)).mirrored(false)
-			.uv(24, 38).cuboid(0.0F, -3.0F, 8.0F, 0.0F, 1.0F, 1.0F, new Dilation(0.0F))
-			.uv(28, 37).cuboid(0.0F, -5.0F, 9.0F, 0.0F, 2.0F, 1.0F, new Dilation(0.0F)), ModelTransform.origin(0.0F, -6.0F, -1.0F));
+		stand.addChild("head", ModelPartBuilder.create().uv(54, 18).cuboid(-5.0F, -4.5F, -3.0F, 10.0F, 6.0F, 8.0F, new Dilation(0.0F))
+			.uv(0, 45).cuboid(-4.0F, -5.5F, -8.0F, 8.0F, 8.0F, 14.0F, new Dilation(0.0F))
+			.uv(44, 58).cuboid(-3.0F, -6.5F, -3.0F, 6.0F, 10.0F, 8.0F, new Dilation(0.0F))
+			.uv(0, 18).cuboid(-3.0F, -4.5F, -13.0F, 6.0F, 6.0F, 21.0F, new Dilation(0.0F))
+			.uv(54, 40).cuboid(-2.0F, -3.5F, 8.0F, 4.0F, 4.0F, 1.0F, new Dilation(0.0F))
+			.uv(64, 15).cuboid(-1.0F, -3.5F, -15.0F, 2.0F, 1.0F, 2.0F, new Dilation(0.0F))
+			.uv(64, 40).cuboid(-1.0F, -0.5F, -15.0F, 2.0F, 1.0F, 2.0F, new Dilation(0.0F))
+			.uv(76, 39).cuboid(1.0F, -3.5F, -15.0F, 1.0F, 4.0F, 2.0F, new Dilation(0.0F))
+			.uv(50, 76).cuboid(-2.0F, -3.5F, -15.0F, 1.0F, 4.0F, 2.0F, new Dilation(0.0F))
+			.uv(42, 67).cuboid(0.0F, -5.0F, 9.0F, 0.0F, 2.0F, 1.0F, new Dilation(0.0F)), ModelTransform.of(0.0F, -6.0F, -1.0F, -0.2618F, 0.0F, 0.0F));
 
-		return TexturedModelData.of(modelData, 64, 64);
+		return TexturedModelData.of(modelData, 128, 128);
 	}
 
 	// //////////////// //
@@ -65,11 +58,11 @@ public class CannonTurretModel extends BaseTurretModel<BaseTurretRenderState> {
 
 	@Override
 	protected float getMinPitch() {
-		return -30f;
+		return -20.0f;
 	}
 
 	@Override
 	protected float getMaxPitch() {
-		return 30f;
+		return 22.5f;
 	}
 }

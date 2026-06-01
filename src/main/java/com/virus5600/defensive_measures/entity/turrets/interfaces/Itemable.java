@@ -28,9 +28,8 @@ import java.util.Random;
 /**
  * An interface that serves as a base for all entities that can be stored as an items.
  *
- * @since 1.0.0
+ * @since 1.0.0-beta
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
- * @version 1.0.0
  */
 public interface Itemable {
 	/**

@@ -24,19 +24,29 @@ public class ModEntityModels {
 	// TURRETS //
 	// /////// //
 
-	// v1.0.0
+	// v1.0.0-beta
 	public static final EntityModelLayer CANNON_TURRET = registerMain("cannon_turret");
 	public static final EntityModelLayer BALLISTA_TURRET = registerMain("ballista");
 	public static final EntityModelLayer MG_TURRET = registerMain("mg_turret");
+
+	// v1.1.0-beta
+	public static final EntityModelLayer AA_TURRET = registerMain("aa_turret");
+	public static final EntityModelLayer FLAME_TURRET = registerMain("flame_turret");
+	public static final EntityModelLayer MISSILE_TURRET = registerMain("missile_turret");
 
 	// /////////// //
 	// PROJECTILES //
 	// /////////// //
 
-	// v1.0.0
+	// v1.0.0-beta
 	public static final EntityModelLayer CANNONBALL = registerMain("cannonball");
 	public static final EntityModelLayer BALLISTA_BOLT = registerMain("ballista_bolt");
 	public static final EntityModelLayer MG_BULLET = registerMain("mg_bullet");
+
+	// v1.1.0-beta
+	public static final EntityModelLayer FLAK_PROJECTILE = registerMain("flak_projectile");
+	public static final EntityModelLayer FLAMMABLE_AEROSOL = registerMain("flammable_aerosol");
+	public static final EntityModelLayer MICRO_MISSILE = registerMain("micro_missile");
 
 	public static void registerEntityModels() {
 		DefensiveMeasures.LOGGER.info("REGISTERING ENTITY MODELS FOR {}...", DefensiveMeasures.MOD_NAME);
@@ -45,19 +55,29 @@ public class ModEntityModels {
 		// TURRETS //
 		// /////// //
 
-		// v1.0.0
+		// v1.0.0-beta
 		EntityModelLayerRegistry.registerModelLayer(CANNON_TURRET, CannonTurretModel::getTexturedModelData);
 		EntityModelLayerRegistry.registerModelLayer(BALLISTA_TURRET, BallistaTurretModel::getTexturedModelData);
 		EntityModelLayerRegistry.registerModelLayer(MG_TURRET, MGTurretModel::getTexturedModelData);
+
+		// v1.1.0-beta
+		EntityModelLayerRegistry.registerModelLayer(AA_TURRET, AATurretModel::getTexturedModelData);
+		EntityModelLayerRegistry.registerModelLayer(FLAME_TURRET, FlameTurretModel::getTexturedModelData);
+		EntityModelLayerRegistry.registerModelLayer(MISSILE_TURRET, MissileTurretModel::getTexturedModelData);
 
 		// /////////// //
 		// PROJECTILES //
 		// /////////// //
 
-		// v1.0.0
+		// v1.0.0-beta
 		EntityModelLayerRegistry.registerModelLayer(CANNONBALL, CannonballModel::getTexturedModelData);
 		EntityModelLayerRegistry.registerModelLayer(BALLISTA_BOLT, BallistaBoltModel::getTexturedModelData);
 		EntityModelLayerRegistry.registerModelLayer(MG_BULLET, MGBulletModel::getTexturedModelData);
+
+		// v1.1.0-beta
+		EntityModelLayerRegistry.registerModelLayer(FLAK_PROJECTILE, FlakProjectileModel::getTexturedModelData);
+		EntityModelLayerRegistry.registerModelLayer(FLAMMABLE_AEROSOL, FlammableAerosolModel::getTexturedModelData);
+		EntityModelLayerRegistry.registerModelLayer(MICRO_MISSILE, MicroMissileModel::getTexturedModelData);
 	}
 
 	private static EntityModelLayer registerMain(String id) {
@@ -67,7 +87,7 @@ public class ModEntityModels {
 	private static EntityModelLayer register(String id, String layer) {
 		EntityModelLayer entityModelLayer = create(id, layer);
 		if (!LAYERS.add(entityModelLayer)) {
-			throw new IllegalStateException("Duplicate registration for " + String.valueOf(entityModelLayer));
+			throw new IllegalStateException("Duplicate registration for " + entityModelLayer);
 		} else {
 			return entityModelLayer;
 		}

@@ -1,6 +1,7 @@
 {
 	"replace": false,
 	"values": [
-		"dm:arrowhead"
+		"dm:bolt_head",
+		"dm:electric_fence"
 	]
 }

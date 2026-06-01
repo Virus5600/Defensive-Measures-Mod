@@ -1,0 +1,28 @@
+{
+	"variants": {
+		"bolt_heads=1,waterlogged=false": {
+			"model": "dm:block/bolt_head_1"
+		},
+		"bolt_heads=1,waterlogged=true": {
+			"model": "dm:block/bolt_head_1"
+		},
+		"bolt_heads=2,waterlogged=false": {
+			"model": "dm:block/bolt_head_2"
+		},
+		"bolt_heads=2,waterlogged=true": {
+			"model": "dm:block/bolt_head_2"
+		},
+		"bolt_heads=3,waterlogged=false": {
+			"model": "dm:block/bolt_head_3"
+		},
+		"bolt_heads=3,waterlogged=true": {
+			"model": "dm:block/bolt_head_3"
+		},
+		"bolt_heads=4,waterlogged=false": {
+			"model": "dm:block/bolt_head_4"
+		},
+		"bolt_heads=4,waterlogged=true": {
+			"model": "dm:block/bolt_head_4"
+		}
+	}
+}

@@ -3,11 +3,13 @@ package com.virus5600.defensive_measures.entity.ai.goal;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.RangedAttackMob;
 import net.minecraft.util.math.MathHelper;
-
 import net.minecraft.util.math.Vec3d;
-import org.jetbrains.annotations.Nullable;
 
+
+import com.virus5600.defensive_measures._util.MathUtil;
 import com.virus5600.defensive_measures.entity.turrets.TurretEntity;
+
+import org.jetbrains.annotations.Nullable;
 
 import java.util.EnumSet;
 
@@ -56,9 +58,8 @@ import java.util.EnumSet;
  * 			yet to be implemented as they are not yet needed.
  * @see net.minecraft.entity.ai.goal.ProjectileAttackGoal ProjectileAttackGoal
  *
- * @since 1.0.0
+ * @since 1.0.0-beta
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
- * @version 1.0.0
  */
 public class ProjectileAttackGoal extends net.minecraft.entity.ai.goal.ProjectileAttackGoal {
 	private final TurretEntity mob;
@@ -109,7 +110,10 @@ public class ProjectileAttackGoal extends net.minecraft.entity.ai.goal.Projectil
 	@Override
 	public boolean canStart() {
 		LivingEntity livingEntity = this.mob.getTarget();
-		if (livingEntity != null && livingEntity.isAlive() && this.isWithinRotationLimit(livingEntity)) {
+		if (livingEntity != null &&
+			livingEntity.isAlive() &&
+			this.isWithinRotationLimit(livingEntity)
+		) {
 			this.target = livingEntity;
 			return true;
 		} else {
@@ -155,8 +159,17 @@ public class ProjectileAttackGoal extends net.minecraft.entity.ai.goal.Projectil
 				this.mob.getNavigation().startMovingTo(this.target, this.mobSpeed);
 			}
 
-			this.mob.getLookControl().lookAt(this.target, 30.0F, 30.0F);
+			float minPitch = -this.mob.getMaxLookPitchChange();
+			float maxPitch = -this.mob.getMinLookPitchChange();
+			float minYaw = -this.mob.getMaxHeadRotation();
+			float maxYaw = -this.mob.getMinHeadRotation();
+
 			this.mob.setTrackedShooting(false);
+			this.mob.getLookControl().lookAt(
+				this.target,
+				minYaw, maxYaw,
+				minPitch, maxPitch
+			);
 
 			if (--this.updateCountdownTicks == 0) {
 				if (!canBeSeen) {
@@ -232,40 +245,50 @@ public class ProjectileAttackGoal extends net.minecraft.entity.ai.goal.Projectil
 	 * shoot.
 	 *
 	 * @param target The target on which the shooter will aim at.
+	 * @param shouldClamp Whether to clamp the pitch angle to the rotation limits of the turret. If true, the pitch angle will be clamped to the rotation limits of the turret. If false, the pitch angle will not be clamped and may exceed the rotation limits of the turret.
+	 *
 	 * @return The pitch angle in degrees.
 	 */
 	public float getShootingPitch(LivingEntity target, boolean shouldClamp) {
-		Vec3d velocity = TurretEntity.TurretProjectileVelocity
-			.init((TurretEntity) this.mob)
-			.setVelocity(target)
+		Vec3d velocity = this.mob
+			.getProjectileVelocityData(target)
 			.getVelocity();
 
 		float maxPitch = this.mob.getMaxLookPitchChange();
+		float minPitch = this.mob.getMinLookPitchChange();
 
 		float vx = MathHelper.sqrt((float) (velocity.x * velocity.x + velocity.z * velocity.z));
-		float p = (float) -Math.atan2(velocity.y, vx);
-		p *= (float) (180.0 / Math.PI);
+		float p = (float) MathUtil.radToDeg(-Math.atan2(velocity.y, vx));
 
 		if (shouldClamp) {
-			p = MathHelper.clamp(p, -maxPitch, maxPitch);
+			p = MathHelper.clamp(p, minPitch, maxPitch);
 		}
 
 		return p;
 	}
 
+	/**
+	 * Calculates the initial yaw angle in degrees for the shooter to aim at the target. This
+	 * allows the shooter to align its yaw angle to the trajectory of the projectile it will shoot.
+	 *
+	 * @param target The target on which the shooter will aim at.
+	 * @param shouldClamp Whether to clamp the yaw angle to the rotation limits of the turret. If true, the pitch angle will be clamped to the rotation limits of the turret. If false, the yaw angle will not be clamped and may exceed the rotation limits of the turret.
+	 *
+	 * @return The yaw angle in degrees.
+	 */
 	public float getShootingYaw(LivingEntity target, boolean shouldClamp) {
-		Vec3d velocity = TurretEntity.TurretProjectileVelocity
-			.init((TurretEntity) this.mob)
-			.setVelocity(target)
+		Vec3d velocity = this.mob
+			.getProjectileVelocityData(target)
 			.getVelocity();
 
 		float maxYaw = this.mob.getMaxHeadRotation();
+		float minYaw = this.mob.getMinHeadRotation();
 
 		float y = (float) Math.atan2(velocity.z, velocity.x);
 		y *= (float) (180.0 / Math.PI);
 
 		if (shouldClamp) {
-			y = MathHelper.clamp(y, -maxYaw, maxYaw);
+			y = MathHelper.clamp(y, minYaw, maxYaw);
 		}
 
 		return y;
@@ -278,14 +301,16 @@ public class ProjectileAttackGoal extends net.minecraft.entity.ai.goal.Projectil
 	 * @return {@code true} if the target is within the rotation limits of the turret, {@code false} otherwise.
 	 */
 	public boolean isWithinRotationLimit(LivingEntity target) {
-		float maxPitch = this.mob.getMaxLookPitchChange();
-		float maxYaw = this.mob.getMaxHeadRotation();
+		float minPitch = -this.mob.getMaxLookPitchChange();
+		float maxPitch = -this.mob.getMinLookPitchChange();
+		float minYaw = -this.mob.getMaxHeadRotation();
+		float maxYaw = -this.mob.getMinHeadRotation();
 
 		float targetPitch = this.getShootingPitch(target, false);
 		float targetYaw = this.getShootingYaw(target, false);
 
-		boolean withinPitch = targetPitch <= maxPitch && targetPitch >= -maxPitch;
-		boolean withinYaw = targetYaw <= maxYaw && targetYaw >= -maxYaw;
+		boolean withinPitch = targetPitch <= maxPitch && targetPitch >= minPitch;
+		boolean withinYaw = targetYaw <= maxYaw && targetYaw >= minYaw;
 
 		return withinPitch && withinYaw;
 	}

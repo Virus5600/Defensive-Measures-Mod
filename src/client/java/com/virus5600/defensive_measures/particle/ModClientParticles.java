@@ -14,9 +14,8 @@ import net.fabricmc.fabric.api.client.particle.v1.ParticleFactoryRegistry;
  * <br><br>
  * All custom particles are registered here, even if they are not used by the client.
  *
- * @since 1.0.0
+ * @since 1.0.0-beta
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
- * @version 1.0.0
  */
 @Environment(EnvType.CLIENT)
 public class ModClientParticles {
@@ -26,11 +25,16 @@ public class ModClientParticles {
 		ParticleFactoryRegistry registry = ParticleFactoryRegistry.getInstance();
 
 		// PARTICLES
-		registry.register(ModParticles.CANNON_FUSE, CannonFuse.Factory::new);
-		registry.register(ModParticles.SPARKS, Sparks.Factory::new);
-		registry.register(ModParticles.SUSPENDED_SPARKS, Sparks.SuspendedFactory::new);
+		registry.register(ModParticles.CANNON_FUSE, CannonFuseParticle.Factory::new);
+		registry.register(ModParticles.SPARKS, SparksParticle.Factory::new);
+		registry.register(ModParticles.SUSPENDED_SPARKS, SparksParticle.SuspendedFactory::new);
+		registry.register(ModParticles.FLAK, FlakParticle.Factory::new);
+		registry.register(ModParticles.FLAK_CLOUD, FlakCloudParticle.Factory::new);
+		registry.register(ModParticles.LIGHTER_FLAME, LighterFlameParticle.Factory::new);
 
 		// EMITTERS
-		registry.register(ModParticles.CANNON_FLASH, new CannonFlash.Factory());
+		registry.register(ModParticles.CANNON_FLASH, new CannonFlashEmitter.Factory());
+		registry.register(ModParticles.FLAK_EXPLOSION, new FlakExplosionEmitter.Factory());
+		registry.register(ModParticles.ROCKET_THRUSTER, new CannonFlashEmitter.ThrusterFactory());
 	}
 }

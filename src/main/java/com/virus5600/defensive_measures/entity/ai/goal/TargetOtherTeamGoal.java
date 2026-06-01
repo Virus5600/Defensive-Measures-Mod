@@ -13,9 +13,8 @@ import com.virus5600.defensive_measures.entity.turrets.TurretEntity;
  * This is based originally on {@code TargetOtherTeamGoal} of the {@link net.minecraft.entity.mob.ShulkerEntity ShulkerEntity}
  * class. But since the original was not public, this implementation was created.
  *
- * @since 1.0.0
+ * @since 1.0.0-beta
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
- * @version 1.0.0
  */
 public class TargetOtherTeamGoal extends ActiveTargetGoal<LivingEntity> {
 	public TargetOtherTeamGoal(TurretEntity turret) {

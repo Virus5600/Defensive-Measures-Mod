@@ -6,6 +6,7 @@ import net.minecraft.entity.projectile.ProjectileEntity;
 
 import com.virus5600.defensive_measures.renderer.projectiles.state.BaseProjectileRenderState;
 import com.virus5600.defensive_measures.model.BaseModel;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -31,9 +32,8 @@ import org.jetbrains.annotations.Nullable;
  *
  * @see BaseModel
  *
- * @since 1.0.0
+ * @since 1.0.0-beta
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
- * @version 2.1.0
  */
 public abstract class BaseProjectileModel<S extends BaseProjectileRenderState> extends BaseModel<S> {
 
@@ -43,6 +43,19 @@ public abstract class BaseProjectileModel<S extends BaseProjectileRenderState> e
 	// //////////// //
 	// CONSTRUCTORS //
 	// //////////// //
+
+	/**
+	 * Constructs a new {@link BaseProjectileModel} with a specified model part. This constructor
+	 * is used when the model does not have any texture to render, such as the invisible projectile
+	 * used by the flame turret.
+	 *
+	 * @param root The root model part of this model.
+	 */
+	public BaseProjectileModel(@NotNull ModelPart root) {
+		super(root);
+
+		this.loopAnim = null;
+	}
 
 	/**
 	 * Constructs a new {@link BaseProjectileModel} with a specified model part and texture path.

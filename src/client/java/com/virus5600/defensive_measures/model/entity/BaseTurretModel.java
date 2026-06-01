@@ -1,15 +1,22 @@
 package com.virus5600.defensive_measures.model.entity;
 
+import com.virus5600.defensive_measures._util.MathUtil;
 import net.minecraft.client.model.ModelPart;
 import net.minecraft.client.render.entity.animation.Animation;
+import net.minecraft.client.render.entity.animation.AnimationDefinition;
+import net.minecraft.client.render.entity.state.EntityRenderState;
+import net.minecraft.entity.AnimationState;
 import net.minecraft.util.math.MathHelper;
 
-import com.virus5600.defensive_measures.renderer.entity.state.BaseTurretRenderState;
+import com.virus5600.defensive_measures.animations.Keyframe;
 import com.virus5600.defensive_measures.entity.turrets.TurretEntity;
 import com.virus5600.defensive_measures.model.BaseModel;
+import com.virus5600.defensive_measures.renderer.entity.state.BaseTurretRenderState;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.*;
 
 /**
  * A base model for turrets which handles all the common logic for rendering
@@ -32,16 +39,18 @@ import org.jetbrains.annotations.Nullable;
  *
  * @see BaseModel
  *
- * @since 1.0.0
+ * @since 1.0.0-beta
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
- * @version 2.1.0
  */
 public abstract class BaseTurretModel<S extends BaseTurretRenderState> extends BaseModel<S> {
+	private final Map<UUID, Queue<? extends Keyframe>> shootAnimProcedure = new HashMap<>();
+	private final Map<UUID, Queue<? extends Keyframe>> deathAnimProcedure = new HashMap<>();
+
 	/**
 	 * Identifies the bone that serves as the neck of the turret so that it can
 	 * rotate along the yaw axis. This part is basically the stand of a turret.
 	 */
-	protected final ModelPart stand;
+	protected final ModelPart neck;
 	/**
 	 * Identifies the bone that serves as the head of the turret so that it can
 	 * rotate along the pitch axis.
@@ -59,6 +68,21 @@ public abstract class BaseTurretModel<S extends BaseTurretRenderState> extends B
 	 * when it dies.
 	 */
 	protected final Animation deathAnim;
+	protected final float shootAnimLen;
+	protected final float deathAnimLen;
+
+	protected final static Queue<? extends Keyframe> DEFAULT_EMPTY_KEYFRAME = new PriorityQueue<>() {
+		{
+			add(
+				new Keyframe() {
+					@Override public int compareTo(@NotNull Keyframe o) { return 0; }
+					@Override public double getTime() { return 0; }
+					@Override public void apply(AnimationState animState, EntityRenderState state) { }
+					@Override public int getTimeMS() { return 0; }
+				}
+			);
+		}
+	};
 
 	// //////////// //
 	// CONSTRUCTORS //
@@ -70,13 +94,13 @@ public abstract class BaseTurretModel<S extends BaseTurretRenderState> extends B
 	 * render the turret entity and apply default configurations.
 	 * <br><br>
 	 * Using this overloaded constructor will set the shooting and death animation to {@code null}.
-	 * Use {@link BaseTurretModel#BaseTurretModel(ModelPart, String, String[], ModelPart, ModelPart, Animation, Animation)}
+	 * Use {@link BaseTurretModel#BaseTurretModel(ModelPart, String, String[], ModelPart, ModelPart, AnimationDefinition, AnimationDefinition)}
 	 * if a shooting or death, or both animation exists.
 	 *
 	 * @param root The root model part of this model.
 	 * @param texturePath The path of the texture this model will use.
 	 * @param textures The file name(s) that this model will use.
-	 * @param stand The model part that serves as the stand of the turret. This part will rotate along the yaw axis.
+	 * @param neck The model part that serves as the neck of the turret. This part will rotate along the yaw axis.
 	 * @param head The model part that servesas the head of the turret. This part will rotate along the pitch axis.
 	 *
 	 * @see #texturePath
@@ -84,9 +108,9 @@ public abstract class BaseTurretModel<S extends BaseTurretRenderState> extends B
 	 */
 	public BaseTurretModel(
 		@NotNull ModelPart root, @NotNull String texturePath, @NotNull String[] textures,
-		@NotNull ModelPart stand, @NotNull ModelPart head
+		@NotNull ModelPart neck, @NotNull ModelPart head
 	) {
-		this(root, texturePath, textures, stand, head, null, null);
+		this(root, texturePath, textures, neck, head, null, null);
 	}
 
 	/**
@@ -97,7 +121,7 @@ public abstract class BaseTurretModel<S extends BaseTurretRenderState> extends B
 	 * @param root The root model part of this model.
 	 * @param texturePath The path of the texture this model will use.
 	 * @param textures The file name(s) that this model will use.
-	 * @param stand The model part that serves as the stand of the turret. This part will rotate along the yaw axis.
+	 * @param neck The model part that serves as the neck of the turret. This part will rotate along the yaw axis.
 	 * @param head The model part that servesas the head of the turret. This part will rotate along the pitch axis.
 	 * @param shootAnim The shoot animation. {@code null} if none.
 	 * @param deathAnim The death animation. {@code null} if none.
@@ -107,19 +131,52 @@ public abstract class BaseTurretModel<S extends BaseTurretRenderState> extends B
 	 */
 	public BaseTurretModel(
 		@NotNull ModelPart root, @NotNull String texturePath, @NotNull String[] textures,
-		@NotNull ModelPart stand, @NotNull ModelPart head,
-		@Nullable Animation shootAnim, @Nullable Animation deathAnim
+		@NotNull ModelPart neck, @NotNull ModelPart head,
+		@Nullable AnimationDefinition shootAnim, @Nullable AnimationDefinition deathAnim
 	) {
 		super(root, texturePath, textures);
 
 		// Set the common model parts used by all turret models
-		this.stand = stand;
+		this.neck = neck;
 		this.head = head;
 
+		// Identify the procedures' length
+		Keyframe lastKF;
+		lastKF = this.getShootAnimProcedureInstance()
+			.stream()
+			.max(Comparator.comparingDouble(Keyframe::getTime))
+			.orElse(null);
+		int shootProcLenMS = lastKF == null ? 0 : lastKF.getTimeMS();
+
+		lastKF = this.getDeathAnimProcedureInstance()
+			.stream()
+			.max(Comparator.comparingDouble(Keyframe::getTime))
+			.orElse(null);
+		int deathProcLenMS = lastKF == null ? 0 : lastKF.getTimeMS();
+
+		// Stores the animation lengths first...
+		this.shootAnimLen = shootAnim == null ? shootProcLenMS : shootAnim.lengthInSeconds();
+		this.deathAnimLen = deathAnim == null ? deathProcLenMS : deathAnim.lengthInSeconds();
+
 		// Sets the common animation parts that may/not be used by all turret models
-		this.shootAnim = shootAnim;
-		this.deathAnim = deathAnim;
+		this.shootAnim = shootAnim != null ?
+			shootAnim.createAnimation(root) :
+			AnimationDefinition.Builder
+				.create(this.shootAnimLen / 1000)
+				.build()
+				.createAnimation(root);
+
+		this.deathAnim = deathAnim != null ?
+			deathAnim.createAnimation(root) :
+			AnimationDefinition.Builder
+				.create(this.deathAnimLen / 1000)
+				.build()
+				.createAnimation(root);
 	}
+
+	// /////////////// //
+	// PROCESS METHODS //
+	// /////////////// //
 
 	/**
 	 * Sets the angles of the model parts based on the render state of the turret entity. This
@@ -140,18 +197,55 @@ public abstract class BaseTurretModel<S extends BaseTurretRenderState> extends B
 	public void setAngles(S state) {
 		super.setAngles(state);
 
-		// HEAD ANGLE HANDLING
-		float headYaw = state.relativeHeadYaw + state.bodyYaw + 180;
-		this.setHeadAngles(headYaw, state.pitch);
-
-		// ANIMATION HANDLING
+		// ANIMATION HANDLING (& ADDITIONAL PROCEDURES)
 		if (this.shootAnim != null) {
+			if ((this.getShootAnimProcedure(state.id) == null &&
+				state.shootAnimationState.getTimeInMilliseconds(state.age) > 0 &&
+				!state.shootAnimationState.isRunning())
+			) {
+				this.setShootAnimProcedure(state.id, this.getShootAnimProcedureInstance());
+			}
+
 			this.shootAnim.apply(state.shootAnimationState, state.age);
+			this.additionalShootAnimProcedures(state.shootAnimationState, state);
+		}
+		else {
+			this.setShootAnimProcedure(state.id, null);
 		}
 
 		if (this.deathAnim != null) {
+			if (this.getDeathAnimProcedure(state.id) == null &&
+				state.deathAnimationState.getTimeInMilliseconds(state.age) > 0 &&
+				!state.deathAnimationState.isRunning()
+			) {
+				Queue<? extends Keyframe> procedure = this.getDeathAnimProcedureInstance();
+				this.setDeathAnimProcedure(state.id, procedure);
+			}
+
 			this.deathAnim.apply(state.deathAnimationState, state.age);
+			this.additionalDeathAnimProcedures(state.deathAnimationState, state);
 		}
+		else {
+			this.setDeathAnimProcedure(state.id, null);
+		}
+
+		// Garbage Collector
+		Queue<? extends Keyframe> deathProcedure = this.getDeathAnimProcedure(state.id);
+		if (state.dead && (deathProcedure == null || deathProcedure.isEmpty())) {
+			this.setShootAnimProcedure(state.id, null);
+			this.setDeathAnimProcedure(state.id, null);
+		}
+
+		// HEAD ANGLE HANDLING
+		float headYaw = state.relativeHeadYaw + state.bodyYaw + 180;
+		float headPitch = state.pitch;
+
+		// If default head pitch is not 0, use it when it's idle.
+		if (this.getDefaultHeadPitch() != 0 && state.hasTarget) {
+			headPitch = this.getDefaultHeadPitch();
+		}
+
+		this.setHeadAngles(headYaw, headPitch);
 	}
 
 	/**
@@ -165,12 +259,148 @@ public abstract class BaseTurretModel<S extends BaseTurretRenderState> extends B
 	protected void setHeadAngles(float headYaw, float headPitch) {
 		headPitch = MathHelper.clamp(
 			headPitch,
-			this.getMinPitch(),
-			this.getMaxPitch()
+			-this.getMaxPitch(),
+			-this.getMinPitch()
 		);
 
-		this.stand.yaw = headYaw * ((float)Math.PI / 180F);
-		this.head.pitch = headPitch * ((float)Math.PI / 180F);
+		this.neck.yaw = MathUtil.degToRad(headYaw);
+		this.head.pitch = MathUtil.degToRad(headPitch);
+	}
+
+	// ///////////////// //
+	// GETTERS & SETTERS //
+	// ///////////////// //
+
+	protected void setShootAnimProcedure(UUID id, @Nullable Queue<? extends Keyframe> queue) {
+		if (queue == null) {
+			this.shootAnimProcedure.remove(id);
+		}
+		else {
+			this.shootAnimProcedure.put(id, queue);
+		}
+	}
+
+	@Nullable
+	protected final Queue<? extends Keyframe> getShootAnimProcedure(UUID id) {
+		return this.shootAnimProcedure.get(id);
+	}
+
+	protected void setDeathAnimProcedure(UUID id, @Nullable Queue<? extends Keyframe> queue) {
+		if (queue == null) {
+			this.deathAnimProcedure.remove(id);
+		}
+		else {
+			this.deathAnimProcedure.put(id, queue);
+		}
+	}
+
+	@Nullable
+	protected final Queue<? extends Keyframe> getDeathAnimProcedure(UUID id) {
+		return this.deathAnimProcedure.get(id);
+	}
+
+	// /////////////////// //
+	// OVERRIDABLE METHODS //
+	// /////////////////// //
+
+	/**
+	 * Returns a queue of keyframes that defines the shooting animation of the turret. This method
+	 * is called whenever the turret starts shooting and the shooting animation needs to be applied
+	 * to the model parts.
+	 *
+	 * @return {@code Queue<? extends Keyframe>} a queue of keyframes.
+	 */
+	public Queue<? extends Keyframe> getShootAnimProcedureInstance() {
+		return new PriorityQueue<>();
+	}
+
+	/**
+	 * Returns a queue of keyframes that defines the death animation of the turret. This method is
+	 * called whenever the turret dies and the death animation needs to be applied to the model parts.
+	 *
+	 * @return {@code Queue<? extends Keyframe>} a queue of keyframes.
+	 */
+	public Queue<? extends Keyframe> getDeathAnimProcedureInstance() {
+		return new PriorityQueue<>();
+	}
+
+	/**
+	 * Defines additional procedures to be executed during the shooting animation. This method is called
+	 * after the shooting animation is applied to the model parts, allowing for any additional
+	 * transformations or effects to be applied to the model during the shooting animation. This can be
+	 * used to add extra visual flair or effects to the turret's shooting animation, such as adding
+	 * particle effects, changing the model's color, or applying additional transformations to the
+	 * model parts to enhance the visual impact of the turret's shooting.<br>
+	 * <br>
+	 * By default, this method does nothing, but it can be overridden in subclasses to implement
+	 * custom behavior during the shooting animation.
+	 *
+	 * @param animState The shooting animation state that is running.
+	 * @param state	 The current state of the turret.
+	 */
+	protected void additionalShootAnimProcedures(AnimationState animState, S state) {
+		long ms = animState.getTimeInMilliseconds(state.age);
+		UUID id = state.id;
+		Queue<? extends Keyframe> procedure = this.getShootAnimProcedure(id);
+		Keyframe keyframe = procedure == null ? null : procedure.peek();
+
+		if (animState.isRunning() && keyframe != null) {
+			if (keyframe.getTimeMS() <= ms) {
+				keyframe.apply(animState, state);
+				procedure.remove();
+			}
+		}
+
+		if (procedure != null && procedure.isEmpty()) {
+			this.setShootAnimProcedure(id, null);
+		}
+	}
+
+	/**
+	 * Defines additional procedures to be executed during the death animation. This method is called
+	 * after the death animation is applied to the model parts, allowing for any additional
+	 * transformations or effects to be applied to the model during the death animation. This can be
+	 * used to add extra visual flair or effects to the turret's death animation, such as adding
+	 * particle effects, changing the model's color, or applying additional transformations to the
+	 * model parts to enhance the visual impact of the turret's death.<br>
+	 * <br>
+	 * By default, this method does nothing, but it can be overridden in subclasses to implement
+	 * custom behavior during the death animation.
+	 *
+	 * @param animState The death animation state that is running.
+	 * @param state	 The current state of the turret.
+	 */
+	protected void additionalDeathAnimProcedures(AnimationState animState, S state) {
+		long ms = animState.getTimeInMilliseconds(state.age);
+		UUID id = state.id;
+		Queue<? extends Keyframe> procedure = this.getDeathAnimProcedure(id);
+		Keyframe keyframe = procedure == null ? null : procedure.peek();
+
+		if (animState.isRunning() && keyframe != null) {
+			if (keyframe.getTimeMS() <= ms) {
+				keyframe.apply(animState, state);
+				procedure.remove();
+			}
+		}
+
+		if (procedure != null && procedure.isEmpty()) {
+			this.setDeathAnimProcedure(id, null);
+		}
+	}
+
+	/**
+	 * Defines the default head pitch the turret uses. This is to render the model
+	 * with their guns in their resting pose. A good example is the {@link AATurretModel} which
+	 * has a 30 degree tilt upward when in rest, allowing the turret to portray the constant state
+	 * of monitoring the air for targets.
+	 *
+	 * @return The default head pitch in degrees. By default, this is 0, meaning the turret will be
+	 * rendered with its gun parallel to the ground when in rest.
+	 *
+	 * @see AATurretModel#getDefaultHeadPitch()
+	 */
+	protected float getDefaultHeadPitch() {
+		return 0;
 	}
 
 	// //////////////// //

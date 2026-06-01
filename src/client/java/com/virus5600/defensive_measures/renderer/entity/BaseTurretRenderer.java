@@ -20,13 +20,14 @@ public abstract class BaseTurretRenderer<
 
 	private final Supplier<S> renderStateFactory;
 	private boolean deathRotEnabled = false;
+	private boolean lookControlOnDeath = false;
 
 	public BaseTurretRenderer(
 		EntityRendererFactory.Context context,
 		M entityModel,
 		Supplier<S> renderStateFactory
 	) {
-		this(context, entityModel, 0.5F, renderStateFactory);;
+		this(context, entityModel, 0.5F, renderStateFactory);
 	}
 
 	public BaseTurretRenderer(
@@ -60,10 +61,28 @@ public abstract class BaseTurretRenderer<
 		turretRenderState.shootAnimationState.copyFrom(turretEntity.getShootAnimationState());
 		turretRenderState.deathAnimationState.copyFrom(turretEntity.getDeathAnimationState());
 
+		turretRenderState.eyePos = turretEntity.getEyePos();
+		turretRenderState.currentBarrelPos = turretEntity.getCurrentBarrel(false);
+
+		turretRenderState.id = turretEntity.getUuid();
 		turretRenderState.turretLvl = turretEntity.getTrackedLevel();
+		turretRenderState.hasTarget = turretEntity.hasTarget();
+		turretRenderState.isLockedButNotAttacking = turretEntity.getTrackedLockedButNotAttacking();
 		turretRenderState.shooting = turretEntity.getTrackedShooting();
 
+		turretRenderState.dead = turretEntity.isDead();
 		turretRenderState.hurt = turretEntity.hurtTime > 0 && turretEntity.isAlive();
+
+		// Death look-control handling
+		if (!this.lookControlOnDeath && !turretEntity.isAlive()) {
+			float idlePitch = turretEntity.getPitch();
+
+			if (turretEntity.getIdlePitch().isPresent()) {
+				idlePitch = turretEntity.getIdlePitch().get();
+			}
+
+			turretRenderState.pitch = idlePitch;
+		}
 	}
 
 	@Override
@@ -86,6 +105,7 @@ public abstract class BaseTurretRenderer<
 
 	// DEATH RELATED //
 
+	// DEATH ROTATION
 	protected void setDeathRotation(boolean deathRotationEnabled) {
 		this.deathRotEnabled = deathRotationEnabled;
 	}
@@ -105,5 +125,23 @@ public abstract class BaseTurretRenderer<
 
 	protected boolean isDeathRotationEnabled() {
 		return this.deathRotEnabled;
+	}
+
+	// LOOK CONTROL
+	protected void enableLookControlOnDeath() {
+		this.lookControlOnDeath = true;
+	}
+
+	protected void disableLookControlOnDeath() {
+		this.lookControlOnDeath = false;
+	}
+
+	protected boolean toggleLookControlOnDeath() {
+		this.lookControlOnDeath = !this.lookControlOnDeath;
+		return this.lookControlOnDeath;
+	}
+
+	protected boolean isLookControlOnDeathEnabled() {
+		return this.lookControlOnDeath;
 	}
 }

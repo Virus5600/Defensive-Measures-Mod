@@ -1,0 +1,22 @@
+{
+	"type": "dm:tas_shaped",
+	"category": "traps",
+	"pattern": [
+		" ccc ",
+		"icqci",
+		" cqc ",
+		"icqci",
+		" cqc ",
+		"icqci",
+		" ccc "
+	],
+	"key": {
+		"c": "minecraft:cobblestone",
+		"q": "minecraft:quartz",
+		"i": "minecraft:copper_ingot"
+	},
+	"result": {
+		"id": "dm:electric_fence",
+		"count": 6
+	}
+}

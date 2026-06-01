@@ -2,12 +2,20 @@ package com.virus5600.defensive_measures;
 
 import com.virus5600.defensive_measures.advancement.criterion.ModCriterion;
 import com.virus5600.defensive_measures.block.ModBlocks;
+import com.virus5600.defensive_measures.command.ModCommands;
 import com.virus5600.defensive_measures.entity.ModEntities;
 import com.virus5600.defensive_measures.entity.damage.ModDamageTypes;
 import com.virus5600.defensive_measures.item.ModItemGroups;
 import com.virus5600.defensive_measures.item.ModItems;
+import com.virus5600.defensive_measures.network.ModPackets;
 import com.virus5600.defensive_measures.particle.ModParticles;
+import com.virus5600.defensive_measures.recipe.ModRecipeDisplays;
+import com.virus5600.defensive_measures.recipe.ModRecipeSerializers;
+import com.virus5600.defensive_measures.recipe.ModRecipeTypes;
+import com.virus5600.defensive_measures.recipe.book.ModRecipeBookCategories;
+import com.virus5600.defensive_measures.screen.ModScreenHandlers;
 import com.virus5600.defensive_measures.sound.ModSoundEvents;
+import com.virus5600.defensive_measures.stat.ModStats;
 import net.fabricmc.api.ModInitializer;
 
 import org.slf4j.Logger;
@@ -19,9 +27,8 @@ import org.slf4j.LoggerFactory;
  * This class holds the Mod ID, name, and Logger instances, along with common initialization processes and
  * utility methods that can be used throughout the mod's development.
  *
- * @since 1.0.0
+ * @since 1.0.0-beta
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
- * @version 1.0.0
  */
 public class DefensiveMeasures implements ModInitializer {
 	/**
@@ -55,6 +62,14 @@ public class DefensiveMeasures implements ModInitializer {
 		ModCriterion.registerModCriterion();
 		ModEntities.registerModEntityAttributes();
 		ModParticles.registerParticles();
+		ModStats.registerStats();
+		ModScreenHandlers.registerScreenHandlers();
+		ModRecipeDisplays.registerModRecipeDisplays();
+		ModRecipeSerializers.registerModRecipeSerializers();
+		ModRecipeTypes.registerModRecipesTypes();
+		ModRecipeBookCategories.registerBookCategories();
+		ModCommands.registerCommands();
+		ModPackets.registerModPackets();
 
 		LOGGER.info("{} MAIN ENTRY POINT INITIALIZED.", MOD_NAME);
 	}

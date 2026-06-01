@@ -5,8 +5,9 @@ import net.fabricmc.fabric.api.registry.FuelRegistryEvents;
 import net.minecraft.block.Block;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.mob.MobEntity;
-import net.minecraft.item.Item;
 import net.minecraft.item.Item.Settings;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemGroups;
 
 import com.virus5600.defensive_measures.DefensiveMeasures;
 import com.virus5600.defensive_measures._helper.RegistryHelper;
@@ -15,9 +16,12 @@ import com.virus5600.defensive_measures.entity.ModEntities;
 import com.virus5600.defensive_measures.item.equipments.TurretRemoverItem;
 import com.virus5600.defensive_measures.item.interfaces.FuelItem;
 import com.virus5600.defensive_measures.item.turrets.TurretItem;
+import com.virus5600.defensive_measures.item.turrets.aa_turret.*;
 import com.virus5600.defensive_measures.item.turrets.ballista.*;
 import com.virus5600.defensive_measures.item.turrets.cannon.*;
+import com.virus5600.defensive_measures.item.turrets.flame_turret.*;
 import com.virus5600.defensive_measures.item.turrets.mg_turret.*;
+import com.virus5600.defensive_measures.item.turrets.missile_turret.*;
 
 import java.util.Arrays;
 import java.util.function.Function;
@@ -29,11 +33,14 @@ import java.util.function.Function;
  * ingredients, etc. This class is also used to register the items to their respective item groups to categorize
  * them in the creative inventory.
  *
- * @since 1.0.0
+ * @since 1.0.0-beta
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
- * @version 1.0.0
  */
 public class ModItems {
+	// VANILLA GROUPS
+	public final static Item[] FUNCTIONAL_ITEMS;
+
+	// MODDED GROUPS
 	public final static Item[] DM_ITEMS;
 	public final static Item[] DM_EQUIPMENTS;
 	public final static Item[] DM_TRAPS;
@@ -53,7 +60,7 @@ public class ModItems {
 
 	// BALLISTA
 	public final static Item BALLISTA_TURRET = registerItem("ballista", ModEntities.BALLISTA_TURRET, BallistaTurretItem::new);
-	public final static Item ARROWHEAD = registerItem(ModBlocks.ARROWHEAD);
+	public final static Item BOLT_HEAD = registerItem(ModBlocks.BOLT_HEAD);
 	public final static Item BALLISTA_BOLT = registerItem("ballista_bolt", BallistaBoltItem::new);
 	public final static Item BALLISTA_BASE = registerItem("ballista_base", BallistaBaseItem::new);
 	public final static Item BALLISTA_BASE_WITH_STAND = registerItem("ballista_base_with_stand", BallistaBaseWithStandItem::new);
@@ -67,12 +74,29 @@ public class ModItems {
 	public final static Item MG_HEAD = registerItem("mg_head", MGHeadItem::new);
 	public final static Item MG_STAND = registerItem("mg_stand", MGStandItem::new);
 
+	// AA TURRET
+	public final static Item AA_TURRET = registerItem("aa_turret", ModEntities.AA_TURRET, AATurretItem::new);
+
+	// FLAME TURRET
+	public final static Item FLAME_TURRET = registerItem("flame_turret", ModEntities.FLAME_TURRET, FlameTurretItem::new);
+
+	// MISSILE TURRET
+	public final static Item MISSILE_TURRET = registerItem("missile_turret", ModEntities.MISSILE_TURRET, MissileTurretItem::new);
+
 	// ////////// //
 	// EQUIPMENTS //
 	// ////////// //
 
 	// TURRET REMOVER
 	public final static Item TURRET_REMOVER = registerToolItem("turret_remover", (settings) -> new TurretRemoverItem(ModToolMaterials.TURRET_REMOVER, 0.0f, 0.0f, settings));
+
+	// ////// //
+	// BLOCKS //
+	// ////// //
+
+	// TURRET ASSEMBLY STATION
+	public final static Item TURRET_ASSEMBLY_STATION = registerItem(ModBlocks.TURRET_ASSEMBLY_STATION);
+	public final static Item ELECTRIC_FENCE = registerItem(ModBlocks.ELECTRIC_FENCE);
 
 	// //////////////////////// //
 	// REGISTRY RELATED METHODS //
@@ -134,6 +158,12 @@ public class ModItems {
 	public static void registerModItems() {
 		DefensiveMeasures.LOGGER.info("REGISTERING ITEMS TO ITEM GROUPS...");
 
+		Arrays.stream(FUNCTIONAL_ITEMS).iterator().forEachRemaining(
+			(item) -> ItemGroupEvents.modifyEntriesEvent(ItemGroups.FUNCTIONAL).register(
+				(content) -> content.add(item)
+			)
+		);
+
 		Arrays.stream(DM_ITEMS).iterator().forEachRemaining(
 			(item) -> ItemGroupEvents.modifyEntriesEvent(ModItemGroups.DMI_KEY).register(
 				(content) -> content.add(item)
@@ -176,6 +206,10 @@ public class ModItems {
 	}
 
 	static {
+		FUNCTIONAL_ITEMS = new Item[] {
+			TURRET_ASSEMBLY_STATION
+		};
+
 		DM_ITEMS = new Item[] {
 			// CANNON
 			CANNON_BASE,
@@ -202,13 +236,20 @@ public class ModItems {
 		};
 
 		DM_TRAPS = new Item[] {
-			ARROWHEAD
+			BOLT_HEAD,
+			ELECTRIC_FENCE,
 		};
 
 		DM_TURRETS = new Item[] {
+			// TIER 1
 			CANNON_TURRET,
 			BALLISTA_TURRET,
-			MG_TURRET
+			MG_TURRET,
+
+			// TIER 2
+			AA_TURRET,
+			FLAME_TURRET,
+			MISSILE_TURRET
 		};
 
 		FUEL_ITEMS = new Item[] {

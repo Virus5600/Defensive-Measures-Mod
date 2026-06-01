@@ -1,0 +1,40 @@
+﻿{
+	"parent": "minecraft:recipes/root",
+	"criteria": {
+		"has_ingredients": {
+			"trigger": "minecraft:inventory_changed",
+			"conditions": {
+				"items": [
+					{
+						"items": [
+							"dm:cannon_stand",
+							"dm:cannon_head",
+							"minecraft:smooth_stone_slab"
+						]
+					}
+				]
+			}
+		},
+		"has_wooden_slabs": {
+			"trigger": "minecraft:inventory_changed",
+			"conditions": {
+				"items": [
+					{
+						"items": "#minecraft:wooden_slabs"
+					}
+				]
+			}
+		}
+	},
+	"requirements": [
+		[
+			"has_wooden_slabs",
+			"has_ingredients"
+		]
+	],
+	"rewards": {
+		"recipes": [
+			"dm:cannon_turret/cannon_turret_shortcut"
+		]
+	}
+}

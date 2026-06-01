@@ -8,11 +8,14 @@ import net.minecraft.client.render.entity.EntityRendererFactory;
 import net.minecraft.client.render.state.CameraRenderState;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.RotationAxis;
 
+import com.virus5600.defensive_measures.entity.projectiles.ExplosiveProjectileEntity;
 import com.virus5600.defensive_measures.entity.projectiles.TurretProjectileEntity;
 import com.virus5600.defensive_measures.model.projectiles.BaseProjectileModel;
 import com.virus5600.defensive_measures.renderer.projectiles.state.BaseProjectileRenderState;
-import net.minecraft.util.math.RotationAxis;
+
+import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Supplier;
 
@@ -53,6 +56,10 @@ public abstract class BaseProjectileRenderer<
 
 		state.pitch = entity.getLerpedPitch(tickProgress);
 		state.yaw = entity.getLerpedYaw(tickProgress);
+
+		state.pitch *= entity instanceof ExplosiveProjectileEntity ? -1 : 1;
+		state.yaw *= entity instanceof ExplosiveProjectileEntity ? -1 : 1;
+		state.yaw += entity instanceof ExplosiveProjectileEntity ? 180 : 0;
 	}
 
 	@Override
@@ -60,18 +67,21 @@ public abstract class BaseProjectileRenderer<
 		stack.push();
 
 		if (this.shouldLookAtDir()) {
-			stack.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(state.yaw - 180F));
 			stack.multiply(RotationAxis.POSITIVE_X.rotationDegrees(state.pitch));
+			stack.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(state.yaw - 180F));
 		}
 
-		queue.submitModel(
-			this.getModel(), state, stack,
-			RenderLayers.entityCutout(this.getTexture(state)),
-			state.light,
-			OverlayTexture.DEFAULT_UV,
-			state.outlineColor,
-			null
-		);
+		Identifier textureId = this.getTexture(state);
+		if (textureId != null) {
+			queue.submitModel(
+				this.getModel(), state, stack,
+				RenderLayers.entityCutout(textureId),
+				state.light,
+				OverlayTexture.DEFAULT_UV,
+				state.outlineColor,
+				null
+			);
+		}
 
 		stack.pop();
 		super.render(state, stack, queue, camState);
@@ -109,6 +119,7 @@ public abstract class BaseProjectileRenderer<
 		this.lookAtDirection = shouldLookAtDir;
 	}
 
+	@Nullable
 	public Identifier getTexture(S state) {
 		return this.getModel().getBaseTexture();
 	}

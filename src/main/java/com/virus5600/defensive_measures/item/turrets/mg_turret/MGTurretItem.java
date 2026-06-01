@@ -9,8 +9,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Rarity;
 
-import com.virus5600.defensive_measures.entity.turrets.CannonTurretEntity;
-import com.virus5600.defensive_measures.entity.turrets.MGTurretEntity;
+import com.virus5600.defensive_measures.entity.turrets.tier1.MGTurretEntity;
 import com.virus5600.defensive_measures.entity.turrets.TurretEntity;
 import com.virus5600.defensive_measures.item.turrets.TurretItem;
 
@@ -18,19 +17,18 @@ import java.lang.reflect.Type;
 import java.util.function.Consumer;
 
 /**
- * The item that spawns the {@link CannonTurretEntity Cannon Turret}.
+ * The item that spawns the {@link MGTurretEntity MG Turret}.
  *
- * @since 1.0.0
+ * @since 1.0.0-beta
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
- * @version 1.0.0
  */
 public class MGTurretItem extends TurretItem {
 	public MGTurretItem(EntityType<? extends MobEntity> type, net.minecraft.item.Item.Settings settings) {
 		super(
 			type,
 			settings
-				.maxCount(16)			// MAX STACK SIZE
-				.rarity(Rarity.RARE)	// RARITY
+				.maxCount(16)
+				.rarity(Rarity.UNCOMMON)
 		);
 	}
 
@@ -41,7 +39,7 @@ public class MGTurretItem extends TurretItem {
 		for (int i = 1; i <= 3; i++) {
 			textConsumer.accept(
 				Text.translatable("itemTooltip.dm.mg_turret.line" + i)
-					.formatted(Formatting.DARK_AQUA)
+					.formatted(Formatting.GRAY)
 			);
 		}
 	}

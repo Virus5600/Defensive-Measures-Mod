@@ -1,6 +1,9 @@
 package com.virus5600.defensive_measures.particle.custom.emitters;
 
+import com.virus5600.defensive_measures.entity.projectiles.FlakProjectileEntity;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.particle.NoRenderParticle;
+import net.minecraft.client.particle.ParticleManager;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
 import net.minecraft.particle.ParticleEffect;
@@ -20,12 +23,10 @@ import java.util.function.Function;
  *
  * @see net.minecraft.client.particle.NoRenderParticle NoRenderParticle
  *
- * @since 1.0.0
+ * @since 1.0.0-beta
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
- * @version 1.0.0
  */
 public class CustomEmitter extends NoRenderParticle {
-	// PRIVATE FIELDS
 	/**
 	 * The particle that will be emitted by the emitter.
 	 */
@@ -34,6 +35,11 @@ public class CustomEmitter extends NoRenderParticle {
 	 * The entity that is the source of the particle.
 	 */
 	private final Entity entity;
+	/**
+	 * Defines the particle manager used for this emitter.
+	 */
+	protected final ParticleManager particleManager;
+
 	/**
 	 * The vector position of the source of the particle. This could be a
 	 * static position or the position of the source entity.
@@ -45,8 +51,6 @@ public class CustomEmitter extends NoRenderParticle {
 	 * the Vec3d constructor.
 	 */
 	private boolean isEntitySource = true;
-
-	// PROTECTED FIELDS
 	/**
 	 * Determines whether to update the {@link #posSource} field.
 	 * When set to {@code true}, the {@link #posSource} field will be updated
@@ -59,6 +63,16 @@ public class CustomEmitter extends NoRenderParticle {
 	 * will be set to the eye position of the entity.
 	 */
 	protected boolean useEyePos = false;
+	/**
+	 * Determines whether to force render the particle or not. When set to {@code true}, the particle
+	 * will be rendered even when it's far away from the player and will not respect the players'
+	 * particle settings. This is useful for particles that are important to be seen by the player,
+	 * such as the explosion particles of the {@link FlakProjectileEntity}, which are important for
+	 * the player to see when the projectile explodes.
+	 * <br><br>
+	 * By default, this is set to {@code false}.
+	 */
+	protected boolean forceShow = false;
 	/**
 	 * Defines a custom emitter code that will be executed.
 	 * Useful for overriding the {@link #tick()} method's emitter
@@ -75,7 +89,7 @@ public class CustomEmitter extends NoRenderParticle {
 	 */
 	protected Function<ParticleEffect, Void> customEmitterCode;
 
-	/// CONSTRUCTORS - VEC3D ///
+	// CONSTRUCTORS - VEC3D //
 
 	/**
 	 * Creates a new custom emitter particle with default values.
@@ -132,9 +146,11 @@ public class CustomEmitter extends NoRenderParticle {
 		this.entity = null;
 		this.posSource = new Vec3d(x, y, z);
 		this.isEntitySource = false;
+
+		this.particleManager = MinecraftClient.getInstance().particleManager;
 	}
 
-	/// CONSTRUCTORS - ENTITY ///
+	// CONSTRUCTORS - ENTITY //
 
 	/**
 	 * Creates a new custom emitter particle with default values.
@@ -184,9 +200,11 @@ public class CustomEmitter extends NoRenderParticle {
 		this.particle = particle;
 		this.posSource = entity.getTrackedPosition().getPos();
 		this.entity = entity;
+
+		this.particleManager = MinecraftClient.getInstance().particleManager;
 	}
 
-	/// METHODS ///
+	// METHODS //
 
 	/**
 	 * {@inheritDoc}
@@ -228,6 +246,7 @@ public class CustomEmitter extends NoRenderParticle {
 					double zPos = this.entity.getBodyZ(zVel / 4.0);
 					this.world.addParticleClient(
 						this.particle,
+						this.forceShow, this.forceShow,
 						xPos, yPos, zPos,
 						xVel, yVel + 0.2, zVel
 					);
@@ -247,5 +266,38 @@ public class CustomEmitter extends NoRenderParticle {
 	 */
 	protected Vec3d getPosSource() {
 		return this.posSource;
+	}
+
+	// PROTECTED
+	protected void explodeBall(ParticleEffect particle, double size, int amount, double variance) {
+		size += this.random.nextGaussian() * variance;
+
+		for (int i = -amount; i <= amount; ++i) {
+			for (int j = -amount; j <= amount; ++j) {
+				for (int k = -amount; k <= amount; ++k) {
+					double g = (double) j + (this.random.nextDouble() - this.random.nextDouble()) * (double) 0.5F;
+					double h = (double) i + (this.random.nextDouble() - this.random.nextDouble()) * (double) 0.5F;
+					double l = (double) k + (this.random.nextDouble() - this.random.nextDouble()) * (double) 0.5F;
+					double m = Math.sqrt(g * g + h * h + l * l) / size + this.random.nextGaussian() * 0.05;
+
+//					this.particleManager.addParticle(
+//						particle,
+//						this.x, this.y, this.z,
+//						g / m, h / m, l / m
+//					);
+
+					this.world.addParticleClient(
+						particle,
+						this.forceShow, this.forceShow,
+						this.x, this.y, this.z,
+						g / m, h / m, l / m
+					);
+
+					if (i != -amount && i != amount && j != -amount && j != amount) {
+						k += amount * 2 - 1;
+					}
+				}
+			}
+		}
 	}
 }

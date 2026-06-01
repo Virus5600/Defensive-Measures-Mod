@@ -1,0 +1,28 @@
+﻿{
+	"parent": "minecraft:recipes/root",
+	"criteria": {
+		"has_ingredients": {
+			"trigger": "minecraft:inventory_changed",
+			"conditions": {
+				"items": [
+					{
+						"items": [
+							"dm:unfinished_cannon_head",
+							"minecraft:string"
+						]
+					}
+				]
+			}
+		}
+	},
+	"requirements": [
+		[
+			"has_ingredients"
+		]
+	],
+	"rewards": {
+		"recipes": [
+			"dm:cannon_turret/cannon_head"
+		]
+	}
+}

@@ -1,0 +1,29 @@
+﻿{
+	"parent": "minecraft:recipes/root",
+	"criteria": {
+		"has_ingredients": {
+			"trigger": "minecraft:inventory_changed",
+			"conditions": {
+				"items": [
+					{
+						"items": [
+							"dm:ballista_base_with_stand",
+							"dm:ballista_bolt",
+							"dm:ballista_bow"
+						]
+					}
+				]
+			}
+		}
+	},
+	"requirements": [
+		[
+			"has_ingredients"
+		]
+	],
+	"rewards": {
+		"recipes": [
+			"dm:ballista/ballista"
+		]
+	}
+}

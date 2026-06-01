@@ -19,7 +19,10 @@
 		"minecraft:quartz_block",
 		"minecraft:smooth_quartz",
 		"minecraft:purpur_block",
-		"minecraft:magma_block"
+		"minecraft:magma_block",
+
+		"dm:bolt_head",
+		"dm:electric_fence"
 	]
 }
 

@@ -1,0 +1,33 @@
+package com.virus5600.defensive_measures.recipebook;
+
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import net.minecraft.recipe.book.RecipeBookCategory;
+import net.minecraft.recipe.book.RecipeBookGroup;
+
+import com.virus5600.defensive_measures.recipe.book.ModRecipeBookCategories;
+
+import java.util.List;
+
+@Environment(EnvType.CLIENT)
+public enum ModRecipeBookType implements RecipeBookGroup {
+	TURRET_ASSEMBLY_STATION(
+		ModRecipeBookCategories.TAS_TURRETS,
+		ModRecipeBookCategories.TAS_PARTS,
+		ModRecipeBookCategories.TAS_TRAPS,
+		ModRecipeBookCategories.TAS_DEFENSE,
+		ModRecipeBookCategories.TAS_EQUIPMENTS,
+		ModRecipeBookCategories.TAS_MISC
+	)
+	;
+
+	private final List<RecipeBookCategory> categories;
+
+	ModRecipeBookType(final RecipeBookCategory... categories) {
+		this.categories =  List.of(categories);
+	}
+
+	public List<RecipeBookCategory> getCategories() {
+		return this.categories;
+	}
+}

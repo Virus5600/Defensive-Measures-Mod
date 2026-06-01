@@ -1,19 +1,28 @@
 package com.virus5600.defensive_measures.entity.projectiles;
 
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.entity.damage.DamageType;
+import net.minecraft.entity.damage.DamageTypes;
 import net.minecraft.entity.data.DataTracker.Builder;
-import net.minecraft.entity.EntityType;
 import net.minecraft.entity.projectile.ProjectileUtil;
 import net.minecraft.network.listener.ClientPlayPacketListener;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket;
+import net.minecraft.particle.BlockParticleEffect;
 import net.minecraft.particle.ParticleEffect;
+import net.minecraft.particle.ParticleTypes;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.server.network.EntityTrackerEntry;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.sound.SoundEvent;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.storage.ReadView;
 import net.minecraft.storage.WriteView;
+import net.minecraft.util.collection.Pool;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
@@ -21,8 +30,9 @@ import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
-
 import net.minecraft.world.explosion.ExplosionBehavior;
+
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -57,14 +67,17 @@ import java.util.List;
  *
  * @see TurretProjectileEntity
  * @see KineticProjectileEntity
+ * @see AreaCloudEntity
  *
  * @see #doDamage()
  *
+ * @since 1.0.0-beta
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
- * @since 1.0.0
  */
 public abstract class ExplosiveProjectileEntity extends TurretProjectileEntity {
-	protected ParticleEffect particleTrail;
+	protected static final Pool<BlockParticleEffect> EXPLOSION_BLOCK_PARTICLES;
+	protected static final Pool<BlockParticleEffect> EMPTY_EXPLOSION_BLOCK_PARTICLES;
+
 	public double accelerationPower = 0.1;
 
 	// //////////// //
@@ -72,27 +85,10 @@ public abstract class ExplosiveProjectileEntity extends TurretProjectileEntity {
 	// //////////// //
 	protected ExplosiveProjectileEntity(EntityType<? extends TurretProjectileEntity> entityType, World world) {
 		super(entityType, world);
+
 		this.setDamage(5);
 		this.setPierceLevel(this.getMaxPierceLevel());
 		this.setSpeedAffectsDamage(false);
-	}
-
-	protected ExplosiveProjectileEntity(EntityType<? extends ExplosiveProjectileEntity> type, double x, double y, double z, World world) {
-		this(type, world);
-		this.setPosition(x, y, z);
-	}
-
-	public ExplosiveProjectileEntity(EntityType<? extends ExplosiveProjectileEntity> type, double x, double y, double z, Vec3d velocity, World world) {
-		this(type, world);
-		this.refreshPositionAndAngles(x, y, z, this.getYaw(), this.getPitch());
-		this.refreshPosition();
-		this.setVelocityWithAcceleration(velocity, this.accelerationPower);
-	}
-
-	public ExplosiveProjectileEntity(EntityType<? extends ExplosiveProjectileEntity> type, LivingEntity owner, Vec3d velocity, World world) {
-		this(type, owner.getX(), owner.getY(), owner.getZ(), velocity, world);
-		this.setOwner(owner);
-		this.setRotation(owner.getYaw(), owner.getPitch());
 	}
 
 	// //////////// //
@@ -168,7 +164,8 @@ public abstract class ExplosiveProjectileEntity extends TurretProjectileEntity {
 	 */
 	public void doDamage() {
 		// Create the damage source
-		DamageSource dmgSrc = this.getDamageSources().explosion(
+		DamageSource dmgSrc = this.getDamageSources().create(
+			this.getDamageType(),
 			this,
 			this.getOwner() == null ? this : this.getOwner()
 		);
@@ -184,7 +181,11 @@ public abstract class ExplosiveProjectileEntity extends TurretProjectileEntity {
 				this.getZ(),
 				1.25F,
 				false,
-				World.ExplosionSourceType.NONE
+				World.ExplosionSourceType.NONE,
+				this.getSmallExplosionParticleType(),
+				this.getLargeExplosionParticleType(),
+				EMPTY_EXPLOSION_BLOCK_PARTICLES,
+				this.getExplosionSoundEvent()
 			);
 
 		// Damaging entities within a radius.
@@ -203,6 +204,7 @@ public abstract class ExplosiveProjectileEntity extends TurretProjectileEntity {
 			this.getZ() + effectiveRadius
 		);
 
+		// Entities receives full damage
 		List<LivingEntity> damagedEntities = new ArrayList<>();
 		this.getEntityWorld()
 			.getOtherEntities(this, fullDmgReceiver)
@@ -237,7 +239,9 @@ public abstract class ExplosiveProjectileEntity extends TurretProjectileEntity {
 				.forEach(entity -> {
 					if (entity instanceof LivingEntity && !damagedEntities.contains(entity)) {
 						float normalizedRadius = (float) ((radius - effectiveRadius) / (maxDmgRadius - effectiveRadius));
-						float formula = (float) (Math.exp(-dmgReduction * normalizedRadius) - Math.exp(-dmgReduction) / (1 - Math.exp(-dmgReduction)));
+						float numerator = (float) (Math.exp(-dmgReduction * normalizedRadius) - Math.exp(-dmgReduction));
+						float denominator = (float) (1 - Math.exp(-dmgReduction));
+						float formula = numerator / denominator;
 						float dmg = (float) (baseDmg * formula);
 
 						entity.damage(
@@ -281,23 +285,43 @@ public abstract class ExplosiveProjectileEntity extends TurretProjectileEntity {
 	/**
 	 * Adds particles to the projectile. It uses the provided position
 	 * as the position of where the particle will appear. If the
-	 * {@link #getParticleType() particle type} is {@code null},
+	 * {@link #getTrailParticleType() particle type} is {@code null},
 	 * this method will not add any particles.
 	 *
 	 * @param pos The position of the particle.
 	 */
 	protected void addParticles(Vec3d pos) {
-		this.addParticles(pos, this.getParticleType());
+		if (this.getTrailParticleType() != null) {
+			this.addParticles(pos, this.getTrailParticleType());
+		}
 	}
 
 	/**
 	 * Adds particles to the projectile. It uses the current position
 	 * of the projectile as the position of the particle. If the
-	 * {@link #getParticleType() particle type} is {@code null},
+	 * {@link #getTrailParticleType() particle type} is {@code null},
 	 * this method will not add any particles.
 	 */
 	protected void addParticles() {
 		this.addParticles(this.getTrackedPosition().getPos());
+	}
+
+	protected void move() {
+		this.applyDrag();
+
+		HitResult hitResult = ProjectileUtil.getCollision(this, this::canHit, this.getRaycastShapeType());
+
+		Vec3d pos = this.getEntityPos();
+		if (hitResult.getType() != HitResult.Type.MISS) {
+			pos = hitResult.getPos();
+		} else {
+			pos = pos.add(this.getVelocity());
+		}
+
+		ProjectileUtil.setRotationFromVelocity(this, 0.2F);
+		this.setPosition(pos);
+		this.tickBlockCollision();
+		this.applyGravity();
 	}
 
 	@Override
@@ -305,42 +329,41 @@ public abstract class ExplosiveProjectileEntity extends TurretProjectileEntity {
 		Entity owner = this.getOwner();
 		Vec3d pos = this.getEntityPos();
 
-		this.applyDrag();
-
 		int[] xz = new int[] {
 			this.getChunkPos().x,
 			this.getChunkPos().z
 		};
 
-		if (this.getEntityWorld().isClient()
-			|| (owner == null || !owner.isRemoved())
+		if ((owner == null || !owner.isRemoved())
 			&& this.getEntityWorld().getChunkManager().isChunkLoaded(xz[0], xz[1])
 		) {
-			HitResult hitResult = ProjectileUtil.getCollision(this, this::canHit, this.getRaycastShapeType());
-			Vec3d vec3d = pos;
-			if (hitResult.getType() != HitResult.Type.MISS) {
-				vec3d = hitResult.getPos();
-			} else {
-				vec3d = vec3d.add(this.getVelocity());
-			}
-
-			ProjectileUtil.setRotationFromVelocity(this, 0.2F);
-			this.setPosition(vec3d);
-			this.tickBlockCollision();
-			this.applyGravity();
+			this.move();
 			super.tick();
-			if (this.isBurning()) {
-				this.setOnFireFor(1.0F);
-			}
 
-			if (hitResult.getType() != HitResult.Type.MISS && this.isAlive()) {
-				this.hitOrDeflect(hitResult);
+			if (this.getEntityWorld().isClient()) {
+				// Trail Particle
+				this.addParticles(pos.add(0, 0.25, 0));
 			}
+			else {
+				HitResult hitResult;
 
-			this.addParticles(pos.add(0, 0.25, 0));
+				if (this.getVelocity().lengthSquared() > 1.0E-7) {
+					hitResult = ProjectileUtil.getCollision(this, this::canHit, this.getRaycastShapeType());
+				}
+				else {
+					hitResult = this.getZeroVelocityCollision();
+				}
+
+				if (this.isBurning()) {
+					this.setOnFireFor(1.0F);
+				}
+
+				if (hitResult.getType() != HitResult.Type.MISS && this.isAlive()) {
+					this.hitOrDeflect(hitResult);
+				}
+			}
 		}
 		else {
-//			System.out.println("Projectile is removed.");
 			this.discard();
 		}
 	}
@@ -366,9 +389,49 @@ public abstract class ExplosiveProjectileEntity extends TurretProjectileEntity {
 		return RaycastContext.ShapeType.COLLIDER;
 	}
 
+	/**
+	 * Defines the trailing particle this projectile will use. By default, this method returns {@code null},
+	 * which means this projectile won't leave a trailing particle in its wake.
+	 *
+	 * @return The particle effect to use for the projectile's trail, or {@code null} if no trail should be rendered.
+	 */
 	@Nullable
-	protected ParticleEffect getParticleType() {
-		return this.particleTrail;
+	protected ParticleEffect getTrailParticleType() {
+		return null;
+	}
+
+	/**
+	 * Defines the particle effect to use for the small explosion when the projectile hits a blockor
+	 * an entity. By default, this method returns {@link ParticleTypes#EXPLOSION}, which is also the
+	 * default explosion particle used by vanilla explosions.
+	 *
+	 * @return The particle effect to use for the small explosion. This method should not return {@code null} as the small explosion particle is essential for the explosion effect.
+	 */
+	@NotNull
+	protected ParticleEffect getSmallExplosionParticleType() {
+		return ParticleTypes.EXPLOSION;
+	}
+
+	/**
+	 * Defines the particle effect to use for the large explosion when the projectile hits a block or
+	 * an entity. By default, this method returns {@link ParticleTypes#EXPLOSION_EMITTER}, which is
+	 * also the default large explosion particle used by vanilla explosions.
+	 *
+	 * @return The particle effect to use for the large explosion. This method should not return {@code null} as the large explosion particle is essential for the explosion effect.
+	 */
+	@NotNull
+	protected ParticleEffect getLargeExplosionParticleType() {
+		return ParticleTypes.EXPLOSION_EMITTER;
+	}
+
+	/**
+	 * Defines the sound event to play when this projectile explodes.
+	 *
+	 * @return {@link SoundEvents#ENTITY_GENERIC_EXPLODE}
+	 */
+	@NotNull
+	protected RegistryEntry<SoundEvent> getExplosionSoundEvent() {
+		return SoundEvents.ENTITY_GENERIC_EXPLODE;
 	}
 
 	@Override
@@ -388,6 +451,11 @@ public abstract class ExplosiveProjectileEntity extends TurretProjectileEntity {
 	@Override
 	protected boolean canHit(Entity entity) {
 		return super.canHit(entity) && !entity.noClip;
+	}
+
+	@Override
+	public RegistryKey<DamageType> getDamageType() {
+		return DamageTypes.PLAYER_EXPLOSION;
 	}
 
 	/**
@@ -525,5 +593,18 @@ public abstract class ExplosiveProjectileEntity extends TurretProjectileEntity {
 	@Override
 	public boolean armorAffectsDamage() {
 		return false;
+	}
+
+	// ///////////////////// //
+	// STATIC INITIALIZATION //
+	// ///////////////////// //
+	static {
+		EXPLOSION_BLOCK_PARTICLES = Pool.<BlockParticleEffect>builder()
+			.add(new BlockParticleEffect(ParticleTypes.POOF, 0.5F, 1.0F))
+			.add(new BlockParticleEffect(ParticleTypes.SMOKE, 1.0F, 1.0F))
+			.build();
+
+		EMPTY_EXPLOSION_BLOCK_PARTICLES = Pool.<BlockParticleEffect>builder()
+			.build();
 	}
 }

@@ -1,0 +1,6 @@
+{
+	"message_id": "electricity",
+	"exhaustion": 0.25,
+	"scaling": "never",
+	"effects": "burning"
+}

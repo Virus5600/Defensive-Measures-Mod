@@ -4,7 +4,10 @@
 	"itemGroup.dm.defensive_measures.traps" : "Defensive Measures Traps",
 	"itemGroup.dm.defensive_measures.turrets" : "Defensive Measures Turrets",
 
-	"block.dm.arrowhead" : "Arrowhead",
+	"block.dm.bolt_head" : "Bolt Head",
+	"block.dm.electric_fence" : "Electric Fence",
+
+	"block.dm.turret_assembly_station": "Turret Assembly Station",
 
 	"item.dm.turret_remover": "Turret Remover",
 
@@ -27,19 +30,35 @@
 	"item.dm.mg_stand" : "MG Stand",
 	"item.dm.mg_turret" : "Place MG Turret",
 
+	"item.dm.aa_turret": "Place Anti-Air (AA) Turret",
+	"item.dm.flame_turret": "Place Flame Turret",
+	"item.dm.missile_turret": "Place Missile Turret",
+
 	"itemTooltip.dm.generic.health" : "Health: %s / %s",
 
 	"itemTooltip.dm.cannon_turret.line1" : "Range: 3-24 blocks",
-	"itemTooltip.dm.cannon_turret.line2" : "Firing Arc: X: ±360° | Y: ±30°",
+	"itemTooltip.dm.cannon_turret.line2" : "Firing Arc: X: ±360° | Y: -20° to 22.5°",
 	"itemTooltip.dm.cannon_turret.line3" : "Reload Time: 5 seconds",
 
 	"itemTooltip.dm.ballista.line1" : "Range: 16 blocks",
-	"itemTooltip.dm.ballista.line2" : "Firing Arc: X: ±360° | Y: ±25°",
+	"itemTooltip.dm.ballista.line2" : "Firing Arc: X: ±360° | Y: ±20°",
 	"itemTooltip.dm.ballista.line3" : "Reload Time: 2.5 seconds",
 
 	"itemTooltip.dm.mg_turret.line1" : "Range: 20 blocks",
-	"itemTooltip.dm.mg_turret.line2" : "Firing Arc: X: ±360° | Y: ±27.5°",
+	"itemTooltip.dm.mg_turret.line2" : "Firing Arc: X: ±360° | Y: -27.5° to +90°",
 	"itemTooltip.dm.mg_turret.line3" : "Reload Time: 0.15 seconds (burst) | 3.75 seconds (cooldown)",
+
+	"itemTooltip.dm.aa_turret.line1" : "Range: 8-96 blocks",
+	"itemTooltip.dm.aa_turret.line2" : "Firing Arc: X: ±360° | Y: 0° to +90°",
+	"itemTooltip.dm.aa_turret.line3" : "Reload Time: 10 seconds",
+
+	"itemTooltip.dm.flame_turret.line1" : "Range: 2-10 blocks",
+	"itemTooltip.dm.flame_turret.line2" : "Firing Arc: X: ±360° | Y: -30° to +22.5°",
+	"itemTooltip.dm.flame_turret.line3" : "Reload Time: 1 second",
+
+	"itemTooltip.dm.missile_turret.line1" : "Range: 64 blocks",
+	"itemTooltip.dm.missile_turret.line2" : "Firing Arc: X: ±360° | Y: ±12°",
+	"itemTooltip.dm.missile_turret.line3" : "Reload Time: 0.34 seconds (burst) | 5 seconds (cooldown)",
 
 	"entity.dm.cannon_turret" : "Cannon Turret",
 	"entity.dm.cannonball" : "Cannon ball",
@@ -50,8 +69,26 @@
 	"entity.dm.mg_turret" : "MG Turret",
 	"entity.dm.mg_bullet" : "MG Bullet",
 
-	"death.attack.arrowhead" : "%1$s got poked to death with a sticking arrowhead on a ground",
-	"death.attack.arrowhead.player" : "%1$s stepped on a random Arrowhead whilst fighting with %2$s",
+	"entity.dm.aa_turret": "Anti-Air Turret",
+	"entity.dm.flak_projectile": "Flak Projectile",
+
+	"entity.dm.flame_turret": "Flame Turret",
+	"entity.dm.flammable_aerosol": "Flammable Aerosol",
+
+	"entity.dm.missile_turret": "Missile Turret",
+	"entity.dm.micro_missile": "Micro Missile",
+
+	"death.attack.bolt_head" : "%1$s got poked to death with a sticking bolt head on a ground",
+	"death.attack.bolt_head.player" : "%1$s stepped on a random bolt head whilst fighting with %2$s",
+
+	"death.attack.electricity": "%1$s learned that quartz conducts electricity the hard way.",
+	"death.attack.electricity.player": "%1$s was piezoelectrically persuaded to let go by %2$s",
+
+	"death.attack.secondary_explosion": "%1$1 died from a secondary explosion.",
+	"death.attack.secondary_explosion.player": "%1$s died standing near %2$s.",
+
+	"death.attack.thrown_flame": "%1$s got cooked by %2$s.",
+	"death.attack.thrown_flame.player": "%1$s got turned to ashes thanks %2$s.",
 
 	"subtitles.turret.remove.metal" : "Metallic Turret Removed",
 	"subtitles.turret.remove.wood" : "Wooden Turret Removed",
@@ -68,6 +105,10 @@
 	"subtitles.generic.impact.bullet.stone" : "Bullet impacted on stone",
 	"subtitles.generic.impact.bullet.wood" : "Bullet impacted on wood",
 
+	"subtitles.generic.rocket.engine.loop": "Rocket Engine firing",
+	"subtitles.generic.rocket.explode": "Rocket explodes",
+	"subtitles.generic.missile.explode": "Missile explodes",
+
 	"subtitles.turret.hurt.metal" : "Metal turret damaged",
 	"subtitles.turret.hurt.wood" : "Wooden turret damaged",
 
@@ -81,13 +122,48 @@
 	"subtitles.turret.mg_turret.destroyed" : "MG Turret destroyed",
 	"subtitles.turret.mg_turret.shoot" : "MG Turret shoots",
 
-	"subtitles.turret.anti_air.hurt" : "Anti-air Turret damaged",
-	"subtitles.turret.anti_air.destroyed" : "Anti-air Turret destroyed",
-	"subtitles.turret.anti_air.shoot.begin" : "Anti-air Turret begins shooting",
-	"subtitles.turret.anti_air.shoot" : "Anti-air Turret shoots",
-	"subtitles.turret.anti_air.shoot.end" : "Anti-air Turret finished shooting",
+	"subtitles.turret.aa_turret.hurt" : "Anti-Air Turret damaged",
+	"subtitles.turret.aa_turret.destroyed" : "Anti-Air Turret destroyed",
+	"subtitles.turret.aa_turret.shoot" : "Anti-Air Turret shoots",
+	"subtitles.turret.flame_turret.hurt" : "Flame Turret damaged",
+	"subtitles.turret.flame_turret.destroyed" : "Flame Turret destroyed",
+	"subtitles.turret.flame_turret.shoot.start" : "Flame Turret charging up",
+	"subtitles.turret.flame_turret.shoot.loop" : "Flame Turret shoots",
+	"subtitles.turret.flame_turret.shoot.end" : "Flame Turret disengaging",
+	"subtitles.turret.missile_turret.hurt" : "Missile Turret damaged",
+	"subtitles.turret.missile_turret.destroyed" : "Missile Turret destroyed",
+	"subtitles.turret.missile_turret.shoot" : "Missile Turret shoots",
 
-	"tag.item.dm.turret_remover_repairable" : "Turret Remover Repairable",
+	"tag.item.dm.tier_1_turrets" : "Tier 1 Turrets",
+	"tag.item.dm.tier_2_turrets" : "Tier 2 Turrets",
+	"tag.item.dm.turrets" : "Turrets",
 	"tag.item.dm.turret_removers" : "Turret Removers",
-	"tag.item.dm.turrets" : "Turrets"
+	"tag.item.dm.turret_remover_repairable" : "Turret Remover Repairable",
+
+	"tag.entity.dm.flying_hostiles" : "Flying Hostiles",
+	"tag.entity.dm.projectiles" : "Defensive Measures Projectiles",
+	"tag.entity.dm.tier_1_turrets" : "Tier 1 Turrets",
+	"tag.entity.dm.tier_2_turrets" : "Tier 2 Turrets",
+	"tag.entity.dm.turrets" : "Turrets",
+
+	"tag.block.dm.dirt" : "Soil/Earth Blocks",
+	"tag.block.dm.glass" : "Vitreous Blocks",
+	"tag.block.dm.grainy" : "Grainy Blocks",
+	"tag.block.dm.greenery" : "Shrub/Fauna Blocks",
+	"tag.block.dm.metal" : "Metallic Blocks",
+	"tag.block.dm.stone" : "Stone Blocks",
+	"tag.block.dm.traps" : "Trap Blocks",
+	"tag.block.dm.wood" : "Wooden Blocks",
+	"tag.block.dm.electric_fence" : "Electric Fence",
+
+	"container.dm.turret_assembly_station": "Assembling",
+
+	"stat.dm.interact_with_turret_assembly_station": "Interactions with Turret Assembly Station",
+
+	"commands.getpose.not_living_entity": "Target is not a living entity",
+	"commands.getpose.success": "%s pose: %s",
+
+	"commands.setpose.not_living_entity": "Target is not a living entity",
+	"commands.setpose.failed": "Could not set pose of %s to %s",
+	"commands.setpose.success": "Changed %s pose to %s"
 }

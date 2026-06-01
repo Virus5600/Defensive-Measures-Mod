@@ -1,0 +1,28 @@
+﻿{
+	"parent": "minecraft:recipes/root",
+	"criteria": {
+		"has_ingredients": {
+			"trigger": "minecraft:inventory_changed",
+			"conditions": {
+				"items": [
+					{
+						"items": [
+							"minecraft:heavy_weighted_pressure_plate",
+							"minecraft:nether_brick"
+						]
+					}
+				]
+			}
+		}
+	},
+	"requirements": [
+		[
+			"has_ingredients"
+		]
+	],
+	"rewards": {
+		"recipes": [
+			"dm:mg_turret/mg_base"
+		]
+	}
+}

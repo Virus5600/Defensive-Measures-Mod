@@ -8,9 +8,8 @@ import com.virus5600.defensive_measures.item.interfaces.FuelItem;
 /**
  * The class for the Ballista Bolt {@link Item item}.
  *
- * @since 1.0.0
+ * @since 1.0.0-beta
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
- * @version 1.0.0
  */
 public class BallistaBoltItem extends Item implements FuelItem {
 	public BallistaBoltItem(net.minecraft.item.Item.Settings settings) {

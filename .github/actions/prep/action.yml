@@ -33,8 +33,9 @@ runs:
     - name: Setup JDK ${{ inputs.java }}
       uses: actions/setup-java@v4
       with:
-        distribution: 'adopt'
+        distribution: ${{ inputs.java_dist }}
         java-version: ${{ inputs.java }}
+        cache: gradle
 
     - name: Make Gradle Wrapper Executable
       if: ${{ inputs.os != 'Windows' }}

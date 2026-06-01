@@ -10,9 +10,8 @@ import net.minecraft.item.Item;
  *
  * @see net.minecraft.item.Item Item
  *
- * @since 1.0.0
+ * @since 1.0.0-beta
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
- * @version 1.0.1
  */
 public final class ItemUtil {
 	/**

@@ -12,9 +12,8 @@ import net.minecraft.advancement.criterion.Criteria;
  * can also be used for player statistics, which can be used to track player
  * progress.
  *
- * @since 1.0.0
+ * @since 1.0.0-beta
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
- * @version 1.0.0
  */
 public class ModCriterion {
 
