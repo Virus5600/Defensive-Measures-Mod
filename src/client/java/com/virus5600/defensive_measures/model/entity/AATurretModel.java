@@ -1,6 +1,8 @@
 package com.virus5600.defensive_measures.model.entity;
 
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.model.*;
+import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.AnimationState;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.sound.SoundEvents;
@@ -11,6 +13,7 @@ import com.virus5600.defensive_measures.animations.FXKeyframe;
 import com.virus5600.defensive_measures.animations.Keyframe;
 import com.virus5600.defensive_measures.animations.ScriptKeyframe;
 import com.virus5600.defensive_measures.animations.entity.AATurretAnimation;
+import com.virus5600.defensive_measures.particle.ModParticles;
 import com.virus5600.defensive_measures.renderer.entity.state.BaseTurretRenderState;
 
 import java.util.PriorityQueue;
@@ -19,6 +22,7 @@ import java.util.Queue;
 import static com.virus5600.defensive_measures.animations.KeyframeScripts.EXPLODE_SCRIPT;
 
 public class AATurretModel extends BaseTurretModel<BaseTurretRenderState> {
+	private final static Queue<? extends Keyframe> SHOOT_KEYFRAMES;
 	private final static Queue<? extends Keyframe> DEATH_KEYFRAMES;
 
 	protected final static String[] TEXTURES = new String[]{
@@ -113,6 +117,11 @@ public class AATurretModel extends BaseTurretModel<BaseTurretRenderState> {
 	// /////////////////// //
 
 	@Override
+	public Queue<? extends Keyframe> getShootAnimProcedureInstance() {
+		return new PriorityQueue<>(SHOOT_KEYFRAMES);
+	}
+
+	@Override
 	public Queue<? extends Keyframe> getDeathAnimProcedureInstance() {
 		if (MathUtil.randomBool(25)) {
 			return new PriorityQueue<>(DEATH_KEYFRAMES);
@@ -149,6 +158,33 @@ public class AATurretModel extends BaseTurretModel<BaseTurretRenderState> {
 	// STATIC //
 	// ////// //
 	static {
+		SHOOT_KEYFRAMES = new PriorityQueue<>() {
+			{
+				add(ScriptKeyframe.of(0.0, ((animState, state, pos) -> {
+					ClientWorld world = MinecraftClient.getInstance().world;
+
+					if (world != null) {
+						Vec3d targetPos = MathUtil.getRelativePos(
+							state.eyePos, state.currentBarrelPos,
+							-state.relativeHeadYaw, -state.pitch
+						);
+
+						Vec3d velMod = MathUtil.getRelativePos(
+							state.eyePos,
+							0, 0, 1.5,
+							-state.relativeHeadYaw, -state.pitch
+						).subtract(state.eyePos);
+
+						world.addParticleClient(
+							ModParticles.CANNON_FLASH,
+							targetPos.getX(), targetPos.getY(), targetPos.getZ(),
+							velMod.getX(), velMod.getY(), velMod.getZ()
+						);
+					}
+				})));
+			}
+		};
+
 		DEATH_KEYFRAMES = new PriorityQueue<>() {
 			{
 				add(FXKeyframe.of(0.0, ParticleTypes.EXPLOSION, SoundEvents.ENTITY_GENERIC_EXPLODE.value(), new Vec3d(0, 0, -1.125)));

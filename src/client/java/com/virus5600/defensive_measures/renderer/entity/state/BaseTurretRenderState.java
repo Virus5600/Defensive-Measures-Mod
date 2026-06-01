@@ -13,6 +13,7 @@ public class BaseTurretRenderState extends LivingEntityRenderState {
 
 	public UUID id;
 	public Vec3d eyePos;
+	public Vec3d currentBarrelPos;
 	public int turretLvl;
 	public boolean hasTarget;
 	public boolean isLockedButNotAttacking;

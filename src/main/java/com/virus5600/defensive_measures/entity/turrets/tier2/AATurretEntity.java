@@ -25,7 +25,6 @@ import com.virus5600.defensive_measures.entity.TurretMaterial;
 import com.virus5600.defensive_measures.entity.ai.goal.ProjectileAttackGoal;
 import com.virus5600.defensive_measures.entity.turrets.TurretEntity;
 import com.virus5600.defensive_measures.item.ModItems;
-import com.virus5600.defensive_measures.particle.ModParticles;
 import com.virus5600.defensive_measures.registry.tag.ModEntityTypeTags;
 import com.virus5600.defensive_measures.sound.ModSoundEvents;
 
@@ -152,11 +151,7 @@ public class AATurretEntity extends TurretEntity {
 
 	@Override
 	public void shootAt(LivingEntity target, float pullProgress) {
-		TurretProjectileVelocity velocityData = TurretProjectileVelocity.init(this)
-			.setPower(5f)
-			.setUpwardVelocityMultiplier(0.1f)
-			.setVelocity(target);
-
+		TurretProjectileVelocity velocityData = this.getProjectileVelocityData(target);
 		super.shootAt(velocityData);
 	}
 
@@ -244,6 +239,14 @@ public class AATurretEntity extends TurretEntity {
 		return barrels;
 	}
 
+	public TurretProjectileVelocity getProjectileVelocityData(LivingEntity target) {
+		return TurretProjectileVelocity
+			.init(this)
+			.setLaunchAngle(30f)
+			.setSpeed(5f)
+			.setVelocity(target);
+	}
+
 	public double getProjectileDamage() {
 		return DAMAGE[this.getTrackedLevel() - 1];
 	}
@@ -269,22 +272,6 @@ public class AATurretEntity extends TurretEntity {
 		// Calls all the previous animation logics first before handling
 		// particle logic
 		super.updateAnimations();
-
-		// Set variables that will be used for logic
-		boolean isShooting = this.getTrackedShooting();
-
-		// Handles the Flash particle for when the AA shoots
-		if (isShooting) {
-			Vec3d barrelPos = this.getRelativePos(this.getCurrentBarrel(false)),
-				velMod = this.getRelativePos(0, 0, 1.5).subtract(this.getEyePos());
-
-			this.getEntityWorld()
-				.addParticleClient(
-					ModParticles.CANNON_FLASH,
-					barrelPos.getX(), barrelPos.getY(), barrelPos.getZ(),
-					velMod.getX(), velMod.getY(), velMod.getZ()
-				);
-		}
 	}
 
 	// ///////////////// //

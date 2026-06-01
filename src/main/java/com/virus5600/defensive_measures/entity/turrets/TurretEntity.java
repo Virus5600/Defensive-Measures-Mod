@@ -32,7 +32,6 @@ import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.entity.mob.Monster;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.ProjectileEntity;
-import net.minecraft.entity.projectile.ProjectileUtil;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -893,21 +892,6 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 					this.lastRenderY = this.getY();
 					this.lastRenderZ = this.getZ();
 				}
-			}
-
-			// Adjusts the pitch when shooting
-			if (this.getTarget() != null) {
-				Vec3d velocity = TurretEntity.TurretProjectileVelocity
-					.init(this)
-					.setVelocity(this.getTarget())
-					.getVelocity();
-
-				float vx = MathHelper.sqrt((float) (velocity.x * velocity.x + velocity.z * velocity.z));
-				float p = (float) -Math.atan2(velocity.y, vx);
-				p *= (float) (180.0 / Math.PI);
-				p = MathHelper.clamp(p, -this.getMaxLookPitchChange(), this.getMaxLookPitchChange());
-
-				this.setTrackedPitch(p);
 			}
 
 			// Negates the levitation effect
@@ -1790,6 +1774,16 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 	protected abstract int getDeathAnimDuration();
 
 	/**
+	 * Defines the velocity of the projectile shot by this turret. This includes the speed, power,
+	 * and uncertainty of the projectile.
+	 *
+	 * @param target The target of this entity.
+	 *
+	 * @return {@link TurretProjectileVelocity} The velocity data of the projectile shot by this turret.
+	 */
+	public abstract TurretProjectileVelocity getProjectileVelocityData(LivingEntity target);
+
+	/**
 	 * Determines the damage this turret's projectile will deal. This only
 	 * works for instances of {@link com.virus5600.defensive_measures.entity.projectiles.TurretProjectileEntity TurretProjectileEntity}
 	 * or its subclasses due to the overridden methods and tailored behavior.
@@ -1914,7 +1908,7 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 			this.shootAnimationState.start(this.age);
 		}
 
-		if (!isShooting && isAnimPlaying && isAttacking) {
+		if (!isShooting && isAnimPlaying && isAttacking && elapsedTime > 1000) {
 			this.shootAnimationState.stop();
 		}
 	}
@@ -2026,9 +2020,10 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 
 			// Set projectile direction
 			Vec3d dir = velocityData.getVelocity().normalize();
-			float pitch = -MathUtil.radToDeg((float) MathHelper.atan2(dir.getY(), Math.sqrt(dir.getX() * dir.getX() + dir.getZ() * dir.getZ())));
+			float pitch = MathUtil.radToDeg((float) MathHelper.atan2(dir.getY(), Math.sqrt(dir.getX() * dir.getX() + dir.getZ() * dir.getZ())));
 			float yaw = MathUtil.radToDeg((float) MathHelper.atan2(dir.getX(), dir.getZ()));
 
+			pitch *= projectile instanceof ExplosiveProjectileEntity ? -1 : 1;
 			yaw *= projectile instanceof ExplosiveProjectileEntity ? -1 : 1;
 			yaw += projectile instanceof ExplosiveProjectileEntity ? 180 : 0;
 
@@ -2139,13 +2134,10 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 	 * allowing for more control over the projectile's behavior such as making it shoot up in a
 	 * parabolic arc or making it shoot in a straight line.
 	 * <br><br>
-	 * The default values for the power, uncertainty, and upward velocity multiplier are set to
-	 * {@code 1.5f}, {@code 2 * difficulty}, and {@code 0.1f} respectively. These values can be
-	 * changed via their respective setters after initializing an instance with the use of the
-	 * {@link #init(TurretEntity)} method.
-	 *
+	 * The default values for the uncertainty and launch angle are set to {@code 2 * difficulty},
+	 * and {@code 7.5f} respectively. These values can be changed via their respective setters
+	 * after initializing an instance with the use of the {@link #init(TurretEntity)} method.
 	 * <hr>
-	 *
 	 * <h1>Setting the Velocity</h1>
 	 * There are several ways to set the velocity of the projectile since by default, the velocity
 	 * is set to {@link Vec3d#ZERO}:
@@ -2160,9 +2152,9 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 	 * The properties defined in this class are:
 	 * <ul>
 	 * 	<li>{@link #turret} - The turret entity that will be shooting the projectile</li>
-	 * 	<li>{@link #power} - The power of the projectile's velocity</li>
+	 * 	<li>{@link #launchAngle} - The projectile's launch angle</li>
 	 * 	<li>{@link #uncertainty} - The distortion of the projectile's trajectory, allowing for inaccuracies</li>
-	 * 	<li>{@link #upwardVelocityMultiplier} - The multiplier for the upward velocity of the projectile</li>
+	 * 	<li>{@link #launchAngle} - The multiplier for the upward velocity of the projectile</li>
 	 * 	<li>{@link #velocity} - The velocity of the projectile</li>
 	 * </ul>
 	 *
@@ -2182,16 +2174,20 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 		private Vec3d lastTargetPos;
 		/** The turret entity that will be shooting the projectile */
 		private final TurretEntity turret;
-		/** The power of the projectile's velocity */
-		private float power;
 		/** The distortion of the projectile's trajectory, allowing for inaccuracies */
 		private float uncertainty;
-		/** The multiplier for the upward velocity of the projectile */
-		private float upwardVelocityMultiplier;
+		/** The projectile's launching angle */
+		private float launchAngle;
+		/**
+		 * The projectile's speed if it has no gravity.
+		 */
+		private float speed;
 		/** The velocity of the projectile */
 		private Vec3d velocity;
 		/** A flag that determines whether the projectile's trajectory is parabolic */
 		private boolean isParabolic;
+		/** Determines after calculation whether the projectile has gravity or not. */
+		private boolean hasNoGravity;
 
 		/**
 		 * Initializes the velocity data of the turret's projectile. This can only be initialized
@@ -2201,10 +2197,11 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 		 */
 		private TurretProjectileVelocity(TurretEntity turret) {
 			this.turret = turret;
-			this.power = 1f;
 			this.uncertainty = turret.getEntityWorld().getDifficulty().getId() * 2;
-			this.upwardVelocityMultiplier = 1f;
+			this.launchAngle = 7.5f;
+			this.speed = 1f;
 			this.velocity = Vec3d.ZERO;
+			this.hasNoGravity = false;
 		}
 
 		/**
@@ -2222,40 +2219,40 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 		}
 
 		/**
-		 * Sets the power of the projectile's velocity.
+		 * Applies a speed to a projectile with 0 gravity or has the {@code hasNoGravity()} to
+		 * {@code true}. If the projectile has gravity more than 0 <b>AND</b> the
+		 * {@code hasNoGravity()} is {@code false}, then the speed, irregardless of value, will be
+		 * ignored.
 		 *
-		 * @param power The power of the projectile's velocity
+		 * @param speed The speed of the projectile if it has no gravity.
 		 *
-		 * @return {@code TurretProjectileVelocity} The instance of the {@link TurretProjectileVelocity} class
-		 *
-		 * @see #power
+		 * @see #speed
 		 */
-		public TurretProjectileVelocity setPower(float power) {
-			this.power = power;
+		public TurretProjectileVelocity setSpeed(float speed) {
+			this.speed = speed;
 			this.recalculateVelocity();
 			return this;
 		}
 
 		/**
-		 * Retrieves the power of the projectile's velocity.
-		 * The power scales by 1.5 times the value set as this
-		 * was the most optimal value for the projectile's velocity.
-		 * <br><br>
-		 * However, if this instance is set to be a parabolic velocity,
-		 * then the power will instead be calculated based on the magnitude
+		 * Retrieves the power will instead be calculated based on the magnitude
 		 * of the velocity vector, allowing for more dynamic power values that
-		 * are based on the velocity. This means that providing a power to a
-		 * parabolic velocity will have no effect on the actual power of the
-		 * projectile's velocity.
+		 * are based on the velocity.
+		 * <br><br>
+		 * When the projectile has no gravity, it uses the provided {@link #speed}
+		 * to match the differently used formula for its velocity.
 		 *
 		 * @return float The power of the projectile's velocity
-		 *
-		 * @see #power
 		 */
 		public float getPower() {
-			return this.isParabolic ?
-				(float) this.velocity.length() :
-				this.power * 1.5f;
+			if (this.isParabolic) {
+				return (float) this.velocity.length();
+			}
+
+			float multiplier = this.hasNoGravity ?
+				1f : 1.5f;
+
+			return this.speed * multiplier;
 		}
 
 		/**
@@ -2266,9 +2263,27 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 		 * @return {@code TurretProjectileVelocity} The instance of the {@link TurretProjectileVelocity} class
 		 *
 		 * @see #uncertainty
+		 * @see #addUncertainty(float)
 		 */
 		public TurretProjectileVelocity setUncertainty(float uncertainty) {
 			this.uncertainty = uncertainty;
+			this.recalculateVelocity();
+			return this;
+		}
+
+		/**
+		 * Adds to the current uncertainty of the projectile's trajectory, allowing for increasing
+		 * or decreasing the inaccuracy of the projectile from its current value.
+		 *
+		 * @param uncertainty The amount to add to the current distortion of the projectile's trajectory. This can be a negative value if you want to decrease the uncertainty.
+		 *
+		 * @return {@code TurretProjectileVelocity} The instance of the {@link TurretProjectileVelocity} class
+		 *
+		 * @see #uncertainty
+		 * @see #setUncertainty(float)
+		 */
+		public TurretProjectileVelocity addUncertainty(float uncertainty) {
+			this.uncertainty += uncertainty;
 			this.recalculateVelocity();
 			return this;
 		}
@@ -2285,39 +2300,54 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 		}
 
 		/**
-		 * Sets the multiplier for the upward velocity of the projectile.
+		 * Sets the launching angle of the projectile. The launching angle is the angle at which
+		 * the projectile is launched from the turret, allowing for different trajectories such as
+		 * shooting in a parabolic arc or shooting in a straight line.
 		 *
-		 * @param upwardVelocityMultiplier The multiplier for the upward velocity of the projectile
+		 * @param launchAngle The launching angle of the projectile in degrees. A positive value will make the projectile shoot in a parabolic arc, while a value of 0 will make the projectile shoot in a straight line.
 		 *
 		 * @return {@code TurretProjectileVelocity} The instance of the {@link TurretProjectileVelocity} class
 		 *
-		 * @see #upwardVelocityMultiplier
+		 * @see #launchAngle
 		 */
-		public TurretProjectileVelocity setUpwardVelocityMultiplier(float upwardVelocityMultiplier) {
-			this.upwardVelocityMultiplier = upwardVelocityMultiplier;
+		public TurretProjectileVelocity setLaunchAngle(float launchAngle) {
+			this.launchAngle = launchAngle;
 			this.recalculateVelocity();
 			return this;
 		}
 
 		/**
-		 * Retrieves the multiplier for the upward velocity of the projectile.
-		 * The upward velocity multiplier scales by 0.1 times the value set as this
-		 * was the most optimal value for the projectile's velocity.
+		 * Retrieves the launching angle of the projectile.
+		 * <br><br>
+		 * The launching angle, by default, is 7.5°.
 		 *
-		 * @return float The multiplier for the upward velocity of the projectile
+		 * @return float The launching angle of the projectile in degrees.
 		 *
-		 * @see #upwardVelocityMultiplier
+		 * @see #launchAngle
+		 * @see #getLaunchAngleRad()
 		 */
-		public float getUpwardVelocityMultiplier() {
-			return this.upwardVelocityMultiplier * 0.1f;
+		public float getLaunchAngle() {
+			return this.launchAngle;
+		}
+
+		/**
+		 * Retrieves the launching angle of the projectile in radians. This is useful for velocity
+		 * calculations that require the angle to be in radians.
+		 *
+		 * @return float The launching angle of the projectile in radians.
+		 *
+		 * @see #launchAngle
+		 * @see #getLaunchAngle()
+		 */
+		public float getLaunchAngleRad() {
+			return MathUtil.degToRad(this.launchAngle);
 		}
 
 		/**
 		 * Sets the velocity of the projectile. When this method is used to set the velocity, the
 		 * projectile's velocity won't respect the following properties:
 		 * <ul>
-		 * 	<li>{@link #power Power}</li>
-		 * 	<li>{@link #upwardVelocityMultiplier Upward Velocity Multiplier}</li>
+		 * 	<li>{@link #launchAngle Upward Velocity Multiplier}</li>
 		 * 	<li>{@link #isParabolic Parabolic Arc}</li>
 		 * </ul>
 		 *
@@ -2336,8 +2366,7 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 		 * Sets the velocity of the projectile. When this method is used to set the velocity, the
 		 * projectile's velocity won't respect the following properties:
 		 * <ul>
-		 * 	<li>{@link #power Power}</li>
-		 * 	<li>{@link #upwardVelocityMultiplier Upward Velocity Multiplier}</li>
+		 * 	<li>{@link #launchAngle Launch Angle}</li>
 		 * 	<li>{@link #isParabolic Parabolic Arc}</li>
 		 * </ul>
 		 *
@@ -2376,12 +2405,26 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 		 * @return {@code TurretProjectileVelocity} The instance of the {@link TurretProjectileVelocity} class
 		 *
 		 * @see #velocity
+		 * @see #setVelocityFromPos(double, double, double)
 		 */
 		public TurretProjectileVelocity setVelocityFromPos(Vec3d pos) {
 			this.calculateVelocity(pos, true);
 			return this;
 		}
 
+		/**
+		 * Sets the velocity of the projectile based from the target position given by the x, y,
+		 * and z coordinates.
+		 *
+		 * @param x The X coordinate of the target position.
+		 * @param y The Y coordinate of the target position.
+		 * @param z The Z coordinate of the target position.
+		 *
+		 * @return {@code TurretProjectileVelocity} The instance of the {@link TurretProjectileVelocity} class
+		 *
+		 * @see #velocity
+		 * @see #setVelocityFromPos(Vec3d)
+		 */
 		public TurretProjectileVelocity setVelocityFromPos(double x, double y, double z) {
 			return this.setVelocityFromPos(new Vec3d(x, y, z));
 		}
@@ -2450,6 +2493,21 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 				this.calculateVelocity(this.lastTargetPos, true);
 		}
 
+		/**
+		 * Calculates the new velocity.
+		 * <br><br>
+		 * If the provided {@code v3d} provided is a position, it calculates it accordingly,
+		 * depending on whether this instance is a {@link #isParabolic parabloic} trajectory or
+		 * a straight trajectory. However, if the {@code v3d} is a velocity vector, then the
+		 * provided value becomes the new velocity data, foregoing the entire calculation process.
+		 * <br><br>
+		 * The {@code v3d} value is identified whether it is a position or not is via the
+		 * {@code isPos} parameter. A {@code true} value meant it is a position vector while
+		 * {@code false} meant it is a velocity vector.
+		 *
+		 * @param v3d   The target position to calculate the velocity OR the new velocity to use.
+		 * @param isPos Whether the provided {@code v3d} is a position or a velocity.
+		 */
 		private void calculateVelocity(Vec3d v3d, boolean isPos) {
 			if (!isPos) {
 				this.lastTargetPos = null;
@@ -2462,88 +2520,121 @@ public abstract class TurretEntity extends MobEntity implements Itemable, Ranged
 
 			this.lastTargetPos = v3d;
 
-			if (this.isParabolic) {
-				this.power = 0;
+			this.calculateVelocity(
+				v3d, barrel,
+				this.isParabolic ? 45 : this.getLaunchAngle()
+			);
+		}
 
-				double rawVx = v3d.getX() - barrel.getX();
-				double rawVz = v3d.getZ() - barrel.getZ();
-				double dy = v3d.getY() - barrel.getY();
+		/**
+		 * Calculates the velocity of the projectile towards the target position using a binary
+		 * search algorithm to find the optimal horizontal velocity that allows the projectile to
+		 * reach the target, accounting for gravity and drag. The method simulates the projectile's
+		 * trajectory over time to determine if it lands on the target, adjusting the velocity
+		 * accordingly until it finds a suitable value.
+		 *
+		 * @param v3d    The target position to calculate the velocity towards.
+		 * @param barrel The position of the turret's barrel, which is the starting point of the projectile.
+		 * @param angle  The launch angle of the projectile in degrees.
+		 */
+		private void calculateVelocity(Vec3d v3d, Vec3d barrel, double angle) {
+			Entity projectile = turret.projectile
+				.create(this.turret.getEntityWorld(), SpawnReason.TRIGGERED);
+			double g = 0;
+			double drag = 0.95;
 
-				double horizontalDist = Math.sqrt(rawVx * rawVx + rawVz * rawVz);
-				double dirX = rawVx / horizontalDist;
-				double dirZ = rawVz / horizontalDist;
+			if (projectile != null) {
+				g = projectile.getFinalGravity();
+				this.hasNoGravity = projectile.hasNoGravity() || g == 0;
 
-				Entity projectile = turret.projectile
-					.create(this.turret.getEntityWorld(), SpawnReason.TRIGGERED);
-				double g = 0.05;
-				double drag = 0.95;
-
-				if (projectile != null) {
-					g = projectile.getFinalGravity();
-					projectile.discard();
-
-					if (projectile instanceof TurretProjectileEntity tpe) {
-						drag = tpe.getFinalDrag();
-					}
+				if (projectile instanceof TurretProjectileEntity tpe) {
+					drag = tpe.getFinalDrag();
 				}
 
-				// Fixed 55° launch angle for visible arc
-				double theta = 45 * Math.PI / 180;
-				double tanTheta = Math.tan(theta);
-
-				// Scale iterations and ticks based on distance
-				// Close range = less iterations/ticks needed
-				// Far range = more iterations/ticks needed
-				int iterations = (int) Math.clamp(horizontalDist * 0.5, 16, 32);
-				int maxTicks = (int) Math.clamp(horizontalDist * 3, 100, 600);
-
-				// Binary search for vH that lands on target
-				double lo = 0.01, hi = 50.0, vH = 1.0;
-
-				for (int i = 0; i < iterations; i++) {
-					vH = (lo + hi) / 2.0;
-					double vyInit = vH * tanTheta;
-
-					double simX = 0, simY = 0, simVY = vyInit;
-					double simVH = vH;
-
-					for (int t = 0; t < maxTicks; t++) {
-						simVY -= g;
-						simVY *= drag;
-						simVH *= drag;
-						simY += simVY;
-						simX += simVH;
-						if (simVY < 0 && simY <= dy) break;
-					}
-
-					if (simX < horizontalDist - 0.1) lo = vH;
-					else hi = vH;
-				}
-
-				double vyApplied = vH * tanTheta;
-
-				this.velocity = new Vec3d(
-					dirX * vH,
-					vyApplied,
-					dirZ * vH
-				);
+				projectile.discard();
+				projectile.remove(RemovalReason.DISCARDED);
 			}
-			else {
-				// Straight Trajectory — untouched
+
+			// For when a projectile has no gravity...
+			if (this.hasNoGravity || !this.isParabolic) {
 				double vx = (v3d.getX() - barrel.getX()) * 1.0625;
 				double vy = (v3d.getY() - barrel.getY());
 				double vz = (v3d.getZ() - barrel.getZ()) * 1.0625;
 
 				double variance = Math.sqrt(vx * vx + vz * vz);
-				vy += variance * this.getUpwardVelocityMultiplier();
+				vy += variance * ((this.hasNoGravity ? 0.1 : this.launchAngle) * 0.1);
 
 				// Applies a scale factor to make sure that when the power
 				// is applied, it will still be around its target's position.
 				Vec3d rawV = new Vec3d(vx, vy, vz);
 				double magnitude = rawV.length();
-				double scaleFactor = magnitude / this.getPower();
+				double power = this.speed * 1.5f;
+				double scaleFactor = magnitude / power;
 				this.velocity = rawV.multiply(scaleFactor);
+
+				return;
 			}
+
+			double rawVx = v3d.getX() - barrel.getX();
+			double rawVz = v3d.getZ() - barrel.getZ();
+			double dy = v3d.getY() - barrel.getY();
+
+			double horizontalDist = Math.sqrt(rawVx * rawVx + rawVz * rawVz);
+			double dirX = rawVx / horizontalDist;
+			double dirZ = rawVz / horizontalDist;
+
+			double theta = MathUtil.degToRad(angle);
+			double tanTheta = Math.tan(theta);
+
+			// Scale iterations and ticks based on distance
+			// Close range = less iterations/ticks needed
+			// Far range = more iterations/ticks needed
+			int iterations = (int) Math.clamp(horizontalDist * 0.5, 16, 32);
+			int maxTicks = (int) Math.clamp(horizontalDist * 3, 100, 600);
+
+			// Binary search for vH that lands on target
+			double lo = 0.01, hi = 50.0, vH = 1.0;
+
+			for (int i = 0; i < iterations; i++) {
+				vH = (lo + hi) / 2.0;
+
+				double simX = 0, simY = 0, simVY = vH * tanTheta;
+				double simVH = vH;
+
+				for (int t = 0; t < maxTicks; t++) {
+					simVY -= g;
+					simVY *= drag;
+					simVH *= drag;
+					simY += simVY;
+					simX += simVH;
+
+					// For targets above: break when projectile has peaked and is now falling past dy.
+					// For targets below (or same level): break when projectile is falling and has dropped to/past dy.
+					boolean isPastPeak = simVY < 0;
+					boolean hasReachedTargetY = (dy >= 0) ? (simY >= dy) : (simY <= dy);
+
+					if (isPastPeak && hasReachedTargetY) {
+						break;
+					}
+				}
+
+				if (simX < horizontalDist - 0.1) {
+					lo = vH;
+				}
+				else {
+					hi = vH;
+				}
+			}
+
+			double vyApplied = vH * tanTheta;
+
+			Vec3d vel = new Vec3d(
+				dirX * vH,
+				vyApplied,
+				dirZ * vH
+			);
+
+			this.velocity = vel;
 		}
 	}
 

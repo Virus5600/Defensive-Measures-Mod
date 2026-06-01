@@ -21,4 +21,11 @@ public class FlakProjectileRenderer extends BaseProjectileRenderer<
 			BaseProjectileRenderState::new
 		);
 	}
+
+	@Override
+	public void updateRenderState(FlakProjectileEntity entity, BaseProjectileRenderState state, float tickProgress) {
+		super.updateRenderState(entity, state, tickProgress);
+
+		state.pitch = entity.getLerpedPitch(tickProgress);
+	}
 }

@@ -120,12 +120,7 @@ public class BallistaTurretEntity extends TurretEntity {
 
 	@Override
 	public void shootAt(LivingEntity target, float pullProgress) {
-		float dist = (float) this.getEntityPos()
-			.distanceTo(target.getEntityPos());
-
-		TurretProjectileVelocity velocityData = TurretProjectileVelocity.init(this)
-			.setVelocity(target)
-			.setUpwardVelocityMultiplier(dist * 0.125f);
+		TurretProjectileVelocity velocityData = this.getProjectileVelocityData(target);
 
 		super.shootAt(velocityData);
 	}
@@ -211,6 +206,16 @@ public class BallistaTurretEntity extends TurretEntity {
 
 	protected List<Vec3d> getTurretProjectileSpawn() {
 		return OFFSETS.get(Offsets.BOLT_HOLDER);
+	}
+
+	public TurretProjectileVelocity getProjectileVelocityData(LivingEntity target) {
+		float dist = (float) this.getEntityPos()
+			.distanceTo(target.getEntityPos());
+
+		return TurretProjectileVelocity
+			.init(this)
+			.setLaunchAngle(dist * 0.125f)
+			.setVelocity(target);
 	}
 
 	public double getProjectileDamage() {

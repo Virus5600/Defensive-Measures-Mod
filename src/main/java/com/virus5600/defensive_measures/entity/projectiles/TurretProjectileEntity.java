@@ -6,6 +6,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.entity.*;
 import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.entity.damage.DamageType;
 import net.minecraft.entity.damage.DamageTypes;
 import net.minecraft.entity.data.DataTracker.Builder;
 import net.minecraft.entity.data.DataTracker;
@@ -19,6 +20,7 @@ import net.minecraft.inventory.StackReference;
 import net.minecraft.item.ItemStack;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.registry.Registries;
+import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.tag.EntityTypeTags;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvent;
@@ -251,7 +253,8 @@ public abstract class TurretProjectileEntity extends ProjectileEntity {
 		World world = this.getEntityWorld();
 
 		// Handles the damage calculation
-		DamageSource dmgSrc = this.getDamageSources().create(DamageTypes.ARROW, this, owner != null ? owner : this);
+		DamageSource dmgSrc = this.getDamageSources()
+			.create(this.getDamageType(), this, owner != null ? owner : this);
 		float velocityMagnitude = (float) this.getVelocity().length();
 		double damage = this.getDamage();
 		int damageToDeal = MathHelper.ceil(
@@ -679,6 +682,18 @@ public abstract class TurretProjectileEntity extends ProjectileEntity {
 	// ///////////////// //
 	// GETTERS & SETTERS //
 	// ///////////////// //
+
+	/**
+	 * Returns this projectile's damage type. Used for when damaging entities for custom message
+	 * and exhaustion.
+	 *
+	 * @return The damage type of this projectile.
+	 *
+	 * @implNote By default, this returns {@link DamageTypes#ARROW}, but it can be overridden to return a custom damage type if needed.
+	 */
+	public RegistryKey<DamageType> getDamageType() {
+		return DamageTypes.ARROW;
+	}
 
 	/** Overridable method that defines the sound played when this projectile hits something. **/
 	public SoundEvent getHitSound() {

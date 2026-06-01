@@ -17,7 +17,8 @@ public class FlakProjectileModel extends BaseProjectileModel<BaseProjectileRende
 		ModelData modelData = new ModelData();
 		ModelPartData modelPartData = modelData.getRoot();
 
-		modelPartData.addChild("projectile", ModelPartBuilder.create().uv(0, 0).cuboid(-0.5F, -0.5F, -0.5F, 1.0F, 1.0F, 3.0F, new Dilation(0.0F))
+		modelPartData.addChild("projectile", ModelPartBuilder.create()
+			.uv(0, 0).cuboid(-0.5F, -0.5F, -0.5F, 1.0F, 1.0F, 3.0F, new Dilation(0.0F))
 			.uv(0, 4).cuboid(-0.5F, -0.5F, -1.25F, 1.0F, 1.0F, 1.0F, new Dilation(-0.125F)), ModelTransform.origin(0.0F, 0.5F, -0.5F));
 
 		return TexturedModelData.of(modelData, 8, 8);

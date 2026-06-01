@@ -147,13 +147,7 @@ public class MissileTurretEntity extends TurretEntity implements UsesMissile {
 
 	@Override
 	public void shootAt(LivingEntity target, float pullProgress) {
-		Vec3d dir = MathUtil.getTargetDirection(this, target);
-		Vec3d vel = dir.multiply(this.getMissileSpeed());
-
-		TurretProjectileVelocity velocityData = TurretProjectileVelocity.init(this)
-			.setPower(1)
-			.setUpwardVelocityMultiplier(0.1f)
-			.setVelocity(vel.getX(), vel.getY(), vel.getZ());
+		TurretProjectileVelocity velocityData = this.getProjectileVelocityData(target);
 
 		super.shootBurst(3, (20 / 3), velocityData);
 	}
@@ -208,6 +202,16 @@ public class MissileTurretEntity extends TurretEntity implements UsesMissile {
 
 	protected List<Vec3d> getTurretProjectileSpawn() {
 		return OFFSETS.get(Offsets.BARREL);
+	}
+
+	public TurretProjectileVelocity getProjectileVelocityData(LivingEntity target) {
+		Vec3d dir = MathUtil.getTargetDirection(this, target);
+		Vec3d vel = dir.multiply(this.getMissileSpeed());
+
+		return TurretProjectileVelocity
+			.init(this)
+			.setLaunchAngle(0.1f)
+			.setVelocity(vel.getX(), vel.getY(), vel.getZ());
 	}
 
 	public double getProjectileDamage() {
