@@ -6,11 +6,5 @@ TODO: TargetPlayerGoal
 - Class
 	- Fully implement this class after implementing a UI for the turrets.
 
-TODO: TurretEntity
-- Method
-	- calculateVelocity
-		- Properly calculate the parabolic trajectory (high priority) - Apparently, it was because of the "acceleration" modifier in the "ExplosiveProjectileEntity" class. Fuck.
-
 TODO:
-- Implement Missile Turret (#33)
- - Recipe and recipe related advancements
+- None Currently
