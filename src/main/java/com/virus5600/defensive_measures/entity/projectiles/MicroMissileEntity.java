@@ -25,6 +25,7 @@ import com.virus5600.defensive_measures._util.MathUtil;
 import com.virus5600.defensive_measures.entity.LoopingSoundEntity;
 import com.virus5600.defensive_measures.entity.turrets.TurretEntity;
 import com.virus5600.defensive_measures.entity.turrets.interfaces.UsesMissile;
+import com.virus5600.defensive_measures.entity.turrets.tier2.MissileTurretEntity;
 import com.virus5600.defensive_measures.particle.ModParticles;
 import com.virus5600.defensive_measures.sound.ModSoundEvents;
 
@@ -33,6 +34,23 @@ import org.jspecify.annotations.NonNull;
 
 import java.util.Optional;
 
+/**
+ * The projectile used by {@link MissileTurretEntity}.
+ * <br><br>
+ * Represents a small explosive that can fly in a straight line for a given distance before falling
+ * to the ground. It can also home into targets with variable turn rate, allowing for a more
+ * lethal missile that can be harder to shake off.
+ * <br><br>
+ * The Micro Missile's homing logic is quite simple: it always takes the shortest path towards its
+ * target. This meant that even when it is hard to shake off, it can still be easily outmaneuvered
+ * by fast and erratic movements, or by simply hiding behind blocks since it doesn't have any
+ * pathfinding logic to navigate around blocks.
+ *
+ * @see ExplosiveProjectileEntity
+ *
+ * @since 1.1.0-beta
+ * @author <a href="https://github.com/Virus5600">Virus5600</a>
+ */
 public class MicroMissileEntity extends ExplosiveProjectileEntity implements LoopingSoundEntity {
 	protected static final TrackedData<Integer> REMAINING_FUEL;
 	protected static final TrackedData<Boolean> IS_HOMING;

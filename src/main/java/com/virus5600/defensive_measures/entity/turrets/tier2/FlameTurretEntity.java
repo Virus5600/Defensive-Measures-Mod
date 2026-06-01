@@ -13,6 +13,7 @@ import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.mob.MobEntity;
+import net.minecraft.entity.mob.Monster;
 import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -171,9 +172,10 @@ public class FlameTurretEntity extends TurretEntity implements LoopableShootingS
 	protected boolean targetPredicate(LivingEntity target, ServerWorld world) {
 		boolean isInFiringArc = this.attackGoal.isWithinRotationLimit(target);
 		boolean isGroundTarget = !target.getType().isIn(ModEntityTypeTags.FLYING_HOSTILES);
+		boolean isMonster = target instanceof Monster;
 		boolean isNotTurret = !target.getType().isIn(ModEntityTypeTags.TURRETS);
 
-		return isInFiringArc && isGroundTarget && isNotTurret;
+		return isInFiringArc && isGroundTarget && isMonster && isNotTurret;
 	}
 
 	@Override
@@ -279,10 +281,7 @@ public class FlameTurretEntity extends TurretEntity implements LoopableShootingS
 
 	@Override
 	public void shootAt(LivingEntity target, float pullProgress) {
-		TurretProjectileVelocity velocityData = TurretProjectileVelocity.init(this)
-			.setPower(1f)
-			.setUpwardVelocityMultiplier(0.05f)
-			.setVelocity(target);
+		TurretProjectileVelocity velocityData = this.getProjectileVelocityData(target);
 
 		super.shootAt(velocityData);
 	}
@@ -414,6 +413,13 @@ public class FlameTurretEntity extends TurretEntity implements LoopableShootingS
 		}
 
 		return barrels;
+	}
+
+	public TurretProjectileVelocity getProjectileVelocityData(LivingEntity target) {
+		return TurretProjectileVelocity
+			.init(this)
+			.setLaunchAngle(0.05f)
+			.setVelocity(target);
 	}
 
 	public double getProjectileDamage() {

@@ -54,9 +54,10 @@ public abstract class BaseProjectileRenderer<
 
 		state.loopAnimationState.copyFrom(entity.getLoopAnimationState());
 
-		state.pitch = -entity.getLerpedPitch(tickProgress);
+		state.pitch = entity.getLerpedPitch(tickProgress);
 		state.yaw = entity.getLerpedYaw(tickProgress);
 
+		state.pitch *= entity instanceof ExplosiveProjectileEntity ? -1 : 1;
 		state.yaw *= entity instanceof ExplosiveProjectileEntity ? -1 : 1;
 		state.yaw += entity instanceof ExplosiveProjectileEntity ? 180 : 0;
 	}

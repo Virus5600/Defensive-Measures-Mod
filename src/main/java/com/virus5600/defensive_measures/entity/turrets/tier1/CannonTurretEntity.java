@@ -127,13 +127,12 @@ public class CannonTurretEntity extends TurretEntity {
 
 	@Override
 	public void shootAt(LivingEntity target, float pullProgress) {
-		float dist = (float) getEntityPos()
-			.distanceTo(target.getEntityPos());
+		TurretProjectileVelocity velocityData = this.getProjectileVelocityData(target);
 
-		TurretProjectileVelocity velocityData = TurretProjectileVelocity.init(this)
-			.setPower(1.375f)
-			.setVelocity(target)
-			.setUpwardVelocityMultiplier(dist * 0.1625f);
+		velocityData.setUncertainty(
+			velocityData.getUncertainty() *
+				0.75f
+		);
 
 		super.shootAt(velocityData);
 	}
@@ -226,6 +225,17 @@ public class CannonTurretEntity extends TurretEntity {
 
 	protected List<Vec3d> getTurretProjectileSpawn() {
 		return OFFSETS.get(Offsets.BARREL);
+	}
+
+	public TurretProjectileVelocity getProjectileVelocityData(LivingEntity target) {
+		float dist = (float) getEntityPos()
+			.distanceTo(target.getEntityPos());
+
+		return TurretProjectileVelocity
+			.init(this)
+			.setLaunchAngle(dist * 0.1625f)
+			.setSpeed(1.375f)
+			.setVelocity(target);
 	}
 
 	public double getProjectileDamage() {

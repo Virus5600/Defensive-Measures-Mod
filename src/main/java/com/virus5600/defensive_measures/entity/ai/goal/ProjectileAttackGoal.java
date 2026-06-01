@@ -3,11 +3,13 @@ package com.virus5600.defensive_measures.entity.ai.goal;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.RangedAttackMob;
 import net.minecraft.util.math.MathHelper;
-
 import net.minecraft.util.math.Vec3d;
-import org.jetbrains.annotations.Nullable;
 
+
+import com.virus5600.defensive_measures._util.MathUtil;
 import com.virus5600.defensive_measures.entity.turrets.TurretEntity;
+
+import org.jetbrains.annotations.Nullable;
 
 import java.util.EnumSet;
 
@@ -108,7 +110,10 @@ public class ProjectileAttackGoal extends net.minecraft.entity.ai.goal.Projectil
 	@Override
 	public boolean canStart() {
 		LivingEntity livingEntity = this.mob.getTarget();
-		if (livingEntity != null && livingEntity.isAlive() && this.isWithinRotationLimit(livingEntity)) {
+		if (livingEntity != null &&
+			livingEntity.isAlive() &&
+			this.isWithinRotationLimit(livingEntity)
+		) {
 			this.target = livingEntity;
 			return true;
 		} else {
@@ -245,17 +250,15 @@ public class ProjectileAttackGoal extends net.minecraft.entity.ai.goal.Projectil
 	 * @return The pitch angle in degrees.
 	 */
 	public float getShootingPitch(LivingEntity target, boolean shouldClamp) {
-		Vec3d velocity = TurretEntity.TurretProjectileVelocity
-			.init(this.mob)
-			.setVelocity(target)
+		Vec3d velocity = this.mob
+			.getProjectileVelocityData(target)
 			.getVelocity();
 
 		float maxPitch = this.mob.getMaxLookPitchChange();
 		float minPitch = this.mob.getMinLookPitchChange();
 
 		float vx = MathHelper.sqrt((float) (velocity.x * velocity.x + velocity.z * velocity.z));
-		float p = (float) -Math.atan2(velocity.y, vx);
-		p *= (float) (180.0 / Math.PI);
+		float p = (float) MathUtil.radToDeg(-Math.atan2(velocity.y, vx));
 
 		if (shouldClamp) {
 			p = MathHelper.clamp(p, minPitch, maxPitch);
@@ -274,13 +277,12 @@ public class ProjectileAttackGoal extends net.minecraft.entity.ai.goal.Projectil
 	 * @return The yaw angle in degrees.
 	 */
 	public float getShootingYaw(LivingEntity target, boolean shouldClamp) {
-		Vec3d velocity = TurretEntity.TurretProjectileVelocity
-			.init(this.mob)
-			.setVelocity(target)
+		Vec3d velocity = this.mob
+			.getProjectileVelocityData(target)
 			.getVelocity();
 
 		float maxYaw = this.mob.getMaxHeadRotation();
-		float minYaw = this.mob.getMaxHeadRotation();
+		float minYaw = this.mob.getMinHeadRotation();
 
 		float y = (float) Math.atan2(velocity.z, velocity.x);
 		y *= (float) (180.0 / Math.PI);

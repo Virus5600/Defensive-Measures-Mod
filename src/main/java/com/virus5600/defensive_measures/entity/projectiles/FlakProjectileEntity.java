@@ -10,11 +10,32 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 
+import com.virus5600.defensive_measures.entity.turrets.tier2.AATurretEntity;
 import com.virus5600.defensive_measures.particle.ModParticles;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+/**
+ * The projectile used by {@link AATurretEntity}.
+ * <br><br>
+ * Represents an explosive projectile that shoots out fragments (in reality) upon exploding to
+ * create a blanket of smaller, deadly projectiles around its area, providing a great airspace
+ * denial. However, in this game, the flak projectile is represented as a projectile that explodes
+ * upon hitting something or when it is near its target (if it missed), damaging entities around
+ * a large radius.
+ * <br><br>
+ * With its turret's rate of fire, this projectile has a maximum radius of 10 blocks with 3.5
+ * blocks being the effective radius where entities gets the full damage, which gets reduced the
+ * farther the entity is from the effective radius.
+ *
+ * @see AATurretEntity
+ * @see CannonballEntity
+ * @see ExplosiveProjectileEntity
+ *
+ * @since 1.1.0-beta
+ * @author <a href="https://github.com/Virus5600">Virus5600</a>
+ */
 public class FlakProjectileEntity extends CannonballEntity {
 	protected double targetDistance = -1;
 

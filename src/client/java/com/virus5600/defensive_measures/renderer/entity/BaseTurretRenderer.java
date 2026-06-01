@@ -62,6 +62,7 @@ public abstract class BaseTurretRenderer<
 		turretRenderState.deathAnimationState.copyFrom(turretEntity.getDeathAnimationState());
 
 		turretRenderState.eyePos = turretEntity.getEyePos();
+		turretRenderState.currentBarrelPos = turretEntity.getCurrentBarrel(false);
 
 		turretRenderState.id = turretEntity.getUuid();
 		turretRenderState.turretLvl = turretEntity.getTrackedLevel();

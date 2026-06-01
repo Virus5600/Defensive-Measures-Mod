@@ -4,6 +4,8 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.entity.damage.DamageType;
+import net.minecraft.entity.damage.DamageTypes;
 import net.minecraft.entity.data.DataTracker.Builder;
 import net.minecraft.entity.projectile.ProjectileUtil;
 import net.minecraft.network.listener.ClientPlayPacketListener;
@@ -12,6 +14,7 @@ import net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket;
 import net.minecraft.particle.BlockParticleEffect;
 import net.minecraft.particle.ParticleEffect;
 import net.minecraft.particle.ParticleTypes;
+import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.server.network.EntityTrackerEntry;
 import net.minecraft.server.world.ServerWorld;
@@ -161,7 +164,8 @@ public abstract class ExplosiveProjectileEntity extends TurretProjectileEntity {
 	 */
 	public void doDamage() {
 		// Create the damage source
-		DamageSource dmgSrc = this.getDamageSources().explosion(
+		DamageSource dmgSrc = this.getDamageSources().create(
+			this.getDamageType(),
 			this,
 			this.getOwner() == null ? this : this.getOwner()
 		);
@@ -447,6 +451,11 @@ public abstract class ExplosiveProjectileEntity extends TurretProjectileEntity {
 	@Override
 	protected boolean canHit(Entity entity) {
 		return super.canHit(entity) && !entity.noClip;
+	}
+
+	@Override
+	public RegistryKey<DamageType> getDamageType() {
+		return DamageTypes.PLAYER_EXPLOSION;
 	}
 
 	/**
