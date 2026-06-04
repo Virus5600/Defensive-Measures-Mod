@@ -1,6 +1,6 @@
 # Automatically build the project and run any configured tests for every push
 # and submitted pull request. This can help catch issues that only occur on
-# certain platforms or Java versions, and provides a first line of defence
+# certain platforms or Java versions, and provides a first line of defense
 # against bad commits.
 
 name: Build Check
@@ -12,7 +12,7 @@ jobs:
       matrix:
         # Use these Java versions
         java: [
-          22  # Current Java LTS & minimum supported by Minecraft
+          21  # Current Java LTS & minimum supported by Minecraft
         ]
         # Run on both Linux
         os:
