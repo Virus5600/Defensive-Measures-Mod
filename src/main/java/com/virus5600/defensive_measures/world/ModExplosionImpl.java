@@ -6,6 +6,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.projectile.ProjectileEntity;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
@@ -126,6 +127,10 @@ public class ModExplosionImpl extends ExplosionImpl {
 					.multiply(knockback);
 
 				entity.addVelocity(knockbackVec);
+
+				if (entity instanceof ServerPlayerEntity serverPlayer) {
+					this.getKnockbackByPlayer().put(serverPlayer, knockbackVec);
+				}
 			}
 
 			entity.onExplodedBy(projectile.getOwner());

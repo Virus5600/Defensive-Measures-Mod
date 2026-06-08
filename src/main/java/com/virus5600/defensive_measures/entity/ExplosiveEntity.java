@@ -61,7 +61,7 @@ public interface ExplosiveEntity {
 	 *
 	 * @apiNote When implementing and returning a calculated one, do note that the value that this
 	 * method will return will further undergo processing under the
-	 * {@link ModExplosionImpl#damageEntity(ProjectileEntity, Entity, List, boolean, double)},
+	 * {@link ModExplosionImpl ModExplosionImpl#damageEntity(ProjectileEntity, Entity, List, boolean, double)},
 	 * adding a damage falloff formula on entities inside the outer radius, and further processing
 	 * the final damage based on the entity's size and exposed parts against the explosion.
 	 */
@@ -101,6 +101,10 @@ public interface ExplosiveEntity {
 	}
 
 	default void createExplosion(Entity entity, @Nullable DamageSource damageSource, @Nullable ExplosionBehavior behavior, double x, double y, double z, float power, boolean createFire, World.ExplosionSourceType explosionSourceType, ParticleEffect smallParticle, ParticleEffect largeParticle, Pool<BlockParticleEffect> blockParticles, RegistryEntry<SoundEvent> soundEvent, boolean destroyBlocks) {
+		if (entity.getEntityWorld().isClient()) {
+			return;
+		}
+
 		ServerWorld world = (ServerWorld) entity.getEntityWorld();
 
 		Explosion.DestructionType dType;
