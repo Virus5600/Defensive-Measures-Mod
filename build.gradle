@@ -87,10 +87,7 @@ tasks.withType(Copy).configureEach {
 }
 
 java {
-	def javaVersion = JavaVersion.toVersion(targetJavaVersion)
-	if (JavaVersion.current() < javaVersion) {
-		toolchain.languageVersion = JavaLanguageVersion.of(targetJavaVersion)
-	}
+	toolchain.languageVersion = JavaLanguageVersion.of(targetJavaVersion)
 	archives_base_name = project.archives_base_name
 
 	// Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task
