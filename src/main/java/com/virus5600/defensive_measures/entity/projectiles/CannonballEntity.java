@@ -88,10 +88,6 @@ public class CannonballEntity extends ExplosiveProjectileEntity {
 	@Override
 	protected void onEntityHit(EntityHitResult entityHitResult) {
 		super.onEntityHit(entityHitResult);
-
-		if (!this.getEntityWorld().isClient()) {
-			this.doDamage();
-		}
 	}
 
 	@Override
@@ -147,6 +143,12 @@ public class CannonballEntity extends ExplosiveProjectileEntity {
 	@Override
 	public double getDamageReduction() {
 		return 0.25;
+	}
+
+	// ExplosiveEntity //
+	@Override
+	public boolean canDestroyBlocks() {
+		return false;
 	}
 
 	// TurretProjectileEntity //

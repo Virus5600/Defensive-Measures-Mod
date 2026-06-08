@@ -2,7 +2,6 @@ package com.virus5600.defensive_measures.entity.projectiles;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.damage.DamageType;
 import net.minecraft.entity.damage.DamageTypes;
@@ -26,17 +25,15 @@ import net.minecraft.util.collection.Pool;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
 import net.minecraft.world.explosion.ExplosionBehavior;
 
+import com.virus5600.defensive_measures.entity.ExplosiveEntity;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * {@code ExplosiveProjectileEntity} is an abstract class that extends {@link TurretProjectileEntity}.
@@ -74,7 +71,7 @@ import java.util.List;
  * @since 1.0.0-beta
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
  */
-public abstract class ExplosiveProjectileEntity extends TurretProjectileEntity {
+public abstract class ExplosiveProjectileEntity extends TurretProjectileEntity implements ExplosiveEntity {
 	protected static final Pool<BlockParticleEffect> EXPLOSION_BLOCK_PARTICLES;
 	protected static final Pool<BlockParticleEffect> EMPTY_EXPLOSION_BLOCK_PARTICLES;
 
@@ -132,13 +129,12 @@ public abstract class ExplosiveProjectileEntity extends TurretProjectileEntity {
 		}
 	}
 
-	private double radius = 0;
 	/**
 	 * Applies damage to the surrounding entity.
 	 * <br><br>
 	 * The damage is applied in two stages:
 	 * <ol>
-	 *     <li>Entities within the {@link #getEffectiveRadius() effective radius} will receive the full {@link #getDamage() base damage}.</li>
+	 *     <li>Entities within the {@link #getEffectiveRadius() effective radius} will receive the full {@link #getBaseDamage() base damage}.</li>
 	 *     <li>Entities outside the effective radius but within the {@link #getMaxDamageRadius() max radius} will receive reduced damage based on the {@link #getDamageReduction() damage reduction} multiplier.</li>
 	 * </ol>
 	 * <hr>
@@ -163,6 +159,10 @@ public abstract class ExplosiveProjectileEntity extends TurretProjectileEntity {
 	 * </ul>
 	 */
 	public void doDamage() {
+		if (this.getEntityWorld().isClient()) {
+			return;
+		}
+
 		// Create the damage source
 		DamageSource dmgSrc = this.getDamageSources().create(
 			this.getDamageType(),
@@ -171,89 +171,22 @@ public abstract class ExplosiveProjectileEntity extends TurretProjectileEntity {
 		);
 
 		// Create the explosion
-		this.getEntityWorld()
-			.createExplosion(
-				this,
-				dmgSrc,
-				new ExplosionBehavior(),
-				this.getX(),
-				this.getBodyY(0.0625),
-				this.getZ(),
-				1.25F,
-				false,
-				World.ExplosionSourceType.NONE,
-				this.getSmallExplosionParticleType(),
-				this.getLargeExplosionParticleType(),
-				EMPTY_EXPLOSION_BLOCK_PARTICLES,
-				this.getExplosionSoundEvent()
-			);
-
-		// Damaging entities within a radius.
-		double effectiveRadius = this.getEffectiveRadius();
-		double maxDmgRadius = this.getMaxDamageRadius();
-		double dmgReduction = this.getDamageReduction();
-		double baseDmg = this.getDamage();
-
-		// Damaging entities within Effective Radius
-		Box fullDmgReceiver = new Box(
-			this.getX() - effectiveRadius,
-			this.getY() - effectiveRadius,
-			this.getZ() - effectiveRadius,
-			this.getX() + effectiveRadius,
-			this.getY() + effectiveRadius,
-			this.getZ() + effectiveRadius
+		this.createExplosion(
+			this,
+			dmgSrc,
+			new ExplosionBehavior(),
+			this.getX(),
+			this.getBodyY(0.0625),
+			this.getZ(),
+			1.25F,
+			false,
+			this.getExplosionSourceType(),
+			this.getSmallExplosionParticleType(),
+			this.getLargeExplosionParticleType(),
+			EMPTY_EXPLOSION_BLOCK_PARTICLES,
+			this.getExplosionSoundEvent(),
+			this.canDestroyBlocks()
 		);
-
-		// Entities receives full damage
-		List<LivingEntity> damagedEntities = new ArrayList<>();
-		this.getEntityWorld()
-			.getOtherEntities(this, fullDmgReceiver)
-			.forEach(entity -> {
-				if (entity instanceof LivingEntity) {
-					entity.damage(
-						(ServerWorld) this.getEntityWorld(),
-						dmgSrc,
-						(float) baseDmg
-					);
-					damagedEntities.add((LivingEntity) entity);
-				}
-			});
-
-		// Creates a dynamic increment for the radius to reduce the number of entities to check
-		double steps = (maxDmgRadius - effectiveRadius) > 10 ? 0.5 : 0.25;
-
-		// Damaging entities outside Effective Radius but within Max Damage Radius
-		for (radius = effectiveRadius; radius <= maxDmgRadius; radius += steps) {
-			double ext = radius + 1;
-			Box partialDmgReceiver = new Box(
-				this.getX() - ext,
-				this.getY() - ext,
-				this.getZ() - ext,
-				this.getX() + ext,
-				this.getY() + ext,
-				this.getZ() + ext
-			);
-
-			this.getEntityWorld()
-				.getOtherEntities(this, partialDmgReceiver)
-				.forEach(entity -> {
-					if (entity instanceof LivingEntity && !damagedEntities.contains(entity)) {
-						float normalizedRadius = (float) ((radius - effectiveRadius) / (maxDmgRadius - effectiveRadius));
-						float numerator = (float) (Math.exp(-dmgReduction * normalizedRadius) - Math.exp(-dmgReduction));
-						float denominator = (float) (1 - Math.exp(-dmgReduction));
-						float formula = numerator / denominator;
-						float dmg = (float) (baseDmg * formula);
-
-						entity.damage(
-							(ServerWorld) this.getEntityWorld(),
-							dmgSrc,
-							dmg
-						);
-
-						damagedEntities.add((LivingEntity) entity);
-					}
-				});
-		}
 
 		this.discard();
 	}
@@ -462,7 +395,7 @@ public abstract class ExplosiveProjectileEntity extends TurretProjectileEntity {
 	 * Defines the maximum effective radius of the explosion. Within this
 	 * radius, all entities will receive the full {@link #getDamage() base damage}.
 	 * Entities outside this radius will receive reduced damage based on the
-	 * {@link #getDamageReduction() damage reduction} multiplier.
+	 * {@link ExplosiveEntity#getDamageReduction() damage reduction} multiplier.
 	 *
 	 * @return The maximum effective radius of the explosion.
 	 */
@@ -535,6 +468,10 @@ public abstract class ExplosiveProjectileEntity extends TurretProjectileEntity {
 	 * @see <a href="https://www.desmos.com/calculator/pdm27kw9oe">Formulas</a>
 	 */
 	public abstract double getDamageReduction();
+
+	public double getBaseDamage() {
+		return this.getDamage();
+	}
 
 	protected void setVelocityWithAcceleration(Vec3d velocity, double accelerationPower) {
 		this.setVelocity(velocity.normalize().multiply(accelerationPower));

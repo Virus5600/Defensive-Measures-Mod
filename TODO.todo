@@ -7,4 +7,4 @@ TODO: TargetPlayerGoal
 	- Fully implement this class after implementing a UI for the turrets.
 
 TODO:
-- Modify or create a new utility method for creating explosion that utilizes the custom damaging system. It will be better to implement it in the `ExplosiveProjectileEntity#doDamage` method as it already has the new damaging system implemented. This will allow us to create explosions that can damage entities and blocks in a more controlled manner, and also allow us to add custom effects or behaviors to the explosion if needed.
+- Remove set and get pose commands.

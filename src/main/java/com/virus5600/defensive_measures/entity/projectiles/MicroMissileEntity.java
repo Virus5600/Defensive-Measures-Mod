@@ -411,6 +411,12 @@ public class MicroMissileEntity extends ExplosiveProjectileEntity implements Loo
 		return 0.125;
 	}
 
+	// ExplosiveEntity //
+	@Override
+	public boolean canDestroyBlocks() {
+		return false;
+	}
+
 	// TurretProjectileEntity //
 	@Override
 	public byte getMaxPierceLevel() {
