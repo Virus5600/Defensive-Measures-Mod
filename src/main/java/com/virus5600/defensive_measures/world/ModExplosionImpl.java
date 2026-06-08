@@ -86,15 +86,23 @@ public class ModExplosionImpl extends ExplosionImpl {
 		if (list.contains(entity) || entity.isImmuneToExplosion(this)) return;
 
 		if (projectile instanceof ExplosiveEntity epe) {
-			boolean shouldDmg = this.behavior.shouldDamage(this, entity);
-			double baseDmg = epe.getBaseDamage();
 			double effectiveRadius = epe.getEffectiveRadius();
 			double maxDmgRadius = epe.getMaxDamageRadius();
+			double distance = Math.sqrt(entity.squaredDistanceTo(this.getPosition()));
+			if (distance > maxDmgRadius) {
+				// Outside the explosion's max range; avoid repeatedly re-checking this entity in later radius iterations.
+				list.add(entity);
+				return;
+			}
+			if (!outerRad && distance > effectiveRadius) return;
+			if (outerRad && distance > currentRadius) return;
+
+			boolean shouldDmg = this.behavior.shouldDamage(this, entity);
+			double baseDmg = epe.getBaseDamage();
 			double dmgReduction = epe.getDamageReduction();
 			float knockbackMod = this.behavior.getKnockbackModifier(entity);
 			float exposure = !shouldDmg && knockbackMod == 0 ?
 				0f : calculateReceivedDamage(this.getPosition(), entity);
-
 			// Size-aware factor
 			Box box = entity.getBoundingBox();
 			double sizeFactor = MathHelper.clamp(
