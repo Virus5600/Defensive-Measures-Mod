@@ -1,3 +1,15 @@
 accessWidener v2 named
-accessible method net/minecraft/client/gui/screen/recipebook/GhostRecipe addResults (Lnet/minecraft/screen/slot/Slot;Lnet/minecraft/util/context/ContextParameterMap;Lnet/minecraft/recipe/display/SlotDisplay;)V
+# GhostRecipe
 accessible method net/minecraft/client/gui/screen/recipebook/GhostRecipe addInputs (Lnet/minecraft/screen/slot/Slot;Lnet/minecraft/util/context/ContextParameterMap;Lnet/minecraft/recipe/display/SlotDisplay;)V
+accessible method net/minecraft/client/gui/screen/recipebook/GhostRecipe addResults (Lnet/minecraft/screen/slot/Slot;Lnet/minecraft/util/context/ContextParameterMap;Lnet/minecraft/recipe/display/SlotDisplay;)V
+
+# ExplosionImpl
+accessible field net/minecraft/world/explosion/ExplosionImpl behavior Lnet/minecraft/world/explosion/ExplosionBehavior;
+accessible field net/minecraft/world/explosion/ExplosionImpl createFire Z
+accessible method net/minecraft/world/explosion/ExplosionImpl createFire (Ljava/util/List;)V
+accessible method net/minecraft/world/explosion/ExplosionImpl getBlocksToDestroy ()Ljava/util/List;
+accessible method net/minecraft/world/explosion/ExplosionImpl shouldDestroyBlocks ()Z
+extendable method net/minecraft/world/explosion/ExplosionImpl destroyBlocks (Ljava/util/List;)V
+
+# ServerWorld
+accessible method net/minecraft/server/world/ServerWorld getDestructionType (Lnet/minecraft/world/rule/GameRule;)Lnet/minecraft/world/explosion/Explosion$DestructionType;

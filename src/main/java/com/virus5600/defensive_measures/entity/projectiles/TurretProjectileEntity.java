@@ -42,6 +42,7 @@ import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 
 import java.util.Objects;
 
+import com.virus5600.defensive_measures.entity.ExplosiveEntity;
 import com.virus5600.defensive_measures.entity.turrets.TurretEntity;
 
 /**
@@ -298,38 +299,40 @@ public abstract class TurretProjectileEntity extends ProjectileEntity {
 			hitEntity.setOnFireFor(5F);
 		}
 
-		// Handles the application of damage to the target
-		if (world instanceof ServerWorld serverWorld) {
-			hitEntity.damage(serverWorld, dmgSrc, (float) damageToDeal);
+		// Handles the application of damage to the target (if it's not an explosive)
+		if (!(this instanceof ExplosiveEntity)) {
+			if (world instanceof ServerWorld serverWorld) {
+				hitEntity.damage(serverWorld, dmgSrc, (float) damageToDeal);
 
-			if (isEnderman) return;
+				if (isEnderman) return;
 
-			if (hitEntity instanceof LivingEntity livingEntity) {
-				if (!world.isClient() && this.getPierceLevel() <= 0) {
-					livingEntity.setStuckArrowCount(livingEntity.getStuckArrowCount() + 1);
+				if (hitEntity instanceof LivingEntity livingEntity) {
+					if (!world.isClient() && this.getPierceLevel() <= 0) {
+						livingEntity.setStuckArrowCount(livingEntity.getStuckArrowCount() + 1);
+					}
+
+					this.onHit(livingEntity);
 				}
 
-				this.onHit(livingEntity);
-			}
-
-			this.playSound(this.sound , 1f, 1.2f / (this.random.nextFloat() * 0.2f + 0.9f));
-			if (this.getPierceLevel() <= 0) {
-				this.discard();
-			}
-		}
-		else {
-			hitEntity.clientDamage(dmgSrc);
-
-			hitEntity.setFireTicks(fireTime);
-			this.deflect(ProjectileDeflection.SIMPLE, hitEntity, LazyEntityReference.of(hitEntity), false);
-			this.setVelocity(this.getVelocity().multiply(0.2));
-
-			if (world instanceof ServerWorld serverWorld && this.getVelocity().lengthSquared() < 1.0E-7) {
-				if (this.pickupType == PickupPermission.ALLOWED && this.stack != null) {
-					this.dropStack(serverWorld, this.asItemStack(), 0.1f);
+				this.playSound(this.sound , 1f, 1.2f / (this.random.nextFloat() * 0.2f + 0.9f));
+				if (this.getPierceLevel() <= 0) {
+					this.discard();
 				}
+			}
+			else {
+				hitEntity.clientDamage(dmgSrc);
 
-				this.discard();
+				hitEntity.setFireTicks(fireTime);
+				this.deflect(ProjectileDeflection.SIMPLE, hitEntity, LazyEntityReference.of(hitEntity), false);
+				this.setVelocity(this.getVelocity().multiply(0.2));
+
+				if (world instanceof ServerWorld serverWorld && this.getVelocity().lengthSquared() < 1.0E-7) {
+					if (this.pickupType == PickupPermission.ALLOWED && this.stack != null) {
+						this.dropStack(serverWorld, this.asItemStack(), 0.1f);
+					}
+
+					this.discard();
+				}
 			}
 		}
 
@@ -368,8 +371,8 @@ public abstract class TurretProjectileEntity extends ProjectileEntity {
 				);
 			}
 
-			// If armor affects damage...
-			if (this.armorAffectsDamage()) {
+			// If armor affects damage... (only if it's not an explosives)
+			if (this.armorAffectsDamage() && !(this instanceof ExplosiveEntity)) {
 				double reduction = 0.05;
 
 				switch (armorType) {

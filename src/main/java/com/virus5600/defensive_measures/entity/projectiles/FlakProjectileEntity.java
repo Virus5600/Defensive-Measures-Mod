@@ -183,4 +183,10 @@ public class FlakProjectileEntity extends CannonballEntity {
 	public double getDamageReduction() {
 		return 0.125;
 	}
+
+	// ExplosiveEntity //
+	@Override
+	public boolean canDestroyBlocks() {
+		return false;
+	}
 }
