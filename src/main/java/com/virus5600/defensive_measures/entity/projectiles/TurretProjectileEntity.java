@@ -299,7 +299,7 @@ public abstract class TurretProjectileEntity extends ProjectileEntity {
 			hitEntity.setOnFireFor(5F);
 		}
 
-		// Handles the application of damage to the target (if it's not an explosives)
+		// Handles the application of damage to the target (if it's not an explosive)
 		if (!(this instanceof ExplosiveEntity)) {
 			if (world instanceof ServerWorld serverWorld) {
 				hitEntity.damage(serverWorld, dmgSrc, (float) damageToDeal);
@@ -371,7 +371,7 @@ public abstract class TurretProjectileEntity extends ProjectileEntity {
 				);
 			}
 
-			// If armor affects damage... (only if it's not an explsives)
+			// If armor affects damage... (only if it's not an explosives)
 			if (this.armorAffectsDamage() && !(this instanceof ExplosiveEntity)) {
 				double reduction = 0.05;
 

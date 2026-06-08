@@ -469,6 +469,7 @@ public abstract class ExplosiveProjectileEntity extends TurretProjectileEntity i
 	 */
 	public abstract double getDamageReduction();
 
+	@Override
 	public double getBaseDamage() {
 		return this.getDamage();
 	}

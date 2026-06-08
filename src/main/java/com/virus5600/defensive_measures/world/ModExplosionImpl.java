@@ -38,64 +38,38 @@ public class ModExplosionImpl extends ExplosionImpl {
 			throw new IllegalStateException("The damageEntities() method can only be called if the exploding entity is an instance of ExplosiveProjectileEntity.");
 		}
 
-		// Damaging entities within a radius.
-		double effectiveRadius = epe.getEffectiveRadius();
 		double maxDmgRadius = epe.getMaxDamageRadius();
-
-		// Damaging entities within Effective Radius
 		Vec3d explosionPos = this.getPosition();
-		Box fullDmgReceiver = new Box(
-			explosionPos.getX() - effectiveRadius,
-			explosionPos.getY() - effectiveRadius,
-			explosionPos.getZ() - effectiveRadius,
-			explosionPos.getX() + effectiveRadius,
-			explosionPos.getY() + effectiveRadius,
-			explosionPos.getZ() + effectiveRadius
+
+		// Single query with max radius — damageEntity handles zone detection internally
+		Box fullReceiver = new Box(
+			explosionPos.getX() - maxDmgRadius,
+			explosionPos.getY() - maxDmgRadius,
+			explosionPos.getZ() - maxDmgRadius,
+			explosionPos.getX() + maxDmgRadius,
+			explosionPos.getY() + maxDmgRadius,
+			explosionPos.getZ() + maxDmgRadius
 		);
 
-		// Entities in the inner radius
 		List<Entity> damagedEntities = new ArrayList<>();
 		epe.getEntityWorld()
-			.getOtherEntities(epe, fullDmgReceiver)
-			.forEach(entity -> this.damageEntity(epe, entity, damagedEntities, false, effectiveRadius));
-
-		// Creates a dynamic increment for the radius to reduce the number of entities to check
-		double steps = (maxDmgRadius - effectiveRadius) > 10 ? 0.5 : 0.25;
-
-		// Damaging entities outside Effective Radius but within Max Damage Radius
-		for (double currentRadius = effectiveRadius; currentRadius <= maxDmgRadius; currentRadius += steps) {
-			final double capturedRadius = currentRadius;
-			double ext = capturedRadius + 1;
-			Box partialDmgReceiver = new Box(
-				explosionPos.getX() - ext,
-				explosionPos.getY() - ext,
-				explosionPos.getZ() - ext,
-				explosionPos.getX() + ext,
-				explosionPos.getY() + ext,
-				explosionPos.getZ() + ext
-			);
-
-			epe.getEntityWorld()
-				.getOtherEntities(epe, partialDmgReceiver)
-				.forEach(entity -> this.damageEntity(epe, entity, damagedEntities, true, capturedRadius));
-		}
+			.getOtherEntities(epe, fullReceiver)
+			.forEach(entity -> this.damageEntity(epe, entity, damagedEntities, explosionPos));
 	}
 
-	private void damageEntity(ProjectileEntity projectile, Entity entity, List<Entity> list, boolean outerRad, double currentRadius) {
-		// Skip if already damaged
-		if (list.contains(entity) || entity.isImmuneToExplosion(this)) return;
+	private void damageEntity(ProjectileEntity projectile, Entity entity, List<Entity> list, Vec3d explosionPos) {
+		if (list.contains(entity)) return;
 
-		if (projectile instanceof ExplosiveEntity epe) {
+		if (!entity.isImmuneToExplosion(this) && (projectile instanceof ExplosiveEntity epe)) {
 			double effectiveRadius = epe.getEffectiveRadius();
 			double maxDmgRadius = epe.getMaxDamageRadius();
-			double distance = Math.sqrt(entity.squaredDistanceTo(this.getPosition()));
+			double distance = Math.sqrt(entity.squaredDistanceTo(explosionPos));
+
+			// Spherical radius guard
 			if (distance > maxDmgRadius) {
-				// Outside the explosion's max range; avoid repeatedly re-checking this entity in later radius iterations.
 				list.add(entity);
 				return;
 			}
-			if (!outerRad && distance > effectiveRadius) return;
-			if (outerRad && distance > currentRadius) return;
 
 			boolean shouldDmg = this.behavior.shouldDamage(this, entity);
 			double baseDmg = epe.getBaseDamage();
@@ -103,6 +77,7 @@ public class ModExplosionImpl extends ExplosionImpl {
 			float knockbackMod = this.behavior.getKnockbackModifier(entity);
 			float exposure = !shouldDmg && knockbackMod == 0 ?
 				0f : calculateReceivedDamage(this.getPosition(), entity);
+
 			// Size-aware factor
 			Box box = entity.getBoundingBox();
 			double sizeFactor = MathHelper.clamp(
@@ -112,21 +87,23 @@ public class ModExplosionImpl extends ExplosionImpl {
 				2.0
 			);
 
-			// If this is the outer radius, implement the damage falloff.
-			if (outerRad) {
-				float normalizedRadius = (float) ((currentRadius - effectiveRadius) / (maxDmgRadius - effectiveRadius));
+			// Determine inner vs outer zone from distance
+			double baseDmgFinal;
+			if (distance <= effectiveRadius) {
+				// Inner zone — full damage
+				baseDmgFinal = baseDmg;
+			}
+			else {
+				// Outer zone — exponential falloff
+				float normalizedRadius = (float) ((distance - effectiveRadius) / (maxDmgRadius - effectiveRadius));
 				float numerator = (float) (Math.exp(-dmgReduction * normalizedRadius) - Math.exp(-dmgReduction));
 				float denominator = (float) (1 - Math.exp(-dmgReduction));
-				float formula = numerator / denominator;
-
-				baseDmg = baseDmg * formula;
+				baseDmgFinal = baseDmg * (numerator / denominator);
 			}
 
-			// sizeFactor and exposure applied on top of baseDmg
-			float dmg = (float) (baseDmg * sizeFactor * exposure);
+			float dmg = (float) (baseDmgFinal * sizeFactor * exposure);
 			dmg = Math.max(1, dmg);
 
-			// Apply damage only if shouldDmg is true
 			if (shouldDmg) {
 				entity.damage(
 					(ServerWorld) projectile.getEntityWorld(),
@@ -135,34 +112,25 @@ public class ModExplosionImpl extends ExplosionImpl {
 				);
 			}
 
-			// Apply knockback
+			// Knockback
 			if (knockbackMod != 0) {
-				Vec3d entityPos = entity.getEyePos();
-				double distance = Math.sqrt(entity.squaredDistanceTo(this.getPosition()));
 				double normalizedDist = distance / maxDmgRadius;
 				double knockbackResistance = entity instanceof LivingEntity living
 					? living.getAttributeValue(EntityAttributes.EXPLOSION_KNOCKBACK_RESISTANCE)
 					: 0.0;
 
 				double knockback = (1 - normalizedDist) * exposure * knockbackMod * (1 - knockbackResistance);
-				Vec3d knockbackVec = entityPos.subtract(this.getPosition())
+				Vec3d knockbackVec = entity.getEyePos()
+					.subtract(explosionPos)
 					.normalize()
 					.multiply(knockback);
 
 				entity.addVelocity(knockbackVec);
 			}
 
-			// Notify entity of explosion
 			entity.onExplodedBy(projectile.getOwner());
 		}
-		else {
-			throw new IllegalStateException("The damageEntity() method can only be called if the exploding entity is an instance of ExplosiveEntity.");
-		}
 
-		// Don't forget to call `onExplodedBy` for the damaged entity
-		entity.onExplodedBy(projectile);
-
-		// Always add to list to prevent double-processing
 		list.add(entity);
 	}
 
