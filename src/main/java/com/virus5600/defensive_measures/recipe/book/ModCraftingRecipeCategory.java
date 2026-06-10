@@ -1,15 +1,18 @@
 package com.virus5600.defensive_measures.recipe.book;
 
 import com.mojang.serialization.Codec;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.util.ByIdMap;
+import net.minecraft.util.StringRepresentable;
+
+import org.jspecify.annotations.NonNull;
+
 import io.netty.buffer.ByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.codec.PacketCodecs;
-import net.minecraft.util.StringIdentifiable;
-import net.minecraft.util.function.ValueLists;
 
 import java.util.function.IntFunction;
 
-public enum ModCraftingRecipeCategory implements StringIdentifiable {
+public enum ModCraftingRecipeCategory implements StringRepresentable {
 	TURRETS("turrets", 0),
 	PARTS("parts", 1),
 	TRAPS("traps", 2),
@@ -17,19 +20,20 @@ public enum ModCraftingRecipeCategory implements StringIdentifiable {
 	EQUIPMENTS("equipments", 4),
 	MISC("misc", 5);
 
-	public static final Codec<ModCraftingRecipeCategory> CODEC = StringIdentifiable.createCodec(ModCraftingRecipeCategory::values);
-	public static final IntFunction<ModCraftingRecipeCategory> INDEX_TO_VALUE = ValueLists.createIndexToValueFunction(ModCraftingRecipeCategory::getIndex, values(), ValueLists.OutOfBoundsHandling.ZERO);
-	public static final PacketCodec<ByteBuf, ModCraftingRecipeCategory> PACKET_CODEC = PacketCodecs.indexed(INDEX_TO_VALUE, ModCraftingRecipeCategory::getIndex);
+	public static final Codec<ModCraftingRecipeCategory> CODEC = StringRepresentable.fromEnum(ModCraftingRecipeCategory::values);
+	public static final IntFunction<ModCraftingRecipeCategory> INDEX_TO_VALUE = ByIdMap.continuous(ModCraftingRecipeCategory::getIndex, values(), ByIdMap.OutOfBoundsStrategy.ZERO);
+	public static final StreamCodec<ByteBuf, ModCraftingRecipeCategory> PACKET_CODEC = ByteBufCodecs.idMapper(INDEX_TO_VALUE, ModCraftingRecipeCategory::getIndex);
 
 	private final String id;
 	private final int index;
 
-	private ModCraftingRecipeCategory(final String id, final int index) {
+	ModCraftingRecipeCategory(final String id, final int index) {
 		this.id = id;
 		this.index = index;
 	}
 
-	public String asString() {
+	@NonNull
+	public String getSerializedName() {
 		return this.id;
 	}
 

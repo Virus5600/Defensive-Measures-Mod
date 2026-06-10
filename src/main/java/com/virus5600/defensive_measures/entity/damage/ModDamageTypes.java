@@ -1,7 +1,7 @@
 package com.virus5600.defensive_measures.entity.damage;
 
-import net.minecraft.entity.damage.DamageType;
-import net.minecraft.registry.RegistryKey;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.damagesource.DamageType;
 
 import com.virus5600.defensive_measures.DefensiveMeasures;
 import com.virus5600.defensive_measures._helper.RegistryHelper;
@@ -18,12 +18,12 @@ import com.virus5600.defensive_measures._helper.RegistryHelper;
  */
 public class ModDamageTypes {
 	// v1.0.0-beta
-	public static final RegistryKey<DamageType> BOLT_HEAD = RegistryHelper.getDamageTypeKey("bolt_head");
+	public static final ResourceKey<DamageType> BOLT_HEAD = RegistryHelper.getDamageTypeKey("bolt_head");
 
 	// v1.1.0-beta
-	public static final RegistryKey<DamageType> ELECTRICITY = RegistryHelper.getDamageTypeKey("electricity");
-	public static final RegistryKey<DamageType> THROWN_FLAME = RegistryHelper.getDamageTypeKey("thrown_flame");
-	public static final RegistryKey<DamageType> SECONDARY_EXPLOSION = RegistryHelper.getDamageTypeKey("secondary_explosion");
+	public static final ResourceKey<DamageType> ELECTRICITY = RegistryHelper.getDamageTypeKey("electricity");
+	public static final ResourceKey<DamageType> THROWN_FLAME = RegistryHelper.getDamageTypeKey("thrown_flame");
+	public static final ResourceKey<DamageType> SECONDARY_EXPLOSION = RegistryHelper.getDamageTypeKey("secondary_explosion");
 
 	public static void registerDamageTypes() {
 		DefensiveMeasures.LOGGER.info("REGISTERING DAMAGE TYPES FOR {}...", DefensiveMeasures.MOD_NAME);

@@ -1,8 +1,9 @@
 package com.virus5600.defensive_measures.network;
 
+import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
+
 import com.virus5600.defensive_measures.DefensiveMeasures;
 import com.virus5600.defensive_measures.network.clientbound.sounds.TurretLoopSoundPacket;
-import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 
 /**
  * Class containing all the packet identifiers used by the mod. This is usually used to create the

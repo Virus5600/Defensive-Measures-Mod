@@ -1,30 +1,30 @@
 package com.virus5600.defensive_measures.recipe;
 
 import com.mojang.serialization.MapCodec;
-import com.virus5600.defensive_measures.item.ModItems;
-import com.virus5600.defensive_measures.recipe.display.TASCraftingRecipeDisplay;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.codec.PacketCodecs;
-import net.minecraft.recipe.Ingredient;
-import net.minecraft.recipe.Recipe;
-import net.minecraft.recipe.RecipeSerializer;
-import net.minecraft.recipe.RecipeType;
-import net.minecraft.recipe.display.RecipeDisplay;
-import net.minecraft.recipe.display.ShapedCraftingRecipeDisplay;
-import net.minecraft.recipe.display.SlotDisplay;
-import net.minecraft.recipe.input.CraftingRecipeInput;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.CraftingInput;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.world.item.crafting.display.RecipeDisplay;
+import net.minecraft.world.item.crafting.display.SlotDisplay;
 
+import com.virus5600.defensive_measures.item.ModItems;
 import com.virus5600.defensive_measures.recipe.book.ModCraftingRecipeCategory;
+import com.virus5600.defensive_measures.recipe.display.TASCraftingRecipeDisplay;
+
+import org.jspecify.annotations.NonNull;
 
 import java.util.List;
 
-public class TASShapedRecipe extends BaseCraftingRecipe<CraftingRecipeInput> {
+public class TASShapedRecipe extends BaseCraftingRecipe<CraftingInput> {
 
 	public static final MapCodec<TASShapedRecipe> CODEC;
-	public static final PacketCodec<RegistryByteBuf, TASShapedRecipe> PACKET_CODEC;
+	public static final StreamCodec<RegistryFriendlyByteBuf, TASShapedRecipe> PACKET_CODEC;
 
 	public TASShapedRecipe(String group, ModCraftingRecipeCategory category, CustomShapedRecipe recipe, ItemStack result, boolean showNotification) {
 		super(group, category, recipe, result, showNotification);
@@ -34,17 +34,17 @@ public class TASShapedRecipe extends BaseCraftingRecipe<CraftingRecipeInput> {
 	// OVERRIDE METHODS //
 	// //////////////// //
 
-	public List<RecipeDisplay> getDisplays() {
+	public @NonNull List<RecipeDisplay> display() {
 		return List.of(new TASCraftingRecipeDisplay(
 			this.recipe.getWidth(),
 			this.recipe.getHeight(),
 			this.recipe.getIngredients()
 				.stream()
 				.map((ingredient) ->
-					ingredient.map(Ingredient::toDisplay)
-						.orElse(SlotDisplay.EmptySlotDisplay.INSTANCE))
+					ingredient.map(Ingredient::display)
+						.orElse(SlotDisplay.Empty.INSTANCE))
 				.toList(),
-			new SlotDisplay.StackSlotDisplay(this.result),
+			new SlotDisplay.ItemStackSlotDisplay(this.result),
 			new SlotDisplay.ItemSlotDisplay(ModItems.TURRET_ASSEMBLY_STATION)
 		));
 	}
@@ -53,8 +53,8 @@ public class TASShapedRecipe extends BaseCraftingRecipe<CraftingRecipeInput> {
 	// ABSTRACT METHODS //
 	// //////////////// //
 
-	@Override
-	public RecipeType<? extends Recipe<CraftingRecipeInput>> getType() {
+	@Override @NonNull
+	public RecipeType<? extends Recipe<CraftingInput>> getType() {
 		return ModRecipeTypes.TAS_RECIPE_TYPE;
 	}
 
@@ -62,8 +62,8 @@ public class TASShapedRecipe extends BaseCraftingRecipe<CraftingRecipeInput> {
 	// INTERFACE METHODS //
 	// ///////////////// //
 
-	@Override
-	public RecipeSerializer<? extends BaseCraftingRecipe<CraftingRecipeInput>> getSerializer() {
+	@Override @NonNull
+	public RecipeSerializer<? extends BaseCraftingRecipe<CraftingInput>> getSerializer() {
 		return ModRecipeSerializers.TAS_SERIALIZER;
 	}
 
@@ -76,12 +76,12 @@ public class TASShapedRecipe extends BaseCraftingRecipe<CraftingRecipeInput> {
 			TASShapedRecipe::new
 		);
 
-		PACKET_CODEC = PacketCodec.tuple(
-			PacketCodecs.STRING, BaseCraftingRecipe::getGroup,
+		PACKET_CODEC = StreamCodec.composite(
+			ByteBufCodecs.STRING_UTF8, BaseCraftingRecipe::group,
 			ModCraftingRecipeCategory.PACKET_CODEC, BaseCraftingRecipe::getCategory,
 			CustomShapedRecipe.PACKET_CODEC, recipe -> recipe.recipe,
-			ItemStack.PACKET_CODEC, recipe -> recipe.result,
-			PacketCodecs.BOOLEAN, BaseCraftingRecipe::showNotification,
+			ItemStack.STREAM_CODEC, recipe -> recipe.result,
+			ByteBufCodecs.BOOL, BaseCraftingRecipe::showNotification,
 			TASShapedRecipe::new
 		);
 	}

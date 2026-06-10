@@ -2,11 +2,11 @@ package com.virus5600.defensive_measures.entity.turrets.interfaces;
 
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvent;
-import net.minecraft.world.World;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.level.Level;
 
 import com.virus5600.defensive_measures.entity.turrets.TurretEntity;
 import com.virus5600.defensive_measures.network.clientbound.sounds.TurretLoopSoundPacket;
@@ -96,8 +96,8 @@ public interface LoopableShootingSound {
 	// DEFAULT METHODS //
 	// /////////////// //
 
-	default SoundCategory getSoundCategory() {
-		return SoundCategory.NEUTRAL;
+	default SoundSource getSoundCategory() {
+		return SoundSource.NEUTRAL;
 	}
 
 	/**
@@ -108,9 +108,9 @@ public interface LoopableShootingSound {
 	 * @param turret The turret entity for which to play the shooting loopSound.
 	 */
 	default void playShootSound(TurretEntity turret) {
-		World world = turret.getEntityWorld();
+		Level world = turret.level();
 
-		if (world instanceof ServerWorld) {
+		if (world instanceof ServerLevel) {
 			boolean isShootingNow = turret.getTrackedLockedButNotAttacking() || turret.getTrackedShooting();
 
 			// Starts playing the loopSound loop if the turret is shooting now but wasn't shooting in the last tick
@@ -118,7 +118,7 @@ public interface LoopableShootingSound {
 				if (turret.getTarget() != null) {
 					this.setShootingLastTick(true);
 
-					for (ServerPlayerEntity player : PlayerLookup.tracking(turret)) {
+					for (ServerPlayer player : PlayerLookup.tracking(turret)) {
 						ServerPlayNetworking.send(
 							player,
 							new TurretLoopSoundPacket(
@@ -139,7 +139,7 @@ public interface LoopableShootingSound {
 					this.setShootingLastTick(false);
 
 					// Send the STOP packet to every player tracking this turret
-					for (ServerPlayerEntity player : PlayerLookup.tracking(turret)) {
+					for (ServerPlayer player : PlayerLookup.tracking(turret)) {
 						ServerPlayNetworking.send(
 							player,
 							new TurretLoopSoundPacket(

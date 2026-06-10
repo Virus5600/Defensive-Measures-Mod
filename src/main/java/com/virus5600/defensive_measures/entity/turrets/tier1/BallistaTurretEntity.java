@@ -1,35 +1,35 @@
 package com.virus5600.defensive_measures.entity.turrets.tier1;
 
-import com.virus5600.defensive_measures.entity.turrets.TurretEntity;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.attribute.DefaultAttributeContainer.Builder;
-import net.minecraft.entity.damage.DamageSource;
-import net.minecraft.entity.data.DataTracker;
-import net.minecraft.entity.effect.StatusEffects;
-import net.minecraft.entity.mob.MobEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.sound.SoundEvent;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
-
-import org.jetbrains.annotations.Nullable;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.ai.attributes.AttributeSupplier.Builder;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
 
 import com.virus5600.defensive_measures.entity.ModEntities;
 import com.virus5600.defensive_measures.entity.TurretMaterial;
 import com.virus5600.defensive_measures.entity.ai.goal.ProjectileAttackGoal;
+import com.virus5600.defensive_measures.entity.turrets.TurretEntity;
 import com.virus5600.defensive_measures.item.ModItems;
 import com.virus5600.defensive_measures.sound.ModSoundEvents;
 
+import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+
 import java.util.ArrayList;
-import java.util.List;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -62,7 +62,7 @@ public class BallistaTurretEntity extends TurretEntity {
 	 * The time is calculated in ticks and by default, it's 2.5 seconds <b>(20 ticks times 2.5 seconds)</b>.
 	 */
 	private static final int TOTAL_ATT_COOLDOWN = (int) (20 * 2.5);
-	private static final Map<Offsets, List<Vec3d>> OFFSETS;
+	private static final Map<Offsets, List<Vec3>> OFFSETS;
 	private static final Map<Item, SoundEvent> HEAL_SOUNDS;
 	private static final double[] DAMAGE;
 	private static final byte[] PIERCE_LEVELS;
@@ -79,7 +79,7 @@ public class BallistaTurretEntity extends TurretEntity {
 	// //////////// //
 	// CONSTRUCTORS //
 	// //////////// //
-	public BallistaTurretEntity(EntityType<? extends MobEntity> entityType, World world) {
+	public BallistaTurretEntity(EntityType<? extends Mob> entityType, Level world) {
 		super(entityType, world, TurretMaterial.WOOD, ModEntities.BALLISTA_BOLT, ModItems.BALLISTA_TURRET);
 
 		this.setShootSound(ModSoundEvents.TURRET_BALLISTA_SHOOT);
@@ -93,18 +93,18 @@ public class BallistaTurretEntity extends TurretEntity {
 	// INITIALIZERS //
 	// //////////// //
 	@Override
-	protected void initGoals() {
+	protected void registerGoals() {
 		// Goal instances
 		this.attackGoal = new ProjectileAttackGoal(this, 0, TOTAL_ATT_COOLDOWN, this.getMaxAttackRange(), this.getMinAttackRange());
 
 		// Set the standard goals
-		super.initGoals();
+		super.registerGoals();
 	}
 
 	@Override
-	protected void initDataTracker(DataTracker.Builder builder) {
+	protected void defineSynchedData(net.minecraft.network.syncher.SynchedEntityData.@NonNull Builder builder) {
 		// Initialize standard data trackers
-		super.initDataTracker(builder);
+		super.defineSynchedData(builder);
 	}
 
 	public static Builder setAttributes() {
@@ -119,16 +119,16 @@ public class BallistaTurretEntity extends TurretEntity {
 	// /////////////// //
 
 	@Override
-	public void shootAt(LivingEntity target, float pullProgress) {
+	public void performRangedAttack(@NonNull LivingEntity target, float pullProgress) {
 		TurretProjectileVelocity velocityData = this.getProjectileVelocityData(target);
 
 		super.shootAt(velocityData);
 	}
 
 	@Override
-	public void onRemove(Entity.RemovalReason reason) {
+	public void onRemoval(Entity.@NonNull RemovalReason reason) {
 		// Shoot the animation projectile as a real projectile when the turret is destroyed
-		if (this.isDead()) {
+		if (this.isDeadOrDying()) {
 			this.shoot(
 				TurretEntity.TurretProjectileVelocity
 					.init(this)
@@ -136,25 +136,25 @@ public class BallistaTurretEntity extends TurretEntity {
 			);
 		}
 
-		super.onRemove(reason);
+		super.onRemoval(reason);
 	}
 
 	@Override
-	public ActionResult interactMob(PlayerEntity player, Hand hand) {
-		Item usedItem = player.getStackInHand(hand).getItem();
+	public @NonNull InteractionResult mobInteract(Player player, @NonNull InteractionHand hand) {
+		Item usedItem = player.getItemInHand(hand).getItem();
 
 		if (this.isHealableItem(usedItem)) {
 			this.setHealSound(HEAL_SOUNDS.get(usedItem));
 		}
 
-		return super.interactMob(player, hand);
+		return super.mobInteract(player, hand);
 	}
 
 	@Override
 	public void tick() {
 		super.tick();
 
-		if (this.getEntityWorld().isClient()) {
+		if (this.level().isClientSide()) {
 			this.updateAnimations();
 		}
 	}
@@ -164,13 +164,13 @@ public class BallistaTurretEntity extends TurretEntity {
 	// /////////////////// //
 
 	@Override
-	public int getMaxLookPitchChange() {
+	public int getMaxHeadXRot() {
 		return 20;
 	}
 
 	@Nullable
 	@Override
-	protected SoundEvent getHurtSound(DamageSource source) {
+	protected SoundEvent getHurtSound(@NonNull DamageSource source) {
 		return ModSoundEvents.TURRET_BALLISTA_HURT;
 	}
 
@@ -204,13 +204,13 @@ public class BallistaTurretEntity extends TurretEntity {
 		return (int) (1.5F * 20);
 	}
 
-	protected List<Vec3d> getTurretProjectileSpawn() {
+	protected List<Vec3> getTurretProjectileSpawn() {
 		return OFFSETS.get(Offsets.BOLT_HOLDER);
 	}
 
 	public TurretProjectileVelocity getProjectileVelocityData(LivingEntity target) {
-		float dist = (float) this.getEntityPos()
-			.distanceTo(target.getEntityPos());
+		float dist = (float) this.position()
+			.distanceTo(target.position());
 
 		return TurretProjectileVelocity
 			.init(this)
@@ -256,7 +256,7 @@ public class BallistaTurretEntity extends TurretEntity {
 
 		OFFSETS = Map.of(
 			Offsets.BOLT_HOLDER, List.of(
-				new Vec3d(0, 0, 0.875)
+				new Vec3(0, 0, 0.875)
 			)
 		);
 
@@ -283,7 +283,7 @@ public class BallistaTurretEntity extends TurretEntity {
 			{
 				for (Item item : TurretEntity.LOGS) {
 					put(item, List.<Object[]>of(
-						new Object[] {StatusEffects.ABSORPTION, 60, 2}
+						new Object[] {MobEffects.ABSORPTION, 60, 2}
 					));
 				}
 			}

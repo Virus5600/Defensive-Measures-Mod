@@ -2,29 +2,28 @@ package com.virus5600.defensive_measures.entity.turrets.tier2;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.goal.ActiveTargetGoal;
-import net.minecraft.entity.attribute.DefaultAttributeContainer;
-import net.minecraft.entity.attribute.EntityAttributes;
-import net.minecraft.entity.damage.DamageSource;
-import net.minecraft.entity.data.DataTracker;
-import net.minecraft.entity.data.TrackedData;
-import net.minecraft.entity.data.TrackedDataHandlerRegistry;
-import net.minecraft.entity.effect.StatusEffects;
-import net.minecraft.entity.mob.MobEntity;
-import net.minecraft.entity.mob.Monster;
-import net.minecraft.entity.projectile.ProjectileEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.particle.ParticleEffect;
-import net.minecraft.particle.ParticleTypes;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.sound.SoundEvent;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.random.Random;
-import net.minecraft.world.World;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
+import net.minecraft.world.entity.monster.Enemy;
+import net.minecraft.world.entity.projectile.Projectile;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
 
 import com.virus5600.defensive_measures._util.MathUtil;
 import com.virus5600.defensive_measures.entity.ModEntities;
@@ -40,6 +39,7 @@ import com.virus5600.defensive_measures.sound.ModSoundEvents;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -88,13 +88,13 @@ import java.util.Map;
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
  */
 public class FlameTurretEntity extends TurretEntity implements LoopableShootingSound {
-	private static final TrackedData<Boolean> IS_PRIMED;
+	private static final EntityDataAccessor<Boolean> IS_PRIMED;
 	/**
 	 * Defines how many seconds the cannon should wait before shooting again.
 	 * The time is calculated in ticks and by default, it's 1 second <b>(20 ticks times 1 second)</b>.
 	 */
 	private static final int TOTAL_ATT_COOLDOWN = 20;
-	private static final Vec3d HINGE_POS;
+	private static final Vec3 HINGE_POS;
 	/**
 	 * Defines the position of the lighter or the fire that ignites the fuel. This position is a
 	 * relative position from the turret's barrel position, which in turn is relative to the
@@ -104,7 +104,7 @@ public class FlameTurretEntity extends TurretEntity implements LoopableShootingS
 	 *
 	 * @see #LIGHTER_ATT_POS
 	 */
-	private static final Vec3d LIGHTER_POS;
+	private static final Vec3 LIGHTER_POS;
 	/**
 	 * Defines the position of the lighter or the fire that ignites the fuel. This position is a
 	 * relative position from the turret's barrel position, which in turn is relative to the
@@ -114,8 +114,8 @@ public class FlameTurretEntity extends TurretEntity implements LoopableShootingS
 	 *
 	 * @see #LIGHTER_POS
 	 */
-	private static final Vec3d LIGHTER_ATT_POS;
-	private static final List<Vec3d> BARRELS;
+	private static final Vec3 LIGHTER_ATT_POS;
+	private static final List<Vec3> BARRELS;
 	private static final double[] DAMAGE;
 	/**
 	 * Contains all the items that can heal this entity.
@@ -133,7 +133,7 @@ public class FlameTurretEntity extends TurretEntity implements LoopableShootingS
 	// //////////// //
 	// CONSTRUCTORS //
 	// //////////// //
-	public FlameTurretEntity(EntityType<? extends MobEntity> entityType, World world) {
+	public FlameTurretEntity(EntityType<? extends Mob> entityType, Level world) {
 		super(entityType, world, TurretMaterial.METAL, ModEntities.FLAMMABLE_AEROSOL, ModItems.FLAME_TURRET);
 
 		this.setShootSound(ModSoundEvents.TURRET_FLAME_SHOOT_LOOP);
@@ -148,7 +148,7 @@ public class FlameTurretEntity extends TurretEntity implements LoopableShootingS
 	// INITIALIZERS //
 	// //////////// //
 	@Override
-	public void initGoals() {
+	public void registerGoals() {
 		// Goal instances
 		this.attackGoal = new ProjectileAttackGoal(
 			this, 0,
@@ -156,45 +156,45 @@ public class FlameTurretEntity extends TurretEntity implements LoopableShootingS
 		);
 
 		// Set the standard goals
-		super.initGoals();
+		super.registerGoals();
 	}
 
 	@Override
-	protected ActiveTargetGoal<?> getActiveTargetGoal() {
-		return new ActiveTargetGoal<>(
-			this, MobEntity.class, 80,
+	protected NearestAttackableTargetGoal<?> getActiveTargetGoal() {
+		return new NearestAttackableTargetGoal<>(
+			this, Mob.class, 80,
 			true, false,
 			this::targetPredicate
 		);
 	}
 
 	@Override
-	protected boolean targetPredicate(LivingEntity target, ServerWorld world) {
+	protected boolean targetPredicate(LivingEntity target, ServerLevel world) {
 		boolean isInFiringArc = this.attackGoal.isWithinRotationLimit(target);
-		boolean isGroundTarget = !target.getType().isIn(ModEntityTypeTags.FLYING_HOSTILES);
-		boolean isMonster = target instanceof Monster;
-		boolean isNotTurret = !target.getType().isIn(ModEntityTypeTags.TURRETS);
+		boolean isGroundTarget = !target.getType().is(ModEntityTypeTags.FLYING_HOSTILES);
+		boolean isMonster = target instanceof Enemy;
+		boolean isNotTurret = !target.getType().is(ModEntityTypeTags.TURRETS);
 
 		return isInFiringArc && isGroundTarget && isMonster && isNotTurret;
 	}
 
 	@Override
-	protected void initDataTracker(DataTracker.Builder builder) {
+	protected void defineSynchedData(SynchedEntityData.@NonNull Builder builder) {
 		// Initialize standard data trackers
-		super.initDataTracker(builder);
+		super.defineSynchedData(builder);
 
 		builder
-			.add(IS_PRIMED, false)
+			.define(IS_PRIMED, false)
 		;
 	}
 
-	public static @NotNull DefaultAttributeContainer.Builder setAttributes() {
+	public static @NotNull net.minecraft.world.entity.ai.attributes.AttributeSupplier.Builder setAttributes() {
 		TurretEntity.setTurretMaxHealth(150);
 		TurretEntity.setTurretMaxRange(10 + ModEntities.FLAME_TURRET.getDimensions().eyeHeight());
 
 		return TurretEntity.setAttributes()
-			.add(EntityAttributes.ARMOR, 5)
-			.add(EntityAttributes.ARMOR_TOUGHNESS, 3);
+			.add(Attributes.ARMOR, 5)
+			.add(Attributes.ARMOR_TOUGHNESS, 3);
 	}
 
 	// //////////// //
@@ -207,11 +207,11 @@ public class FlameTurretEntity extends TurretEntity implements LoopableShootingS
 	 * @param isPrimed whether the turret is primed and ready to shoot or not
 	 */
 	public void setIsPrimed(boolean isPrimed) {
-		this.dataTracker.set(IS_PRIMED, isPrimed);
+		this.entityData.set(IS_PRIMED, isPrimed);
 	}
 
 	public boolean isPrimed() {
-		return this.dataTracker.get(IS_PRIMED);
+		return this.entityData.get(IS_PRIMED);
 	}
 
 	// /////////////// //
@@ -219,21 +219,21 @@ public class FlameTurretEntity extends TurretEntity implements LoopableShootingS
 	// /////////////// //
 
 	protected void lightLighter() {
-		Vec3d barrelOrigin = this.getRelativePosFrom(
-			this.getEyePos(), HINGE_POS,
+		Vec3 barrelOrigin = this.getRelativePosFrom(
+			this.getEyePosition(), HINGE_POS,
 			false
 		);
 
-		Vec3d lighterPos = this.getRelativePosFrom(
+		Vec3 lighterPos = this.getRelativePosFrom(
 			barrelOrigin, LIGHTER_POS,
 			true
 		);
-		Vec3d lighterAttPos = this.getRelativePosFrom(
+		Vec3 lighterAttPos = this.getRelativePosFrom(
 			barrelOrigin, LIGHTER_ATT_POS,
 			true
 		);
 
-		Vec3d newPos = lighterPos.lerp(lighterAttPos, this.currentLighterPos / 20f);
+		Vec3 newPos = lighterPos.lerp(lighterAttPos, this.currentLighterPos / 20f);
 		if (this.isPrimed()) {
 			this.currentLighterPos = MathUtil.clamp(
 				this.currentLighterPos + 1, 0, 20
@@ -244,16 +244,16 @@ public class FlameTurretEntity extends TurretEntity implements LoopableShootingS
 			);
 		}
 
-		this.getEntityWorld()
-			.addParticleClient(
+		this.level()
+			.addParticle(
 				ModParticles.LIGHTER_FLAME,
-				newPos.getX(), newPos.getY(), newPos.getZ(),
+				newPos.x(), newPos.y(), newPos.z(),
 				0, 0, 0
 			);
 	}
 
 	@Override
-	protected <P extends ProjectileEntity> void onProjectileCreateCallback(P projectile) {
+	protected <P extends Projectile> void onProjectileCreateCallback(P projectile) {
 		FlammableAerosolEntity fae = (FlammableAerosolEntity) projectile;
 
 		int fireDuration = (int) (2.5 * 20);
@@ -269,7 +269,7 @@ public class FlameTurretEntity extends TurretEntity implements LoopableShootingS
 		fae.setRadiusGrowth(radGrowth);
 		fae.setReApplicationDelay(10);
 
-		if (!this.getEntityWorld().isClient() && !this.isPrimed()) {
+		if (!this.level().isClientSide() && !this.isPrimed()) {
 			this.setIsPrimed(true);
 		}
 	}
@@ -280,7 +280,7 @@ public class FlameTurretEntity extends TurretEntity implements LoopableShootingS
 	}
 
 	@Override
-	public void shootAt(LivingEntity target, float pullProgress) {
+	public void performRangedAttack(@NonNull LivingEntity target, float pullProgress) {
 		TurretProjectileVelocity velocityData = this.getProjectileVelocityData(target);
 
 		super.shootAt(velocityData);
@@ -292,9 +292,9 @@ public class FlameTurretEntity extends TurretEntity implements LoopableShootingS
 
 		this.playShootSound(this);
 
-		World world = this.getEntityWorld();
+		Level world = this.level();
 
-		if (!world.isClient()) {
+		if (!world.isClientSide()) {
 			this.setHasTarget(this.getTarget() != null);
 
 			if (!this.hasTarget() && this.isPrimed()) {
@@ -302,28 +302,28 @@ public class FlameTurretEntity extends TurretEntity implements LoopableShootingS
 			}
 		}
 
-		if (world.isClient()) {
+		if (world.isClientSide()) {
 			if (this.isPrimed()) {
-				Random rand = this.getRandom();
-				Vec3d barrelPos = this.getRelativePos(this.getCurrentBarrel(false));
-				Vec3d direction = Vec3d.fromPolar(
-					this.getPitch(),
-					this.getHeadYaw()
+				RandomSource rand = this.getRandom();
+				Vec3 barrelPos = this.getRelativePos(this.getCurrentBarrel(false));
+				Vec3 direction = Vec3.directionFromRotation(
+					this.getXRot(),
+					this.getYHeadRot()
 				);
-				Vec3d vel = direction.multiply(
-					rand.nextBetween(25, 50) / 100f,
-					rand.nextBetween(25, 50) / 100f,
-					rand.nextBetween(25, 50) / 100f
+				Vec3 vel = direction.multiply(
+					rand.nextIntBetweenInclusive(25, 50) / 100f,
+					rand.nextIntBetweenInclusive(25, 50) / 100f,
+					rand.nextIntBetweenInclusive(25, 50) / 100f
 				);
 
-				for (int i = 0; i < rand.nextBetween(5, 10); i++) {
-					ParticleEffect particle = rand.nextBoolean() ?
+				for (int i = 0; i < rand.nextIntBetweenInclusive(5, 10); i++) {
+					ParticleOptions particle = rand.nextBoolean() ?
 						ParticleTypes.FLAME : ParticleTypes.SMALL_FLAME;
 
-					world.addImportantParticleClient(
+					world.addAlwaysVisibleParticle(
 						particle,
-						barrelPos.getX(), barrelPos.getY(), barrelPos.getZ(),
-						vel.getX(), vel.getY(), vel.getZ()
+						barrelPos.x(), barrelPos.y(), barrelPos.z(),
+						vel.x(), vel.y(), vel.z()
 					);
 				}
 			}
@@ -335,7 +335,7 @@ public class FlameTurretEntity extends TurretEntity implements LoopableShootingS
 	// /////////////////// //
 
 	@Override @Nullable
-	protected SoundEvent getHurtSound(DamageSource src) {
+	protected SoundEvent getHurtSound(@NonNull DamageSource src) {
 		return ModSoundEvents.TURRET_FLAME_HURT;
 	}
 
@@ -345,12 +345,12 @@ public class FlameTurretEntity extends TurretEntity implements LoopableShootingS
 	}
 
 	@Override
-	public int getMaxLookPitchChange() {
+	public int getMaxHeadXRot() {
 		return 25;
 	}
 
 	@Override
-	public int getMinLookPitchChange() {
+	public int getMinHeadXRot() {
 		return -35;
 	}
 
@@ -388,27 +388,27 @@ public class FlameTurretEntity extends TurretEntity implements LoopableShootingS
 		return (int) (1.25F * 20);
 	}
 
-	protected List<Vec3d> getTurretProjectileSpawn() {
-		List<Vec3d> barrels = new ArrayList<>();
+	protected List<Vec3> getTurretProjectileSpawn() {
+		List<Vec3> barrels = new ArrayList<>();
 
-		for (Vec3d barrel : BARRELS) {
-			Vec3d barrelOrigin = this.getRelativePosFrom(
-				this.getEyePos(), HINGE_POS,
+		for (Vec3 barrel : BARRELS) {
+			Vec3 barrelOrigin = this.getRelativePosFrom(
+				this.getEyePosition(), HINGE_POS,
 				false
 			);
 
-			Vec3d barrelPos = this.getRelativePosFrom(
+			Vec3 barrelPos = this.getRelativePosFrom(
 				barrelOrigin, barrel,
 				true
 			);
 
-			float pitchRad = MathUtil.degToRad(this.getPitch());
-			float yawRad = MathUtil.degToRad(this.getHeadYaw());
+			float pitchRad = MathUtil.degToRad(this.getXRot());
+			float yawRad = MathUtil.degToRad(this.getYHeadRot());
 
 			barrels.add(
-				barrelPos.subtract(this.getEyePos())
-					.rotateY(yawRad)
-					.rotateX(pitchRad)
+				barrelPos.subtract(this.getEyePosition())
+					.yRot(yawRad)
+					.xRot(pitchRad)
 			);
 		}
 
@@ -484,7 +484,7 @@ public class FlameTurretEntity extends TurretEntity implements LoopableShootingS
 	// ///////////////// //
 
 	static {
-		IS_PRIMED = DataTracker.registerData(FlameTurretEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
+		IS_PRIMED = SynchedEntityData.defineId(FlameTurretEntity.class, EntityDataSerializers.BOOLEAN);
 
 		DAMAGE = new double[] {
 			15.00,
@@ -492,13 +492,13 @@ public class FlameTurretEntity extends TurretEntity implements LoopableShootingS
 			17.50
 		};
 
-		HINGE_POS = new Vec3d(0, 0, 0.575);
+		HINGE_POS = new Vec3(0, 0, 0.575);
 
-		LIGHTER_POS = new Vec3d(0, -0.125, 1.3125);
-		LIGHTER_ATT_POS = new Vec3d(0, 0, 1.275);
+		LIGHTER_POS = new Vec3(0, -0.125, 1.3125);
+		LIGHTER_ATT_POS = new Vec3(0, 0, 1.275);
 
 		BARRELS = List.of(
-			new Vec3d(0, 0, 1.3125)
+			new Vec3(0, 0, 1.3125)
 		);
 
 		healables = Map.of(
@@ -512,10 +512,10 @@ public class FlameTurretEntity extends TurretEntity implements LoopableShootingS
 
 		effectSource = Map.of(
 			Items.IRON_BLOCK, List.<Object[]>of(
-				new Object[] { StatusEffects.RESISTANCE, 60, 2 }
+				new Object[] { MobEffects.RESISTANCE, 60, 2 }
 			),
 			Items.COPPER_BLOCK, List.<Object[]>of(
-				new Object[] { StatusEffects.RESISTANCE, 60, 1 }
+				new Object[] { MobEffects.RESISTANCE, 60, 1 }
 			)
 		);
 	}

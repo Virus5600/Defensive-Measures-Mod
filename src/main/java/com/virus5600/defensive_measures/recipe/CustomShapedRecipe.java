@@ -4,37 +4,37 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.recipe.Ingredient;
-import net.minecraft.recipe.RawShapedRecipe;
-import net.minecraft.recipe.input.CraftingRecipeInput;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.util.ExtraCodecs;
 import net.minecraft.util.Util;
-import net.minecraft.util.dynamic.Codecs;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.CraftingInput;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.ShapedRecipePattern;
+
+import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.VisibleForTesting;
+
+import it.unimi.dsi.fastutil.chars.CharArraySet;
+import it.unimi.dsi.fastutil.chars.CharSet;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import it.unimi.dsi.fastutil.chars.CharArraySet;
-import it.unimi.dsi.fastutil.chars.CharSet;
-
-import org.jetbrains.annotations.Nullable;
-import org.jetbrains.annotations.VisibleForTesting;
-
 /**
  * With the vanilla crafting system class rigid, the need to create a flexible one drived the developer
  * to create a new base class that can hold the centralized common logic of all crafting system-related
- * classes. This class was derived from {@link RawShapedRecipe} class to allow a more dynamic and
+ * classes. This class was derived from {@link ShapedRecipePattern} class to allow a more dynamic and
  * flexible crafting system that can support larger crafting grids and more complex recipes, which
  * is necessary for the crafting systems being implemented in this mod.
  *
  * @since 1.1.0
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
  *
- * @see RawShapedRecipe
+ * @see ShapedRecipePattern
  */
 public final class CustomShapedRecipe {
 	public static final char SPACE = ' ';
@@ -55,11 +55,11 @@ public final class CustomShapedRecipe {
 		this.symmetrical = Util.isSymmetrical(width, height, ingredients);
 	}
 
-	public boolean matches(CraftingRecipeInput input) {
-		if (input.getStackCount() == this.ingredientCount) {
-			if (input.getWidth() >= this.width && input.getHeight() >= this.height) {
-				for (int offsetY = 0; offsetY <= input.getHeight() - this.height; ++offsetY) {
-					for (int offsetX = 0; offsetX <= input.getWidth() - this.width; ++offsetX) {
+	public boolean matches(CraftingInput input) {
+		if (input.ingredientCount() == this.ingredientCount) {
+			if (input.width() >= this.width && input.height() >= this.height) {
+				for (int offsetY = 0; offsetY <= input.height() - this.height; ++offsetY) {
+					for (int offsetX = 0; offsetX <= input.width() - this.width; ++offsetX) {
 						if (!this.symmetrical && this.matches(input, true, offsetX, offsetY)) {
 							return true;
 						}
@@ -74,7 +74,7 @@ public final class CustomShapedRecipe {
 		return false;
 	}
 
-	private boolean matches(CraftingRecipeInput input, boolean mirrored, int offsetX, int offsetY) {
+	private boolean matches(CraftingInput input, boolean mirrored, int offsetX, int offsetY) {
 		for(int row = 0; row < this.height; ++row) {
 			for(int col = 0; col < this.width; ++col) {
 				Optional<Ingredient> optional;
@@ -84,8 +84,8 @@ public final class CustomShapedRecipe {
 					optional = this.ingredients.get(col + row * this.width);
 				}
 
-				ItemStack itemStack = input.getStackInSlot(col + offsetX, row + offsetY);
-				if (!Ingredient.matches(optional, itemStack)) {
+				ItemStack itemStack = input.getItem(col + offsetX, row + offsetY);
+				if (!Ingredient.testOptionalIngredient(optional, itemStack)) {
 					return false;
 				}
 			}
@@ -129,11 +129,11 @@ public final class CustomShapedRecipe {
 	// CODEC CREATION //
 	// ////////////// //
 
-	public static final PacketCodec<RegistryByteBuf, CustomShapedRecipe> PACKET_CODEC =
-		PacketCodec.tuple(
-			net.minecraft.network.codec.PacketCodecs.VAR_INT, CustomShapedRecipe::getWidth,
-			net.minecraft.network.codec.PacketCodecs.VAR_INT, CustomShapedRecipe::getHeight,
-			Ingredient.OPTIONAL_PACKET_CODEC.collect(net.minecraft.network.codec.PacketCodecs.toList()), CustomShapedRecipe::getIngredients,
+	public static final StreamCodec<RegistryFriendlyByteBuf, CustomShapedRecipe> PACKET_CODEC =
+		StreamCodec.composite(
+			net.minecraft.network.codec.ByteBufCodecs.VAR_INT, CustomShapedRecipe::getWidth,
+			net.minecraft.network.codec.ByteBufCodecs.VAR_INT, CustomShapedRecipe::getHeight,
+			Ingredient.OPTIONAL_CONTENTS_STREAM_CODEC.apply(net.minecraft.network.codec.ByteBufCodecs.list()), CustomShapedRecipe::getIngredients,
 			CustomShapedRecipe::createFromNetwork
 		);
 
@@ -154,7 +154,7 @@ public final class CustomShapedRecipe {
 
 		MapCodec<DataPair> dataCodec = RecordCodecBuilder.mapCodec(instance ->
 			instance.group(
-				Codecs.strictUnboundedMap(keyEntryCodec, Ingredient.CODEC)
+				ExtraCodecs.strictUnboundedMap(keyEntryCodec, Ingredient.CODEC)
 					.fieldOf("key")
 					.forGetter(DataPair::key),
 				Codec.STRING.listOf()

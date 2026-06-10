@@ -1,12 +1,10 @@
 package com.virus5600.defensive_measures.registry.tag;
 
-import com.virus5600.defensive_measures._helper.RegistryHelper;
-import net.minecraft.block.Block;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.registry.tag.TagKey;
-import net.minecraft.util.Identifier;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.level.block.Block;
 
-import com.virus5600.defensive_measures.DefensiveMeasures;
+import com.virus5600.defensive_measures._helper.RegistryHelper;
+
 
 public class ModBlockTags {
 	// Categories

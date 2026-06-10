@@ -1,14 +1,14 @@
 package com.virus5600.defensive_measures._util;
 
-import net.minecraft.item.Item;
+import net.minecraft.world.item.Item;
 
 /**
- * Contains all utility methods that can be used for the {@link net.minecraft.item.Item Item class}
+ * Contains all utility methods that can be used for the {@link net.minecraft.world.item.Item Item class}
  * such as identifying if it matches a superclass or interface. This is to supplement some
  * shortcomings of the primary vanilla {@code Item} class and create flexibility towards applying
  * features and modifications.
  *
- * @see net.minecraft.item.Item Item
+ * @see net.minecraft.world.item.Item Item
  *
  * @since 1.0.0-beta
  * @author <a href="https://github.com/Virus5600">Virus5600</a>

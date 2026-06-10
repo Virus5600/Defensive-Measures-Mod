@@ -1,6 +1,6 @@
 package com.virus5600.defensive_measures.recipe;
 
-import net.minecraft.recipe.book.RecipeBookType;
+import net.minecraft.world.inventory.RecipeBookType;
 
 /**
  * This enum replaces the vanilla {@link RecipeBookType} for all custom crafting stations added by
@@ -10,5 +10,5 @@ import net.minecraft.recipe.book.RecipeBookType;
 public enum HelperUIType {
 	TURRET_ASSEMBLY_STATION;
 
-	private HelperUIType() {}
+	HelperUIType() {}
 }

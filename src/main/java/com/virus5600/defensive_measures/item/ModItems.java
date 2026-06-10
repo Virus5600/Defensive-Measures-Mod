@@ -2,12 +2,12 @@ package com.virus5600.defensive_measures.item;
 
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.fabricmc.fabric.api.registry.FuelRegistryEvents;
-import net.minecraft.block.Block;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.mob.MobEntity;
-import net.minecraft.item.Item.Settings;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemGroups;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.item.CreativeModeTabs;
+import net.minecraft.world.item.Item.Properties;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.level.block.Block;
 
 import com.virus5600.defensive_measures.DefensiveMeasures;
 import com.virus5600.defensive_measures._helper.RegistryHelper;
@@ -109,11 +109,11 @@ public class ModItems {
 	 * @param factory The factory method to create the turret item. Usually a lambda expression like {@code CannonTurretItem::new}.
 	 * @return The registered item.
 	 */
-	private static Item registerItem(String name, EntityType<? extends MobEntity> entityType, TurretItemFactory<? extends TurretItem> factory) {
+	private static Item registerItem(String name, EntityType<? extends Mob> entityType, TurretItemFactory<? extends TurretItem> factory) {
 		return RegistryHelper.registerItem(
 			name,
 			(settings) -> factory.create(entityType, settings),
-			new Settings()
+			new Properties()
 		);
 	}
 
@@ -125,7 +125,7 @@ public class ModItems {
 	 *
 	 * @return The registered item.
 	 */
-	private static Item registerToolItem(String name, Function<Item.Settings, Item> factory) {
+	private static Item registerToolItem(String name, Function<Item.Properties, Item> factory) {
 		return RegistryHelper.registerItem(
 			name,
 			factory
@@ -142,7 +142,7 @@ public class ModItems {
 		return RegistryHelper.registerItem(
 			name,
 			factory::create,
-			new Settings()
+			new Properties()
 		);
 	}
 
@@ -159,36 +159,36 @@ public class ModItems {
 		DefensiveMeasures.LOGGER.info("REGISTERING ITEMS TO ITEM GROUPS...");
 
 		Arrays.stream(FUNCTIONAL_ITEMS).iterator().forEachRemaining(
-			(item) -> ItemGroupEvents.modifyEntriesEvent(ItemGroups.FUNCTIONAL).register(
-				(content) -> content.add(item)
+			(item) -> ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.FUNCTIONAL_BLOCKS).register(
+				(content) -> content.accept(item)
 			)
 		);
 
 		Arrays.stream(DM_ITEMS).iterator().forEachRemaining(
 			(item) -> ItemGroupEvents.modifyEntriesEvent(ModItemGroups.DMI_KEY).register(
-				(content) -> content.add(item)
+				(content) -> content.accept(item)
 			)
 		);
 
 		Arrays.stream(DM_EQUIPMENTS).iterator().forEachRemaining(
 			(item) -> ItemGroupEvents.modifyEntriesEvent(ModItemGroups.DME_KEY).register(
-				(content) -> content.add(item)
+				(content) -> content.accept(item)
 			)
 		);
 
 		Arrays.stream(DM_TRAPS).iterator().forEachRemaining(
 			(item) -> ItemGroupEvents.modifyEntriesEvent(ModItemGroups.DMTR_KEY).register(
-				(content) -> content.add(item)
+				(content) -> content.accept(item)
 			)
 		);
 
 		Arrays.stream(DM_TURRETS).iterator().forEachRemaining(
 			(item) -> ItemGroupEvents.modifyEntriesEvent(ModItemGroups.DMTT_KEY).register(
-				(content) -> content.add(item)
+				(content) -> content.accept(item)
 			)
 		);
 
-		Arrays.stream(FUEL_ITEMS).iterator().forEachRemaining((item) -> FuelRegistryEvents.BUILD.register((builder, ctx) -> {
+		Arrays.stream(FUEL_ITEMS).iterator().forEachRemaining((item) -> FuelRegistryEvents.BUILD.register((builder, _) -> {
 			// Verifies whether the item is a valid fuel item. Ignores the item if it is not.
 			if (item instanceof FuelItem)
 				builder.add(item, ((FuelItem) item).getFuelTime());
@@ -198,11 +198,11 @@ public class ModItems {
 	}
 
 	private interface TurretItemFactory<T extends TurretItem> {
-		T create(EntityType<? extends MobEntity> entityType, Settings settings);
+		T create(EntityType<? extends Mob> entityType, Properties settings);
 	}
 
 	private interface ItemFactory<T extends Item> {
-		T create(Settings settings);
+		T create(Properties settings);
 	}
 
 	static {

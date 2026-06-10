@@ -1,24 +1,23 @@
 package com.virus5600.defensive_measures.entity.turrets.tier2;
 
-import com.virus5600.defensive_measures._util.MathUtil;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.attribute.DefaultAttributeContainer;
-import net.minecraft.entity.attribute.EntityAttributes;
-import net.minecraft.entity.damage.DamageSource;
-import net.minecraft.entity.data.DataTracker;
-import net.minecraft.entity.effect.StatusEffects;
-import net.minecraft.entity.mob.MobEntity;
-import net.minecraft.entity.projectile.ProjectileEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.sound.SoundEvent;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
+import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.projectile.Projectile;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
 
+import com.virus5600.defensive_measures._util.MathUtil;
 import com.virus5600.defensive_measures.entity.ModEntities;
 import com.virus5600.defensive_measures.entity.TurretMaterial;
 import com.virus5600.defensive_measures.entity.ai.goal.ProjectileAttackGoal;
@@ -29,6 +28,7 @@ import com.virus5600.defensive_measures.item.ModItems;
 import com.virus5600.defensive_measures.sound.ModSoundEvents;
 
 import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
 
 import java.util.List;
 import java.util.Map;
@@ -78,7 +78,7 @@ public class MissileTurretEntity extends TurretEntity implements UsesMissile {
 	 * included in the cooldown attribute and will be handled by the {@link #tick() tick()} method.
 	 */
 	private static final int TOTAL_ATT_COOLDOWN = 20 * 5;
-	private static final Map<Offsets, List<Vec3d>> OFFSETS;
+	private static final Map<Offsets, List<Vec3>> OFFSETS;
 	private static final double[] DAMAGE;
 	private static final byte[] PIERCE_LEVELS;
 
@@ -97,7 +97,7 @@ public class MissileTurretEntity extends TurretEntity implements UsesMissile {
 	// //////////// //
 	// CONSTRUCTORS //
 	// //////////// //
-	public MissileTurretEntity(EntityType<? extends MobEntity> entityType, World world) {
+	public MissileTurretEntity(EntityType<? extends Mob> entityType, Level world) {
 		super(entityType, world, TurretMaterial.METAL, ModEntities.MICRO_MISSILE, ModItems.MISSILE_TURRET);
 
 		this.setShootSound(ModSoundEvents.TURRET_MISSILE_SHOOT);
@@ -112,41 +112,41 @@ public class MissileTurretEntity extends TurretEntity implements UsesMissile {
 	// INITIALIZERS //
 	// //////////// //
 	@Override
-	protected void initGoals() {
+	protected void registerGoals() {
 		// Goal instances
 		this.attackGoal = new ProjectileAttackGoal(this, 0, TOTAL_ATT_COOLDOWN, this.getMaxAttackRange(), this.getMinAttackRange());
 
 		// Set the standard goals
-		super.initGoals();
+		super.registerGoals();
 	}
 
 	@Override
-	protected void initDataTracker(DataTracker.Builder builder) {
+	protected void defineSynchedData(SynchedEntityData.@NonNull Builder builder) {
 		// Initialize standard data trackers
-		super.initDataTracker(builder);
+		super.defineSynchedData(builder);
 	}
 
-	public static DefaultAttributeContainer.Builder setAttributes() {
+	public static net.minecraft.world.entity.ai.attributes.AttributeSupplier.Builder setAttributes() {
 		TurretEntity.setTurretMaxHealth(75);
 		TurretEntity.setTurretMaxRange(64 + ModEntities.MISSILE_TURRET.getDimensions().eyeHeight());
 
 		return TurretEntity.setAttributes()
-			.add(EntityAttributes.ARMOR, 2)
-			.add(EntityAttributes.ARMOR_TOUGHNESS, 1);
+			.add(Attributes.ARMOR, 2)
+			.add(Attributes.ARMOR_TOUGHNESS, 1);
 	}
 
 	// /////////////// //
 	// PROCESS METHODS //
 	// /////////////// //
 	@Override
-	protected <P extends ProjectileEntity> void onProjectileCreateCallback(P projectile) {
+	protected <P extends Projectile> void onProjectileCreateCallback(P projectile) {
 		MicroMissileEntity missile = (MicroMissileEntity) projectile;
 
 		missile.setRemainingFuel(this.getMissileFuel());
 	}
 
 	@Override
-	public void shootAt(LivingEntity target, float pullProgress) {
+	public void performRangedAttack(@NonNull LivingEntity target, float pullProgress) {
 		TurretProjectileVelocity velocityData = this.getProjectileVelocityData(target);
 
 		super.shootBurst(3, (20 / 3), velocityData);
@@ -157,7 +157,7 @@ public class MissileTurretEntity extends TurretEntity implements UsesMissile {
 	// /////////////////// //
 
 	@Override @Nullable
-	protected SoundEvent getHurtSound(DamageSource source) {
+	protected SoundEvent getHurtSound(@NonNull DamageSource source) {
 		return ModSoundEvents.TURRET_MISSILE_HURT;
 	}
 
@@ -167,12 +167,12 @@ public class MissileTurretEntity extends TurretEntity implements UsesMissile {
 	}
 
 	@Override
-	public int getMinLookPitchChange() {
+	public int getMinHeadXRot() {
 		return -12;
 	}
 
 	@Override
-	public int getMaxLookPitchChange() {
+	public int getMaxHeadXRot() {
 		return 12;
 	}
 
@@ -200,18 +200,18 @@ public class MissileTurretEntity extends TurretEntity implements UsesMissile {
 		return (int) (1.5F * 20);
 	}
 
-	protected List<Vec3d> getTurretProjectileSpawn() {
+	protected List<Vec3> getTurretProjectileSpawn() {
 		return OFFSETS.get(Offsets.BARREL);
 	}
 
 	public TurretProjectileVelocity getProjectileVelocityData(LivingEntity target) {
-		Vec3d dir = MathUtil.getTargetDirection(this, target);
-		Vec3d vel = dir.multiply(this.getMissileSpeed());
+		Vec3 dir = MathUtil.getTargetDirection(this, target);
+		Vec3 vel = dir.scale(this.getMissileSpeed());
 
 		return TurretProjectileVelocity
 			.init(this)
 			.setLaunchAngle(0.1f)
-			.setVelocity(vel.getX(), vel.getY(), vel.getZ());
+			.setVelocity(vel.x(), vel.y(), vel.z());
 	}
 
 	public double getProjectileDamage() {
@@ -322,9 +322,9 @@ public class MissileTurretEntity extends TurretEntity implements UsesMissile {
 
 		OFFSETS = Map.of(
 			Offsets.BARREL, List.of(
-				new Vec3d(0, 0.1875, 0.625),
-				new Vec3d(0, 0, 0.625),
-				new Vec3d(0, -0.1875, 0.625)
+				new Vec3(0, 0.1875, 0.625),
+				new Vec3(0, 0, 0.625),
+				new Vec3(0, -0.1875, 0.625)
 			)
 		);
 
@@ -336,7 +336,7 @@ public class MissileTurretEntity extends TurretEntity implements UsesMissile {
 
 		effectSource = Map.of(
 			Items.IRON_BLOCK, List.<Object[]>of(
-				new Object[] { StatusEffects.RESISTANCE, 60, 2 }
+				new Object[] { MobEffects.RESISTANCE, 60, 2 }
 			)
 		);
 	}

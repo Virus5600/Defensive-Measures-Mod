@@ -1,29 +1,30 @@
 package com.virus5600.defensive_measures.block;
 
 import com.mojang.serialization.MapCodec;
-import net.minecraft.block.*;
-import net.minecraft.block.enums.NoteBlockInstrument;
-import net.minecraft.entity.ai.pathing.NavigationType;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.screen.NamedScreenHandlerFactory;
-import net.minecraft.screen.ScreenHandlerContext;
-import net.minecraft.screen.SimpleNamedScreenHandlerFactory;
-import net.minecraft.sound.BlockSoundGroup;
-import net.minecraft.state.StateManager;
-import net.minecraft.state.property.EnumProperty;
-import net.minecraft.text.Text;
-import net.minecraft.util.BlockMirror;
-import net.minecraft.util.BlockRotation;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.util.shape.VoxelShapes;
-import net.minecraft.world.BlockView;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.world.SimpleMenuProvider;
+import net.minecraft.world.inventory.ContainerLevelAccess;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.*;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
+import net.minecraft.world.level.block.state.properties.NoteBlockInstrument;
+import net.minecraft.world.level.pathfinder.PathComputationType;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 import com.virus5600.defensive_measures.screen.TurretAssemblyStationScreenHandler;
 import com.virus5600.defensive_measures.stat.ModStats;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * Turret Assembly Station (or TAS) is a functional block that allows players to craft higher tiered turrets.
@@ -44,54 +45,54 @@ import com.virus5600.defensive_measures.stat.ModStats;
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
  */
 public class TurretAssemblyStationBlock extends BaseFunctionalBlock {
-	public static final MapCodec<TurretAssemblyStationBlock> CODEC = createCodec(TurretAssemblyStationBlock::new);
+	public static final MapCodec<TurretAssemblyStationBlock> CODEC = simpleCodec(TurretAssemblyStationBlock::new);
 
 	public static final EnumProperty<Direction> FACING;
 
 	private static final VoxelShape SHAPE;
 
-	public TurretAssemblyStationBlock(Settings settings) {
+	public TurretAssemblyStationBlock(Properties settings) {
 		super(settings);
 
 		settings.instrument(NoteBlockInstrument.IRON_XYLOPHONE)
-			.requiresTool()
+			.requiresCorrectToolForDrops()
 			.strength(5.0F, 6.0F)
-			.sounds(BlockSoundGroup.IRON)
-			.nonOpaque();
+			.sound(SoundType.IRON)
+			.noOcclusion();
 
-		this.setDefaultState(this.stateManager.getDefaultState().with(FACING, Direction.NORTH));
+		this.registerDefaultState(this.stateDefinition.any().setValue(FACING, Direction.NORTH));
 	}
 
-	public BlockState getPlacementState(ItemPlacementContext ctx) {
-		return this.getDefaultState().with(FACING, ctx.getHorizontalPlayerFacing().getOpposite());
+	public BlockState getStateForPlacement(BlockPlaceContext ctx) {
+		return this.defaultBlockState().setValue(FACING, ctx.getHorizontalDirection().getOpposite());
 	}
 
 	@Override
-	protected VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
+	protected @NonNull VoxelShape getShape(@NonNull BlockState state, @NonNull BlockGetter world, @NonNull BlockPos pos, @NonNull CollisionContext context) {
 		return SHAPE;
 	}
 
 	@Override
-	protected BlockState rotate(BlockState state, BlockRotation rotation) {
-		return state.with(FACING, rotation.rotate(state.get(FACING)));
+	protected @NonNull BlockState rotate(BlockState state, Rotation rotation) {
+		return state.setValue(FACING, rotation.rotate(state.getValue(FACING)));
 	}
 
 	@Override
-	protected BlockState mirror(BlockState state, BlockMirror mirror) {
-		return state.rotate(mirror.getRotation(state.get(FACING)));
+	protected @NonNull BlockState mirror(BlockState state, Mirror mirror) {
+		return state.rotate(mirror.getRotation(state.getValue(FACING)));
 	}
 
-	protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+	protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
 		builder.add(FACING);
 	}
 
 	@Override
-	public MapCodec<TurretAssemblyStationBlock> getCodec() {
+	public @NonNull MapCodec<TurretAssemblyStationBlock> codec() {
 		return CODEC;
 	}
 
 	@Override
-	protected boolean canPathfindThrough(BlockState state, NavigationType type) {
+	protected boolean isPathfindable(@NonNull BlockState state, @NonNull PathComputationType type) {
 		return false;
 	}
 
@@ -100,12 +101,12 @@ public class TurretAssemblyStationBlock extends BaseFunctionalBlock {
 	// /////////////////// //
 
 	@Override
-	protected NamedScreenHandlerFactory createScreenHandlerFactory(BlockState state, World world, BlockPos pos) {
-		return new SimpleNamedScreenHandlerFactory(
-			(syncId, inventory, player) ->
+	protected MenuProvider getMenuProvider(@NonNull BlockState state, @NonNull Level world, @NonNull BlockPos pos) {
+		return new SimpleMenuProvider(
+			(syncId, inventory, _) ->
 				new TurretAssemblyStationScreenHandler(
 					syncId, inventory,
-					ScreenHandlerContext.create(world, pos)
+					ContainerLevelAccess.create(world, pos)
 				),
 			this.getTitle()
 		);
@@ -117,8 +118,8 @@ public class TurretAssemblyStationBlock extends BaseFunctionalBlock {
 	// //////////////// //
 
 	@Override
-	public Text getTitle() {
-		return Text.translatable("container.dm.turret_assembly_station");
+	public Component getTitle() {
+		return Component.translatable("container.dm.turret_assembly_station");
 	}
 
 	@Override
@@ -127,16 +128,16 @@ public class TurretAssemblyStationBlock extends BaseFunctionalBlock {
 	}
 
 	static {
-		FACING = HorizontalFacingBlock.FACING;
+		FACING = HorizontalDirectionalBlock.FACING;
 
-		SHAPE = VoxelShapes.union(
+		SHAPE = Shapes.or(
 			// Table Top
-			Block.createCuboidShape(0, 14, 0, 16, 16, 16),
+			Block.box(0, 14, 0, 16, 16, 16),
 			// Legs
-			Block.createCuboidShape(1, 0, 13, 3, 14, 15),
-			Block.createCuboidShape(1, 0, 1, 3, 14, 3),
-			Block.createCuboidShape(13, 0, 13, 15, 14, 15),
-			Block.createCuboidShape(13, 0, 1, 15, 14, 3)
+			Block.box(1, 0, 13, 3, 14, 15),
+			Block.box(1, 0, 1, 3, 14, 3),
+			Block.box(13, 0, 13, 15, 14, 15),
+			Block.box(13, 0, 1, 15, 14, 3)
 		);
 	}
 }

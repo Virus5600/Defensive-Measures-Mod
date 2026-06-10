@@ -1,36 +1,38 @@
 package com.virus5600.defensive_measures.block;
 
 import com.mojang.serialization.MapCodec;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.ShapeContext;
-import net.minecraft.block.Waterloggable;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.damage.DamageSource;
-import net.minecraft.fluid.FluidState;
-import net.minecraft.fluid.Fluids;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.state.StateManager;
-import net.minecraft.state.property.BooleanProperty;
-import net.minecraft.state.property.IntProperty;
-import net.minecraft.state.property.Properties;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.random.Random;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.world.BlockView;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldAccess;
-import net.minecraft.world.WorldView;
-import net.minecraft.world.tick.ScheduledTickView;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.ScheduledTickAccess;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.SimpleWaterloggedBlock;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.block.state.properties.IntegerProperty;
+import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.level.material.Fluids;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 import com.virus5600.defensive_measures.entity.damage.ModDamageSources;
 import com.virus5600.defensive_measures.entity.damage.ModDamageTypes;
 import com.virus5600.defensive_measures.state.properties.ModProperties;
 
 import java.util.Objects;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * Bolt head blocks are blocks that deal damage to entities that step on them.
@@ -47,13 +49,13 @@ import java.util.Objects;
  * @since 1.0.0-beta
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
  */
-public class BoltHeadBlock extends Block implements Waterloggable {
-	public static final MapCodec<BoltHeadBlock> CODEC = createCodec(BoltHeadBlock::new);
+public class BoltHeadBlock extends Block implements SimpleWaterloggedBlock {
+	public static final MapCodec<BoltHeadBlock> CODEC = simpleCodec(BoltHeadBlock::new);
 
 	public static int MAX_HEADS = 4;
 
-	public static final IntProperty BOLT_HEADS = ModProperties.BOLT_HEADS;
-	public static final BooleanProperty WATERLOGGED = Properties.WATERLOGGED;
+	public static final IntegerProperty BOLT_HEADS = ModProperties.BOLT_HEADS;
+	public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
 
 	private static final VoxelShape ONE_HEAD;
 	private static final VoxelShape TWO_HEADS;
@@ -70,78 +72,78 @@ public class BoltHeadBlock extends Block implements Waterloggable {
 	 */
 	protected int damageDealt = 2;
 
-	public BoltHeadBlock(Settings settings) {
+	public BoltHeadBlock(Properties settings) {
 		super(settings);
 
-		settings.hardness(1.5f)
-			.resistance(1.0f)
-			.nonOpaque();
+		settings.destroyTime(1.5f)
+			.explosionResistance(1.0f)
+			.noOcclusion();
 
-		this.setDefaultState(
-			this.stateManager
-				.getDefaultState()
-				.with(BOLT_HEADS, 1)
-				.with(WATERLOGGED, false)
+		this.registerDefaultState(
+			this.stateDefinition
+				.any()
+				.setValue(BOLT_HEADS, 1)
+				.setValue(WATERLOGGED, false)
 		);
 	}
 
 	@Override
-	protected boolean canReplace(BlockState state, ItemPlacementContext context) {
-		return !context.shouldCancelInteraction()
-			&& context.getStack().getItem() == this.asItem()
-			&& state.get(BOLT_HEADS) < MAX_HEADS
-			|| super.canReplace(state, context);
+	protected boolean canBeReplaced(@NonNull BlockState state, BlockPlaceContext context) {
+		return !context.isSecondaryUseActive()
+			&& context.getItemInHand().getItem() == this.asItem()
+			&& state.getValue(BOLT_HEADS) < MAX_HEADS
+			|| super.canBeReplaced(state, context);
 	}
 
 	@Override
-	protected VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
-		return SHAPES_BY_HEAD[state.get(BOLT_HEADS) - 1];
+	protected @NonNull VoxelShape getShape(BlockState state, @NonNull BlockGetter world, @NonNull BlockPos pos, @NonNull CollisionContext context) {
+		return SHAPES_BY_HEAD[state.getValue(BOLT_HEADS) - 1];
 	}
 
 	@Override
-	protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+	protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
 		builder.add(BOLT_HEADS, WATERLOGGED);
 	}
 
 	@Override
-	protected boolean canPlaceAt(BlockState state, WorldView world, BlockPos pos) {
-		return hasTopRim(world, pos) || Block.sideCoversSmallSquare(world, pos.down(), Direction.UP);
+	protected boolean canSurvive(@NonNull BlockState state, @NonNull LevelReader world, @NonNull BlockPos pos) {
+		return canSupportRigidBlock(world, pos) || Block.canSupportCenter(world, pos.below(), Direction.UP);
 	}
 
 	@Override
-	protected FluidState getFluidState(BlockState state) {
-		return state.get(WATERLOGGED) ? Fluids.WATER.getStill(false) : super.getFluidState(state);
+	protected @NonNull FluidState getFluidState(BlockState state) {
+		return state.getValue(WATERLOGGED) ? Fluids.WATER.getSource(false) : super.getFluidState(state);
 	}
 
 	@Override
-	protected BlockState getStateForNeighborUpdate(
+	protected @NonNull BlockState updateShape(
 		BlockState state,
-		WorldView world,
-		ScheduledTickView tickView,
-		BlockPos pos,
-		Direction direction,
-		BlockPos neighborPos,
-		BlockState neighborState,
-		Random random
+		@NonNull LevelReader world,
+		@NonNull ScheduledTickAccess tickView,
+		@NonNull BlockPos pos,
+		@NonNull Direction direction,
+		@NonNull BlockPos neighborPos,
+		@NonNull BlockState neighborState,
+		@NonNull RandomSource random
 	) {
-		if (state.get(WATERLOGGED)) {
-			tickView.scheduleFluidTick(
+		if (state.getValue(WATERLOGGED)) {
+			tickView.scheduleTick(
 				pos,
 				Fluids.WATER,
-				Fluids.WATER.getTickRate(world)
+				Fluids.WATER.getTickDelay(world)
 			);
 		}
 
-		return super.getStateForNeighborUpdate(state, world, tickView, pos, direction, neighborPos, neighborState, random);
+		return super.updateShape(state, world, tickView, pos, direction, neighborPos, neighborState, random);
 	}
 
 	@Override
-	public boolean tryFillWithFluid(WorldAccess world, BlockPos pos, BlockState state, FluidState fluidState) {
-		if (!(Boolean)state.get(WATERLOGGED) && fluidState.getFluid() == Fluids.WATER) {
-			BlockState blockState = state.with(WATERLOGGED, true);
+	public boolean placeLiquid(@NonNull LevelAccessor world, @NonNull BlockPos pos, BlockState state, @NonNull FluidState fluidState) {
+		if (!(Boolean)state.getValue(WATERLOGGED) && fluidState.getType() == Fluids.WATER) {
+			BlockState blockState = state.setValue(WATERLOGGED, true);
 
-			world.setBlockState(pos, blockState, Block.NOTIFY_ALL);
-			world.scheduleFluidTick(pos, fluidState.getFluid(), fluidState.getFluid().getTickRate(world));
+			world.setBlock(pos, blockState, Block.UPDATE_ALL);
+			world.scheduleTick(pos, fluidState.getType(), fluidState.getType().getTickDelay(world));
 
 			return true;
 		} else {
@@ -150,42 +152,40 @@ public class BoltHeadBlock extends Block implements Waterloggable {
 	}
 
 	@Override
-	public BlockState getPlacementState(ItemPlacementContext ctx) {
-		BlockState blockState = ctx.getWorld()
-			.getBlockState(ctx.getBlockPos());
+	public BlockState getStateForPlacement(BlockPlaceContext ctx) {
+		BlockState blockState = ctx.getLevel()
+			.getBlockState(ctx.getClickedPos());
 
-		if (blockState.isOf(this)) {
-			Direction dir = ctx.getHorizontalPlayerFacing().getOpposite();
-
+		if (blockState.is(this)) {
 			return blockState.cycle(BOLT_HEADS);
 		} else {
-			FluidState fluidState = ctx.getWorld().getFluidState(ctx.getBlockPos());
+			FluidState fluidState = ctx.getLevel().getFluidState(ctx.getClickedPos());
 
-			boolean isFluidWater = fluidState.getFluid() == Fluids.WATER;
-			return Objects.requireNonNull(super.getPlacementState(ctx))
-				.with(WATERLOGGED, isFluidWater);
+			boolean isFluidWater = fluidState.getType() == Fluids.WATER;
+			return Objects.requireNonNull(super.getStateForPlacement(ctx))
+				.setValue(WATERLOGGED, isFluidWater);
 		}
 	}
 
 	@Override
-	public void onSteppedOn(World world, BlockPos pos, BlockState state, Entity entity) {
-		if (!entity.bypassesSteppingEffects() && entity instanceof LivingEntity) {
-			if (world instanceof ServerWorld serverWorld) {
+	public void stepOn(@NonNull Level world, @NonNull BlockPos pos, @NonNull BlockState state, Entity entity) {
+		if (!entity.isSteppingCarefully() && entity instanceof LivingEntity) {
+			if (world instanceof ServerLevel serverWorld) {
 				DamageSource dmgSrc = ModDamageSources.create(world, ModDamageTypes.BOLT_HEAD, null, null);
-				entity.damage(serverWorld, dmgSrc, this.getDamageDealt(state));
+				entity.hurtServer(serverWorld, dmgSrc, this.getDamageDealt(state));
 			}
 		}
 
-		super.onSteppedOn(world, pos, state, entity);
+		super.stepOn(world, pos, state, entity);
 	}
 
 	@Override
-	public boolean canMobSpawnInside(BlockState state) {
+	public boolean isPossibleToRespawnInThis(@NonNull BlockState state) {
 		return false;
 	}
 
 	@Override
-	public MapCodec<BoltHeadBlock> getCodec() {
+	public @NonNull MapCodec<BoltHeadBlock> codec() {
 		return CODEC;
 	}
 
@@ -201,14 +201,14 @@ public class BoltHeadBlock extends Block implements Waterloggable {
 	 * @return The final damage to be dealt when this block is stepped on.
 	 */
 	public float getDamageDealt(BlockState state) {
-		return this.damageDealt * state.get(BOLT_HEADS);
+		return this.damageDealt * state.getValue(BOLT_HEADS);
 	}
 
 	static {
-		ONE_HEAD = Block.createCuboidShape(6, 0, 6, 10, 4, 10);
-		TWO_HEADS = Block.createCuboidShape(3, 0, 6, 13, 4, 10);
-		THREE_HEADS = Block.createCuboidShape(3, 0, 3, 13, 4, 13);
-		FOUR_HEADS = Block.createCuboidShape(3, 0, 3, 13, 4, 13);
+		ONE_HEAD = Block.box(6, 0, 6, 10, 4, 10);
+		TWO_HEADS = Block.box(3, 0, 6, 13, 4, 10);
+		THREE_HEADS = Block.box(3, 0, 3, 13, 4, 13);
+		FOUR_HEADS = Block.box(3, 0, 3, 13, 4, 13);
 
 		SHAPES_BY_HEAD = new VoxelShape[] {
 			ONE_HEAD,

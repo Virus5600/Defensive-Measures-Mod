@@ -1,7 +1,7 @@
 package com.virus5600.defensive_measures.registry.tag;
 
-import net.minecraft.item.Item;
-import net.minecraft.registry.tag.TagKey;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.item.Item;
 
 import com.virus5600.defensive_measures._helper.RegistryHelper;
 

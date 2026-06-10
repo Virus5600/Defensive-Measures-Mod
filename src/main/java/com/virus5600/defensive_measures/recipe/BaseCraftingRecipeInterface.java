@@ -1,34 +1,36 @@
 package com.virus5600.defensive_measures.recipe;
 
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.recipe.Recipe;
-import net.minecraft.recipe.book.RecipeBookCategory;
-import net.minecraft.recipe.input.RecipeInput;
-import net.minecraft.util.collection.DefaultedList;
+import net.minecraft.core.NonNullList;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeBookCategory;
+import net.minecraft.world.item.crafting.RecipeInput;
 
 import com.virus5600.defensive_measures.recipe.book.ModCraftingRecipeCategory;
 import com.virus5600.defensive_measures.recipe.book.ModRecipeBookCategories;
+import org.jspecify.annotations.NonNull;
 
 public interface BaseCraftingRecipeInterface<T extends RecipeInput> extends Recipe<T> {
 	ModCraftingRecipeCategory getCategory();
 
-	default DefaultedList<ItemStack> getRecipeRemainders(T input) {
+	default NonNullList<ItemStack> getRecipeRemainders(T input) {
 		return collectRecipeRemainders(input);
 	}
 
-	static DefaultedList<ItemStack> collectRecipeRemainders(RecipeInput input) {
-		DefaultedList<ItemStack> defaultedList = DefaultedList.ofSize(input.size(), ItemStack.EMPTY);
+	static NonNullList<ItemStack> collectRecipeRemainders(RecipeInput input) {
+		NonNullList<ItemStack> defaultedList = NonNullList.withSize(input.size(), ItemStack.EMPTY);
 
 		for(int i = 0; i < defaultedList.size(); ++i) {
-			Item item = input.getStackInSlot(i).getItem();
-			defaultedList.set(i, item.getRecipeRemainder());
+			Item item = input.getItem(i).getItem();
+			defaultedList.set(i, item.getCraftingRemainder());
 		}
 
 		return defaultedList;
 	}
 
-	default RecipeBookCategory getRecipeBookCategory() {
+	@NonNull
+	default RecipeBookCategory recipeBookCategory() {
 		RecipeBookCategory category;
 		switch (this.getCategory()) {
 			case TURRETS -> category = ModRecipeBookCategories.TAS_TURRETS;

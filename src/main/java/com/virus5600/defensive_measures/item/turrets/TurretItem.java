@@ -1,52 +1,53 @@
 package com.virus5600.defensive_measures.item.turrets;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.function.Consumer;
-
-import net.minecraft.block.BlockState;
-import net.minecraft.block.FluidBlock;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.NbtComponent;
-import net.minecraft.component.type.TooltipDisplayComponent;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.SpawnReason;
-import net.minecraft.entity.attribute.EntityAttributeInstance;
-import net.minecraft.entity.attribute.EntityAttributes;
-import net.minecraft.entity.effect.StatusEffect;
-import net.minecraft.entity.effect.StatusEffectInstance;
-import net.minecraft.entity.mob.MobEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUsageContext;
-import net.minecraft.item.SpawnEggItem;
-import net.minecraft.item.tooltip.TooltipType;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtList;
+import net.minecraft.ChatFormatting;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Holder;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtOps;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.stat.Stats;
-import net.minecraft.text.Text;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.Hand;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.RaycastContext;
-import net.minecraft.world.World;
-import net.minecraft.world.event.GameEvent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.stats.Stats;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntitySpawnReason;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.SpawnEggItem;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.CustomData;
+import net.minecraft.world.item.component.TooltipDisplay;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.ClipContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.LiquidBlock;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.gameevent.GameEvent;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
 
 import com.virus5600.defensive_measures.entity.turrets.TurretEntity;
 
 import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+import java.util.function.Consumer;
 
 /**
  * {@code TurretItem} is an abstract class that acts nearly akin
@@ -69,97 +70,99 @@ import org.jetbrains.annotations.Nullable;
  */
 public abstract class TurretItem extends Item {
 	protected final EntityType<?> type;
-	private static final Map<EntityType<? extends MobEntity>, TurretItem> TURRETS = new HashMap<>();
+	private static final Map<EntityType<? extends Mob>, TurretItem> TURRETS = new HashMap<>();
 
 
-	public TurretItem(EntityType<? extends MobEntity> type, net.minecraft.item.Item.Settings settings) {
+	public TurretItem(EntityType<? extends Mob> type, Properties settings) {
 		super(settings);
 
 		this.type = type;
 		TURRETS.put(type, this);
 	}
 
-	public ActionResult useOnBlock(ItemUsageContext context) {
-		World world = context.getWorld();
+	@NonNull
+	public InteractionResult useOn(UseOnContext context) {
+		Level world = context.getLevel();
 
 		// If the world is not the Server world
-		if (!(world instanceof ServerWorld)) {
-			return ActionResult.SUCCESS;
+		if (!(world instanceof ServerLevel)) {
+			return InteractionResult.SUCCESS;
 		} else {
-			ItemStack itemStack = context.getStack();
-			BlockPos blockPos = context.getBlockPos();
-			Direction direction = context.getSide();
+			ItemStack itemStack = context.getItemInHand();
+			BlockPos blockPos = context.getClickedPos();
+			Direction direction = context.getClickedFace();
 			BlockState blockState = world.getBlockState(blockPos);
 			BlockPos blockPos2;
 
 			if (blockState.getCollisionShape(world, blockPos).isEmpty()) {
 				blockPos2 = blockPos;
 			} else {
-				blockPos2 = blockPos.offset(direction);
+				blockPos2 = blockPos.relative(direction);
 			}
 
-			NbtComponent nbtComponent = itemStack.get(DataComponentTypes.CUSTOM_DATA);
-			NbtCompound nbt = nbtComponent != null ? nbtComponent.copyNbt() : NbtComponent.DEFAULT.copyNbt();
+			CustomData nbtComponent = itemStack.get(DataComponents.CUSTOM_DATA);
+			CompoundTag nbt = nbtComponent != null ? nbtComponent.copyTag() : CustomData.EMPTY.copyTag();
 			EntityType<?> entityType2 = this.getEntityType(nbt);
-			Entity entity = entityType2.spawnFromItemStack(
-				(ServerWorld) world,
+			Entity entity = entityType2.spawn(
+				(ServerLevel) world,
 				itemStack,
 				context.getPlayer(),
 				blockPos2,
-				SpawnReason.SPAWN_ITEM_USE,
+				EntitySpawnReason.SPAWN_ITEM_USE,
 				true,
 				!Objects.equals(blockPos, blockPos2) && direction == Direction.UP
 			);
 
 			if (entity != null) {
-				this.applyNbt((MobEntity) entity, nbt);
+				this.applyNbt((Mob) entity, nbt);
 
-				itemStack.decrement(1);
-				world.emitGameEvent(context.getPlayer(), GameEvent.ENTITY_PLACE, blockPos);
+				itemStack.shrink(1);
+				world.gameEvent(context.getPlayer(), GameEvent.ENTITY_PLACE, blockPos);
 			}
 
-			return ActionResult.CONSUME;
+			return InteractionResult.CONSUME;
 		}
 	}
 
-	public ActionResult use(World world, PlayerEntity user, Hand hand) {
-		ItemStack itemStack = user.getStackInHand(hand);
-        BlockHitResult hitResult = SpawnEggItem.raycast(world, user, RaycastContext.FluidHandling.SOURCE_ONLY);
+	@NonNull
+	public InteractionResult use(@NonNull Level world, Player user, @NonNull InteractionHand hand) {
+		ItemStack itemStack = user.getItemInHand(hand);
+        BlockHitResult hitResult = SpawnEggItem.getPlayerPOVHitResult(world, user, ClipContext.Fluid.SOURCE_ONLY);
 
         if (hitResult.getType() != HitResult.Type.BLOCK) {
-            return ActionResult.PASS;
+            return InteractionResult.PASS;
         }
-        if (!(world instanceof ServerWorld)) {
-            return ActionResult.SUCCESS;
+        if (!(world instanceof ServerLevel)) {
+            return InteractionResult.SUCCESS;
         }
 
         BlockPos blockPos = hitResult.getBlockPos();
 
-        if (!(world.getBlockState(blockPos).getBlock() instanceof FluidBlock)) {
-            return ActionResult.PASS;
+        if (!(world.getBlockState(blockPos).getBlock() instanceof LiquidBlock)) {
+            return InteractionResult.PASS;
         }
-        if (!world.canEntityModifyAt(user, blockPos) || !user.canPlaceOn(blockPos, hitResult.getSide(), itemStack)) {
-            return ActionResult.FAIL;
+        if (!world.mayInteract(user, blockPos) || !user.mayUseItemAt(blockPos, hitResult.getDirection(), itemStack)) {
+            return InteractionResult.FAIL;
         }
 
-		NbtComponent nbtComponent = itemStack.get(DataComponentTypes.CUSTOM_DATA);
-		NbtCompound nbt = nbtComponent != null ? nbtComponent.copyNbt() : NbtComponent.DEFAULT.copyNbt();
+		CustomData nbtComponent = itemStack.get(DataComponents.CUSTOM_DATA);
+		CompoundTag nbt = nbtComponent != null ? nbtComponent.copyTag() : CustomData.EMPTY.copyTag();
 		EntityType<?> entityType = this.getEntityType(nbt);
-        Entity entity = entityType.spawnFromItemStack((ServerWorld)world, itemStack, user, blockPos, SpawnReason.SPAWN_ITEM_USE, false, false);
+        Entity entity = entityType.spawn((ServerLevel)world, itemStack, user, blockPos, EntitySpawnReason.SPAWN_ITEM_USE, false, false);
         if (entity == null) {
-            return ActionResult.PASS;
+            return InteractionResult.PASS;
         }
-        if (!user.getAbilities().creativeMode) {
-            itemStack.decrement(1);
+        if (!user.getAbilities().instabuild) {
+            itemStack.shrink(1);
         }
 
-        user.incrementStat(Stats.USED.getOrCreateStat(this));
-        world.emitGameEvent(user, GameEvent.ENTITY_PLACE, entity.getTrackedPosition().getPos());
+        user.awardStat(Stats.ITEM_USED.get(this));
+        world.gameEvent(user, GameEvent.ENTITY_PLACE, entity.getPositionCodec().getBase());
 
-        return ActionResult.CONSUME;
+        return InteractionResult.CONSUME;
 	}
 
-	public boolean isOfSameEntityType(@Nullable NbtCompound nbt, EntityType<?> type) {
+	public boolean isOfSameEntityType(@Nullable CompoundTag nbt, EntityType<?> type) {
 		return Objects.equals(this.getEntityType(nbt), type);
 	}
 
@@ -172,48 +175,47 @@ public abstract class TurretItem extends Item {
 		return TURRETS.values();
 	}
 
-	public EntityType<?> getEntityType(@Nullable NbtCompound nbt) {
+	public EntityType<?> getEntityType(@Nullable CompoundTag nbt) {
 		if (nbt != null && nbt.contains("EntityTag")) {
-			NbtCompound nbtCompound = nbt.getCompound("EntityTag")
+			CompoundTag nbtCompound = nbt.getCompound("EntityTag")
 				.orElse(null);
 
 			if (nbtCompound != null && nbtCompound.contains("id")) {
 				String id = nbtCompound.getString("id")
 					.orElse(null);
 
-				return id != null ? EntityType.get(id).orElse(this.type) : this.type;
+				return id != null ? EntityType.byString(id).orElse(this.type) : this.type;
 			}
 		}
 
 		return this.type;
 	}
 
-	@Override
-	@Deprecated
-	public void appendTooltip(ItemStack stack, TooltipContext context, TooltipDisplayComponent displayComponent, Consumer<Text> textConsumer, TooltipType type) {
+	@Deprecated @Override
+	public void appendHoverText(ItemStack stack, @NonNull TooltipContext context, @NonNull TooltipDisplay displayComponent, @NonNull Consumer<Component> textConsumer, @NonNull TooltipFlag type) {
 		int maxHealth = (int) this.getTurretMaxHealth();
 		int currentHealth = maxHealth;
 
-		NbtComponent nbtComponent = stack.get(DataComponentTypes.CUSTOM_DATA);
-		NbtCompound nbt;
+		CustomData nbtComponent = stack.get(DataComponents.CUSTOM_DATA);
+		CompoundTag nbt;
 		if (nbtComponent != null) {
-			nbt = nbtComponent.copyNbt();
+			nbt = nbtComponent.copyTag();
 
 			if (nbt.contains("Health")) {
-				currentHealth = (int) nbt.getFloat("Health", 0.0F);
+				currentHealth = (int) nbt.getFloatOr("Health", 0.0F);
 			}
 
 			if (nbt.contains("MaxHealth")) {
-				maxHealth = (int) nbt.getFloat("MaxHealth", 0.0F);
+				maxHealth = (int) nbt.getFloatOr("MaxHealth", 0.0F);
 			}
 		}
 
 		if (maxHealth != 0) {
 			textConsumer.accept(
-				Text.translatable(
+				Component.translatable(
 					"itemTooltip.dm.generic.health",
 					currentHealth, maxHealth)
-					.formatted(Formatting.RED)
+					.withStyle(ChatFormatting.RED)
 			);
 		}
 	}
@@ -233,28 +235,28 @@ public abstract class TurretItem extends Item {
 	 *     <li>{@code Health}</li>
 	 * </ul>
 	 *
-	 * @param entity {@link MobEntity} The entity to apply the NBT data to.
-	 * @param nbt {@link NbtCompound} The NBT data to apply to the entity.
+	 * @param entity {@link Mob} The entity to apply the NBT data to.
+	 * @param nbt {@link CompoundTag} The NBT data to apply to the entity.
 	 */
-	protected void applyNbt(MobEntity entity, NbtCompound nbt) {
+	protected void applyNbt(Mob entity, CompoundTag nbt) {
 		if (nbt.contains("NoAI")) {
-			entity.setAiDisabled(nbt.getBoolean("NoAI", false));
+			entity.setNoAi(nbt.getBooleanOr("NoAI", false));
 		}
 		if (nbt.contains("Silent")) {
-			entity.setSilent(nbt.getBoolean("Silent", false));
+			entity.setSilent(nbt.getBooleanOr("Silent", false));
 		}
 		if (nbt.contains("NoGravity")) {
-			entity.setNoGravity(nbt.getBoolean("NoGravity", false));
+			entity.setNoGravity(nbt.getBooleanOr("NoGravity", false));
 		}
 		if (nbt.contains("Glowing")) {
-			entity.setGlowing(nbt.getBoolean("Glowing", false));
+			entity.setGlowingTag(nbt.getBooleanOr("Glowing", false));
 		}
 		if (nbt.contains("Invulnerable")) {
-			entity.setInvulnerable(nbt.getBoolean("Invulnerable", false));
+			entity.setInvulnerable(nbt.getBooleanOr("Invulnerable", false));
 		}
 		if (nbt.contains("MaxHealth")) {
-			float maxHp = nbt.getFloat("MaxHealth", entity.getMaxHealth());
-			EntityAttributeInstance maxHealthAttr = entity.getAttributeInstance(EntityAttributes.MAX_HEALTH);
+			float maxHp = nbt.getFloatOr("MaxHealth", entity.getMaxHealth());
+			AttributeInstance maxHealthAttr = entity.getAttribute(Attributes.MAX_HEALTH);
 
 			if (maxHealthAttr != null) {
 				maxHealthAttr.setBaseValue(maxHp);
@@ -262,16 +264,16 @@ public abstract class TurretItem extends Item {
 		}
 		if (nbt.contains("Health")) {
 			float max = entity.getMaxHealth();
-			float hp = Math.min(nbt.getFloat("Health", max), max);
+			float hp = Math.min(nbt.getFloatOr("Health", max), max);
 			entity.setHealth(hp);
 		}
 		if (nbt.contains("ActiveEffects")) {
-			NbtList effectList = nbt.getList("ActiveEffects")
-				.orElse(new NbtList());
+			ListTag effectList = nbt.getList("ActiveEffects")
+				.orElse(new ListTag());
 
 			effectList.forEach(effect -> {
 				// Guard against non-compound list elements
-				if (!(effect instanceof NbtCompound effectNbt)) {
+				if (!(effect instanceof CompoundTag effectNbt)) {
 					return;
 				}
 
@@ -283,26 +285,26 @@ public abstract class TurretItem extends Item {
 
 				Identifier effId;
 				try {
-					effId = Identifier.of(idString);
+					effId = Identifier.parse(idString);
 				}
 				// Skip invalid identifiers
 				catch (IllegalArgumentException e) {
 					return;
 				}
 
-				RegistryEntry<StatusEffect> entry = entity.getEntityWorld()
-					.getRegistryManager()
-					.getOrThrow(RegistryKeys.STATUS_EFFECT)
-					.getEntry(effId)
+				Holder<MobEffect> entry = entity.level()
+					.registryAccess()
+					.lookupOrThrow(Registries.MOB_EFFECT)
+					.get(effId)
 					.orElse(null);
 
 				if (entry != null) {
-					NbtCompound nbtCompound = effectNbt.getCompound("effect")
+					CompoundTag nbtCompound = effectNbt.getCompound("effect")
 						.orElse(null);
 
-					StatusEffectInstance.CODEC
+					MobEffectInstance.CODEC
 						.parse(NbtOps.INSTANCE, nbtCompound)
-						.ifSuccess(entity::addStatusEffect);
+						.ifSuccess(entity::addEffect);
 				}
 			});
 		}
@@ -310,7 +312,7 @@ public abstract class TurretItem extends Item {
 		// Handling turret related stuff
 		if (entity instanceof TurretEntity turretEntity) {
 			if (nbt.contains("TurretLevel")) {
-				turretEntity.setTrackedLevel(nbt.getInt("TurretLevel", 1));
+				turretEntity.setTrackedLevel(nbt.getIntOr("TurretLevel", 1));
 			}
 		}
 	}

@@ -1,11 +1,9 @@
 package com.virus5600.defensive_measures.stat;
 
-import com.virus5600.defensive_measures.DefensiveMeasures;
-import net.minecraft.registry.Registries;
-import net.minecraft.stat.StatFormatter;
-import net.minecraft.stat.StatType;
-import net.minecraft.util.Identifier;
+import net.minecraft.stats.StatFormatter;
+import net.minecraft.resources.Identifier;
 
+import com.virus5600.defensive_measures.DefensiveMeasures;
 import com.virus5600.defensive_measures._helper.RegistryHelper;
 
 public class ModStats {

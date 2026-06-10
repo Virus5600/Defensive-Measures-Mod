@@ -2,64 +2,65 @@ package com.virus5600.defensive_measures.entity.projectiles;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.block.BlockState;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.entity.*;
-import net.minecraft.entity.damage.DamageSource;
-import net.minecraft.entity.damage.DamageType;
-import net.minecraft.entity.damage.DamageTypes;
-import net.minecraft.entity.data.DataTracker.Builder;
-import net.minecraft.entity.data.DataTracker;
-import net.minecraft.entity.data.TrackedData;
-import net.minecraft.entity.data.TrackedDataHandlerRegistry;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.projectile.PersistentProjectileEntity;
-import net.minecraft.entity.projectile.ProjectileEntity;
-import net.minecraft.entity.projectile.ProjectileUtil;
-import net.minecraft.inventory.StackReference;
-import net.minecraft.item.ItemStack;
-import net.minecraft.particle.ParticleTypes;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.registry.tag.EntityTypeTags;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.sound.SoundEvent;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.util.Identifier;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData.Builder;
+import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.tags.EntityTypeTags;
+import net.minecraft.util.Mth;
 import net.minecraft.util.Unit;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.hit.EntityHitResult;
-import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.*;
-import net.minecraft.world.World;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.damagesource.DamageType;
+import net.minecraft.world.damagesource.DamageTypes;
+import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.projectile.Projectile;
+import net.minecraft.world.entity.projectile.ProjectileDeflection;
+import net.minecraft.world.entity.projectile.ProjectileUtil;
+import net.minecraft.world.entity.projectile.arrow.AbstractArrow;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.phys.*;
+
+import com.virus5600.defensive_measures.entity.ExplosiveEntity;
+import com.virus5600.defensive_measures.entity.turrets.TurretEntity;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
+import org.jspecify.annotations.NonNull;
 
 import java.util.Objects;
 
-import com.virus5600.defensive_measures.entity.ExplosiveEntity;
-import com.virus5600.defensive_measures.entity.turrets.TurretEntity;
-
 /**
- * {@code TurretProjectile} is an abstract class that acts nearly akin to {@link PersistentProjectileEntity}
+ * {@code TurretProjectile} is an abstract class that acts nearly akin to {@link AbstractArrow}
  * but with more support towards entity based projectiles and more control over some aspects of the
  * projectile such as its damage, piercing, and more.
  * <br><br>
- * For a more basic projectile entity or one that can be shot by a player, use the {@link PersistentProjectileEntity}
+ * For a more basic projectile entity or one that can be shot by a player, use the {@link AbstractArrow}
  * class.
  *
  * @since 1.0.0-beta
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
  */
-public abstract class TurretProjectileEntity extends ProjectileEntity {
-	protected static final TrackedData<Byte> PROJECTILE_FLAGS = DataTracker.registerData(TurretProjectileEntity.class, TrackedDataHandlerRegistry.BYTE);
-	protected static final TrackedData<Byte> PIERCE_LEVEL = DataTracker.registerData(TurretProjectileEntity.class, TrackedDataHandlerRegistry.BYTE);
-	protected static final TrackedData<Boolean> IN_GROUND = DataTracker.registerData(TurretProjectileEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
+public abstract class TurretProjectileEntity extends Projectile {
+	protected static final EntityDataAccessor<Byte> PROJECTILE_FLAGS = SynchedEntityData.defineId(TurretProjectileEntity.class, EntityDataSerializers.BYTE);
+	protected static final EntityDataAccessor<Byte> PIERCE_LEVEL = SynchedEntityData.defineId(TurretProjectileEntity.class, EntityDataSerializers.BYTE);
+	protected static final EntityDataAccessor<Boolean> IN_GROUND = SynchedEntityData.defineId(TurretProjectileEntity.class, EntityDataSerializers.BOOLEAN);
 	protected static final int CRITICAL_FLAG = 1;
 	protected static final int NO_CLIP_FLAG = 2;
 
@@ -84,7 +85,7 @@ public abstract class TurretProjectileEntity extends ProjectileEntity {
 	 * Defines the position this projectile is spawned at. Used for calculating the distance
 	 * traveled by this projectile.
 	 */
-	protected Vec3d spawnPos = Vec3d.ZERO;
+	protected Vec3 spawnPos = Vec3.ZERO;
 	/** Defines how long the shaking animation will play (in ticks). */
 	protected int shake;
 	/** Determines how long this projectile have been stuck "**in**" the ground. */
@@ -107,7 +108,7 @@ public abstract class TurretProjectileEntity extends ProjectileEntity {
 	 *
 	 * @see EntityType
 	 */
-	protected TurretProjectileEntity(EntityType<? extends TurretProjectileEntity> entityType, World world) {
+	protected TurretProjectileEntity(EntityType<? extends TurretProjectileEntity> entityType, Level world) {
 		super(entityType, world);
 	}
 
@@ -126,22 +127,22 @@ public abstract class TurretProjectileEntity extends ProjectileEntity {
 	 * @see EntityType
 	 */
 	protected TurretProjectileEntity(
-		EntityType<? extends TurretProjectileEntity> entityType,
-		double x,
-		double y,
-		double z,
-		World world,
-		@Nullable ItemStack stack
+            EntityType<? extends TurretProjectileEntity> entityType,
+            double x,
+            double y,
+            double z,
+            Level world,
+            @Nullable ItemStack stack
 	) {
 		this(entityType, world);
 
 		this.stack = stack;
-		this.setPosition(x, y, z);
+		this.setPos(x, y, z);
 
 		if (stack != null) {
-			this.setCustomName(stack.get(DataComponentTypes.CUSTOM_NAME));
+			this.setCustomName(stack.get(DataComponents.CUSTOM_NAME));
 
-			Unit unit = stack.remove(DataComponentTypes.INTANGIBLE_PROJECTILE);
+			Unit unit = stack.remove(DataComponents.INTANGIBLE_PROJECTILE);
 			if (unit != null) {
 				this.pickupType = PickupPermission.CREATIVE_ONLY;
 			}
@@ -159,10 +160,10 @@ public abstract class TurretProjectileEntity extends ProjectileEntity {
 	 * @param stack The item stack used to spawn this projectile.
 	 */
 	protected TurretProjectileEntity(
-		EntityType<? extends TurretProjectileEntity> entityType,
-		@NotNull LivingEntity owner,
-		@NotNull World world,
-		@Nullable ItemStack stack
+            EntityType<? extends TurretProjectileEntity> entityType,
+            @NotNull LivingEntity owner,
+            @NotNull Level world,
+            @Nullable ItemStack stack
 	) {
 		this(entityType, owner.getX(), owner.getEyeY() - 0.1F, owner.getZ(), world, stack);
 		this.setOwner(owner);
@@ -173,36 +174,36 @@ public abstract class TurretProjectileEntity extends ProjectileEntity {
 	// //////////// //
 
 	@Override
-	protected void initDataTracker(Builder builder) {
-		builder.add(PROJECTILE_FLAGS, (byte) 0)
-			.add(PIERCE_LEVEL, (byte) 0)
-			.add(IN_GROUND, false);
+	protected void defineSynchedData(Builder builder) {
+		builder.define(PROJECTILE_FLAGS, (byte) 0)
+			.define(PIERCE_LEVEL, (byte) 0)
+			.define(IN_GROUND, false);
 	}
 
 	// /////////////// //
 	// PROCESS METHODS //
 	// /////////////// //
 	protected HitResult getZeroVelocityCollision() {
-		Box box = this.getBoundingBox()
-			.expand(0.2);
+		AABB box = this.getBoundingBox()
+			.inflate(0.2);
 
-		EntityHitResult entityHitResult = ProjectileUtil.getEntityCollision(
-			this.getEntityWorld(),
+		EntityHitResult entityHitResult = ProjectileUtil.getEntityHitResult(
+			this.level(),
 			this,
-			box.getMinPos(),
-			box.getMaxPos(),
+			box.getMinPosition(),
+			box.getMaxPosition(),
 			box,
-			this::canHit
+			this::canHitEntity
 		);
 
 		if (entityHitResult != null) {
 			return entityHitResult;
 		}
 
-		return BlockHitResult.createMissed(
-			this.getEntityPos(),
+		return BlockHitResult.miss(
+			this.position(),
 			Direction.DOWN,
-			BlockPos.ofFloored(this.getEntityPos())
+			BlockPos.containing(this.position())
 		);
 	}
 
@@ -212,7 +213,7 @@ public abstract class TurretProjectileEntity extends ProjectileEntity {
 	 * <br><br>
 	 * In this implementation, the method will handle the damage calculation, the
 	 * critical damage multiplier, the pierce behavior, and the fire behavior similar
-	 * to how the {@link PersistentProjectileEntity} handles it.
+	 * to how the {@link AbstractArrow} handles it.
 	 * <br><br>
 	 * Furthermore, this implementation, the projectile will have the following behavior
 	 * (assuming the projectile is affected by armor points):
@@ -246,21 +247,21 @@ public abstract class TurretProjectileEntity extends ProjectileEntity {
 	 * @param entityHitResult {@inheritDoc EntityHitResult}
 	 */
 	@Override
-	protected void onEntityHit(EntityHitResult entityHitResult) {
-		super.onEntityHit(entityHitResult);
+	protected void onHitEntity(@NonNull EntityHitResult entityHitResult) {
+		super.onHitEntity(entityHitResult);
 
 		Entity hitEntity = entityHitResult.getEntity();
 		Entity owner = this.getOwner();
-		World world = this.getEntityWorld();
+		Level world = this.level();
 
 		// Handles the damage calculation
-		DamageSource dmgSrc = this.getDamageSources()
-			.create(this.getDamageType(), this, owner != null ? owner : this);
-		float velocityMagnitude = (float) this.getVelocity().length();
+		DamageSource dmgSrc = this.damageSources()
+			.source(this.getDamageType(), this, owner != null ? owner : this);
+		float velocityMagnitude = (float) this.getDeltaMovement().length();
 		double damage = this.getDamage();
-		int damageToDeal = MathHelper.ceil(
+		int damageToDeal = Mth.ceil(
 			this.speedAffectsDamage() ?
-				MathHelper.clamp(
+				Mth.clamp(
 					(double) velocityMagnitude * damage,
 					0.0,
 					2.147483647E9
@@ -289,26 +290,26 @@ public abstract class TurretProjectileEntity extends ProjectileEntity {
 
 		// Makes sure that the owner of this projectile gets to know that it is attacking
 		if (owner instanceof LivingEntity livingEntity) {
-			livingEntity.onAttacking(hitEntity);
+			livingEntity.setLastHurtMob(hitEntity);
 		}
 
 		// Handles the behavior of setting its target on fire if hit
 		boolean isEnderman = hitEntity.getType().equals(EntityType.ENDERMAN);
-		int fireTime = hitEntity.getFireTicks();
+		int fireTime = hitEntity.getRemainingFireTicks();
 		if (this.isOnFire() && !isEnderman) {
-			hitEntity.setOnFireFor(5F);
+			hitEntity.igniteForSeconds(5F);
 		}
 
 		// Handles the application of damage to the target (if it's not an explosive)
 		if (!(this instanceof ExplosiveEntity)) {
-			if (world instanceof ServerWorld serverWorld) {
-				hitEntity.damage(serverWorld, dmgSrc, (float) damageToDeal);
+			if (world instanceof ServerLevel serverWorld) {
+				hitEntity.hurtServer(serverWorld, dmgSrc, (float) damageToDeal);
 
 				if (isEnderman) return;
 
 				if (hitEntity instanceof LivingEntity livingEntity) {
-					if (!world.isClient() && this.getPierceLevel() <= 0) {
-						livingEntity.setStuckArrowCount(livingEntity.getStuckArrowCount() + 1);
+					if (!world.isClientSide() && this.getPierceLevel() <= 0) {
+						livingEntity.setArrowCount(livingEntity.getArrowCount() + 1);
 					}
 
 					this.onHit(livingEntity);
@@ -320,15 +321,15 @@ public abstract class TurretProjectileEntity extends ProjectileEntity {
 				}
 			}
 			else {
-				hitEntity.clientDamage(dmgSrc);
+				hitEntity.hurtClient(dmgSrc);
 
-				hitEntity.setFireTicks(fireTime);
-				this.deflect(ProjectileDeflection.SIMPLE, hitEntity, LazyEntityReference.of(hitEntity), false);
-				this.setVelocity(this.getVelocity().multiply(0.2));
+				hitEntity.setRemainingFireTicks(fireTime);
+				this.deflect(ProjectileDeflection.REVERSE, hitEntity, EntityReference.of(hitEntity), false);
+				this.setDeltaMovement(this.getDeltaMovement().scale(0.2));
 
-				if (world instanceof ServerWorld serverWorld && this.getVelocity().lengthSquared() < 1.0E-7) {
+				if (world instanceof ServerLevel serverWorld && this.getDeltaMovement().lengthSqr() < 1.0E-7) {
 					if (this.pickupType == PickupPermission.ALLOWED && this.stack != null) {
-						this.dropStack(serverWorld, this.asItemStack(), 0.1f);
+						this.spawnAtLocation(serverWorld, this.asItemStack(), 0.1f);
 					}
 
 					this.discard();
@@ -364,10 +365,10 @@ public abstract class TurretProjectileEntity extends ProjectileEntity {
 					case LIGHT -> reduction = 0.25;
 				}
 
-				this.addVelocity(
-					this.getVelocity()
-						.multiply(reduction)
-						.negate()
+				this.push(
+					this.getDeltaMovement()
+						.scale(reduction)
+						.reverse()
 				);
 			}
 
@@ -386,22 +387,22 @@ public abstract class TurretProjectileEntity extends ProjectileEntity {
 	}
 
 	@Override
-	protected void onBlockHit(BlockHitResult blockHitResult) {
-		World world = this.getEntityWorld();
+	protected void onHitBlock(BlockHitResult blockHitResult) {
+		Level world = this.level();
 		this.inBlockState = world.getBlockState(blockHitResult.getBlockPos());
-		super.onBlockHit(blockHitResult);
+		super.onHitBlock(blockHitResult);
 
-		Vec3d velocity = this.getVelocity();
-		Vec3d dirVector = new Vec3d(
+		Vec3 velocity = this.getDeltaMovement();
+		Vec3 dirVector = new Vec3(
 			Math.signum(velocity.x),
 			Math.signum(velocity.y),
 			Math.signum(velocity.z)
 		);
-		Vec3d embeddingAdjustment = dirVector.multiply(0.05);
+		Vec3 embeddingAdjustment = dirVector.scale(0.05);
 
 		this.shake = 7;
-		this.setPosition(this.getEntityPos().subtract(embeddingAdjustment));
-		this.setVelocity(Vec3d.ZERO);
+		this.setPos(this.position().subtract(embeddingAdjustment));
+		this.setDeltaMovement(Vec3.ZERO);
 		this.playSound(this.getSound(), 1f, 1.2f / (this.random.nextFloat() * 0.2f + 0.9f));
 		this.setInGround(true);
 		this.setCritical(false);
@@ -414,11 +415,11 @@ public abstract class TurretProjectileEntity extends ProjectileEntity {
 	}
 
 	@Override
-	public void onPlayerCollision(PlayerEntity player) {
-		World world = this.getEntityWorld();
-		if (world.isClient() && (this.isInGround() || this.isNoClip()) && this.shake <= 0) {
+	public void playerTouch(@NonNull Player player) {
+		Level world = this.level();
+		if (world.isClientSide() && (this.isInGround() || this.isNoClip()) && this.shake <= 0) {
 			if (this.tryPickup(player)) {
-				player.sendPickup(this, 1);
+				player.take(this, 1);
 				this.discard();
 			}
 		}
@@ -427,30 +428,30 @@ public abstract class TurretProjectileEntity extends ProjectileEntity {
 	protected void applyCollision(BlockHitResult blockHitResult) {
 		while (true) {
 			if (this.isAlive()) {
-				Vec3d pos = this.getEntityPos();
-				EntityHitResult entityHitResult = this.getEntityCollision(pos, blockHitResult.getPos());
-				Vec3d nextPos = Objects.requireNonNullElse(entityHitResult, blockHitResult).getPos();
+				Vec3 pos = this.position();
+				EntityHitResult entityHitResult = this.getEntityCollision(pos, blockHitResult.getLocation());
+				Vec3 nextPos = Objects.requireNonNullElse(entityHitResult, blockHitResult).getLocation();
 
-				this.setPosition(nextPos);
-				this.tickBlockCollision(pos, nextPos);
+				this.setPos(nextPos);
+				this.applyEffectsFromBlocks(pos, nextPos);
 
-				if (this.portalManager != null && this.portalManager.isInPortal()) {
-					this.tickPortalTeleportation();
+				if (this.portalProcess != null && this.portalProcess.isInsidePortalThisTick()) {
+					this.handlePortal();
 				}
 
 				if (entityHitResult == null) {
 					if (this.isAlive() && blockHitResult.getType() != HitResult.Type.MISS) {
-						this.hitOrDeflect(blockHitResult);
-						this.velocityDirty = true;
+						this.hitTargetOrDeflectSelf(blockHitResult);
+						this.needsSync = true;
 					}
 				}
 				else {
-					if (!this.isAlive() || this.noClip) {
+					if (!this.isAlive() || this.noPhysics) {
 						continue;
 					}
 
-					ProjectileDeflection deflection = this.hitOrDeflect(entityHitResult);
-					this.velocityDirty = true;
+					ProjectileDeflection deflection = this.hitTargetOrDeflectSelf(entityHitResult);
+					this.needsSync = true;
 
 					if (this.getPierceLevel() > 0 && deflection == ProjectileDeflection.NONE) {
 						continue;
@@ -463,22 +464,22 @@ public abstract class TurretProjectileEntity extends ProjectileEntity {
 	}
 
 	protected void applyDrag() {
-		Vec3d velocity = this.getVelocity();
+		Vec3 velocity = this.getDeltaMovement();
 		float dragCoefficient = this.getDrag();
 
-		if (this.isTouchingWater()) {
+		if (this.isInWater()) {
 			dragCoefficient = this.getDragInWater();
 		}
 
-		this.setVelocity(velocity.multiply(dragCoefficient));
+		this.setDeltaMovement(velocity.scale(dragCoefficient));
 	}
 
-	protected void spawnBubbleParticles(Vec3d pos) {
-		Vec3d velocity = this.getVelocity();
+	protected void spawnBubbleParticles(Vec3 pos) {
+		Vec3 velocity = this.getDeltaMovement();
 
 		for (int i = 0; i < 4; i++) {
 			float radius = 0.25F;
-			this.getEntityWorld().addParticleClient(
+			this.level().addParticle(
 				ParticleTypes.BUBBLE,
 				pos.x - velocity.x * radius,
 				pos.y - velocity.y * radius,
@@ -489,11 +490,11 @@ public abstract class TurretProjectileEntity extends ProjectileEntity {
 	}
 
 	protected void fall() {
-		Vec3d velocity = this.getVelocity();
+		Vec3 velocity = this.getDeltaMovement();
 
 		this.life = 0;
 		this.setInGround(false);
-		this.setVelocity(
+		this.setDeltaMovement(
 			velocity.multiply(
 				this.random.nextFloat() * 0.2F,
 				this.random.nextFloat() * 0.2F,
@@ -517,21 +518,21 @@ public abstract class TurretProjectileEntity extends ProjectileEntity {
 	}
 
 	@Override
-	public boolean shouldRender(double distance) {
-		double d = this.getBoundingBox().getAverageSideLength() * 10;
+	public boolean shouldRenderAtSqrDistance(double distance) {
+		double d = this.getBoundingBox().getSize() * 10;
 		if (Double.isNaN(d)) {
 			d = 1;
 		}
 
-		d *= 64 * TurretProjectileEntity.getRenderDistanceMultiplier();
+		d *= 64 * TurretProjectileEntity.getViewScale();
 		d *= d;
 		return distance < d;
 	}
 
 	@Override
-	public void onTrackedDataSet(TrackedData<?> data) {
-		super.onTrackedDataSet(data);
-		if (!this.firstUpdate && this.shake <= 0 && data.equals(IN_GROUND) && this.isInGround()) {
+	public void onSyncedDataUpdated(@NonNull EntityDataAccessor<?> data) {
+		super.onSyncedDataUpdated(data);
+		if (!this.firstTick && this.shake <= 0 && data.equals(IN_GROUND) && this.isInGround()) {
 			this.shake = 7;
 		}
 	}
@@ -543,8 +544,8 @@ public abstract class TurretProjectileEntity extends ProjectileEntity {
 	}
 
 	@Override
-	public void writeCustomData(WriteView view) {
-		super.writeCustomData(view);
+	public void addAdditionalSaveData(@NonNull ValueOutput view) {
+		super.addAdditionalSaveData(view);
 
 		view.putShort("life", (short) this.life);
 		view.putByte("shake", (byte)this.shake);
@@ -554,31 +555,31 @@ public abstract class TurretProjectileEntity extends ProjectileEntity {
 		view.putBoolean("crit", this.isCritical());
 		view.putByte("PierceLevel", this.getPierceLevel());
 
-		Identifier soundId = Registries.SOUND_EVENT.getId(this.sound);
+		Identifier soundId = BuiltInRegistries.SOUND_EVENT.getKey(this.sound);
 		if (soundId != null) {
 			view.putString("SoundEvent", soundId.toString());
 		}
 
 		if (this.stack != null) {
-			view.put("item", ItemStack.CODEC, this.stack);
+			view.store("item", ItemStack.CODEC, this.stack);
 		}
 
 		if (this.inBlockState != null) {
-			view.putNullable("inBlockState", BlockState.CODEC, this.inBlockState);
+			view.storeNullable("inBlockState", BlockState.CODEC, this.inBlockState);
 		}
 	}
 
 	@Override
-	public void readCustomData(ReadView view) {
-		super.readCustomData(view);
+	public void readAdditionalSaveData(@NonNull ValueInput view) {
+		super.readAdditionalSaveData(view);
 
-		this.life = view.getShort("life", (short) 0);
-		this.shake = view.getByte("shake", (byte) 0) & 255;
-		this.setInGround(view.getBoolean("inGround", false));
-		this.damage = view.getDouble("damage", 2.0F);
-		this.pickupType = PickupPermission.fromOrdinal(view.getByte("pickup", (byte) 0));
-		this.setCritical(view.getBoolean("crit", false));
-		this.setPierceLevel(view.getByte("PierceLevel", (byte) 0));
+		this.life = view.getShortOr("life", (short) 0);
+		this.shake = view.getByteOr("shake", (byte) 0) & 255;
+		this.setInGround(view.getBooleanOr("inGround", false));
+		this.damage = view.getDoubleOr("damage", 2.0F);
+		this.pickupType = PickupPermission.fromOrdinal(view.getByteOr("pickup", (byte) 0));
+		this.setCritical(view.getBooleanOr("crit", false));
+		this.setPierceLevel(view.getByteOr("PierceLevel", (byte) 0));
 
 		this.inBlockState = view.read("inBlockState", BlockState.CODEC)
 			.orElse(null);
@@ -596,23 +597,26 @@ public abstract class TurretProjectileEntity extends ProjectileEntity {
 	public void applyDamageModifier(float damageModifier) {
 		this.setDamage(
 			(double) (damageModifier * 2.0F)
-				+ this.random.nextTriangular(
-					(double) this.getEntityWorld().getDifficulty().getId() * 0.11,
+				+ this.random.triangle(
+					(double) this.level().getDifficulty().getId() * 0.11,
 				0.57425
 			)
 		);
 	}
 
-	protected boolean tryPickup(PlayerEntity player) {
+	protected boolean tryPickup(Player player) {
 		boolean didPickedUp = false;
 
 		if (this.pickupType == PickupPermission.ALLOWED) {
-			if (this.stack != null) {
-				didPickedUp = player.getInventory().insertStack(this.asItemStack());
+			ItemStack stack = this.asItemStack();
+
+			if (stack != null) {
+				didPickedUp = player.getInventory()
+					.add(stack);
 			}
 		}
 		else if (this.pickupType == PickupPermission.CREATIVE_ONLY) {
-			didPickedUp = player.isInCreativeMode();
+			didPickedUp = player.hasInfiniteMaterials();
 		}
 
 		return didPickedUp;
@@ -631,7 +635,7 @@ public abstract class TurretProjectileEntity extends ProjectileEntity {
 
 	/**
 	 * Determines whether the speed of the projectile affects the damage it deals,
-	 * similar to how {@link PersistentProjectileEntity} handles it.
+	 * similar to how {@link AbstractArrow} handles it.
 	 *
 	 * @return {@code true} if the speed affects the damage, {@code false} otherwise
 	 *
@@ -642,13 +646,13 @@ public abstract class TurretProjectileEntity extends ProjectileEntity {
 	}
 
 	protected boolean shouldFall() {
-		Vec3d pos = this.getEntityPos();
-		return this.isInGround() && this.getEntityWorld().isSpaceEmpty(new Box(pos, pos).expand(0.06));
+		Vec3 pos = this.position();
+		return this.isInGround() && this.level().noCollision(new AABB(pos, pos).inflate(0.06));
 	}
 
 	@Override
-	protected boolean canHit(Entity entity) {
-		return super.canHit(entity)
+	protected boolean canHitEntity(@NonNull Entity entity) {
+		return super.canHitEntity(entity)
 			&& (
 			this.piercedEntities == null
 				|| !this.piercedEntities.contains(entity.getId())
@@ -656,17 +660,17 @@ public abstract class TurretProjectileEntity extends ProjectileEntity {
 	}
 
 	@Override
-	public boolean canHit() {
-		return super.canHit() && !this.isInGround();
+	public boolean isPickable() {
+		return super.isPickable() && !this.isInGround();
 	}
 
 	@Override
 	public boolean isAttackable() {
-		return this.getType().isIn(EntityTypeTags.REDIRECTABLE_PROJECTILE);
+		return this.getType().is(EntityTypeTags.REDIRECTABLE_PROJECTILE);
 	}
 
 	@Override
-	protected boolean deflectsAgainstWorldBorder() {
+	protected boolean shouldBounceOnWorldBorder() {
 		return true;
 	}
 
@@ -675,11 +679,11 @@ public abstract class TurretProjectileEntity extends ProjectileEntity {
 	// //////////// //
 
 	protected void setInGround(boolean inGround) {
-		this.dataTracker.set(IN_GROUND, inGround);
+		this.entityData.set(IN_GROUND, inGround);
 	}
 
 	protected boolean isInGround() {
-		return this.dataTracker.get(IN_GROUND);
+		return this.entityData.get(IN_GROUND);
 	}
 
 	// ///////////////// //
@@ -694,13 +698,13 @@ public abstract class TurretProjectileEntity extends ProjectileEntity {
 	 *
 	 * @implNote By default, this returns {@link DamageTypes#ARROW}, but it can be overridden to return a custom damage type if needed.
 	 */
-	public RegistryKey<DamageType> getDamageType() {
+	public ResourceKey<DamageType> getDamageType() {
 		return DamageTypes.ARROW;
 	}
 
 	/** Overridable method that defines the sound played when this projectile hits something. **/
 	public SoundEvent getHitSound() {
-		return SoundEvents.ENTITY_ARROW_HIT;
+		return SoundEvents.ARROW_HIT;
 	}
 
 	protected final SoundEvent getSound() {
@@ -716,7 +720,7 @@ public abstract class TurretProjectileEntity extends ProjectileEntity {
 	}
 
 	@Override
-	protected double getGravity() {
+	protected double getDefaultGravity() {
 		return 0.05;
 	}
 
@@ -729,7 +733,7 @@ public abstract class TurretProjectileEntity extends ProjectileEntity {
 	}
 
 	public float getFinalDrag() {
-		return this.submergedInWater ?
+		return this.wasEyeInWater ?
 			this.getDragInWater() : this.getDrag();
 	}
 
@@ -758,32 +762,32 @@ public abstract class TurretProjectileEntity extends ProjectileEntity {
 	}
 
 	@Override
-	public void setVelocity(double x, double y, double z, float power, float uncertainty) {
-		super.setVelocity(x, y, z, power, uncertainty);
+	public void shoot(double x, double y, double z, float power, float uncertainty) {
+		super.shoot(x, y, z, power, uncertainty);
 		this.life = 0;
 
-		double sqrdPosMagnitude = MathHelper.squaredMagnitude(x, y, z);
+		double sqrdPosMagnitude = Mth.lengthSquared(x, y, z);
 		if (this.isInGround() && sqrdPosMagnitude > 0.0) {
 			this.setInGround(true);
 		}
 	}
 
 	@Nullable
-	protected EntityHitResult getEntityCollision(Vec3d currentPos, Vec3d nextPos) {
-		return ProjectileUtil.getEntityCollision(
-			this.getEntityWorld(),
+	protected EntityHitResult getEntityCollision(Vec3 currentPos, Vec3 nextPos) {
+		return ProjectileUtil.getEntityHitResult(
+			this.level(),
 			this,
 			currentPos, nextPos,
 			this.getBoundingBox()
-				.stretch(this.getVelocity())
-				.expand(1.0),
-			this::canHit
+				.expandTowards(this.getDeltaMovement())
+				.inflate(1.0),
+			this::canHitEntity
 		);
 	}
 
 	@Override
-	protected MoveEffect getMoveEffect() {
-		return MoveEffect.NONE;
+	protected @NonNull MovementEmission getMovementEmission() {
+		return MovementEmission.NONE;
 	}
 
 	public void setDamage(double damage) {
@@ -799,39 +803,39 @@ public abstract class TurretProjectileEntity extends ProjectileEntity {
 	}
 
 	public byte getPierceLevel() {
-		return this.dataTracker.get(PIERCE_LEVEL);
+		return this.entityData.get(PIERCE_LEVEL);
 	}
 
 	protected void setPierceLevel(byte level) {
-		this.dataTracker.set(PIERCE_LEVEL, level);
+		this.entityData.set(PIERCE_LEVEL, level);
 	}
 
 	private void setProjectileFlag(int index, boolean flag) {
-		byte projectileFlags = this.dataTracker.get(PROJECTILE_FLAGS);
+		byte projectileFlags = this.entityData.get(PROJECTILE_FLAGS);
 		if (flag) {
-			this.dataTracker.set(PROJECTILE_FLAGS, (byte) (projectileFlags | index));
+			this.entityData.set(PROJECTILE_FLAGS, (byte) (projectileFlags | index));
 		} else {
-			this.dataTracker.set(PROJECTILE_FLAGS, (byte) (projectileFlags & ~index));
+			this.entityData.set(PROJECTILE_FLAGS, (byte) (projectileFlags & ~index));
 		}
 	}
 
 	public boolean isCritical() {
-		byte projectileFlags = this.dataTracker.get(PROJECTILE_FLAGS);
+		byte projectileFlags = this.entityData.get(PROJECTILE_FLAGS);
 		return (projectileFlags & 1) != 0;
 	}
 
 	public void setNoClip(boolean noClip) {
-		this.noClip = noClip;
+		this.noPhysics = noClip;
 		this.setProjectileFlag(NO_CLIP_FLAG, noClip);
 	}
 
 	public boolean isNoClip() {
-		return !this.getEntityWorld().isClient() ? this.noClip : (this.dataTracker.get(PROJECTILE_FLAGS) & 2) != 0;
+		return !this.level().isClientSide() ? this.noPhysics : (this.entityData.get(PROJECTILE_FLAGS) & 2) != 0;
 	}
 
 	@Override
-	public StackReference getStackReference(int mappedIndex) {
-		return mappedIndex == 0 ? StackReference.of(this::getItemStack, this::setStack) : super.getStackReference(mappedIndex);
+	public SlotAccess getSlot(int mappedIndex) {
+		return mappedIndex == 0 ? SlotAccess.of(this::getItemStack, this::setStack) : super.getSlot(mappedIndex);
 	}
 
 	@Override
@@ -845,20 +849,20 @@ public abstract class TurretProjectileEntity extends ProjectileEntity {
 	}
 
 	public void setSpawnPos(double x, double y, double z) {
-		this.setSpawnPos(new Vec3d(x, y, z));
+		this.setSpawnPos(new Vec3(x, y, z));
 	}
 
-	public void setSpawnPos(Vec3d spawnPos) {
+	public void setSpawnPos(Vec3 spawnPos) {
 		this.spawnPos = spawnPos;
-		this.setPosition(spawnPos);
-		this.updateTrackedPosition(spawnPos);
+		this.setPos(spawnPos);
+		this.moveOrInterpolateTo(spawnPos);
 	}
 
-	public Vec3d getSpawnPos() {
-		return new Vec3d(
-			this.spawnPos.getX(),
-			this.spawnPos.getY(),
-			this.spawnPos.getZ()
+	public Vec3 getSpawnPos() {
+		return new Vec3(
+			this.spawnPos.x(),
+			this.spawnPos.y(),
+			this.spawnPos.z()
 		);
 	}
 
@@ -935,7 +939,7 @@ public abstract class TurretProjectileEntity extends ProjectileEntity {
 
 	@Environment(EnvType.CLIENT)
 	protected void updateAnimations() {
-		this.loopAnimationState.startIfNotRunning(this.age);
+		this.loopAnimationState.startIfStopped(this.tickCount);
 	}
 
 	// ///////////////////// //
@@ -985,7 +989,7 @@ public abstract class TurretProjectileEntity extends ProjectileEntity {
 			}
 
 			// For reference, the max armor points is 30.
-			int armor = entity.getArmor();
+			int armor = entity.getArmorValue();
 
 			if (armor > 15) {
 				toRet = HEAVY;

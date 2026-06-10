@@ -1,9 +1,9 @@
 package com.virus5600.defensive_measures.entity;
 
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
-import net.minecraft.entity.EntityType.Builder;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.SpawnGroup;
+import net.minecraft.world.entity.EntityType.Builder;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.MobCategory;
 
 import com.virus5600.defensive_measures.DefensiveMeasures;
 import com.virus5600.defensive_measures._helper.RegistryHelper;
@@ -23,27 +23,27 @@ public class ModEntities {
 	public static final EntityType<CannonTurretEntity> CANNON_TURRET = RegistryHelper.registerEntity(
 		"cannon_turret",
 		Builder
-			.create(CannonTurretEntity::new, SpawnGroup.MISC)
-			.dimensions(1F, 1F)
-			.maxTrackingRange(32)
+			.of(CannonTurretEntity::new, MobCategory.MISC)
+			.sized(1F, 1F)
+			.clientTrackingRange(32)
 			.eyeHeight(0.51F)
 	);
 
 	public static final EntityType<BallistaTurretEntity> BALLISTA_TURRET = RegistryHelper.registerEntity(
 		"ballista",
 		Builder
-			.create(BallistaTurretEntity::new, SpawnGroup.MISC)
-			.dimensions(1F, 1F)
-			.maxTrackingRange(16)
+			.of(BallistaTurretEntity::new, MobCategory.MISC)
+			.sized(1F, 1F)
+			.clientTrackingRange(16)
 			.eyeHeight(0.71F)
 	);
 
 	public static final EntityType<MGTurretEntity> MG_TURRET = RegistryHelper.registerEntity(
 		"mg_turret",
 		Builder
-			.create(MGTurretEntity::new, SpawnGroup.MISC)
-			.dimensions(1F, 0.625F)
-			.maxTrackingRange(32)
+			.of(MGTurretEntity::new, MobCategory.MISC)
+			.sized(1F, 0.625F)
+			.clientTrackingRange(32)
 			.eyeHeight(0.4275F)
 	);
 
@@ -51,27 +51,27 @@ public class ModEntities {
 	public static final EntityType<AATurretEntity> AA_TURRET = RegistryHelper.registerEntity(
 		"aa_turret",
 		Builder.
-			create(AATurretEntity::new, SpawnGroup.MISC)
-			.dimensions(2F, 2F)
-			.maxTrackingRange(96)
+			of(AATurretEntity::new, MobCategory.MISC)
+			.sized(2F, 2F)
+			.clientTrackingRange(96)
 			.eyeHeight(0.96875F)
 	);
 
 	public static final EntityType<FlameTurretEntity> FLAME_TURRET = RegistryHelper.registerEntity(
 		"flame_turret",
 		Builder.
-			create(FlameTurretEntity::new, SpawnGroup.MISC)
-			.dimensions(2F, 2F)
-			.maxTrackingRange(16)
+			of(FlameTurretEntity::new, MobCategory.MISC)
+			.sized(2F, 2F)
+			.clientTrackingRange(16)
 			.eyeHeight(1.1875F)
 	);
 
 	public static final EntityType<MissileTurretEntity> MISSILE_TURRET = RegistryHelper.registerEntity(
 		"missile_turret",
 		Builder.
-			create(MissileTurretEntity::new, SpawnGroup.MISC)
-			.dimensions(2F, 2F)
-			.maxTrackingRange(64)
+                of(MissileTurretEntity::new, MobCategory.MISC)
+			.sized(2F, 2F)
+			.clientTrackingRange(64)
 			.eyeHeight(1.5625F)
 	);
 
@@ -80,65 +80,65 @@ public class ModEntities {
 	public static final EntityType<CannonballEntity> CANNONBALL = RegistryHelper.registerEntity(
 		"cannonball",
 		Builder
-			.create(CannonballEntity::new, SpawnGroup.MISC)
-			.dropsNothing()
-			.dimensions(0.5f, 0.5f)
-			.maxTrackingRange(4)
-			.trackingTickInterval(10)
+			.of(CannonballEntity::new, MobCategory.MISC)
+			.noLootTable()
+			.sized(0.5f, 0.5f)
+			.clientTrackingRange(4)
+			.updateInterval(10)
 			.eyeHeight(0.25F)
 	);
 
 	public static final EntityType<BallistaBoltEntity> BALLISTA_BOLT = RegistryHelper.registerEntity(
 		"ballista_bolt",
 		Builder
-			.<BallistaBoltEntity>create(BallistaBoltEntity::new, SpawnGroup.MISC)
-			.dropsNothing()
-			.dimensions(0.5f, 0.5f)
-			.maxTrackingRange(4)
-			.trackingTickInterval(10)
+			.<BallistaBoltEntity>of(BallistaBoltEntity::new, MobCategory.MISC)
+			.noLootTable()
+			.sized(0.5f, 0.5f)
+			.clientTrackingRange(4)
+			.updateInterval(10)
 			.eyeHeight(0.1F)
 	);
 
 	public static final EntityType<MGBulletEntity> MG_BULLET = RegistryHelper.registerEntity(
 		"mg_bullet",
 		Builder
-			.<MGBulletEntity>create(MGBulletEntity::new, SpawnGroup.MISC)
-			.dropsNothing()
-			.dimensions(0.125f, 0.125f)
-			.maxTrackingRange(4)
-			.trackingTickInterval(10)
+			.<MGBulletEntity>of(MGBulletEntity::new, MobCategory.MISC)
+			.noLootTable()
+			.sized(0.125f, 0.125f)
+			.clientTrackingRange(4)
+			.updateInterval(10)
 	);
 
 	// v1.1.0-beta
 	public static final EntityType<FlakProjectileEntity> FLAK_PROJECTILE = RegistryHelper.registerEntity(
 		"flak_projectile",
 		Builder
-			.<FlakProjectileEntity>create(FlakProjectileEntity::new, SpawnGroup.MISC)
-			.dropsNothing()
-			.dimensions(0.125f, 0.125f)
-			.maxTrackingRange(8)
-			.trackingTickInterval(10)
+			.of(FlakProjectileEntity::new, MobCategory.MISC)
+			.noLootTable()
+			.sized(0.125f, 0.125f)
+			.clientTrackingRange(8)
+			.updateInterval(10)
 	);
 
 	public static final EntityType<FlammableAerosolEntity> FLAMMABLE_AEROSOL = RegistryHelper.registerEntity(
 		"flammable_aerosol",
 		Builder
-			.create(FlammableAerosolEntity::new, SpawnGroup.MISC)
-			.dropsNothing()
-			.dimensions(0.5f, 0.5f)
-			.maxTrackingRange(4)
-			.trackingTickInterval(10)
-			.makeFireImmune()
+			.of(FlammableAerosolEntity::new, MobCategory.MISC)
+			.noLootTable()
+			.sized(0.5f, 0.5f)
+			.clientTrackingRange(4)
+			.updateInterval(10)
+			.fireImmune()
 	);
 
 	public static final EntityType<MicroMissileEntity> MICRO_MISSILE = RegistryHelper.registerEntity(
 		"micro_missile",
 		Builder
-			.create(MicroMissileEntity::new, SpawnGroup.MISC)
-			.dropsNothing()
-			.dimensions(0.125f, 0.125f)
-			.maxTrackingRange(8)
-			.trackingTickInterval(10)
+			.of(MicroMissileEntity::new, MobCategory.MISC)
+			.noLootTable()
+			.sized(0.125f, 0.125f)
+			.clientTrackingRange(8)
+			.updateInterval(10)
 			.eyeHeight(0.0625f)
 	);
 

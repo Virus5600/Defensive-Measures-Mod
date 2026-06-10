@@ -1,32 +1,32 @@
 package com.virus5600.defensive_measures.world;
 
-import com.virus5600.defensive_measures.entity.ExplosiveEntity;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.attribute.EntityAttributes;
-import net.minecraft.entity.damage.DamageSource;
-import net.minecraft.entity.projectile.ProjectileEntity;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.profiler.Profiler;
-import net.minecraft.util.profiler.Profilers;
-import net.minecraft.world.event.GameEvent;
-import net.minecraft.world.explosion.ExplosionBehavior;
-import net.minecraft.world.explosion.ExplosionImpl;
+import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.Mth;
+import net.minecraft.util.profiling.Profiler;
+import net.minecraft.util.profiling.ProfilerFiller;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.projectile.Projectile;
+import net.minecraft.world.level.ExplosionDamageCalculator;
+import net.minecraft.world.level.ServerExplosion;
+import net.minecraft.world.level.gameevent.GameEvent;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 
+import com.virus5600.defensive_measures.entity.ExplosiveEntity;
 import com.virus5600.defensive_measures.entity.projectiles.ExplosiveProjectileEntity;
+
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.jspecify.annotations.Nullable;
-
-public class ModExplosionImpl extends ExplosionImpl {
-	public ModExplosionImpl(ServerWorld world, @Nullable Entity entity, @Nullable DamageSource damageSource, @Nullable ExplosionBehavior behavior, Vec3d pos, float power, boolean createFire, DestructionType destructionType) {
+public class ModExplosionImpl extends ServerExplosion {
+	public ModExplosionImpl(ServerLevel world, @Nullable Entity entity, @Nullable DamageSource damageSource, @Nullable ExplosionDamageCalculator behavior, Vec3 pos, float power, boolean createFire, BlockInteraction destructionType) {
 		super(world, entity, damageSource, behavior, pos, power, createFire, destructionType);
 	}
 
@@ -35,36 +35,36 @@ public class ModExplosionImpl extends ExplosionImpl {
 	// /////////////// //
 
 	private void damageEntities() {
-		if (!(this.getEntity() instanceof ExplosiveProjectileEntity epe)) {
+		if (!(this.getDirectSourceEntity() instanceof ExplosiveProjectileEntity epe)) {
 			throw new IllegalStateException("The damageEntities() method can only be called if the exploding entity is an instance of ExplosiveProjectileEntity.");
 		}
 
 		double maxDmgRadius = epe.getMaxDamageRadius();
-		Vec3d explosionPos = this.getPosition();
+		Vec3 explosionPos = this.center();
 
 		// Single query with max radius — damageEntity handles zone detection internally
-		Box fullReceiver = new Box(
-			explosionPos.getX() - maxDmgRadius,
-			explosionPos.getY() - maxDmgRadius,
-			explosionPos.getZ() - maxDmgRadius,
-			explosionPos.getX() + maxDmgRadius,
-			explosionPos.getY() + maxDmgRadius,
-			explosionPos.getZ() + maxDmgRadius
+		AABB fullReceiver = new AABB(
+			explosionPos.x() - maxDmgRadius,
+			explosionPos.y() - maxDmgRadius,
+			explosionPos.z() - maxDmgRadius,
+			explosionPos.x() + maxDmgRadius,
+			explosionPos.y() + maxDmgRadius,
+			explosionPos.z() + maxDmgRadius
 		);
 
 		List<Entity> damagedEntities = new ArrayList<>();
-		epe.getEntityWorld()
-			.getOtherEntities(epe, fullReceiver)
+		epe.level()
+			.getEntities(epe, fullReceiver)
 			.forEach(entity -> this.damageEntity(epe, entity, damagedEntities, explosionPos));
 	}
 
-	private void damageEntity(ProjectileEntity projectile, Entity entity, List<Entity> list, Vec3d explosionPos) {
+	private void damageEntity(Projectile projectile, Entity entity, List<Entity> list, Vec3 explosionPos) {
 		if (list.contains(entity)) return;
 
-		if (!entity.isImmuneToExplosion(this) && (projectile instanceof ExplosiveEntity epe)) {
+		if (!entity.ignoreExplosion(this) && (projectile instanceof ExplosiveEntity epe)) {
 			double effectiveRadius = epe.getEffectiveRadius();
 			double maxDmgRadius = epe.getMaxDamageRadius();
-			double distance = Math.sqrt(entity.squaredDistanceTo(explosionPos));
+			double distance = Math.sqrt(entity.distanceToSqr(explosionPos));
 
 			// Spherical radius guard
 			if (distance > maxDmgRadius) {
@@ -72,16 +72,16 @@ public class ModExplosionImpl extends ExplosionImpl {
 				return;
 			}
 
-			boolean shouldDmg = this.behavior.shouldDamage(this, entity);
+			boolean shouldDmg = this.damageCalculator.shouldDamageEntity(this, entity);
 			double baseDmg = epe.getBaseDamage();
 			double dmgReduction = epe.getDamageReduction();
-			float knockbackMod = this.behavior.getKnockbackModifier(entity);
+			float knockbackMod = this.damageCalculator.getKnockbackMultiplier(entity);
 			float exposure = !shouldDmg && knockbackMod == 0 ?
-				0f : calculateReceivedDamage(this.getPosition(), entity);
+				0f : getSeenPercent(this.center(), entity);
 
 			// Size-aware factor
-			Box box = entity.getBoundingBox();
-			double sizeFactor = MathHelper.clamp(
+			AABB box = entity.getBoundingBox();
+			double sizeFactor = Mth.clamp(
 				(box.maxX - box.minX) * (box.maxY - box.minY) * (box.maxZ - box.minZ)
 					/ (0.6 * 1.9 * 0.6),
 				0.5,
@@ -106,8 +106,8 @@ public class ModExplosionImpl extends ExplosionImpl {
 			dmg = Math.max(1, dmg);
 
 			if (shouldDmg) {
-				entity.damage(
-					(ServerWorld) projectile.getEntityWorld(),
+				entity.hurtServer(
+					(ServerLevel) projectile.level(),
 					this.getDamageSource(),
 					dmg
 				);
@@ -117,23 +117,23 @@ public class ModExplosionImpl extends ExplosionImpl {
 			if (knockbackMod != 0) {
 				double normalizedDist = distance / maxDmgRadius;
 				double knockbackResistance = entity instanceof LivingEntity living
-					? living.getAttributeValue(EntityAttributes.EXPLOSION_KNOCKBACK_RESISTANCE)
+					? living.getAttributeValue(Attributes.EXPLOSION_KNOCKBACK_RESISTANCE)
 					: 0.0;
 
 				double knockback = (1 - normalizedDist) * exposure * knockbackMod * (1 - knockbackResistance);
-				Vec3d knockbackVec = entity.getEyePos()
+				Vec3 knockbackVec = entity.getEyePosition()
 					.subtract(explosionPos)
 					.normalize()
-					.multiply(knockback);
+					.scale(knockback);
 
-				entity.addVelocity(knockbackVec);
+				entity.push(knockbackVec);
 
-				if (entity instanceof ServerPlayerEntity serverPlayer) {
-					this.getKnockbackByPlayer().put(serverPlayer, knockbackVec);
+				if (entity instanceof ServerPlayer serverPlayer) {
+					this.getHitPlayers().put(serverPlayer, knockbackVec);
 				}
 			}
 
-			entity.onExplodedBy(projectile.getOwner());
+			entity.onExplosionHit(projectile.getOwner());
 		}
 
 		list.add(entity);
@@ -155,7 +155,7 @@ public class ModExplosionImpl extends ExplosionImpl {
 	 * @see #explode(boolean)
 	 */
 	public int explode(boolean useVanilla, boolean destroyBlocks) {
-		return useVanilla || !(this.getEntity() instanceof ExplosiveProjectileEntity) ?
+		return useVanilla || !(this.getDirectSourceEntity() instanceof ExplosiveProjectileEntity) ?
 			super.explode() : this.explode(destroyBlocks);
 	}
 
@@ -203,24 +203,24 @@ public class ModExplosionImpl extends ExplosionImpl {
 	 */
 	public int explode(boolean destroyBlocks) {
 		// If not an instance of the custom explosive entity, then use the vanilla explosion.
-		if (!(this.getEntity() instanceof ExplosiveProjectileEntity)) {
+		if (!(this.getDirectSourceEntity() instanceof ExplosiveProjectileEntity)) {
 			return super.explode();
 		}
 
-		List<BlockPos> list = this.getBlocksToDestroy();
+		List<BlockPos> list = this.calculateExplodedPositions();
 
-		this.getWorld().emitGameEvent(this.getEntity(), GameEvent.EXPLODE, this.getPosition());
+		this.level().gameEvent(this.getDirectSourceEntity(), GameEvent.EXPLODE, this.center());
 		this.damageEntities();
 
-		if (this.shouldDestroyBlocks() && destroyBlocks) {
-			Profiler profiler = Profilers.get();
+		if (this.interactsWithBlocks() && destroyBlocks) {
+			ProfilerFiller profiler = Profiler.get();
 
 			profiler.push("explosion_blocks");
-			this.destroyBlocks(list);
+			this.interactWithBlocks(list);
 			profiler.pop();
 		}
 
-		if (this.createFire) {
+		if (this.fire) {
 			this.createFire(list);
 		}
 

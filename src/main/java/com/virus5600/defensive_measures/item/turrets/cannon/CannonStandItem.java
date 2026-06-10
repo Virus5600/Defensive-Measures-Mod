@@ -1,7 +1,7 @@
 package com.virus5600.defensive_measures.item.turrets.cannon;
 
-import net.minecraft.item.Item;
-import net.minecraft.util.Rarity;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Rarity;
 
 import com.virus5600.defensive_measures.item.interfaces.FuelItem;
 
@@ -12,10 +12,10 @@ import com.virus5600.defensive_measures.item.interfaces.FuelItem;
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
  */
 public class CannonStandItem extends Item implements FuelItem {
-	public CannonStandItem(net.minecraft.item.Item.Settings settings) {
+	public CannonStandItem(Properties settings) {
 		super(
 			settings
-				.maxCount(16)			// MAX STACK SIZE
+				.stacksTo(16)			// MAX STACK SIZE
 				.rarity(Rarity.COMMON)	// RARITY
 		);
 	}

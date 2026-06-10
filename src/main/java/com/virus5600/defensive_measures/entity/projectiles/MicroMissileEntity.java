@@ -1,25 +1,25 @@
 package com.virus5600.defensive_measures.entity.projectiles;
 
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LazyEntityReference;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.attribute.EntityAttributes;
-import net.minecraft.entity.damage.DamageSource;
-import net.minecraft.entity.damage.DamageTypes;
-import net.minecraft.entity.data.DataTracker;
-import net.minecraft.entity.data.TrackedData;
-import net.minecraft.entity.data.TrackedDataHandlerRegistry;
-import net.minecraft.entity.mob.MobEntity;
-import net.minecraft.particle.ParticleEffect;
-import net.minecraft.particle.ParticleTypes;
-import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.sound.SoundEvent;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.core.Holder;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.util.Mth;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.damagesource.DamageTypes;
+import net.minecraft.world.entity.EntityReference;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.phys.Vec3;
 
 import com.virus5600.defensive_measures._util.MathUtil;
 import com.virus5600.defensive_measures.entity.LoopingSoundEntity;
@@ -52,9 +52,9 @@ import java.util.Optional;
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
  */
 public class MicroMissileEntity extends ExplosiveProjectileEntity implements LoopingSoundEntity {
-	protected static final TrackedData<Integer> REMAINING_FUEL;
-	protected static final TrackedData<Boolean> IS_HOMING;
-	protected static final TrackedData<Optional<LazyEntityReference<LivingEntity>>> TARGET;
+	protected static final EntityDataAccessor<Integer> REMAINING_FUEL;
+	protected static final EntityDataAccessor<Boolean> IS_HOMING;
+	protected static final EntityDataAccessor<Optional<EntityReference<LivingEntity>>> TARGET;
 
 	protected double maxRange = -1;
 	protected double turnRate = 0;
@@ -64,13 +64,13 @@ public class MicroMissileEntity extends ExplosiveProjectileEntity implements Loo
 	// CONSTRUCTORS //
 	// //////////// //
 	public MicroMissileEntity(
-		EntityType<? extends ExplosiveProjectileEntity> entityType,
-		net.minecraft.world.World world
+            EntityType<? extends ExplosiveProjectileEntity> entityType,
+            net.minecraft.world.level.Level world
 	) {
 		super(entityType, world);
 
-		this.setFireTicks(0);
-		this.setOnFire(false);
+		this.setRemainingFireTicks(0);
+		this.setSharedFlagOnFire(false);
 	}
 
 	// //////////// //
@@ -78,12 +78,12 @@ public class MicroMissileEntity extends ExplosiveProjectileEntity implements Loo
 	// //////////// //
 
 	@Override
-	protected void initDataTracker(DataTracker.Builder builder) {
-		super.initDataTracker(builder);
+	protected void defineSynchedData(SynchedEntityData.Builder builder) {
+		super.defineSynchedData(builder);
 
-		builder.add(IS_HOMING, false)
-			.add(REMAINING_FUEL, this.getMissileFuel())
-			.add(TARGET, Optional.empty());
+		builder.define(IS_HOMING, false)
+			.define(REMAINING_FUEL, this.getMissileFuel())
+			.define(TARGET, Optional.empty());
 	}
 
 	// /////////////// //
@@ -158,14 +158,14 @@ public class MicroMissileEntity extends ExplosiveProjectileEntity implements Loo
 	 * simulating an exhaust of a rocket engine.
 	 */
 	@Override @Nullable
-	protected ParticleEffect getTrailParticleType() {
+	protected ParticleOptions getTrailParticleType() {
 		return this.getRemainingFuel() > 0 ?
 			ModParticles.ROCKET_THRUSTER : null;
 	}
 
 	@Override
-	protected double getGravity() {
-		return this.isTouchingWater() || this.getRemainingFuel() <= 0 ?
+	protected double getDefaultGravity() {
+		return this.isInWater() || this.getRemainingFuel() <= 0 ?
 			0.01 : 0;
 	}
 
@@ -180,8 +180,8 @@ public class MicroMissileEntity extends ExplosiveProjectileEntity implements Loo
 	}
 
 	@Override
-	public boolean damage(ServerWorld world, DamageSource source, float amount) {
-		if (source.isOf(DamageTypes.EXPLOSION)) {
+	public boolean hurtServer(@NonNull ServerLevel world, @NonNull DamageSource source, float amount) {
+		if (source.is(DamageTypes.EXPLOSION)) {
 			this.doDamage();
 			return true;
 		}
@@ -190,23 +190,23 @@ public class MicroMissileEntity extends ExplosiveProjectileEntity implements Loo
 
 	@Override
 	public void tick() {
-		if (this.getEntityWorld() instanceof ServerWorld) {
-			if (this.age == 1) {
-				this.setSpawnPos(this.getEntityPos());
+		if (this.level() instanceof ServerLevel) {
+			if (this.tickCount == 1) {
+				this.setSpawnPos(this.position());
 			}
 
 			// Update the distance traveled by this projectile
-			this.distanceTraveled += (float) this.getVelocity().length();
+			this.moveDist += (float) this.getDeltaMovement().length();
 
 			// While the remaining fuel is more than 0...
 			if (this.getRemainingFuel() > 0) {
 				// Use the default velocity for now...
-				Vec3d vel = this.getVelocity();
+				Vec3 vel = this.getDeltaMovement();
 
 				if ((this.getTargetEntity() == null ||
-					(this.getTargetEntity() != null && this.getTargetEntity().isDead())) &&
+					(this.getTargetEntity() != null && this.getTargetEntity().isDeadOrDying())) &&
 					this.getOwner() != null &&
-					this.getOwner() instanceof MobEntity entityOwner &&
+					this.getOwner() instanceof Mob entityOwner &&
 					entityOwner.getTarget() != null
 				) {
 					this.setTarget(entityOwner.getTarget());
@@ -220,34 +220,34 @@ public class MicroMissileEntity extends ExplosiveProjectileEntity implements Loo
 					double turnDegPerSec = this.getMissileTurnRate();
 					double turnDegPerTick = turnDegPerSec / 20;
 
-					Vec3d currentDir = vel.normalize();
-					Vec3d targetDir = MathUtil.getTargetDirection(
+					Vec3 currentDir = vel.normalize();
+					Vec3 targetDir = MathUtil.getTargetDirection(
 						this,
 						this.getTargetEntity()
 					);
 
-					double dot = currentDir.dotProduct(targetDir);
-					dot = MathHelper.clamp(dot, -1, 1);
+					double dot = currentDir.dot(targetDir);
+					dot = Mth.clamp(dot, -1, 1);
 
 					double theta = Math.toDegrees(Math.acos(dot));
 
 					// Slerp instead of lerp for accurate angular turn
-					Vec3d cross = currentDir.crossProduct(targetDir).normalize();
+					Vec3 cross = currentDir.cross(targetDir).normalize();
 					double actualTurnRad = Math.toRadians(Math.min(turnDegPerTick, theta));
 
 					// Rodrigues' rotation formula
-					Vec3d newDir = currentDir.multiply(Math.cos(actualTurnRad))
-						.add(cross.crossProduct(currentDir).multiply(Math.sin(actualTurnRad)))
+					Vec3 newDir = currentDir.scale(Math.cos(actualTurnRad))
+						.add(cross.cross(currentDir).scale(Math.sin(actualTurnRad)))
 						.normalize();
 
-					double speed = this.getVelocity().length();
-					this.setVelocity(newDir.multiply(speed));
+					double speed = this.getDeltaMovement().length();
+					this.setDeltaMovement(newDir.scale(speed));
 				}
 			}
 			else {
 				// If there's an owner, set the max distance to the owner's follow range.
-				if (this.getOwner() instanceof MobEntity entity) {
-					this.maxRange = entity.getAttributeValue(EntityAttributes.FOLLOW_RANGE);
+				if (this.getOwner() instanceof Mob entity) {
+					this.maxRange = entity.getAttributeValue(Attributes.FOLLOW_RANGE);
 				}
 				else {
 					if (this.maxRange == -1) {
@@ -259,9 +259,9 @@ public class MicroMissileEntity extends ExplosiveProjectileEntity implements Loo
 				double despawnRange = this.maxRange * 1.25;
 
 				// If the missile is past its max range...
-				if (this.distanceTraveled >= this.maxRange && this.getRemainingFuel() <= 0) {
+				if (this.moveDist >= this.maxRange && this.getRemainingFuel() <= 0) {
 					// ... starts randomizing whether to make it explode or not.
-					if (this.distanceTraveled < despawnRange) {
+					if (this.moveDist < despawnRange) {
 						boolean shouldExplode = this.getRandom().nextBoolean();
 
 						if (shouldExplode) {
@@ -279,15 +279,15 @@ public class MicroMissileEntity extends ExplosiveProjectileEntity implements Loo
 		// Call super tick to apply other stuff.
 		super.tick();
 
-		this.setRemainingFuel(this.getMissileFuel() - MathHelper.floor(this.distanceTraveled));
+		this.setRemainingFuel(this.getMissileFuel() - Mth.floor(this.moveDist));
 	}
 
 	@Override
 	public void doDamage() {
 		super.doDamage();
 
-		if (this.getEntityWorld() instanceof ServerWorld world) {
-			world.spawnParticles(
+		if (this.level() instanceof ServerLevel world) {
+			world.sendParticles(
 				ParticleTypes.EXPLOSION_EMITTER,
 				true, true,
 				this.getX(), this.getEyeY(), this.getZ(),
@@ -299,31 +299,31 @@ public class MicroMissileEntity extends ExplosiveProjectileEntity implements Loo
 	}
 
 	@Override
-	public void writeCustomData(WriteView view) {
-		super.writeCustomData(view);
+	public void addAdditionalSaveData(@NonNull ValueOutput view) {
+		super.addAdditionalSaveData(view);
 
 		view.putDouble("TurnRate",  this.getMissileTurnRate());
 		view.putBoolean("Homing", this.isHoming());
 		view.putInt("MaxFuel", this.getMissileFuel());
 		view.putInt("Fuel", this.getRemainingFuel());
 
-		LazyEntityReference.writeData(this.getTarget(), view, "Target");
+		EntityReference.store(this.getTarget(), view, "Target");
 	}
 
 	@Override
-	public void readCustomData(ReadView view) {
-		super.readCustomData(view);
+	public void readAdditionalSaveData(@NonNull ValueInput view) {
+		super.readAdditionalSaveData(view);
 
-		this.turnRate = view.getDouble("TurnRate", this.getMissileTurnRate());
-		this.maxMissileFuel = view.getInt("MaxFuel", this.getMissileFuel());
+		this.turnRate = view.getDoubleOr("TurnRate", this.getMissileTurnRate());
+		this.maxMissileFuel = view.getIntOr("MaxFuel", this.getMissileFuel());
 
-		this.setHoming(view.getBoolean("Homing", false));
-		this.setRemainingFuel(view.getInt("Fuel", this.getMissileFuel()));
+		this.setHoming(view.getBooleanOr("Homing", false));
+		this.setRemainingFuel(view.getIntOr("Fuel", this.getMissileFuel()));
 
-		LazyEntityReference<LivingEntity> ref = LazyEntityReference.fromData(view, "Target");
+		EntityReference<LivingEntity> ref = EntityReference.read(view, "Target");
 		LivingEntity entity = ref == null ?
-			null : ref.getEntityByClass(
-				this.getEntityWorld(),
+			null : ref.getEntity(
+				this.level(),
 				LivingEntity.class
 			);
 
@@ -335,60 +335,60 @@ public class MicroMissileEntity extends ExplosiveProjectileEntity implements Loo
 	// ///////////////// //
 
 	@Override @NonNull
-	protected RegistryEntry<SoundEvent> getExplosionSoundEvent() {
+	protected Holder<SoundEvent> getExplosionSoundEvent() {
 		return ModSoundEvents.asRegistryEntry(ModSoundEvents.ROCKET_EXPLOSION);
 	}
 
 	@Override
 	public SoundEvent getHitSound() {
-		return SoundEvents.ENTITY_GENERIC_EXPLODE.value();
+		return SoundEvents.GENERIC_EXPLODE.value();
 	}
 
 	public void setHoming(boolean homing) {
-		this.dataTracker.set(IS_HOMING, homing);
+		this.entityData.set(IS_HOMING, homing);
 	}
 
 	public boolean isHoming() {
-		return this.dataTracker.get(IS_HOMING);
+		return this.entityData.get(IS_HOMING);
 	}
 
 	public void setRemainingFuel(int remainingFuel) {
-		this.dataTracker.set(REMAINING_FUEL, remainingFuel);
+		this.entityData.set(REMAINING_FUEL, remainingFuel);
 	}
 
 	public int getRemainingFuel() {
-		return this.dataTracker.get(REMAINING_FUEL);
+		return this.entityData.get(REMAINING_FUEL);
 	}
 
 	public void setTarget(LivingEntity target) {
-		Optional<LazyEntityReference<LivingEntity>> ref;
+		Optional<EntityReference<LivingEntity>> ref;
 
 		if (target == null) {
 			ref = Optional.empty();
 		}
 		else {
-			ref = Optional.of(LazyEntityReference.of(target));
+			ref = Optional.of(EntityReference.of(target));
 		}
 
-		this.dataTracker.set(TARGET, ref);
+		this.entityData.set(TARGET, ref);
 	}
 
 	@Nullable
-	public LazyEntityReference<LivingEntity> getTarget() {
-		Optional<LazyEntityReference<LivingEntity>> opt = this.dataTracker.get(TARGET);
+	public EntityReference<LivingEntity> getTarget() {
+		Optional<EntityReference<LivingEntity>> opt = this.entityData.get(TARGET);
 
 		return opt.orElse(null);
 	}
 
 	@Nullable
 	public LivingEntity getTargetEntity() {
-		LazyEntityReference<LivingEntity> ref = this.getTarget();
+		EntityReference<LivingEntity> ref = this.getTarget();
 
 		if (ref == null) {
 			return null;
 		}
 
-		return ref.getEntityByClass(this.getEntityWorld(), LivingEntity.class);
+		return ref.getEntity(this.level(), LivingEntity.class);
 	}
 
 	// //////////////// //
@@ -432,8 +432,8 @@ public class MicroMissileEntity extends ExplosiveProjectileEntity implements Loo
 	// STATIC //
 
 	static {
-		REMAINING_FUEL = DataTracker.registerData(MicroMissileEntity.class, TrackedDataHandlerRegistry.INTEGER);
-		IS_HOMING = DataTracker.registerData(MicroMissileEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
-		TARGET = DataTracker.registerData(MicroMissileEntity.class, TrackedDataHandlerRegistry.LAZY_ENTITY_REFERENCE);
+		REMAINING_FUEL = SynchedEntityData.defineId(MicroMissileEntity.class, EntityDataSerializers.INT);
+		IS_HOMING = SynchedEntityData.defineId(MicroMissileEntity.class, EntityDataSerializers.BOOLEAN);
+		TARGET = SynchedEntityData.defineId(MicroMissileEntity.class, EntityDataSerializers.OPTIONAL_LIVING_ENTITY_REFERENCE);
 	}
 }

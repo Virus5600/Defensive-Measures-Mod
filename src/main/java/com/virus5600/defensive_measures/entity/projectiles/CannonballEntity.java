@@ -1,16 +1,17 @@
 package com.virus5600.defensive_measures.entity.projectiles;
 
-import net.minecraft.entity.EntityType;
-import net.minecraft.particle.ParticleEffect;
-import net.minecraft.particle.ParticleTypes;
-import net.minecraft.sound.SoundEvent;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.hit.EntityHitResult;
-import net.minecraft.util.hit.HitResult;
-import net.minecraft.world.World;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.EntityHitResult;
+import net.minecraft.world.phys.HitResult;
 
 import com.virus5600.defensive_measures.entity.turrets.tier1.CannonTurretEntity;
+import org.jspecify.annotations.NonNull;
 
 /**
  * The projectile used by {@link CannonTurretEntity Cannon Turret}.
@@ -61,12 +62,12 @@ public class CannonballEntity extends ExplosiveProjectileEntity {
 	//  CONSTRUCTORS  //
 	// ////////////// //
 	public CannonballEntity(
-		EntityType<? extends ExplosiveProjectileEntity> entityType,
-		World world
+            EntityType<? extends ExplosiveProjectileEntity> entityType,
+            Level world
 	) {
 		super(entityType, world);
-		this.setFireTicks(0);
-		this.setOnFire(false);
+		this.setRemainingFireTicks(0);
+		this.setSharedFlagOnFire(false);
 
 		this.setDamage(10);
 	}
@@ -77,17 +78,17 @@ public class CannonballEntity extends ExplosiveProjectileEntity {
 
 	// PROTECTED
 	@Override
-	protected void onBlockHit(BlockHitResult blockHitResult) {
-		super.onBlockHit(blockHitResult);
+	protected void onHitBlock(BlockHitResult blockHitResult) {
+		super.onHitBlock(blockHitResult);
 
-		if (!this.getEntityWorld().isClient()) {
+		if (!this.level().isClientSide()) {
 			this.doDamage();
 		}
 	}
 
 	@Override
-	protected void onEntityHit(EntityHitResult entityHitResult) {
-		super.onEntityHit(entityHitResult);
+	protected void onHitEntity(@NonNull EntityHitResult entityHitResult) {
+		super.onHitEntity(entityHitResult);
 	}
 
 	@Override
@@ -100,28 +101,28 @@ public class CannonballEntity extends ExplosiveProjectileEntity {
 	 * @return The particle type for the cannonball's trail, which is a cloud particle.
 	 */
 	@Override
-	protected ParticleEffect getTrailParticleType() {
+	protected ParticleOptions getTrailParticleType() {
 		return ParticleTypes.CLOUD;
 	}
 
 	@Override
-	protected void onCollision(HitResult hitResult) {
-		if (!this.getEntityWorld().isClient()) {
+	protected void onHit(@NonNull HitResult hitResult) {
+		if (!this.level().isClientSide()) {
 			this.doDamage();
 		}
 
-		super.onCollision(hitResult);
+		super.onHit(hitResult);
 	}
 
 	@Override
-	protected double getGravity() {
+	protected double getDefaultGravity() {
 		return 0.0625;
 	}
 
 	// PUBLIC
 	@Override
 	public SoundEvent getHitSound() {
-		return SoundEvents.ENTITY_GENERIC_EXPLODE.value();
+		return SoundEvents.GENERIC_EXPLODE.value();
 	}
 
 	@Override

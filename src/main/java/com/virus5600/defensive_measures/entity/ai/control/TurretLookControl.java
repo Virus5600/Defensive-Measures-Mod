@@ -1,15 +1,15 @@
 package com.virus5600.defensive_measures.entity.ai.control;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.ai.control.LookControl;
-import net.minecraft.entity.mob.MobEntity;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.ai.control.LookControl;
 
 public class TurretLookControl extends LookControl {
 	protected float minYawChange;
 	protected float minPitchChange;
 
-	public TurretLookControl(MobEntity entity) {
+	public TurretLookControl(Mob entity) {
 		super(entity);
 	}
 
@@ -22,7 +22,7 @@ public class TurretLookControl extends LookControl {
 	}
 
 	public void lookAt(double x, double y, double z, float minYawChange, float maxYawChange, float minPitchChange, float maxPitchChange) {
-		super.lookAt(x, y, z, maxYawChange, maxPitchChange);
+		super.setLookAt(x, y, z, maxYawChange, maxPitchChange);
 
 		this.minYawChange = minYawChange;
 		this.minPitchChange = minPitchChange;
@@ -30,42 +30,42 @@ public class TurretLookControl extends LookControl {
 
 	@Override
 	public void tick() {
-		if (this.shouldStayHorizontal()) {
-			this.entity.setPitch(0.0F);
+		if (this.resetXRotOnTick()) {
+			this.mob.setXRot(0.0F);
 		}
 
-		if (this.lookAtTimer > 0) {
-			--this.lookAtTimer;
+		if (this.lookAtCooldown > 0) {
+			--this.lookAtCooldown;
 
-			this.getTargetYaw()
+			this.getYRotD()
 				.ifPresent((yaw) ->
-					this.entity.headYaw = this.changeAngleMinMax(
-						this.entity.headYaw, yaw,
-						this.minYawChange, this.maxYawChange
+					this.mob.yHeadRot = this.changeAngleMinMax(
+						this.mob.yHeadRot, yaw,
+						this.minYawChange, this.yMaxRotSpeed
 					)
 				);
 
-			this.getTargetPitch()
+			this.getXRotD()
 				.ifPresent((pitch) ->
-					this.entity.setPitch(this.changeAngleMinMax(
-						this.entity.getPitch(), pitch,
-						this.minPitchChange, this.maxPitchChange
+					this.mob.setXRot(this.changeAngleMinMax(
+						this.mob.getXRot(), pitch,
+						this.minPitchChange, this.xMaxRotAngle
 					))
 				);
 		} else {
-			this.entity.headYaw = this.changeAngle(this.entity.headYaw, this.entity.bodyYaw, 10.0F);
+			this.mob.yHeadRot = this.rotateTowards(this.mob.yHeadRot, this.mob.yBodyRot, 10.0F);
 		}
 
-		this.clampHeadYaw();
+		this.clampHeadRotationToBody();
 	}
 
 	protected float changeAngleMinMax(float start, float end, float minChange, float maxChange) {
-		float f = MathHelper.subtractAngles(start, end);
-		float g = MathHelper.clamp(f, minChange, maxChange);
+		float f = Mth.degreesDifference(start, end);
+		float g = Mth.clamp(f, minChange, maxChange);
 		return start + g;
 	}
 
 	@Override
-	protected void clampHeadYaw() {
+	protected void clampHeadRotationToBody() {
 	}
 }

@@ -1,25 +1,26 @@
 package com.virus5600.defensive_measures.entity.projectiles;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.passive.IronGolemEntity;
-import net.minecraft.particle.BlockStateParticleEffect;
-import net.minecraft.particle.ParticleEffect;
-import net.minecraft.particle.ParticleTypes;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.sound.SoundEvent;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.hit.EntityHitResult;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
-import net.minecraft.world.rule.GameRules;
+import net.minecraft.core.particles.BlockParticleOption;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.animal.golem.IronGolem;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.gamerules.GameRules;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.EntityHitResult;
+import net.minecraft.world.phys.Vec3;
 
 import com.virus5600.defensive_measures._helper.BlockHelper.BlockCategory;
 import com.virus5600.defensive_measures._helper.BlockHelper;
 import com.virus5600.defensive_measures.entity.ModEntities;
 import com.virus5600.defensive_measures.entity.turrets.tier1.MGTurretEntity;
 import com.virus5600.defensive_measures.sound.ModSoundEvents;
+import org.jspecify.annotations.NonNull;
 
 /**
  * The projectile used by {@link MGTurretEntity MG Turret}.
@@ -42,7 +43,7 @@ import com.virus5600.defensive_measures.sound.ModSoundEvents;
  *
  * @see KineticProjectileEntity
  * @see TurretProjectileEntity
- * @see TurretProjectileEntity#onEntityHit(EntityHitResult)
+ * @see TurretProjectileEntity#onHitEntity(EntityHitResult)
  *
  * @since 1.0.0-beta
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
@@ -52,13 +53,13 @@ public class MGBulletEntity extends KineticProjectileEntity {
 	//  CONSTRUCTORS  //
 	// ////////////// //
 	public MGBulletEntity(
-		EntityType<? extends TurretProjectileEntity> entityType,
-		World world
+            EntityType<? extends TurretProjectileEntity> entityType,
+            Level world
 	) {
 		super(entityType, world);
 	}
 
-	public MGBulletEntity(World world, LivingEntity owner) {
+	public MGBulletEntity(Level world, LivingEntity owner) {
 		this(ModEntities.MG_BULLET, world);
 		this.setOwner(owner);
 
@@ -67,14 +68,14 @@ public class MGBulletEntity extends KineticProjectileEntity {
 	}
 
 	public MGBulletEntity(
-		LivingEntity owner,
-		double velocityX,
-		double velocityY,
-		double velocityZ,
-		World world
+            LivingEntity owner,
+            double velocityX,
+            double velocityY,
+            double velocityZ,
+            Level world
 	) {
 		this(world, owner);
-		this.setVelocity(velocityX, velocityY, velocityZ);
+		this.setDeltaMovement(velocityX, velocityY, velocityZ);
 	}
 
 	// ///////// //
@@ -83,15 +84,15 @@ public class MGBulletEntity extends KineticProjectileEntity {
 
 	// PROTECTED
 	@Override
-	protected void onEntityHit(EntityHitResult entityHitResult) {
+	protected void onHitEntity(@NonNull EntityHitResult entityHitResult) {
 		SoundEvent sound = ModSoundEvents.BULLET_IMPACT_FLESH;
-		if (entityHitResult.getEntity() instanceof IronGolemEntity) {
+		if (entityHitResult.getEntity() instanceof IronGolem) {
 			sound = ModSoundEvents.BULLET_IMPACT_METAL;
 		}
 
 		this.setSound(sound);
 
-		super.onEntityHit(entityHitResult);
+		super.onHitEntity(entityHitResult);
 	}
 
 	/**
@@ -132,8 +133,8 @@ public class MGBulletEntity extends KineticProjectileEntity {
 	 * @see BlockCategory
 	 */
 	@Override
-	protected void onBlockHit(BlockHitResult blockHitResult) {
-		BlockState state = this.getEntityWorld().getBlockState(blockHitResult.getBlockPos());
+	protected void onHitBlock(BlockHitResult blockHitResult) {
+		BlockState state = this.level().getBlockState(blockHitResult.getBlockPos());
 		BlockCategory blockCat = BlockHelper.getBlockCategory(state);
 
 		switch (blockCat) {
@@ -147,34 +148,34 @@ public class MGBulletEntity extends KineticProjectileEntity {
 		}
 
 		if (blockCat != BlockCategory.GLASS) {
-			BlockState hitState = this.getEntityWorld().getBlockState(blockHitResult.getBlockPos());
-			ParticleEffect particle = new BlockStateParticleEffect(ParticleTypes.BLOCK, hitState);
+			BlockState hitState = this.level().getBlockState(blockHitResult.getBlockPos());
+			ParticleOptions particle = new BlockParticleOption(ParticleTypes.BLOCK, hitState);
 
-			Vec3d vel = this.getVelocity().negate().multiply(2.5).normalize();
-			Vec3d pos = this.getEntityPos();
+			Vec3 vel = this.getDeltaMovement().reverse().scale(2.5).normalize();
+			Vec3 pos = this.position();
 
-			if (this.getEntityWorld() instanceof ServerWorld sw) {
-				int pNum = this.random.nextBetween(5, 7);
+			if (this.level() instanceof ServerLevel sw) {
+				int pNum = this.random.nextIntBetweenInclusive(5, 7);
 				for (int i = 0; i < pNum; i++) {
-					Vec3d rPos = pos.addRandom(this.random, 0.5F);
-					sw.spawnParticles(
+					Vec3 rPos = pos.offsetRandom(this.random, 0.5F);
+					sw.sendParticles(
 						particle,
 						rPos.x, rPos.y, rPos.z,
 						0,
 						vel.x,  vel.y, vel.z,
-						this.random.nextBetween(3, 7)
+						this.random.nextIntBetweenInclusive(3, 7)
 					);
 				}
 			}
 		}
 
-		super.onBlockHit(blockHitResult);
+		super.onHitBlock(blockHitResult);
 
-		if (this.getEntityWorld() instanceof ServerWorld serverWorld) {
-			if (serverWorld.getGameRules().getValue(GameRules.DO_MOB_GRIEFING)
+		if (this.level() instanceof ServerLevel serverWorld) {
+			if (serverWorld.getGameRules().get(GameRules.MOB_GRIEFING)
 				&& blockCat == BlockCategory.GLASS
 			) {
-				this.getEntityWorld().breakBlock(
+				this.level().destroyBlock(
 					blockHitResult.getBlockPos(),
 					false,
 					this.getOwner(),
@@ -183,14 +184,14 @@ public class MGBulletEntity extends KineticProjectileEntity {
 			}
 		}
 
-		if (this.isAlive() || this.isRemoved() || this.isInGround() || this.isOnGround()) {
+		if (this.isAlive() || this.isRemoved() || this.isInGround() || this.onGround()) {
 			this.discard();
 		}
 	}
 
 	@Override
 	protected final void setPierceLevel(byte pierceLevel) {
-		this.dataTracker.set(PIERCE_LEVEL, pierceLevel);
+		this.entityData.set(PIERCE_LEVEL, pierceLevel);
 	}
 
 	// PUBLIC
