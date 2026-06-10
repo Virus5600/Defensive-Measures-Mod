@@ -4,7 +4,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.ClientRecipeBook;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.ImageButton;
 import net.minecraft.client.gui.components.Tooltip;
@@ -150,17 +150,17 @@ public class BaseRecipeBookResults {
 		}
 	}
 
-	public void draw(GuiGraphics context, int x, int y, int mouseX, int mouseY, float deltaTicks) {
+	public void draw(GuiGraphicsExtractor context, int x, int y, int mouseX, int mouseY, float deltaTicks) {
 		if (this.pageCount > 1) {
 			Component text = Component.translatable("gui.recipebook.page", this.currentPage + 1, this.pageCount);
 			int i = this.client.font.width(text);
-			context.drawString(this.client.font, text, x - i / 2 + 73, y + 141, -1);
+			context.text(this.client.font, text, x - i / 2 + 73, y + 141, -1);
 		}
 
 		this.hoveredResultButton = null;
 
 		for(BaseAnimatedResultButton animatedResultButton : this.resultsButtons) {
-			animatedResultButton.render(context, mouseX, mouseY, deltaTicks);
+			animatedResultButton.extractWidgetRenderState(context, mouseX, mouseY, deltaTicks);
 
 			if (animatedResultButton.visible && animatedResultButton.isHoveredOrFocused()) {
 				this.hoveredResultButton = animatedResultButton;
@@ -168,18 +168,18 @@ public class BaseRecipeBookResults {
 		}
 
 		if (this.prevPageBtn != null) {
-			this.prevPageBtn.render(context, mouseX, mouseY, deltaTicks);
+			this.prevPageBtn.extractContents(context, mouseX, mouseY, deltaTicks);
 		}
 
 		if (this.nextPageBtn != null) {
-			this.nextPageBtn.render(context, mouseX, mouseY, deltaTicks);
+			this.nextPageBtn.extractContents(context, mouseX, mouseY, deltaTicks);
 		}
 
 		context.nextStratum();
-		this.altWidget.render(context, mouseX, mouseY, deltaTicks);
+		this.altWidget.extractRenderState(context, mouseX, mouseY, deltaTicks);
 	}
 
-	public void drawTooltip(GuiGraphics context, int x, int y) {
+	public void drawTooltip(GuiGraphicsExtractor context, int x, int y) {
 		if (this.client.screen != null &&
 			this.hoveredResultButton != null &&
 			!this.altWidget.isVisible()) {

@@ -1,5 +1,6 @@
 package com.virus5600.defensive_measures.entity.turrets.tier2;
 
+import com.virus5600.defensive_measures._helper.RegistryHelper;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.core.particles.ParticleOptions;
@@ -171,9 +172,9 @@ public class FlameTurretEntity extends TurretEntity implements LoopableShootingS
 	@Override
 	protected boolean targetPredicate(LivingEntity target, ServerLevel world) {
 		boolean isInFiringArc = this.attackGoal.isWithinRotationLimit(target);
-		boolean isGroundTarget = !target.getType().is(ModEntityTypeTags.FLYING_HOSTILES);
+		boolean isGroundTarget = !RegistryHelper.isOf(target.getType(), ModEntityTypeTags.FLYING_HOSTILES);
 		boolean isMonster = target instanceof Enemy;
-		boolean isNotTurret = !target.getType().is(ModEntityTypeTags.TURRETS);
+		boolean isNotTurret = !RegistryHelper.isOf(target.getType(), ModEntityTypeTags.TURRETS);
 
 		return isInFiringArc && isGroundTarget && isMonster && isNotTurret;
 	}

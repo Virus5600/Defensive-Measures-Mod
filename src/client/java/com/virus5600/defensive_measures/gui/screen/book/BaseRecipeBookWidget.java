@@ -4,7 +4,6 @@ import net.minecraft.client.ClientRecipeBook;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.*;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.*;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
@@ -352,7 +351,7 @@ public abstract class BaseRecipeBookWidget<T extends RecipeBookMenu> implements 
 		return this.recipeBook.isFiltering(this.screenHandler.getRecipeBookType());
 	}
 
-	public void render(GuiGraphics context, int mouseX, int mouseY, float deltaTicks) {
+	public void extractRenderState(GuiGraphicsExtractor context, int mouseX, int mouseY, float deltaTicks) {
 		if (this.isOpen()) {
 			if (!this.client.hasControlDown()) {
 				this.displayTime += deltaTicks;
@@ -371,28 +370,28 @@ public abstract class BaseRecipeBookWidget<T extends RecipeBookMenu> implements 
 				textureDimension.width, textureDimension.height
 			);
 
-			this.searchField.render(context, mouseX, mouseY, deltaTicks);
+			this.searchField.extractWidgetRenderState(context, mouseX, mouseY, deltaTicks);
 
 			for (BaseRecipeGroupButtonWidget recipeGroupButtonWidget : this.tabButtons) {
-				recipeGroupButtonWidget.render(context, mouseX, mouseY, deltaTicks);
+				recipeGroupButtonWidget.extractContents(context, mouseX, mouseY, deltaTicks);
 			}
 
-			this.toggleCraftableButton.render(context, mouseX, mouseY, deltaTicks);
+			this.toggleCraftableButton.extractRenderState(context, mouseX, mouseY, deltaTicks);
 			this.recipesArea.draw(context, i, j, mouseX, mouseY, deltaTicks);
 		}
 	}
 
-	public void drawTooltip(GuiGraphics context, int x, int y, @Nullable Slot slot) {
+	public void drawTooltip(GuiGraphicsExtractor context, int x, int y, @Nullable Slot slot) {
 		if (this.isOpen()) {
 			this.recipesArea.drawTooltip(context, x, y);
-			this.ghostRecipe.renderTooltip(context, this.client, x, y, slot);
+			this.ghostRecipe.extractTooltip(context, this.client, x, y, slot);
 		}
 	}
 
 	protected abstract Component getToggleCraftableButtonText();
 
-	public void drawGhostSlots(GuiGraphics context, boolean resultHasPadding) {
-		this.ghostRecipe.render(context, this.client, resultHasPadding);
+	public void drawGhostSlots(GuiGraphicsExtractor context, boolean resultHasPadding) {
+		this.ghostRecipe.extractRenderState(context, this.client, resultHasPadding);
 	}
 
 	public boolean mouseClicked(MouseButtonEvent click, boolean doubled) {

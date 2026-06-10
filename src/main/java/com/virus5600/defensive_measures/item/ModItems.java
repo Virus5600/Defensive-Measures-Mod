@@ -1,7 +1,7 @@
 package com.virus5600.defensive_measures.item;
 
-import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
-import net.fabricmc.fabric.api.registry.FuelRegistryEvents;
+import net.fabricmc.fabric.api.creativetab.v1.CreativeModeTabEvents;
+import net.fabricmc.fabric.api.registry.FuelValueEvents;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.item.CreativeModeTabs;
@@ -159,41 +159,41 @@ public class ModItems {
 		DefensiveMeasures.LOGGER.info("REGISTERING ITEMS TO ITEM GROUPS...");
 
 		Arrays.stream(FUNCTIONAL_ITEMS).iterator().forEachRemaining(
-			(item) -> ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.FUNCTIONAL_BLOCKS).register(
-				(content) -> content.accept(item)
+			(item) -> CreativeModeTabEvents.modifyOutputEvent(CreativeModeTabs.FUNCTIONAL_BLOCKS).register(
+				(output) -> output.accept(item)
 			)
 		);
 
 		Arrays.stream(DM_ITEMS).iterator().forEachRemaining(
-			(item) -> ItemGroupEvents.modifyEntriesEvent(ModItemGroups.DMI_KEY).register(
-				(content) -> content.accept(item)
+			(item) -> CreativeModeTabEvents.modifyOutputEvent(ModItemGroups.DMI_KEY).register(
+				(output) -> output.accept(item)
 			)
 		);
 
 		Arrays.stream(DM_EQUIPMENTS).iterator().forEachRemaining(
-			(item) -> ItemGroupEvents.modifyEntriesEvent(ModItemGroups.DME_KEY).register(
-				(content) -> content.accept(item)
+			(item) -> CreativeModeTabEvents.modifyOutputEvent(ModItemGroups.DME_KEY).register(
+				(output) -> output.accept(item)
 			)
 		);
 
 		Arrays.stream(DM_TRAPS).iterator().forEachRemaining(
-			(item) -> ItemGroupEvents.modifyEntriesEvent(ModItemGroups.DMTR_KEY).register(
-				(content) -> content.accept(item)
+			(item) -> CreativeModeTabEvents.modifyOutputEvent(ModItemGroups.DMTR_KEY).register(
+				(output) -> output.accept(item)
 			)
 		);
 
 		Arrays.stream(DM_TURRETS).iterator().forEachRemaining(
-			(item) -> ItemGroupEvents.modifyEntriesEvent(ModItemGroups.DMTT_KEY).register(
-				(content) -> content.accept(item)
+			(item) -> CreativeModeTabEvents.modifyOutputEvent(ModItemGroups.DMTT_KEY).register(
+				(output) -> output.accept(item)
 			)
 		);
 
-		Arrays.stream(FUEL_ITEMS).iterator().forEachRemaining((item) -> FuelRegistryEvents.BUILD.register((builder, _) -> {
+		Arrays.stream(FUEL_ITEMS).iterator().forEachRemaining((item) -> FuelValueEvents.BUILD.register((builder, _) -> {
 			// Verifies whether the item is a valid fuel item. Ignores the item if it is not.
 			if (item instanceof FuelItem)
 				builder.add(item, ((FuelItem) item).getFuelTime());
 			else
-				DefensiveMeasures.LOGGER.warn("Item {} is not a valid fuel item.", item.getName().getString());
+				DefensiveMeasures.LOGGER.warn("Item {} is not a valid fuel item.", item.getName(item.getDefaultInstance()).getString());
 		}));
 	}
 

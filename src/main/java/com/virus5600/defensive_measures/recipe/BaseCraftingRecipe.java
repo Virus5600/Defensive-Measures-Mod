@@ -1,20 +1,15 @@
 package com.virus5600.defensive_measures.recipe;
 
-import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.HolderLookup.Provider;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.crafting.CraftingInput;
-import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.item.crafting.PlacementInfo;
-import net.minecraft.world.item.crafting.Recipe;
-import net.minecraft.world.item.crafting.RecipeInput;
-import net.minecraft.world.item.crafting.RecipeSerializer;
-import net.minecraft.world.item.crafting.ShapedRecipe;
+import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.item.crafting.display.RecipeDisplay;
 import net.minecraft.world.item.crafting.display.ShapedCraftingRecipeDisplay;
 import net.minecraft.world.item.crafting.display.SlotDisplay;
@@ -23,7 +18,6 @@ import net.minecraft.world.level.Level;
 import com.virus5600.defensive_measures.recipe.book.ModCraftingRecipeCategory;
 
 import org.jetbrains.annotations.Nullable;
-import org.jetbrains.annotations.VisibleForTesting;
 import org.jspecify.annotations.NonNull;
 
 import java.util.List;
@@ -47,45 +41,45 @@ import java.util.List;
  * @see ShapedRecipe
  */
 public abstract class BaseCraftingRecipe<T extends CraftingInput> implements BaseCraftingRecipeInterface<T> {
-	final CustomShapedRecipe recipe;
-	final ItemStack result;
-	final String group;
-	final ModCraftingRecipeCategory category;
-	final boolean showNotification;
+	protected final CommonInfo commonInfo;
+	protected final ModCraftingBookInfo bookInfo;
+	private @Nullable PlacementInfo placementInfo;
+
+	final CustomShapedRecipePattern recipe;
+	final ItemStackTemplate result;
 	private @Nullable PlacementInfo ingredientPlacement;
 
-	public BaseCraftingRecipe(String group, ModCraftingRecipeCategory category, CustomShapedRecipe recipe, ItemStack result, boolean showNotification) {
-		this.group = group;
-		this.category = category;
+	public BaseCraftingRecipe(
+		CommonInfo commonInfo, ModCraftingBookInfo bookInfo,
+		CustomShapedRecipePattern recipe, ItemStackTemplate result
+	) {
+		this.commonInfo = commonInfo;
+		this.bookInfo = bookInfo;
+
 		this.recipe = recipe;
 		this.result = result;
-		this.showNotification = showNotification;
-	}
-
-	public BaseCraftingRecipe(String group, ModCraftingRecipeCategory category, CustomShapedRecipe recipe, ItemStack result) {
-		this(group, category, recipe, result, true);
 	}
 
 	@NonNull
 	public String group() {
-		return this.group;
+		return this.bookInfo.group();
 	}
 
-	public ModCraftingRecipeCategory getCategory() {
-		return this.category;
-	}
-
-	@VisibleForTesting @NonNull
-	public PlacementInfo placementInfo() {
-		if (this.ingredientPlacement == null) {
-			this.ingredientPlacement = PlacementInfo.createFromOptionals(this.recipe.getIngredients());
-		}
-
-		return this.ingredientPlacement;
+	public ModCraftingRecipeCategory category() {
+		return this.bookInfo.category();
 	}
 
 	public boolean showNotification() {
-		return this.showNotification;
+		return this.commonInfo.showNotification();
+	}
+
+	@NonNull
+	public PlacementInfo placementInfo() {
+		if (this.ingredientPlacement == null) {
+			this.ingredientPlacement = PlacementInfo.createFromOptionals(this.recipe.ingredients());
+		}
+
+		return this.ingredientPlacement;
 	}
 
 	public boolean matches(@NonNull CraftingInput craftingRecipeInput, @NonNull Level world) {
@@ -94,23 +88,23 @@ public abstract class BaseCraftingRecipe<T extends CraftingInput> implements Bas
 
 	@NonNull
 	public ItemStack assemble(@NonNull CraftingInput craftingRecipeInput, @NonNull Provider wrapperLookup) {
-		return this.result.copy();
+		return this.result.create();
 	}
 
 	public int getWidth() {
-		return this.recipe.getWidth();
+		return this.recipe.width();
 	}
 
 	public int getHeight() {
-		return this.recipe.getHeight();
+		return this.recipe.height();
 	}
 
 	@NonNull
 	public List<RecipeDisplay> display() {
 		return List.of(new ShapedCraftingRecipeDisplay(
-			this.recipe.getWidth(),
-			this.recipe.getHeight(),
-			this.recipe.getIngredients()
+			this.recipe.width(),
+			this.recipe.height(),
+			this.recipe.ingredients()
 				.stream()
 				.map((ingredient) ->
 					ingredient.map(Ingredient::display)
@@ -121,6 +115,23 @@ public abstract class BaseCraftingRecipe<T extends CraftingInput> implements Bas
 		));
 	}
 
+	// //////////////// //
+	// ABSTRACT METHODS //
+	// //////////////// //
+
+	/**
+	 * Gets the recipe pattern for this crafting recipe. This method must be implemented by
+	 * subclasses to provide the specific pattern of ingredients for the recipe, which is used for
+	 * matching the recipe input and displaying the recipe in the crafting book. The pattern is
+	 * typically a grid of ingredients that corresponds to the crafting grid in the game, and it
+	 * defines how the ingredients are arranged to create the resulting item. The pattern is
+	 * essential for the crafting system to determine if the player's input matches the recipe and
+	 * to display the recipe correctly in the crafting book and recipe displays.
+	 *
+	 * @return the {@link CustomShapedRecipePattern} that defines the arrangement of ingredients for this recipe
+	 */
+	protected abstract CustomShapedRecipePattern pattern();
+
 	// ////////////////////// //
 	// CODECS AND SERIALIZERS //
 	// ////////////////////// //
@@ -129,32 +140,25 @@ public abstract class BaseCraftingRecipe<T extends CraftingInput> implements Bas
             MapCodec<T> codec,
             StreamCodec<RegistryFriendlyByteBuf, T> packetCodec
 	) {
-		return new RecipeSerializer<>() {
-			@Override @NonNull
-			public MapCodec<T> codec() {
-				return codec;
-			}
-
-			@Override @NonNull
-			public StreamCodec<RegistryFriendlyByteBuf, T> streamCodec() {
-				return packetCodec;
-			}
-		};
+		return new RecipeSerializer<>(codec, packetCodec);
 	}
 
-	public static <T extends BaseCraftingRecipe<?>, C> MapCodec<T> createCodec(
+	public static <
+		T extends BaseCraftingRecipe<?>,
+		C extends StringRepresentable,
+		D extends BookInfo<C>
+	> MapCodec<T> createMapCodec(
 		int rows, int cols,
-		Codec<C> categoryCodec,
-		C defaultCategory,
-		java.util.function.Function<T, C> categoryGetter,
-		RecipeFactory<T, C> factory) {
-
-		return RecordCodecBuilder.mapCodec(instance -> instance.group(
-			Codec.STRING.optionalFieldOf("group", "").forGetter(BaseCraftingRecipe::group),
-			categoryCodec.fieldOf("category").orElse(defaultCategory).forGetter(categoryGetter),
-			CustomShapedRecipe.createCodec(rows, cols).forGetter(recipe -> recipe.recipe),
-			ItemStack.STRICT_CODEC.fieldOf("result").forGetter(recipe -> recipe.result),
-			Codec.BOOL.optionalFieldOf("show_notification", true).forGetter(BaseCraftingRecipe::showNotification)
-		).apply(instance, factory::create));
+		MapCodec<D> bookInfoCodec,
+		RecipeFactory<T, C, D> factory
+	) {
+		return RecordCodecBuilder.mapCodec(
+			instance -> instance.group(
+				CommonInfo.MAP_CODEC.forGetter(o -> o.commonInfo),
+				bookInfoCodec.forGetter(o -> (D) o.bookInfo),
+				CustomShapedRecipePattern.createCodec(rows, cols).forGetter(o -> o.pattern()),
+				ItemStackTemplate.CODEC.fieldOf("result").forGetter((o) -> o.result)
+			).apply(instance, factory::create)
+		);
 	}
 }

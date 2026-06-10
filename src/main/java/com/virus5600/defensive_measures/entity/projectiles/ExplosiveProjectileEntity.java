@@ -264,8 +264,8 @@ public abstract class ExplosiveProjectileEntity extends TurretProjectileEntity i
 		Vec3 pos = this.position();
 
 		int[] xz = new int[] {
-			this.chunkPosition().x,
-			this.chunkPosition().z
+			this.chunkPosition().x(),
+			this.chunkPosition().z()
 		};
 
 		if ((owner == null || !owner.isRemoved())

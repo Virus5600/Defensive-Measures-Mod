@@ -18,6 +18,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 
+import com.virus5600.defensive_measures._helper.RegistryHelper;
 import com.virus5600.defensive_measures._util.MathUtil;
 import com.virus5600.defensive_measures.entity.ModEntities;
 import com.virus5600.defensive_measures.entity.TurretMaterial;
@@ -127,7 +128,7 @@ public class AATurretEntity extends TurretEntity {
 	@Override
 	protected boolean targetPredicate(LivingEntity target, ServerLevel world) {
 		return this.attackGoal.isWithinRotationLimit(target) &&
-			target.getType().is(ModEntityTypeTags.FLYING_HOSTILES);
+			RegistryHelper.isOf(target.getType(), ModEntityTypeTags.FLYING_HOSTILES);
 	}
 
 	@Override

@@ -4,7 +4,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.ClientRecipeBook;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarratedElementType;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
@@ -78,7 +78,7 @@ public class BaseAnimatedResultButton extends AbstractWidget {
 		return this.resultCollection;
 	}
 
-	public void renderWidget(@NonNull GuiGraphics ctx, int mouseX, int mouseY, float deltaTicks) {
+	public void extractWidgetRenderState(@NonNull GuiGraphicsExtractor ctx, int mouseX, int mouseY, float deltaTicks) {
 		Identifier id = SLOT_UNCRAFTABLE_TEXTURE;
 
 		if (this.resultCollection.hasCraftable()) {
@@ -108,11 +108,11 @@ public class BaseAnimatedResultButton extends AbstractWidget {
 
 		int i = 4;
 		if (this.hasMultipleResults() && this.allResultEqual) {
-			ctx.renderItem(itemStack, this.getX() + i + 1, this.getY() + i + 1, 0);
+			ctx.item(itemStack, this.getX() + i + 1, this.getY() + i + 1, 0);
 			--i;
 		}
 
-		ctx.renderFakeItem(itemStack, this.getX() + i, this.getY() + i);
+		ctx.fakeItem(itemStack, this.getX() + i, this.getY() + i);
 
 		if (shouldBounce) {
 			ctx.pose().popMatrix();

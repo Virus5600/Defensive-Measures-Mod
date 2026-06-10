@@ -1,5 +1,7 @@
 package com.virus5600.defensive_measures.entity.projectiles;
 
+import com.virus5600.defensive_measures._helper.RegistryHelper;
+import com.virus5600.defensive_measures.registry.tag.ModEntityTypeTags;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.core.BlockPos;
@@ -666,7 +668,7 @@ public abstract class TurretProjectileEntity extends Projectile {
 
 	@Override
 	public boolean isAttackable() {
-		return this.getType().is(EntityTypeTags.REDIRECTABLE_PROJECTILE);
+		return RegistryHelper.isOf(this.getType(), EntityTypeTags.REDIRECTABLE_PROJECTILE);
 	}
 
 	@Override

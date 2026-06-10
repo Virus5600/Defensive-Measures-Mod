@@ -79,8 +79,8 @@ public class CannonFuseParticle extends SingleQuadParticle {
 	}
 
 	@Override
-    public int getLightColor(float tint) {
-        int i = super.getLightColor(tint);
+    public int getLightCoords(float tint) {
+        int i = super.getLightCoords(tint);
         int k = i >> 16 & 0xFF;
 
         return 0xF0 | k << 16;

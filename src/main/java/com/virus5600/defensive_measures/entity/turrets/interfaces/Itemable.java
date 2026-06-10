@@ -164,9 +164,9 @@ public interface Itemable {
 				float x = (float) entityPos.x() + 0.5f;
 				float y = (float) entityPos.y() + 0.5f;
 				float z = (float) entityPos.z() + 0.5f;
-				double vx = Mth.nextDouble(world.random, -0.1, 0.1);
-				double vy = Mth.nextDouble(world.random, 0.0, 0.1);
-				double vz = Mth.nextDouble(world.random, -0.1, 0.1);
+				double vx = Mth.nextDouble(world.getRandom(), -0.1, 0.1);
+				double vy = Mth.nextDouble(world.getRandom(), 0.0, 0.1);
+				double vz = Mth.nextDouble(world.getRandom(), -0.1, 0.1);
 
 				entity.discard();
 				ItemEntity itemStackEntity = new ItemEntity(world, x, y, z, stack, vx, vy, vz);

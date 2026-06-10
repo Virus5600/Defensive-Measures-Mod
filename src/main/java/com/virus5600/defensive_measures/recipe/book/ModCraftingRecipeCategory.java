@@ -21,23 +21,23 @@ public enum ModCraftingRecipeCategory implements StringRepresentable {
 	MISC("misc", 5);
 
 	public static final Codec<ModCraftingRecipeCategory> CODEC = StringRepresentable.fromEnum(ModCraftingRecipeCategory::values);
-	public static final IntFunction<ModCraftingRecipeCategory> INDEX_TO_VALUE = ByIdMap.continuous(ModCraftingRecipeCategory::getIndex, values(), ByIdMap.OutOfBoundsStrategy.ZERO);
-	public static final StreamCodec<ByteBuf, ModCraftingRecipeCategory> PACKET_CODEC = ByteBufCodecs.idMapper(INDEX_TO_VALUE, ModCraftingRecipeCategory::getIndex);
+	public static final IntFunction<ModCraftingRecipeCategory> BY_ID = ByIdMap.continuous(ModCraftingRecipeCategory::id, values(), ByIdMap.OutOfBoundsStrategy.ZERO);
+	public static final StreamCodec<ByteBuf, ModCraftingRecipeCategory> STREAM_CODEC = ByteBufCodecs.idMapper(BY_ID, ModCraftingRecipeCategory::id);
 
-	private final String id;
-	private final int index;
+	private final String name;
+	private final int id;
 
-	ModCraftingRecipeCategory(final String id, final int index) {
+	ModCraftingRecipeCategory(final String name, final int id) {
+		this.name = name;
 		this.id = id;
-		this.index = index;
 	}
 
 	@NonNull
 	public String getSerializedName() {
-		return this.id;
+		return this.name;
 	}
 
-	private int getIndex() {
-		return this.index;
+	private int id() {
+		return this.id;
 	}
 }

@@ -1,6 +1,6 @@
 package com.virus5600.defensive_measures.item;
 
-import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
+import net.fabricmc.fabric.api.creativetab.v1.FabricCreativeModeTab;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
@@ -23,25 +23,25 @@ import com.virus5600.defensive_measures.block.ModBlocks;
  */
 public class ModItemGroups {
 	public static final ResourceKey<CreativeModeTab> DMI_KEY = ResourceKey.create(BuiltInRegistries.CREATIVE_MODE_TAB.key(), Identifier.fromNamespaceAndPath(DefensiveMeasures.MOD_ID, "defensive_measures_items"));
-	public static final CreativeModeTab DEFENSIVE_MEASURES_ITEMS = FabricItemGroup.builder()
+	public static final CreativeModeTab DEFENSIVE_MEASURES_ITEMS = FabricCreativeModeTab.builder()
 		.title(Component.translatable("itemGroup.dm.defensive_measures.items"))
 		.icon(ModItems.CANNON_HEAD::getDefaultInstance)
 		.build();
 
 	public static final ResourceKey<CreativeModeTab> DME_KEY = ResourceKey.create(BuiltInRegistries.CREATIVE_MODE_TAB.key(), Identifier.fromNamespaceAndPath(DefensiveMeasures.MOD_ID, "defensive_measures_equipments"));
-	public static final CreativeModeTab DEFENSIVE_MEASURES_EQUIPMENTS = FabricItemGroup.builder()
+	public static final CreativeModeTab DEFENSIVE_MEASURES_EQUIPMENTS = FabricCreativeModeTab.builder()
 		.title(Component.translatable("itemGroup.dm.defensive_measures.equipments"))
 		.icon(ModItems.TURRET_REMOVER::getDefaultInstance)
 		.build();
 
 	public static final ResourceKey<CreativeModeTab> DMTR_KEY = ResourceKey.create(BuiltInRegistries.CREATIVE_MODE_TAB.key(), Identifier.fromNamespaceAndPath(DefensiveMeasures.MOD_ID, "defensive_measures_traps"));
-	public static final CreativeModeTab DEFENSIVE_MEASURES_TRAPS = FabricItemGroup.builder()
+	public static final CreativeModeTab DEFENSIVE_MEASURES_TRAPS = FabricCreativeModeTab.builder()
 		.title(Component.translatable("itemGroup.dm.defensive_measures.traps"))
 		.icon(() -> ModBlocks.ELECTRIC_FENCE.asItem().getDefaultInstance())
 		.build();
 
 	public static final ResourceKey<CreativeModeTab> DMTT_KEY = ResourceKey.create(BuiltInRegistries.CREATIVE_MODE_TAB.key(), Identifier.fromNamespaceAndPath(DefensiveMeasures.MOD_ID, "defensive_measures_turrets"));
-	public static final CreativeModeTab DEFENSIVE_MEASURES_TURRETS = FabricItemGroup.builder()
+	public static final CreativeModeTab DEFENSIVE_MEASURES_TURRETS = FabricCreativeModeTab.builder()
 		.title(Component.translatable("itemGroup.dm.defensive_measures.turrets"))
 		.icon(ModItems.CANNON_TURRET::getDefaultInstance)
 		.build();

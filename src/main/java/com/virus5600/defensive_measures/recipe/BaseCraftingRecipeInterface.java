@@ -1,38 +1,22 @@
 package com.virus5600.defensive_measures.recipe;
 
-import net.minecraft.core.NonNullList;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.Recipe;
-import net.minecraft.world.item.crafting.RecipeBookCategory;
-import net.minecraft.world.item.crafting.RecipeInput;
+import com.mojang.serialization.MapCodec;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.world.item.crafting.*;
 
 import com.virus5600.defensive_measures.recipe.book.ModCraftingRecipeCategory;
 import com.virus5600.defensive_measures.recipe.book.ModRecipeBookCategories;
+
 import org.jspecify.annotations.NonNull;
 
 public interface BaseCraftingRecipeInterface<T extends RecipeInput> extends Recipe<T> {
-	ModCraftingRecipeCategory getCategory();
-
-	default NonNullList<ItemStack> getRecipeRemainders(T input) {
-		return collectRecipeRemainders(input);
-	}
-
-	static NonNullList<ItemStack> collectRecipeRemainders(RecipeInput input) {
-		NonNullList<ItemStack> defaultedList = NonNullList.withSize(input.size(), ItemStack.EMPTY);
-
-		for(int i = 0; i < defaultedList.size(); ++i) {
-			Item item = input.getItem(i).getItem();
-			defaultedList.set(i, item.getCraftingRemainder());
-		}
-
-		return defaultedList;
-	}
+	ModCraftingRecipeCategory category();
 
 	@NonNull
 	default RecipeBookCategory recipeBookCategory() {
 		RecipeBookCategory category;
-		switch (this.getCategory()) {
+		switch (this.category()) {
 			case TURRETS -> category = ModRecipeBookCategories.TAS_TURRETS;
 			case PARTS -> category = ModRecipeBookCategories.TAS_PARTS;
 			case TRAPS -> category = ModRecipeBookCategories.TAS_TRAPS;
@@ -43,5 +27,23 @@ public interface BaseCraftingRecipeInterface<T extends RecipeInput> extends Reci
 		}
 
 		return category;
+	}
+
+	record ModCraftingBookInfo(ModCraftingRecipeCategory category, String group) implements Recipe.BookInfo<ModCraftingRecipeCategory> {
+		public static final MapCodec<ModCraftingBookInfo> MAP_CODEC;
+		public static final StreamCodec<RegistryFriendlyByteBuf, ModCraftingBookInfo> STREAM_CODEC;
+
+		static {
+			MAP_CODEC = BookInfo.mapCodec(
+				ModCraftingRecipeCategory.CODEC,
+				ModCraftingRecipeCategory.MISC,
+				ModCraftingBookInfo::new
+			);
+
+			STREAM_CODEC = BookInfo.streamCodec(
+				ModCraftingRecipeCategory.STREAM_CODEC,
+				ModCraftingBookInfo::new
+			);
+		}
 	}
 }

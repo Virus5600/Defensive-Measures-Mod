@@ -126,7 +126,7 @@ public class FlakProjectileEntity extends CannonballEntity {
 			// Creates a variable fuse trigger near the target
 			double varTargetDistance = this.targetDistance +
 				(this.targetDistance *
-					(world.random.nextIntBetweenInclusive(-2, 2) / 100.0));
+					(world.getRandom().nextIntBetweenInclusive(-2, 2) / 100.0));
 
 			// Calculate the age threshold based on the projectile's speed, with a minimum of 20
 			// ticks (1 second). This makes the projectile explode faster if it's moving faster,

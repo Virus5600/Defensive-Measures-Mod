@@ -2,7 +2,7 @@ package com.virus5600.defensive_measures.particle;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.fabricmc.fabric.api.client.particle.v1.ParticleFactoryRegistry;
+import net.fabricmc.fabric.api.client.particle.v1.ParticleProviderRegistry;
 
 import com.virus5600.defensive_measures.DefensiveMeasures;
 import com.virus5600.defensive_measures.particle.custom.*;
@@ -21,7 +21,7 @@ public class ModClientParticles {
 	public static void registerParticles() {
 		DefensiveMeasures.LOGGER.info("REGISTERING PARTICLES FOR {}...", DefensiveMeasures.MOD_NAME);
 
-		ParticleFactoryRegistry registry = ParticleFactoryRegistry.getInstance();
+		ParticleProviderRegistry registry = ParticleProviderRegistry.getInstance();
 
 		// PARTICLES
 		registry.register(ModParticles.CANNON_FUSE, CannonFuseParticle.Factory::new);

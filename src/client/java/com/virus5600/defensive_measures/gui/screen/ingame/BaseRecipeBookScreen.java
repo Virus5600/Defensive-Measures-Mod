@@ -2,7 +2,7 @@ package com.virus5600.defensive_measures.gui.screen.ingame;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.ImageButton;
 import net.minecraft.client.gui.components.WidgetSprites;
@@ -14,7 +14,7 @@ import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.inventory.ClickType;
+import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.inventory.RecipeBookMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.crafting.display.RecipeDisplay;
@@ -27,8 +27,11 @@ public abstract class BaseRecipeBookScreen<T extends RecipeBookMenu> extends Abs
 	private final BaseRecipeBookWidget<?> recipeBook;
 	private boolean narrow;
 
-	public BaseRecipeBookScreen(T handler, BaseRecipeBookWidget<?> recipeBook, Inventory inventory, Component title) {
-		super(handler, inventory, title);
+	public BaseRecipeBookScreen(
+		T handler, BaseRecipeBookWidget<?> recipeBook, Inventory inventory, Component title,
+		int imageWidth, int imageHeight
+	) {
+		super(handler, inventory, title, imageWidth, imageHeight);
 
 		this.recipeBook = recipeBook;
 	}
@@ -52,25 +55,25 @@ public abstract class BaseRecipeBookScreen<T extends RecipeBookMenu> extends Abs
 		this.addWidget(this.getRecipeBook());
 	}
 
-	public void render(@NonNull GuiGraphics context, int mouseX, int mouseY, float deltaTicks) {
+	public void extractContents(@NonNull GuiGraphicsExtractor context, int mouseX, int mouseY, float deltaTicks) {
 		if (this.getRecipeBook().isOpen() && this.narrow) {
-			this.renderBackground(context, mouseX, mouseY, deltaTicks);
+			this.extractBackground(context, mouseX, mouseY, deltaTicks);
 		} else {
-			super.renderContents(context, mouseX, mouseY, deltaTicks);
+			super.extractContents(context, mouseX, mouseY, deltaTicks);
 		}
 
 		context.nextStratum();
-		this.getRecipeBook().render(context, mouseX, mouseY, deltaTicks);
+		this.getRecipeBook().extractRenderState(context, mouseX, mouseY, deltaTicks);
 
 		context.nextStratum();
-		this.renderCarriedItem(context, mouseX, mouseY);
-		this.renderSnapbackItem(context);
-		this.renderTooltip(context, mouseX, mouseY);
+		this.extractCarriedItem(context, mouseX, mouseY);
+		this.extractSnapbackItem(context);
+		this.extractTooltip(context, mouseX, mouseY);
 		this.getRecipeBook().drawTooltip(context, mouseX, mouseY, this.hoveredSlot);
 	}
 
-	protected void renderSlots(@NonNull GuiGraphics context, int mouseX, int mouseY) {
-		super.renderSlots(context, mouseX, mouseY);
+	protected void extractSlots(@NonNull GuiGraphicsExtractor context, int mouseX, int mouseY) {
+		super.extractSlots(context, mouseX, mouseY);
 		this.getRecipeBook().drawGhostSlots(context, this.shouldAddPaddingToGhostResult());
 	}
 
@@ -108,7 +111,7 @@ public abstract class BaseRecipeBookScreen<T extends RecipeBookMenu> extends Abs
 		return this.getRecipeBook().isClickOutsideBounds(mouseX, mouseY, this.leftPos, this.topPos, this.imageWidth, this.imageHeight) && bl;
 	}
 
-	protected void slotClicked(@NonNull Slot slot, int slotId, int button, @NonNull ClickType actionType) {
+	protected void slotClicked(@NonNull Slot slot, int slotId, int button, @NonNull ContainerInput actionType) {
 		super.slotClicked(slot, slotId, button, actionType);
 		this.getRecipeBook().onMouseClick(slot);
 	}

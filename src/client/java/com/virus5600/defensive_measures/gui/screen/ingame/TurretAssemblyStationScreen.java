@@ -2,7 +2,7 @@ package com.virus5600.defensive_measures.gui.screen.ingame;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.WidgetSprites;
 import net.minecraft.client.gui.navigation.ScreenPosition;
 import net.minecraft.client.renderer.RenderPipelines;
@@ -18,14 +18,16 @@ import com.virus5600.defensive_measures.screen.TurretAssemblyStationScreenHandle
 public class TurretAssemblyStationScreen extends BaseRecipeBookScreen<TurretAssemblyStationScreenHandler> {
 	private static final Identifier TEXTURE = Identifier.fromNamespaceAndPath(DefensiveMeasures.MOD_ID, "textures/gui/container/turret_assembly_station.png");
 
-	public TurretAssemblyStationScreen(TurretAssemblyStationScreenHandler screenHandler, Inventory inventory, Component title) {
-		super(screenHandler, new BlueprintWidget(screenHandler), inventory, title);
+	public TurretAssemblyStationScreen(
+		TurretAssemblyStationScreenHandler screenHandler, Inventory inventory, Component title
+	) {
+		super(
+			screenHandler, new BlueprintWidget(screenHandler), inventory, title,
+			256, 242
+		);
 	}
 
 	protected void init() {
-		this.imageWidth = 256;
-		this.imageHeight = 242;
-
 		this.titleLabelX = 29;
 		this.titleLabelY = 6;
 
@@ -50,7 +52,7 @@ public class TurretAssemblyStationScreen extends BaseRecipeBookScreen<TurretAsse
 		);
 	}
 
-	protected void renderBg(GuiGraphics context, float deltaTicks, int mouseX, int mouseY) {
+	public void extractBackground(GuiGraphicsExtractor context, int mouseX, int mouseY, float deltaTicks) {
 		int x = this.leftPos;
 		int y = (this.height - this.imageHeight) / 2;
 

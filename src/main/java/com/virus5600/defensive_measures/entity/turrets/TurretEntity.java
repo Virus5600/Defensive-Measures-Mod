@@ -1101,7 +1101,7 @@ public abstract class TurretEntity extends Mob implements Itemable, RangedAttack
 	}
 
 	@Override
-	public boolean canAttackType(@NonNull EntityType<?> type) {
+	public boolean canAttack(@NonNull LivingEntity target) {
 		return true;
 	}
 

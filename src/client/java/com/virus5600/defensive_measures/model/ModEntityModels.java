@@ -1,10 +1,10 @@
 package com.virus5600.defensive_measures.model;
 
-import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry;
+import net.fabricmc.fabric.api.client.rendering.v1.ModelLayerRegistry;
 import net.minecraft.client.model.geom.ModelLayerLocation;
-import net.minecraft.client.renderer.blockentity.HangingSignRenderer;
 import net.minecraft.client.renderer.entity.ArmorModelSet;
 import net.minecraft.resources.Identifier;
+import net.minecraft.world.level.block.HangingSignBlock;
 import net.minecraft.world.level.block.state.properties.WoodType;
 
 import com.virus5600.defensive_measures.DefensiveMeasures;
@@ -56,28 +56,28 @@ public class ModEntityModels {
 		// /////// //
 
 		// v1.0.0-beta
-		EntityModelLayerRegistry.registerModelLayer(CANNON_TURRET, CannonTurretModel::getTexturedModelData);
-		EntityModelLayerRegistry.registerModelLayer(BALLISTA_TURRET, BallistaTurretModel::getTexturedModelData);
-		EntityModelLayerRegistry.registerModelLayer(MG_TURRET, MGTurretModel::getTexturedModelData);
+		ModelLayerRegistry.registerModelLayer(CANNON_TURRET, CannonTurretModel::getTexturedModelData);
+		ModelLayerRegistry.registerModelLayer(BALLISTA_TURRET, BallistaTurretModel::getTexturedModelData);
+		ModelLayerRegistry.registerModelLayer(MG_TURRET, MGTurretModel::getTexturedModelData);
 
 		// v1.1.0-beta
-		EntityModelLayerRegistry.registerModelLayer(AA_TURRET, AATurretModel::getTexturedModelData);
-		EntityModelLayerRegistry.registerModelLayer(FLAME_TURRET, FlameTurretModel::getTexturedModelData);
-		EntityModelLayerRegistry.registerModelLayer(MISSILE_TURRET, MissileTurretModel::getTexturedModelData);
+		ModelLayerRegistry.registerModelLayer(AA_TURRET, AATurretModel::getTexturedModelData);
+		ModelLayerRegistry.registerModelLayer(FLAME_TURRET, FlameTurretModel::getTexturedModelData);
+		ModelLayerRegistry.registerModelLayer(MISSILE_TURRET, MissileTurretModel::getTexturedModelData);
 
 		// /////////// //
 		// PROJECTILES //
 		// /////////// //
 
 		// v1.0.0-beta
-		EntityModelLayerRegistry.registerModelLayer(CANNONBALL, CannonballModel::getTexturedModelData);
-		EntityModelLayerRegistry.registerModelLayer(BALLISTA_BOLT, BallistaBoltModel::getTexturedModelData);
-		EntityModelLayerRegistry.registerModelLayer(MG_BULLET, MGBulletModel::getTexturedModelData);
+		ModelLayerRegistry.registerModelLayer(CANNONBALL, CannonballModel::getTexturedModelData);
+		ModelLayerRegistry.registerModelLayer(BALLISTA_BOLT, BallistaBoltModel::getTexturedModelData);
+		ModelLayerRegistry.registerModelLayer(MG_BULLET, MGBulletModel::getTexturedModelData);
 
 		// v1.1.0-beta
-		EntityModelLayerRegistry.registerModelLayer(FLAK_PROJECTILE, FlakProjectileModel::getTexturedModelData);
-		EntityModelLayerRegistry.registerModelLayer(FLAMMABLE_AEROSOL, FlammableAerosolModel::getTexturedModelData);
-		EntityModelLayerRegistry.registerModelLayer(MICRO_MISSILE, MicroMissileModel::getTexturedModelData);
+		ModelLayerRegistry.registerModelLayer(FLAK_PROJECTILE, FlakProjectileModel::getTexturedModelData);
+		ModelLayerRegistry.registerModelLayer(FLAMMABLE_AEROSOL, FlammableAerosolModel::getTexturedModelData);
+		ModelLayerRegistry.registerModelLayer(MICRO_MISSILE, MicroMissileModel::getTexturedModelData);
 	}
 
 	private static ModelLayerLocation registerMain(String id) {
@@ -109,7 +109,7 @@ public class ModEntityModels {
 		return create("sign/wall/" + type.name(), "main");
 	}
 
-	public static ModelLayerLocation createHangingSign(WoodType type, HangingSignRenderer.AttachmentType attachmentType) {
+	public static ModelLayerLocation createHangingSign(WoodType type, HangingSignBlock.Attachment attachmentType) {
 		return create("hanging_sign/" + type.name() + "/" + attachmentType.getSerializedName(), "main");
 	}
 

@@ -1,5 +1,6 @@
 package com.virus5600.defensive_measures._helper;
 
+import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
@@ -16,8 +17,9 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.flag.FeatureFlags;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.Items;
+import net.minecraft.world.item.Item.Properties;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeBookCategory;
 import net.minecraft.world.item.crafting.RecipeSerializer;
@@ -45,6 +47,19 @@ import java.util.function.Function;
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
  */
 public final class RegistryHelper {
+	// Holder
+	public static Holder<Block> getHolder(Block block) {
+		return BuiltInRegistries.BLOCK.wrapAsHolder(block);
+	}
+
+	public static Holder<EntityType<?>> getHolder(EntityType<?> entityType) {
+		return BuiltInRegistries.ENTITY_TYPE.wrapAsHolder(entityType);
+	}
+
+	public static boolean isOf(EntityType<?> entityType, TagKey<EntityType<?>> tag) {
+		return getHolder(entityType).is(tag);
+	}
+
 	// Block Registry
 	private static ResourceKey<Block> createBlockKey(String name) {
 		return ResourceKey.create(Registries.BLOCK, Identifier.fromNamespaceAndPath(DefensiveMeasures.MOD_ID, name));
@@ -59,16 +74,39 @@ public final class RegistryHelper {
 		return ResourceKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath(DefensiveMeasures.MOD_ID, path));
 	}
 
-	public static Item registerItem(String path, Function<net.minecraft.world.item.Item.Properties, Item> factory, net.minecraft.world.item.Item.Properties settings) {
-		return Items.registerItem(createItemKey(path), factory, settings);
+	@SuppressWarnings("OptionalGetWithoutIsPresent")
+	private static ResourceKey<Item> createBlockItemKey(Block block) {
+		ResourceKey<Block> key = getHolder(block).unwrapKey().get();
+		return ResourceKey.create(Registries.ITEM, key.identifier());
 	}
 
-	public static Item registerItem(String path, Function<net.minecraft.world.item.Item.Properties, Item> factory) {
-		return Items.registerItem(createItemKey(path), factory, new net.minecraft.world.item.Item.Properties());
+	public static Item registerItem(String path, Function<Properties, Item> factory, Properties settings) {
+		return registerItem(createItemKey(path), factory, settings);
+	}
+
+	public static Item registerItem(ResourceKey<Item> key, Function<Properties, Item> factory, Properties settings) {
+		settings.setId(key);
+		Item item = factory.apply(settings);
+
+		if (item instanceof BlockItem blockItem) {
+			blockItem.registerBlocks(Item.BY_BLOCK, item);
+		}
+
+		return Registry.register(BuiltInRegistries.ITEM, key, item);
+	}
+
+	public static Item registerItem(String path, Function<Properties, Item> factory) {
+		return registerItem(path, factory, new Properties());
 	}
 
 	public static Item registerItem(Block block) {
-		return Items.registerBlock(block);
+		Properties prop = new Properties();
+
+		return registerItem(
+			createBlockItemKey(block),
+			settings -> new BlockItem(block, settings),
+			prop
+		);
 	}
 
 	// Tag Registry

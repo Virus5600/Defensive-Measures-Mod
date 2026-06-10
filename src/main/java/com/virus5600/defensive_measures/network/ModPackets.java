@@ -25,7 +25,7 @@ public final class ModPackets {
 		// ////////////// //
 
 		// v1.1.0-beta
-		PayloadTypeRegistry.playS2C().register(TurretLoopSoundPacket.PAYLOAD_ID, TurretLoopSoundPacket.CODEC_STREAM);
+		PayloadTypeRegistry.clientboundPlay().register(TurretLoopSoundPacket.PAYLOAD_ID, TurretLoopSoundPacket.CODEC_STREAM);
 	}
 
 	// ///////////////// //

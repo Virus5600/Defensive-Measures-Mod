@@ -5,6 +5,7 @@ import com.mojang.serialization.DataResult;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.util.ExtraCodecs;
 import net.minecraft.util.Util;
@@ -13,7 +14,6 @@ import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.ShapedRecipePattern;
 
-import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.VisibleForTesting;
 
 import it.unimi.dsi.fastutil.chars.CharArraySet;
@@ -36,23 +36,159 @@ import java.util.Optional;
  *
  * @see ShapedRecipePattern
  */
-public final class CustomShapedRecipe {
-	public static final char SPACE = ' ';
+public final class CustomShapedRecipePattern {
+	public static final StreamCodec<RegistryFriendlyByteBuf, CustomShapedRecipePattern> STREAM_CODEC;
+	public static final char EMPTY_SLOT = ' ';
 
 	private final int width;
 	private final int height;
 	private final List<Optional<Ingredient>> ingredients;
-	private final @Nullable DataPair data;
+	private final Optional<DataPair> data;
 	private final int ingredientCount;
 	private final boolean symmetrical;
 
-	public CustomShapedRecipe(int width, int height, List<Optional<Ingredient>> ingredients, @Nullable DataPair data) {
+	public CustomShapedRecipePattern(int width, int height, List<Optional<Ingredient>> ingredients, Optional<DataPair> data) {
 		this.width = width;
 		this.height = height;
 		this.ingredients = ingredients;
 		this.data = data;
 		this.ingredientCount = (int)ingredients.stream().flatMap(Optional::stream).count();
 		this.symmetrical = Util.isSymmetrical(width, height, ingredients);
+	}
+
+	// /////// //
+	// METHODS //
+	// /////// //
+
+	public static MapCodec<CustomShapedRecipePattern> createCodec(int rows, int cols) {
+		Codec<Character> keyEntryCodec = Codec.STRING.comapFlatMap((keyEntry) -> {
+			if (keyEntry.length() != 1) {
+				return DataResult.error(() -> "Invalid key entry: '%s' is an invalid symbol (must be 1 character only).".formatted(keyEntry));
+			}
+			else {
+				return String.valueOf(EMPTY_SLOT).equals(keyEntry) ? DataResult.error(() -> "Invalid key entry: '%s' is a reserved symbol.".formatted(EMPTY_SLOT))
+					: DataResult.success(keyEntry.charAt(0));
+			}
+		}, String::valueOf);
+
+		MapCodec<DataPair> dataCodec = RecordCodecBuilder.mapCodec(instance ->
+			instance.group(
+				ExtraCodecs.strictUnboundedMap(keyEntryCodec, Ingredient.CODEC)
+					.fieldOf("key")
+					.forGetter(DataPair::key),
+				Codec.STRING.listOf()
+					.fieldOf("pattern")
+					.forGetter(DataPair::pattern)
+			).apply(instance, DataPair::new)
+		);
+
+		return dataCodec.flatXmap(
+			data -> DataPair.validate(data, rows, cols).flatMap(CustomShapedRecipePattern::unpack),
+			recipe -> (recipe.data != null && recipe.data.isPresent())
+				? DataResult.success(recipe.data.get())
+				: DataResult.error(() -> "Cannot encode unpacked recipe")
+		);
+	}
+
+	private static CustomShapedRecipePattern createFromNetwork(Integer width, Integer height, List<Optional<Ingredient>> ingredients) {
+		return new CustomShapedRecipePattern(width, height, ingredients, Optional.empty());
+	}
+
+	public static CustomShapedRecipePattern of(final Map<Character, Ingredient> key, final String... pattern) {
+		return of(key, List.of(pattern));
+	}
+
+	public static CustomShapedRecipePattern of(final Map<Character, Ingredient> key, final List<String> pattern) {
+		DataPair data = new DataPair(key, pattern);
+		return unpack(data).getOrThrow();
+	}
+
+	private static DataResult<CustomShapedRecipePattern> unpack(DataPair data) {
+		String[] shrunkPattern = shrink(data.pattern());
+		int width = shrunkPattern[0].length();
+		int height = shrunkPattern.length;
+		List<Optional<Ingredient>> ingredients = new ArrayList<>(width * height);
+		CharSet unusedSymbols = new CharArraySet(data.key().keySet());
+
+		for(String rowStr : shrunkPattern) {
+			for(int colIndex = 0; colIndex < rowStr.length(); ++colIndex) {
+				char symbol = rowStr.charAt(colIndex);
+				Optional<Ingredient> optional;
+				if (symbol == EMPTY_SLOT) {
+					optional = Optional.empty();
+				} else {
+					Ingredient ingredient = data.key().get(symbol);
+					if (ingredient == null) {
+						return DataResult.error(() -> "Pattern references symbol '" + symbol + "' but it's not defined in the key");
+					}
+
+					optional = Optional.of(ingredient);
+				}
+
+				unusedSymbols.remove(symbol);
+				ingredients.add(optional);
+			}
+		}
+
+		if (!unusedSymbols.isEmpty()) {
+			return DataResult.error(() -> "Key defines symbols that aren't used in pattern: " + unusedSymbols);
+		}
+		else {
+			return DataResult.success(new CustomShapedRecipePattern(width, height, ingredients, Optional.of(data)));
+		}
+	}
+
+	@VisibleForTesting
+	static String[] shrink(List<String> pattern) {
+		int firstColumn = Integer.MAX_VALUE;
+		int lastColumn = 0;
+		int topPadding = 0;
+		int bottomPadding = 0;
+
+		for(int rowIndex = 0; rowIndex < pattern.size(); ++rowIndex) {
+			String rowStr = pattern.get(rowIndex);
+			firstColumn = Math.min(firstColumn, findFirstSymbol(rowStr));
+			int lastSymbolIndex = findLastSymbol(rowStr);
+			lastColumn = Math.max(lastColumn, lastSymbolIndex);
+
+			if (lastSymbolIndex < 0) {
+				if (topPadding == rowIndex) {
+					++topPadding;
+				}
+
+				++bottomPadding;
+			} else {
+				bottomPadding = 0;
+			}
+		}
+
+		if (pattern.size() == bottomPadding) {
+			return new String[0];
+		} else {
+			String[] trimmedRows = new String[pattern.size() - bottomPadding - topPadding];
+
+			for(int newRowIndex = 0; newRowIndex < trimmedRows.length; ++newRowIndex) {
+				trimmedRows[newRowIndex] = (pattern.get(newRowIndex + topPadding)).substring(firstColumn, lastColumn + 1);
+			}
+
+			return trimmedRows;
+		}
+	}
+
+	private static int findFirstSymbol(String line) {
+		int index = 0;
+		while (index < line.length() && line.charAt(index) == EMPTY_SLOT) {
+			index++;
+		}
+		return index;
+	}
+
+	private static int findLastSymbol(String line) {
+		int index = line.length() - 1;
+		while (index >= 0 && line.charAt(index) == EMPTY_SLOT) {
+			index--;
+		}
+		return index;
 	}
 
 	public boolean matches(CraftingInput input) {
@@ -93,169 +229,50 @@ public final class CustomShapedRecipe {
 		return true;
 	}
 
-	public int getWidth() {
+	public int width() {
 		return this.width;
 	}
 
-	public int getHeight() {
+	public int height() {
 		return this.height;
 	}
 
-	public List<Optional<Ingredient>> getIngredients() {
+	public List<Optional<Ingredient>> ingredients() {
 		return this.ingredients;
+	}
+
+	// ////// //
+	// STATIC //
+	// ////// //
+
+	static {
+		STREAM_CODEC =
+			StreamCodec.composite(
+				ByteBufCodecs.VAR_INT, CustomShapedRecipePattern::width,
+				ByteBufCodecs.VAR_INT, CustomShapedRecipePattern::height,
+				Ingredient.OPTIONAL_CONTENTS_STREAM_CODEC.apply(ByteBufCodecs.list()), CustomShapedRecipePattern::ingredients,
+				CustomShapedRecipePattern::createFromNetwork
+			);
 	}
 
 	// ///////////////////////// //
 	// FACTORY METHODS (DATAGEN) //
 	// ///////////////////////// //
 
-	private static CustomShapedRecipe create(int width, int height, List<Optional<Ingredient>> ingredients, @Nullable DataPair data) {
-		return new CustomShapedRecipe(width, height, ingredients, data);
+	private static CustomShapedRecipePattern create(int width, int height, List<Optional<Ingredient>> ingredients, Optional<DataPair> data) {
+		return new CustomShapedRecipePattern(width, height, ingredients, data);
 	}
 
-	public static CustomShapedRecipe create(int maxRows, int maxCols, Map<Character, Ingredient> key, String... pattern) {
+	public static CustomShapedRecipePattern create(int maxRows, int maxCols, Map<Character, Ingredient> key, String... pattern) {
 		return create(maxRows, maxCols, key, List.of(pattern));
 	}
 
-	public static CustomShapedRecipe create(int maxRows, int maxCols, Map<Character, Ingredient> key, List<String> pattern) {
+	public static CustomShapedRecipePattern create(int maxRows, int maxCols, Map<Character, Ingredient> key, List<String> pattern) {
 		DataPair data = new DataPair(key, pattern);
 
 		return DataPair.validate(data, maxRows, maxCols)
-			.flatMap(CustomShapedRecipe::fromData)
+			.flatMap(CustomShapedRecipePattern::unpack)
 			.getOrThrow();
-	}
-
-	// ////////////// //
-	// CODEC CREATION //
-	// ////////////// //
-
-	public static final StreamCodec<RegistryFriendlyByteBuf, CustomShapedRecipe> PACKET_CODEC =
-		StreamCodec.composite(
-			net.minecraft.network.codec.ByteBufCodecs.VAR_INT, CustomShapedRecipe::getWidth,
-			net.minecraft.network.codec.ByteBufCodecs.VAR_INT, CustomShapedRecipe::getHeight,
-			Ingredient.OPTIONAL_CONTENTS_STREAM_CODEC.apply(net.minecraft.network.codec.ByteBufCodecs.list()), CustomShapedRecipe::getIngredients,
-			CustomShapedRecipe::createFromNetwork
-		);
-
-	private static CustomShapedRecipe createFromNetwork(Integer width, Integer height, List<Optional<Ingredient>> ingredients) {
-		return new CustomShapedRecipe(width, height, ingredients, null);
-	}
-
-	public static MapCodec<CustomShapedRecipe> createCodec(int rows, int cols) {
-		Codec<Character> keyEntryCodec = Codec.STRING.comapFlatMap((keyEntry) -> {
-			if (keyEntry.length() != 1) {
-				return DataResult.error(() -> "Invalid key entry: '%s' is an invalid symbol (must be 1 character only).".formatted(keyEntry));
-			}
-			else {
-				return String.valueOf(SPACE).equals(keyEntry) ? DataResult.error(() -> "Invalid key entry: '%s' is a reserved symbol.".formatted(SPACE))
-					: DataResult.success(keyEntry.charAt(0));
-			}
-		}, String::valueOf);
-
-		MapCodec<DataPair> dataCodec = RecordCodecBuilder.mapCodec(instance ->
-			instance.group(
-				ExtraCodecs.strictUnboundedMap(keyEntryCodec, Ingredient.CODEC)
-					.fieldOf("key")
-					.forGetter(DataPair::key),
-				Codec.STRING.listOf()
-					.fieldOf("pattern")
-					.forGetter(DataPair::pattern)
-			).apply(instance, DataPair::new)
-		);
-
-		return dataCodec.flatXmap(
-			data -> DataPair.validate(data, rows, cols).flatMap(CustomShapedRecipe::fromData),
-			recipe -> recipe.data != null
-				? DataResult.success(recipe.data)
-				: DataResult.error(() -> "Cannot encode unpacked recipe")
-		);
-	}
-
-	private static DataResult<CustomShapedRecipe> fromData(DataPair data) {
-		String[] trimmedPattern = removePadding(data.pattern());
-		int recipeWidth = trimmedPattern[0].length();
-		int recipeHeight = trimmedPattern.length;
-		List<Optional<Ingredient>> ingredientsList = new ArrayList<>(recipeWidth * recipeHeight);
-		CharSet unusedSymbols = new CharArraySet(data.key().keySet());
-
-		for(String rowStr : trimmedPattern) {
-			for(int colIndex = 0; colIndex < rowStr.length(); ++colIndex) {
-				char symbol = rowStr.charAt(colIndex);
-				Optional<Ingredient> optional;
-				if (symbol == SPACE) {
-					optional = Optional.empty();
-				} else {
-					Ingredient ingredient = data.key().get(symbol);
-					if (ingredient == null) {
-						return DataResult.error(() -> "Pattern references symbol '" + symbol + "' but it's not defined in the key");
-					}
-
-					optional = Optional.of(ingredient);
-				}
-
-				unusedSymbols.remove(symbol);
-				ingredientsList.add(optional);
-			}
-		}
-
-		if (!unusedSymbols.isEmpty()) {
-			return DataResult.error(() -> "Key defines symbols that aren't used in pattern: " + unusedSymbols);
-		} else {
-			return DataResult.success(new CustomShapedRecipe(recipeWidth, recipeHeight, ingredientsList, data));
-		}
-	}
-
-	@VisibleForTesting
-	static String[] removePadding(List<String> pattern) {
-		int firstColumn = Integer.MAX_VALUE;
-		int lastColumn = 0;
-		int topPadding = 0;
-		int bottomPadding = 0;
-
-		for(int rowIndex = 0; rowIndex < pattern.size(); ++rowIndex) {
-			String rowStr = pattern.get(rowIndex);
-			firstColumn = Math.min(firstColumn, findFirstSymbol(rowStr));
-			int lastSymbolIndex = findLastSymbol(rowStr);
-			lastColumn = Math.max(lastColumn, lastSymbolIndex);
-
-			if (lastSymbolIndex < 0) {
-				if (topPadding == rowIndex) {
-					++topPadding;
-				}
-
-				++bottomPadding;
-			} else {
-				bottomPadding = 0;
-			}
-		}
-
-		if (pattern.size() == bottomPadding) {
-			return new String[0];
-		} else {
-			String[] trimmedRows = new String[pattern.size() - bottomPadding - topPadding];
-
-			for(int newRowIndex = 0; newRowIndex < trimmedRows.length; ++newRowIndex) {
-				trimmedRows[newRowIndex] = (pattern.get(newRowIndex + topPadding)).substring(firstColumn, lastColumn + 1);
-			}
-
-			return trimmedRows;
-		}
-	}
-
-	private static int findFirstSymbol(String line) {
-		int index = 0;
-		while (index < line.length() && line.charAt(index) == SPACE) {
-			index++;
-		}
-		return index;
-	}
-
-	private static int findLastSymbol(String line) {
-		int index = line.length() - 1;
-		while (index >= 0 && line.charAt(index) == SPACE) {
-			index--;
-		}
-		return index;
 	}
 
 	// ///////////////////////////////////////// //

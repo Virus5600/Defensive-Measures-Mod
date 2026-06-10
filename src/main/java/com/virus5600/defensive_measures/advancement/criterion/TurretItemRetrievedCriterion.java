@@ -10,10 +10,12 @@ import net.minecraft.advancements.criterion.SimpleCriterionTrigger;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
 
+import org.jspecify.annotations.NonNull;
+
 import java.util.Optional;
 
 public class TurretItemRetrievedCriterion extends SimpleCriterionTrigger<TurretItemRetrievedCriterion.Conditions> {
-	@Override
+	@Override @NonNull
 	public Codec<TurretItemRetrievedCriterion.Conditions> codec() {
 		return TurretItemRetrievedCriterion.Conditions.CODEC;
 	}
