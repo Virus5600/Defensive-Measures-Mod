@@ -1,12 +1,11 @@
 package com.virus5600.defensive_measures.networking.receiver;
 
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking.Context;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.sound.SoundManager;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.entity.Entity;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvent;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.entity.Entity;
 
 import com.virus5600.defensive_measures.entity.turrets.TurretEntity;
 import com.virus5600.defensive_measures.entity.turrets.interfaces.LoopableShootingSound;
@@ -33,22 +32,19 @@ public final class TurretLoopSoundReceiver {
 	private static final Map<Integer, LoopingShootSoundInstance> ACTIVE_SOUNDS = Maps.newConcurrentMap();
 
 	public static void handle(TurretLoopSoundPacket payload, Context ctx) {
-		@SuppressWarnings("resource")
-		MinecraftClient client = ctx.client();
+		Minecraft client = ctx.client();
 
 		client.execute(() -> {
-			ClientWorld world = client.world;
+			ClientLevel world = client.level;
 
 			if (world == null) return;
 
-			Entity entity = world.getEntityById(payload.entityId());
+			Entity entity = world.getEntity(payload.entityId());
 			boolean shouldStart = payload.start();
 
 			if (entity instanceof TurretEntity turret) {
-				SoundManager manager = client.getSoundManager();
-
 				if (shouldStart) {
-					SoundCategory category = payload.soundCategory();
+					SoundSource category = payload.soundCategory();
 					SoundEvent startSound = payload.startSound();
 					SoundEvent loopSound = payload.loopSound();
 					SoundEvent endSound = payload.endSound();

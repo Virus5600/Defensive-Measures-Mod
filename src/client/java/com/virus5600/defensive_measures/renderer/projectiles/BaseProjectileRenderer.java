@@ -1,14 +1,14 @@
 package com.virus5600.defensive_measures.renderer.projectiles;
 
-import net.minecraft.client.render.OverlayTexture;
-import net.minecraft.client.render.RenderLayers;
-import net.minecraft.client.render.command.OrderedRenderCommandQueue;
-import net.minecraft.client.render.entity.EntityRenderer;
-import net.minecraft.client.render.entity.EntityRendererFactory;
-import net.minecraft.client.render.state.CameraRenderState;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.RotationAxis;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Axis;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.entity.EntityRenderer;
+import net.minecraft.client.renderer.entity.EntityRendererProvider;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
+import net.minecraft.client.renderer.state.CameraRenderState;
+import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.resources.Identifier;
 
 import com.virus5600.defensive_measures.entity.projectiles.ExplosiveProjectileEntity;
 import com.virus5600.defensive_measures.entity.projectiles.TurretProjectileEntity;
@@ -16,6 +16,7 @@ import com.virus5600.defensive_measures.model.projectiles.BaseProjectileModel;
 import com.virus5600.defensive_measures.renderer.projectiles.state.BaseProjectileRenderState;
 
 import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
 
 import java.util.function.Supplier;
 
@@ -31,10 +32,10 @@ public abstract class BaseProjectileRenderer<
 	private final M model;
 
 	public BaseProjectileRenderer(
-		EntityRendererFactory.Context context,
-		M entityModel,
-		float shadowRadius,
-		Supplier<S> renderStateFactory
+            EntityRendererProvider.Context context,
+            M entityModel,
+            float shadowRadius,
+            Supplier<S> renderStateFactory
 	) {
 		super(context);
 
@@ -44,18 +45,18 @@ public abstract class BaseProjectileRenderer<
 	}
 
 	@Override
-	public S createRenderState() {
+	public @NonNull S createRenderState() {
 		return this.renderStateFactory.get();
 	}
 
 	@Override
-	public void updateRenderState(T entity, S state, float tickProgress) {
-		super.updateRenderState(entity, state, tickProgress);
+	public void extractRenderState(@NonNull T entity, @NonNull S state, float tickProgress) {
+		super.extractRenderState(entity, state, tickProgress);
 
 		state.loopAnimationState.copyFrom(entity.getLoopAnimationState());
 
-		state.pitch = entity.getLerpedPitch(tickProgress);
-		state.yaw = entity.getLerpedYaw(tickProgress);
+		state.pitch = entity.getXRot(tickProgress);
+		state.yaw = entity.getYRot(tickProgress);
 
 		state.pitch *= entity instanceof ExplosiveProjectileEntity ? -1 : 1;
 		state.yaw *= entity instanceof ExplosiveProjectileEntity ? -1 : 1;
@@ -63,28 +64,28 @@ public abstract class BaseProjectileRenderer<
 	}
 
 	@Override
-	public void render(S state, MatrixStack stack, OrderedRenderCommandQueue queue, CameraRenderState camState) {
-		stack.push();
+	public void submit(@NonNull S state, PoseStack stack, @NonNull SubmitNodeCollector queue, @NonNull CameraRenderState camState) {
+		stack.pushPose();
 
 		if (this.shouldLookAtDir()) {
-			stack.multiply(RotationAxis.POSITIVE_X.rotationDegrees(state.pitch));
-			stack.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(state.yaw - 180F));
+			stack.mulPose(Axis.XP.rotationDegrees(state.pitch));
+			stack.mulPose(Axis.YP.rotationDegrees(state.yaw - 180F));
 		}
 
 		Identifier textureId = this.getTexture(state);
 		if (textureId != null) {
 			queue.submitModel(
 				this.getModel(), state, stack,
-				RenderLayers.entityCutout(textureId),
-				state.light,
-				OverlayTexture.DEFAULT_UV,
+				RenderTypes.entityCutout(textureId),
+				state.lightCoords,
+				OverlayTexture.NO_OVERLAY,
 				state.outlineColor,
 				null
 			);
 		}
 
-		stack.pop();
-		super.render(state, stack, queue, camState);
+		stack.popPose();
+		super.submit(state, stack, queue, camState);
 	}
 
 	// ////////////// //

@@ -1,41 +1,44 @@
 package com.virus5600.defensive_measures.animations.entity;
 
-import net.minecraft.client.render.entity.animation.*;
+import net.minecraft.client.animation.AnimationChannel;
+import net.minecraft.client.animation.AnimationDefinition;
+import net.minecraft.client.animation.Keyframe;
+import net.minecraft.client.animation.KeyframeAnimations;
 
 public class AATurretAnimation {
-	public static final AnimationDefinition ANIM_AA_TURRET_SHOOT = AnimationDefinition.Builder.create(1.0F)
-		.addBoneAnimation("gun", new Transformation(Transformation.Targets.ROTATE,
-			new Keyframe(0.125F, AnimationHelper.createRotationalVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
-			new Keyframe(0.5F, AnimationHelper.createRotationalVector(-5.0F, 0.0F, 0.0F), Transformation.Interpolations.CUBIC),
-			new Keyframe(1.0F, AnimationHelper.createRotationalVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.CUBIC)
+	public static final AnimationDefinition ANIM_AA_TURRET_SHOOT = AnimationDefinition.Builder.withLength(1.0F)
+		.addAnimation("gun", new AnimationChannel(AnimationChannel.Targets.ROTATION,
+			new Keyframe(0.125F, KeyframeAnimations.degreeVec(0.0F, 0.0F, 0.0F), AnimationChannel.Interpolations.LINEAR),
+			new Keyframe(0.5F, KeyframeAnimations.degreeVec(-5.0F, 0.0F, 0.0F), AnimationChannel.Interpolations.CATMULLROM),
+			new Keyframe(1.0F, KeyframeAnimations.degreeVec(0.0F, 0.0F, 0.0F), AnimationChannel.Interpolations.CATMULLROM)
 		))
-		.addBoneAnimation("springs", new Transformation(Transformation.Targets.MOVE_ORIGIN,
-			new Keyframe(0.125F, AnimationHelper.createTranslationalVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
-			new Keyframe(0.5F, AnimationHelper.createTranslationalVector(0.0F, 0.0F, -0.375F), Transformation.Interpolations.CUBIC),
-			new Keyframe(1.0F, AnimationHelper.createTranslationalVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.CUBIC)
+		.addAnimation("springs", new AnimationChannel(AnimationChannel.Targets.POSITION,
+			new Keyframe(0.125F, KeyframeAnimations.posVec(0.0F, 0.0F, 0.0F), AnimationChannel.Interpolations.LINEAR),
+			new Keyframe(0.5F, KeyframeAnimations.posVec(0.0F, 0.0F, -0.375F), AnimationChannel.Interpolations.CATMULLROM),
+			new Keyframe(1.0F, KeyframeAnimations.posVec(0.0F, 0.0F, 0.0F), AnimationChannel.Interpolations.CATMULLROM)
 		))
-		.addBoneAnimation("barrel", new Transformation(Transformation.Targets.MOVE_ORIGIN,
-			new Keyframe(0.0F, AnimationHelper.createTranslationalVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
-			new Keyframe(0.125F, AnimationHelper.createTranslationalVector(0.0F, 0.0F, 4.0F), Transformation.Interpolations.LINEAR),
-			new Keyframe(1.0F, AnimationHelper.createTranslationalVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.CUBIC)
+		.addAnimation("barrel", new AnimationChannel(AnimationChannel.Targets.POSITION,
+			new Keyframe(0.0F, KeyframeAnimations.posVec(0.0F, 0.0F, 0.0F), AnimationChannel.Interpolations.LINEAR),
+			new Keyframe(0.125F, KeyframeAnimations.posVec(0.0F, 0.0F, 4.0F), AnimationChannel.Interpolations.LINEAR),
+			new Keyframe(1.0F, KeyframeAnimations.posVec(0.0F, 0.0F, 0.0F), AnimationChannel.Interpolations.CATMULLROM)
 		))
-		.addBoneAnimation("inner_barrel", new Transformation(Transformation.Targets.MOVE_ORIGIN,
-			new Keyframe(0.0F, AnimationHelper.createTranslationalVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
-			new Keyframe(0.125F, AnimationHelper.createTranslationalVector(0.0F, 0.0F, 5.0F), Transformation.Interpolations.LINEAR),
-			new Keyframe(1.0F, AnimationHelper.createTranslationalVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.CUBIC)
+		.addAnimation("inner_barrel", new AnimationChannel(AnimationChannel.Targets.POSITION,
+			new Keyframe(0.0F, KeyframeAnimations.posVec(0.0F, 0.0F, 0.0F), AnimationChannel.Interpolations.LINEAR),
+			new Keyframe(0.125F, KeyframeAnimations.posVec(0.0F, 0.0F, 5.0F), AnimationChannel.Interpolations.LINEAR),
+			new Keyframe(1.0F, KeyframeAnimations.posVec(0.0F, 0.0F, 0.0F), AnimationChannel.Interpolations.CATMULLROM)
 		))
-		.addBoneAnimation("flak_round_casing", new Transformation(Transformation.Targets.MOVE_ORIGIN,
-			new Keyframe(0.125F, AnimationHelper.createTranslationalVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.CUBIC),
-			new Keyframe(0.5F, AnimationHelper.createTranslationalVector(0.0F, 0.0F, 20.0F), Transformation.Interpolations.LINEAR),
-			new Keyframe(0.5407F, AnimationHelper.createTranslationalVector(0.0F, 0.0F, 20.0F), Transformation.Interpolations.LINEAR),
-			new Keyframe(0.5417F, AnimationHelper.createTranslationalVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.CUBIC)
+		.addAnimation("flak_round_casing", new AnimationChannel(AnimationChannel.Targets.POSITION,
+			new Keyframe(0.125F, KeyframeAnimations.posVec(0.0F, 0.0F, 0.0F), AnimationChannel.Interpolations.CATMULLROM),
+			new Keyframe(0.5F, KeyframeAnimations.posVec(0.0F, 0.0F, 20.0F), AnimationChannel.Interpolations.LINEAR),
+			new Keyframe(0.5407F, KeyframeAnimations.posVec(0.0F, 0.0F, 20.0F), AnimationChannel.Interpolations.LINEAR),
+			new Keyframe(0.5417F, KeyframeAnimations.posVec(0.0F, 0.0F, 0.0F), AnimationChannel.Interpolations.CATMULLROM)
 		))
-		.addBoneAnimation("flak_round_casing", new Transformation(Transformation.Targets.SCALE,
-			new Keyframe(0.4583F, AnimationHelper.createScalingVector(1.0F, 1.0F, 1.0F), Transformation.Interpolations.LINEAR),
-			new Keyframe(0.499F, AnimationHelper.createScalingVector(1.0F, 1.0F, 1.0F), Transformation.Interpolations.LINEAR),
-			new Keyframe(0.5F, AnimationHelper.createScalingVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
-			new Keyframe(0.5407F, AnimationHelper.createScalingVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
-			new Keyframe(0.5417F, AnimationHelper.createScalingVector(1.0F, 1.0F, 1.0F), Transformation.Interpolations.LINEAR)
+		.addAnimation("flak_round_casing", new AnimationChannel(AnimationChannel.Targets.SCALE,
+			new Keyframe(0.4583F, KeyframeAnimations.scaleVec(1.0F, 1.0F, 1.0F), AnimationChannel.Interpolations.LINEAR),
+			new Keyframe(0.499F, KeyframeAnimations.scaleVec(1.0F, 1.0F, 1.0F), AnimationChannel.Interpolations.LINEAR),
+			new Keyframe(0.5F, KeyframeAnimations.scaleVec(0.0F, 0.0F, 0.0F), AnimationChannel.Interpolations.LINEAR),
+			new Keyframe(0.5407F, KeyframeAnimations.scaleVec(0.0F, 0.0F, 0.0F), AnimationChannel.Interpolations.LINEAR),
+			new Keyframe(0.5417F, KeyframeAnimations.scaleVec(1.0F, 1.0F, 1.0F), AnimationChannel.Interpolations.LINEAR)
 		))
 		.build();
 
@@ -46,50 +49,50 @@ public class AATurretAnimation {
 	 * 	<li>Another small explosion at 0.5s</li>
 	 * </ul>
 	 */
-	public static final AnimationDefinition ANIM_AA_TURRET_DEATH = AnimationDefinition.Builder.create(1.5F)
-		.addBoneAnimation("horizontal_traverse", new Transformation(Transformation.Targets.ROTATE,
-			new Keyframe(0.5F, AnimationHelper.createRotationalVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
-			new Keyframe(0.7083F, AnimationHelper.createRotationalVector(5.019F, -4.9809F, 9.5631F), Transformation.Interpolations.LINEAR),
-			new Keyframe(0.8333F, AnimationHelper.createRotationalVector(0.0F, 0.0F, 5.0F), Transformation.Interpolations.LINEAR),
-			new Keyframe(1.0F, AnimationHelper.createRotationalVector(17.5F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR)
+	public static final AnimationDefinition ANIM_AA_TURRET_DEATH = AnimationDefinition.Builder.withLength(1.5F)
+		.addAnimation("horizontal_traverse", new AnimationChannel(AnimationChannel.Targets.ROTATION,
+			new Keyframe(0.5F, KeyframeAnimations.degreeVec(0.0F, 0.0F, 0.0F), AnimationChannel.Interpolations.LINEAR),
+			new Keyframe(0.7083F, KeyframeAnimations.degreeVec(5.019F, -4.9809F, 9.5631F), AnimationChannel.Interpolations.LINEAR),
+			new Keyframe(0.8333F, KeyframeAnimations.degreeVec(0.0F, 0.0F, 5.0F), AnimationChannel.Interpolations.LINEAR),
+			new Keyframe(1.0F, KeyframeAnimations.degreeVec(17.5F, 0.0F, 0.0F), AnimationChannel.Interpolations.LINEAR)
 		))
-		.addBoneAnimation("horizontal_traverse", new Transformation(Transformation.Targets.MOVE_ORIGIN,
-			new Keyframe(0.5F, AnimationHelper.createTranslationalVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
-			new Keyframe(0.7083F, AnimationHelper.createTranslationalVector(0.0F, 1.75F, 0.0F), Transformation.Interpolations.LINEAR),
-			new Keyframe(0.875F, AnimationHelper.createTranslationalVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
-			new Keyframe(1.0F, AnimationHelper.createTranslationalVector(0.0F, 0.0F, -0.5F), Transformation.Interpolations.LINEAR)
+		.addAnimation("horizontal_traverse", new AnimationChannel(AnimationChannel.Targets.POSITION,
+			new Keyframe(0.5F, KeyframeAnimations.posVec(0.0F, 0.0F, 0.0F), AnimationChannel.Interpolations.LINEAR),
+			new Keyframe(0.7083F, KeyframeAnimations.posVec(0.0F, 1.75F, 0.0F), AnimationChannel.Interpolations.LINEAR),
+			new Keyframe(0.875F, KeyframeAnimations.posVec(0.0F, 0.0F, 0.0F), AnimationChannel.Interpolations.LINEAR),
+			new Keyframe(1.0F, KeyframeAnimations.posVec(0.0F, 0.0F, -0.5F), AnimationChannel.Interpolations.LINEAR)
 		))
-		.addBoneAnimation("balancer", new Transformation(Transformation.Targets.MOVE_ORIGIN,
-			new Keyframe(0.4167F, AnimationHelper.createTranslationalVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
-			new Keyframe(0.5F, AnimationHelper.createTranslationalVector(-0.0785F, 0.1241F, 0.0309F), Transformation.Interpolations.LINEAR),
-			new Keyframe(0.7083F, AnimationHelper.createTranslationalVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR)
+		.addAnimation("balancer", new AnimationChannel(AnimationChannel.Targets.POSITION,
+			new Keyframe(0.4167F, KeyframeAnimations.posVec(0.0F, 0.0F, 0.0F), AnimationChannel.Interpolations.LINEAR),
+			new Keyframe(0.5F, KeyframeAnimations.posVec(-0.0785F, 0.1241F, 0.0309F), AnimationChannel.Interpolations.LINEAR),
+			new Keyframe(0.7083F, KeyframeAnimations.posVec(0.0F, 0.0F, 0.0F), AnimationChannel.Interpolations.LINEAR)
 		))
-		.addBoneAnimation("gun", new Transformation(Transformation.Targets.ROTATE,
-			new Keyframe(0.0F, AnimationHelper.createRotationalVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
-			new Keyframe(0.5F, AnimationHelper.createRotationalVector(-75.0F, 0.0F, 0.0F), Transformation.Interpolations.CUBIC),
-			new Keyframe(0.75F, AnimationHelper.createRotationalVector(37.5F, 0.0F, 0.0F), Transformation.Interpolations.CUBIC)
+		.addAnimation("gun", new AnimationChannel(AnimationChannel.Targets.ROTATION,
+			new Keyframe(0.0F, KeyframeAnimations.degreeVec(0.0F, 0.0F, 0.0F), AnimationChannel.Interpolations.LINEAR),
+			new Keyframe(0.5F, KeyframeAnimations.degreeVec(-75.0F, 0.0F, 0.0F), AnimationChannel.Interpolations.CATMULLROM),
+			new Keyframe(0.75F, KeyframeAnimations.degreeVec(37.5F, 0.0F, 0.0F), AnimationChannel.Interpolations.CATMULLROM)
 		))
-		.addBoneAnimation("gun", new Transformation(Transformation.Targets.MOVE_ORIGIN,
-			new Keyframe(0.4583F, AnimationHelper.createTranslationalVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
-			new Keyframe(0.5F, AnimationHelper.createTranslationalVector(-0.0308F, 0.0168F, -0.0407F), Transformation.Interpolations.LINEAR),
-			new Keyframe(0.75F, AnimationHelper.createTranslationalVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR)
+		.addAnimation("gun", new AnimationChannel(AnimationChannel.Targets.POSITION,
+			new Keyframe(0.4583F, KeyframeAnimations.posVec(0.0F, 0.0F, 0.0F), AnimationChannel.Interpolations.LINEAR),
+			new Keyframe(0.5F, KeyframeAnimations.posVec(-0.0308F, 0.0168F, -0.0407F), AnimationChannel.Interpolations.LINEAR),
+			new Keyframe(0.75F, KeyframeAnimations.posVec(0.0F, 0.0F, 0.0F), AnimationChannel.Interpolations.LINEAR)
 		))
-		.addBoneAnimation("springs", new Transformation(Transformation.Targets.MOVE_ORIGIN,
-			new Keyframe(0.0F, AnimationHelper.createTranslationalVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
-			new Keyframe(0.4167F, AnimationHelper.createTranslationalVector(0.0F, 0.0F, -3.0F), Transformation.Interpolations.CUBIC),
-			new Keyframe(0.5F, AnimationHelper.createTranslationalVector(0.0F, 0.0F, -11.0F), Transformation.Interpolations.CUBIC)
+		.addAnimation("springs", new AnimationChannel(AnimationChannel.Targets.POSITION,
+			new Keyframe(0.0F, KeyframeAnimations.posVec(0.0F, 0.0F, 0.0F), AnimationChannel.Interpolations.LINEAR),
+			new Keyframe(0.4167F, KeyframeAnimations.posVec(0.0F, 0.0F, -3.0F), AnimationChannel.Interpolations.CATMULLROM),
+			new Keyframe(0.5F, KeyframeAnimations.posVec(0.0F, 0.0F, -11.0F), AnimationChannel.Interpolations.CATMULLROM)
 		))
-		.addBoneAnimation("inner_barrel", new Transformation(Transformation.Targets.ROTATE,
-			new Keyframe(0.0F, AnimationHelper.createRotationalVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
-			new Keyframe(0.5F, AnimationHelper.createRotationalVector(-25.0F, 0.0F, 0.0F), Transformation.Interpolations.CUBIC),
-			new Keyframe(0.75F, AnimationHelper.createRotationalVector(23.44F, 0.0F, 0.0F), Transformation.Interpolations.CUBIC),
-			new Keyframe(1.0F, AnimationHelper.createRotationalVector(-25.7693F, -13.5662F, 6.4608F), Transformation.Interpolations.CUBIC)
+		.addAnimation("inner_barrel", new AnimationChannel(AnimationChannel.Targets.ROTATION,
+			new Keyframe(0.0F, KeyframeAnimations.degreeVec(0.0F, 0.0F, 0.0F), AnimationChannel.Interpolations.LINEAR),
+			new Keyframe(0.5F, KeyframeAnimations.degreeVec(-25.0F, 0.0F, 0.0F), AnimationChannel.Interpolations.CATMULLROM),
+			new Keyframe(0.75F, KeyframeAnimations.degreeVec(23.44F, 0.0F, 0.0F), AnimationChannel.Interpolations.CATMULLROM),
+			new Keyframe(1.0F, KeyframeAnimations.degreeVec(-25.7693F, -13.5662F, 6.4608F), AnimationChannel.Interpolations.CATMULLROM)
 		))
-		.addBoneAnimation("inner_barrel", new Transformation(Transformation.Targets.MOVE_ORIGIN,
-			new Keyframe(0.75F, AnimationHelper.createTranslationalVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
-			new Keyframe(1.0F, AnimationHelper.createTranslationalVector(0.75F, -5.9215F, -3.8646F), Transformation.Interpolations.CUBIC),
-			new Keyframe(1.0833F, AnimationHelper.createTranslationalVector(1.13F, -5.1643F, -4.5796F), Transformation.Interpolations.CUBIC),
-			new Keyframe(1.25F, AnimationHelper.createTranslationalVector(1.85F, -4.6521F, -6.5789F), Transformation.Interpolations.CUBIC)
+		.addAnimation("inner_barrel", new AnimationChannel(AnimationChannel.Targets.POSITION,
+			new Keyframe(0.75F, KeyframeAnimations.posVec(0.0F, 0.0F, 0.0F), AnimationChannel.Interpolations.LINEAR),
+			new Keyframe(1.0F, KeyframeAnimations.posVec(0.75F, -5.9215F, -3.8646F), AnimationChannel.Interpolations.CATMULLROM),
+			new Keyframe(1.0833F, KeyframeAnimations.posVec(1.13F, -5.1643F, -4.5796F), AnimationChannel.Interpolations.CATMULLROM),
+			new Keyframe(1.25F, KeyframeAnimations.posVec(1.85F, -4.6521F, -6.5789F), AnimationChannel.Interpolations.CATMULLROM)
 		))
 		.build();
 }

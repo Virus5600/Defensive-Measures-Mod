@@ -2,10 +2,16 @@ package com.virus5600.defensive_measures.particle.custom;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.*;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.particle.SimpleParticleType;
-import net.minecraft.util.math.random.Random;
+import net.minecraft.client.particle.ParticleProvider;
+import net.minecraft.client.particle.SingleQuadParticle;
+import net.minecraft.client.particle.SpriteSet;
+import net.minecraft.core.particles.SimpleParticleType;
+import net.minecraft.util.RandomSource;
+
+import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 /**
  * Defines the particles emitted by the {@code Flak Projectile} when it explodes.
@@ -14,50 +20,50 @@ import net.minecraft.util.math.random.Random;
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
  */
 @Environment(EnvType.CLIENT)
-public class FlakParticle extends BillboardParticle {
+public class FlakParticle extends SingleQuadParticle {
 	// CONSTRUCTORS //
-	public FlakParticle(ClientWorld level, double x, double y, double z, SpriteProvider spriteSet, double xd, double yd, double zd) {
-		super(level, x, y, z, xd, yd, zd, spriteSet.getFirst());
+	public FlakParticle(ClientLevel level, double x, double y, double z, SpriteSet spriteSet, double xd, double yd, double zd) {
+		super(level, x, y, z, xd, yd, zd, spriteSet.first());
 
 		this.x = x;
 		this.y = y;
 		this.z = z;
 
-		this.gravityStrength = 0.25f;
-		this.collidesWithWorld = true;
+		this.gravity = 0.25f;
+		this.hasPhysics = true;
 
-		this.velocityMultiplier = 0.5f;
-		this.setVelocity(xd, yd, zd);
+		this.friction = 0.5f;
+		this.setParticleSpeed(xd, yd, zd);
 
 		float black = this.random.nextFloat() * 0.5F;
 
-		this.red = black;
-		this.green = black;
-		this.blue = black;
+		this.rCol = black;
+		this.gCol = black;
+		this.bCol = black;
 
-		this.scale = 0.1F * (this.random.nextFloat() * this.random.nextFloat() * 5.0F + 2.5F);
-		this.maxAge = (int)((double)16.0F / ((double)this.random.nextFloat() * 0.8 + 0.2)) + 2;
+		this.quadSize = 0.1F * (this.random.nextFloat() * this.random.nextFloat() * 5.0F + 2.5F);
+		this.lifetime = (int)((double)16.0F / ((double)this.random.nextFloat() * 0.8 + 0.2)) + 2;
 
-		this.updateSprite(spriteSet);
+		this.setSpriteFromAge(spriteSet);
 	}
 
 	// PUBLIC
-	@Override
-	public RenderType getRenderType() {
-		return RenderType.PARTICLE_ATLAS_OPAQUE;
+	@Override @NotNull
+	public Layer getLayer() {
+		return Layer.OPAQUE;
 	}
 
 	// FACTORIES //
 
 	@Environment(EnvType.CLIENT)
-	public static class Factory implements ParticleFactory<SimpleParticleType> {
-		private final SpriteProvider spriteProvider;
+	public static class Factory implements ParticleProvider<SimpleParticleType> {
+		private final SpriteSet spriteProvider;
 
-		public Factory(SpriteProvider spriteProvider) {
+		public Factory(SpriteSet spriteProvider) {
 			this.spriteProvider = spriteProvider;
 		}
 
-		public Particle createParticle(SimpleParticleType type, ClientWorld level, double x, double y, double z, double xd, double yd, double zd, Random random) {
+		public Particle createParticle(@NonNull SimpleParticleType type, @NonNull ClientLevel level, double x, double y, double z, double xd, double yd, double zd, @NonNull RandomSource random) {
 			return new FlakParticle(level, x, y, z, this.spriteProvider, xd, yd, zd);
 		}
 	}

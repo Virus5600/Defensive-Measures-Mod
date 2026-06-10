@@ -1,8 +1,8 @@
 package com.virus5600.defensive_measures.model.projectiles;
 
-import net.minecraft.client.model.ModelData;
-import net.minecraft.client.model.ModelPart;
-import net.minecraft.client.model.TexturedModelData;
+import net.minecraft.client.model.geom.ModelPart;
+import net.minecraft.client.model.geom.builders.LayerDefinition;
+import net.minecraft.client.model.geom.builders.MeshDefinition;
 
 import com.virus5600.defensive_measures.renderer.projectiles.state.BaseProjectileRenderState;
 
@@ -12,9 +12,9 @@ public class FlammableAerosolModel extends BaseProjectileModel<BaseProjectileRen
 		super(root);
 	}
 
-	public static TexturedModelData getTexturedModelData() {
-		ModelData modelData = new ModelData();
+	public static LayerDefinition getTexturedModelData() {
+		MeshDefinition modelData = new MeshDefinition();
 
-		return TexturedModelData.of(modelData, 8, 8);
+		return LayerDefinition.create(modelData, 8, 8);
 	}
 }

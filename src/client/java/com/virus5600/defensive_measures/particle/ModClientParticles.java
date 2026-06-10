@@ -1,13 +1,12 @@
 package com.virus5600.defensive_measures.particle;
 
-import com.virus5600.defensive_measures.DefensiveMeasures;
-
-import com.virus5600.defensive_measures.particle.custom.*;
-import com.virus5600.defensive_measures.particle.custom.emitters.*;
-
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.particle.v1.ParticleFactoryRegistry;
+
+import com.virus5600.defensive_measures.DefensiveMeasures;
+import com.virus5600.defensive_measures.particle.custom.*;
+import com.virus5600.defensive_measures.particle.custom.emitters.*;
 
 /**
  * Client-side particle registration.

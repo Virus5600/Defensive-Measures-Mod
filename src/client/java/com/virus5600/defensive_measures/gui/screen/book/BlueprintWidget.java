@@ -1,17 +1,17 @@
 package com.virus5600.defensive_measures.gui.screen.book;
 
-import net.minecraft.client.gui.screen.ButtonTextures;
-import net.minecraft.client.gui.screen.recipebook.GhostRecipe;
-import net.minecraft.client.gui.screen.recipebook.RecipeResultCollection;
-import net.minecraft.item.Items;
-import net.minecraft.recipe.RecipeFinder;
-import net.minecraft.recipe.display.RecipeDisplay;
-import net.minecraft.recipe.display.SlotDisplay;
-import net.minecraft.screen.AbstractCraftingScreenHandler;
-import net.minecraft.screen.slot.Slot;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.context.ContextParameterMap;
+import net.minecraft.client.gui.components.WidgetSprites;
+import net.minecraft.client.gui.screens.recipebook.GhostSlots;
+import net.minecraft.client.gui.screens.recipebook.RecipeCollection;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
+import net.minecraft.util.context.ContextMap;
+import net.minecraft.world.entity.player.StackedItemContents;
+import net.minecraft.world.inventory.AbstractCraftingMenu;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.display.RecipeDisplay;
+import net.minecraft.world.item.crafting.display.SlotDisplay;
 
 import com.virus5600.defensive_measures.item.ModItems;
 import com.virus5600.defensive_measures.recipe.book.ModRecipeBookCategories;
@@ -20,23 +20,23 @@ import com.virus5600.defensive_measures.recipebook.ModRecipeBookType;
 
 import java.util.List;
 
-public class BlueprintWidget extends BaseRecipeBookWidget<AbstractCraftingScreenHandler> {
-	private static final ButtonTextures FILTER_BUTTON_TEXTURES = new ButtonTextures(Identifier.ofVanilla("recipe_book/filter_enabled"), Identifier.ofVanilla("recipe_book/filter_disabled"), Identifier.ofVanilla("recipe_book/filter_enabled_highlighted"), Identifier.ofVanilla("recipe_book/filter_disabled_highlighted"));
-	private static final Text TOGGLE_CRAFTABLE_TEXT = Text.translatable("gui.recipebook.toggleRecipes.craftable");
+public class BlueprintWidget extends BaseRecipeBookWidget<AbstractCraftingMenu> {
+	private static final WidgetSprites FILTER_BUTTON_TEXTURES = new WidgetSprites(Identifier.withDefaultNamespace("recipe_book/filter_enabled"), Identifier.withDefaultNamespace("recipe_book/filter_disabled"), Identifier.withDefaultNamespace("recipe_book/filter_enabled_highlighted"), Identifier.withDefaultNamespace("recipe_book/filter_disabled_highlighted"));
+	private static final Component TOGGLE_CRAFTABLE_TEXT = Component.translatable("gui.recipebook.toggleRecipes.craftable");
 	private static final List<BaseRecipeBookWidget.Tab> TABS;
 
-	public BlueprintWidget(AbstractCraftingScreenHandler screenHandler) {
+	public BlueprintWidget(AbstractCraftingMenu screenHandler) {
 		super(screenHandler, TABS);
 	}
 
 	protected boolean isCraftingSlot(Slot slot) {
-		return this.screenHandler.getOutputSlot() == slot ||
-			this.screenHandler.getInputSlots().contains(slot);
+		return this.screenHandler.getResultSlot() == slot ||
+			this.screenHandler.getInputGridSlots().contains(slot);
 	}
 
 	private boolean canDisplay(RecipeDisplay display) {
-		int parentWidth = this.screenHandler.getWidth();
-		int parentHeight = this.screenHandler.getHeight();
+		int parentWidth = this.screenHandler.getGridWidth();
+		int parentHeight = this.screenHandler.getGridHeight();
 		boolean result;
 
 		switch (display) {
@@ -47,15 +47,15 @@ public class BlueprintWidget extends BaseRecipeBookWidget<AbstractCraftingScreen
 		return result;
 	}
 
-	protected void showGhostRecipe(GhostRecipe ghostRecipe, RecipeDisplay display, ContextParameterMap context) {
+	protected void showGhostRecipe(GhostSlots ghostRecipe, RecipeDisplay display, ContextMap context) {
 		switch (display) {
 			case TASCraftingRecipeDisplay tasCraftingRecipeDisplay -> {
-				List<Slot> inputSlots = this.screenHandler.getInputSlots();
+				List<Slot> inputSlots = this.screenHandler.getInputGridSlots();
 				List<SlotDisplay> ingredients = tasCraftingRecipeDisplay.ingredients();
 				int recipeWidth = tasCraftingRecipeDisplay.width();
 				int recipeHeight = tasCraftingRecipeDisplay.height();
-				int gridWidth = this.screenHandler.getWidth();
-				int gridHeight = this.screenHandler.getHeight();
+				int gridWidth = this.screenHandler.getGridWidth();
+				int gridHeight = this.screenHandler.getGridHeight();
 
 				// Center the recipe in the grid
 				int startX = (gridWidth - recipeWidth) / 2;
@@ -71,11 +71,11 @@ public class BlueprintWidget extends BaseRecipeBookWidget<AbstractCraftingScreen
 					int slotIndex = actualY * gridWidth + actualX;
 
 					if (slotIndex < inputSlots.size()) {
-						ghostRecipe.addInputs(inputSlots.get(slotIndex), context, ingredients.get(i));
+						ghostRecipe.setInput(inputSlots.get(slotIndex), context, ingredients.get(i));
 					}
 				}
 
-				ghostRecipe.addResults(this.screenHandler.getOutputSlot(), context, tasCraftingRecipeDisplay.result());
+				ghostRecipe.setResult(this.screenHandler.getResultSlot(), context, tasCraftingRecipeDisplay.result());
 			}
 
 			default -> {
@@ -83,16 +83,16 @@ public class BlueprintWidget extends BaseRecipeBookWidget<AbstractCraftingScreen
 		}
 	}
 
-	protected ButtonTextures getBookButtonTextures() {
+	protected WidgetSprites getBookButtonTextures() {
 		return FILTER_BUTTON_TEXTURES;
 	}
 
-	protected Text getToggleCraftableButtonText() {
+	protected Component getToggleCraftableButtonText() {
 		return TOGGLE_CRAFTABLE_TEXT;
 	}
 
-	protected void populateRecipes(RecipeResultCollection recipeResultCollection, RecipeFinder recipeFinder) {
-		recipeResultCollection.populateRecipes(recipeFinder, this::canDisplay);
+	protected void populateRecipes(RecipeCollection recipeResultCollection, StackedItemContents recipeFinder) {
+		recipeResultCollection.selectRecipes(recipeFinder, this::canDisplay);
 	}
 
 	// //////////////// //

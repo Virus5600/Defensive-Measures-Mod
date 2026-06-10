@@ -1,6 +1,6 @@
 package com.virus5600.defensive_measures.renderer.entity;
 
-import net.minecraft.client.render.entity.EntityRendererFactory;
+import net.minecraft.client.renderer.entity.EntityRendererProvider;
 
 import com.virus5600.defensive_measures.entity.turrets.tier2.FlameTurretEntity;
 import com.virus5600.defensive_measures.model.ModEntityModels;
@@ -13,10 +13,10 @@ public class FlameTurretRenderer extends BaseTurretRenderer<
 	FlameTurretModel
 	> {
 
-	public FlameTurretRenderer(EntityRendererFactory.Context ctx) {
+	public FlameTurretRenderer(EntityRendererProvider.Context ctx) {
 		super(
 			ctx,
-			new FlameTurretModel(ctx.getPart(ModEntityModels.FLAME_TURRET)),
+			new FlameTurretModel(ctx.bakeLayer(ModEntityModels.FLAME_TURRET)),
 			BaseTurretRenderState::new
 		);
 	}

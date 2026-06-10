@@ -1,18 +1,18 @@
 package com.virus5600.defensive_measures.model.projectiles;
 
-import net.minecraft.client.model.ModelPart;
-import net.minecraft.client.render.entity.animation.Animation;
-import net.minecraft.entity.projectile.ProjectileEntity;
+import net.minecraft.client.animation.KeyframeAnimation;
+import net.minecraft.client.model.geom.ModelPart;
+import net.minecraft.world.entity.projectile.Projectile;
 
-import com.virus5600.defensive_measures.renderer.projectiles.state.BaseProjectileRenderState;
 import com.virus5600.defensive_measures.model.BaseModel;
+import com.virus5600.defensive_measures.renderer.projectiles.state.BaseProjectileRenderState;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
  * A base model for projectiles shot by turrets. It handles all the common logic for rendering a
- * {@link ProjectileEntity projectile entity}. The class also provides helper methods commonly
+ * {@link Projectile projectile entity}. The class also provides helper methods commonly
  * used by projectiles, which are also overridables so that you can customize the rendering
  * behavior of the turret.
  * <br><br>
@@ -38,7 +38,7 @@ import org.jetbrains.annotations.Nullable;
 public abstract class BaseProjectileModel<S extends BaseProjectileRenderState> extends BaseModel<S> {
 
 	/** An optional looping animation of the custom projectile. */
-	protected final Animation loopAnim;
+	protected final KeyframeAnimation loopAnim;
 
 	// //////////// //
 	// CONSTRUCTORS //
@@ -89,8 +89,8 @@ public abstract class BaseProjectileModel<S extends BaseProjectileRenderState> e
 	 * @see #baseTexture
 	 */
 	public BaseProjectileModel(
-		@NotNull ModelPart root,@NotNull String texturePath, @NotNull String[] textures,
-		@Nullable Animation loopAnim
+		@NotNull ModelPart root, @NotNull String texturePath, @NotNull String[] textures,
+		@Nullable KeyframeAnimation loopAnim
 	) {
 		super(root, texturePath, textures);
 

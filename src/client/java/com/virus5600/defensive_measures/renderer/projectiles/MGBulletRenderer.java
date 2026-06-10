@@ -1,6 +1,6 @@
 package com.virus5600.defensive_measures.renderer.projectiles;
 
-import net.minecraft.client.render.entity.EntityRendererFactory;
+import net.minecraft.client.renderer.entity.EntityRendererProvider;
 
 import com.virus5600.defensive_measures.entity.projectiles.MGBulletEntity;
 import com.virus5600.defensive_measures.model.ModEntityModels;
@@ -13,10 +13,10 @@ public class MGBulletRenderer extends BaseProjectileRenderer<
 	MGBulletModel
 	> {
 
-	public MGBulletRenderer(EntityRendererFactory.Context ctx) {
+	public MGBulletRenderer(EntityRendererProvider.Context ctx) {
 		super(
 			ctx,
-			new MGBulletModel(ctx.getPart(ModEntityModels.MG_BULLET)),
+			new MGBulletModel(ctx.bakeLayer(ModEntityModels.MG_BULLET)),
 			0.125f,
 			BaseProjectileRenderState::new
 		);

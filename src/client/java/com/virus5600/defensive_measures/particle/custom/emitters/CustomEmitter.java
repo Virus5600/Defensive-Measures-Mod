@@ -1,13 +1,14 @@
 package com.virus5600.defensive_measures.particle.custom.emitters;
 
-import com.virus5600.defensive_measures.entity.projectiles.FlakProjectileEntity;
-import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.NoRenderParticle;
-import net.minecraft.client.particle.ParticleManager;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.entity.Entity;
-import net.minecraft.particle.ParticleEffect;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.client.particle.ParticleEngine;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.phys.Vec3;
+
+import com.virus5600.defensive_measures.entity.projectiles.FlakProjectileEntity;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -30,7 +31,7 @@ public class CustomEmitter extends NoRenderParticle {
 	/**
 	 * The particle that will be emitted by the emitter.
 	 */
-	private final ParticleEffect particle;
+	private final ParticleOptions particle;
 	/**
 	 * The entity that is the source of the particle.
 	 */
@@ -38,13 +39,13 @@ public class CustomEmitter extends NoRenderParticle {
 	/**
 	 * Defines the particle manager used for this emitter.
 	 */
-	protected final ParticleManager particleManager;
+	protected final ParticleEngine particleManager;
 
 	/**
 	 * The vector position of the source of the particle. This could be a
 	 * static position or the position of the source entity.
 	 */
-	private Vec3d posSource;
+	private Vec3 posSource;
 	/**
 	 * Determines whether the source of the particle is an entity. This
 	 * identifies whether this instance used the entity constructor or
@@ -87,7 +88,7 @@ public class CustomEmitter extends NoRenderParticle {
 	 *
 	 * @see #tick()
 	 */
-	protected Function<ParticleEffect, Void> customEmitterCode;
+	protected Function<ParticleOptions, Void> customEmitterCode;
 
 	// CONSTRUCTORS - VEC3D //
 
@@ -102,7 +103,7 @@ public class CustomEmitter extends NoRenderParticle {
 	 * @param y The y-coordinate of the particle.
 	 * @param z The z-coordinate of the particle.
 	 */
-	CustomEmitter(ClientWorld world, @NotNull ParticleEffect particle, double x, double y, double z) {
+	CustomEmitter(ClientLevel world, @NotNull ParticleOptions particle, double x, double y, double z) {
 		this(world, particle, x, y, z, 8);
 	}
 
@@ -118,7 +119,7 @@ public class CustomEmitter extends NoRenderParticle {
 	 * @param z The z-coordinate of the particle.
 	 * @param maxAge The maximum age of the particle.
 	 */
-	CustomEmitter(ClientWorld world, @NotNull ParticleEffect particle, double x, double y, double z, int maxAge) {
+	CustomEmitter(ClientLevel world, @NotNull ParticleOptions particle, double x, double y, double z, int maxAge) {
 		this(world, particle, x, y, z, maxAge, 0, 0, 0);
 	}
 
@@ -138,16 +139,16 @@ public class CustomEmitter extends NoRenderParticle {
 	 * @param vy The y-velocity of the particle.
 	 * @param vz The z-velocity of the particle.
 	 */
-	CustomEmitter(ClientWorld world, @NotNull ParticleEffect particle, double x, double y, double z, int maxAge, double vx, double vy, double vz) {
+	CustomEmitter(ClientLevel world, @NotNull ParticleOptions particle, double x, double y, double z, int maxAge, double vx, double vy, double vz) {
 		super(world, x, y, z, vx, vy, vz);
 
-		this.maxAge = maxAge;
+		this.lifetime = maxAge;
 		this.particle = particle;
 		this.entity = null;
-		this.posSource = new Vec3d(x, y, z);
+		this.posSource = new Vec3(x, y, z);
 		this.isEntitySource = false;
 
-		this.particleManager = MinecraftClient.getInstance().particleManager;
+		this.particleManager = Minecraft.getInstance().particleEngine;
 	}
 
 	// CONSTRUCTORS - ENTITY //
@@ -161,7 +162,7 @@ public class CustomEmitter extends NoRenderParticle {
 	 * @param entity The entity that will be the source of the particle.
 	 * @param particle The particle that will be added.
 	 */
-	CustomEmitter(ClientWorld world, @NotNull Entity entity, @NotNull ParticleEffect particle) {
+	CustomEmitter(ClientLevel world, @NotNull Entity entity, @NotNull ParticleOptions particle) {
 		this(world, entity, particle, 8);
 	}
 
@@ -175,7 +176,7 @@ public class CustomEmitter extends NoRenderParticle {
 	 * @param particle The particle that will be added.
 	 * @param maxAge The maximum age of the particle.
 	 */
-	CustomEmitter(ClientWorld world, @NotNull Entity entity, @NotNull ParticleEffect particle, int maxAge) {
+	CustomEmitter(ClientLevel world, @NotNull Entity entity, @NotNull ParticleOptions particle, int maxAge) {
 		this(world, entity, particle, maxAge, 0, 0, 0);
 	}
 
@@ -193,15 +194,15 @@ public class CustomEmitter extends NoRenderParticle {
 	 * @param vy The y-velocity of the particle.
 	 * @param vz The z-velocity of the particle.
 	 */
-	CustomEmitter(ClientWorld world, @NotNull Entity entity, @NotNull ParticleEffect particle, int maxAge, double vx, double vy, double vz) {
+	CustomEmitter(ClientLevel world, @NotNull Entity entity, @NotNull ParticleOptions particle, int maxAge, double vx, double vy, double vz) {
 		super(world, entity.getX(), entity.getY(), entity.getZ(), vx, vy, vz);
 
-		this.maxAge = maxAge;
+		this.lifetime = maxAge;
 		this.particle = particle;
-		this.posSource = entity.getTrackedPosition().getPos();
+		this.posSource = entity.getPositionCodec().getBase();
 		this.entity = entity;
 
-		this.particleManager = MinecraftClient.getInstance().particleManager;
+		this.particleManager = Minecraft.getInstance().particleEngine;
 	}
 
 	// METHODS //
@@ -226,8 +227,8 @@ public class CustomEmitter extends NoRenderParticle {
 	public void tick() {
 		if (this.updatePosSource && this.isEntitySource && this.entity != null) {
 			this.posSource = this.useEyePos ?
-				this.entity.getEyePos() :
-				this.entity.getTrackedPosition().getPos();
+				this.entity.getEyePosition() :
+				this.entity.getPositionCodec().getBase();
 		}
 
 		// Custom emitter code
@@ -241,10 +242,10 @@ public class CustomEmitter extends NoRenderParticle {
 				double yVel = this.random.nextFloat() * 2.0F - 1.0F;
 				double zVel = this.random.nextFloat() * 2.0F - 1.0F;
 				if (!(xVel * xVel + yVel * yVel + zVel * zVel > 1.0) && this.entity != null) {
-					double xPos = this.entity.getBodyX(xVel / 4.0);
-					double yPos = this.entity.getBodyY(0.5 + yVel / 4.0);
-					double zPos = this.entity.getBodyZ(zVel / 4.0);
-					this.world.addParticleClient(
+					double xPos = this.entity.getX(xVel / 4.0);
+					double yPos = this.entity.getY(0.5 + yVel / 4.0);
+					double zPos = this.entity.getZ(zVel / 4.0);
+					this.level.addParticle(
 						this.particle,
 						this.forceShow, this.forceShow,
 						xPos, yPos, zPos,
@@ -255,8 +256,8 @@ public class CustomEmitter extends NoRenderParticle {
 		}
 
 		this.age++;
-		if (this.age > this.maxAge) {
-			this.markDead();
+		if (this.age > this.lifetime) {
+			this.remove();
 		}
 	}
 
@@ -264,12 +265,12 @@ public class CustomEmitter extends NoRenderParticle {
 	 * Gets the Vec3d position of the source of the particle.
 	 * @return The position of the source of the particle.
 	 */
-	protected Vec3d getPosSource() {
+	protected Vec3 getPosSource() {
 		return this.posSource;
 	}
 
 	// PROTECTED
-	protected void explodeBall(ParticleEffect particle, double size, int amount, double variance) {
+	protected void explodeBall(ParticleOptions particle, double size, int amount, double variance) {
 		size += this.random.nextGaussian() * variance;
 
 		for (int i = -amount; i <= amount; ++i) {
@@ -280,13 +281,7 @@ public class CustomEmitter extends NoRenderParticle {
 					double l = (double) k + (this.random.nextDouble() - this.random.nextDouble()) * (double) 0.5F;
 					double m = Math.sqrt(g * g + h * h + l * l) / size + this.random.nextGaussian() * 0.05;
 
-//					this.particleManager.addParticle(
-//						particle,
-//						this.x, this.y, this.z,
-//						g / m, h / m, l / m
-//					);
-
-					this.world.addParticleClient(
+					this.level.addParticle(
 						particle,
 						this.forceShow, this.forceShow,
 						this.x, this.y, this.z,

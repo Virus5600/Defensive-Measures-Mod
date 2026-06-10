@@ -1,11 +1,13 @@
 package com.virus5600.defensive_measures.renderer.entity;
 
-import net.minecraft.client.render.entity.EntityRendererFactory;
+import net.minecraft.client.renderer.entity.EntityRendererProvider;
 
 import com.virus5600.defensive_measures.entity.turrets.tier2.MissileTurretEntity;
 import com.virus5600.defensive_measures.model.ModEntityModels;
 import com.virus5600.defensive_measures.model.entity.MissileTurretModel;
 import com.virus5600.defensive_measures.renderer.entity.state.MissileTurretRenderState;
+
+import org.jspecify.annotations.NonNull;
 
 public class MissileTurretRenderer extends BaseTurretRenderer<
 	MissileTurretEntity,
@@ -13,10 +15,10 @@ public class MissileTurretRenderer extends BaseTurretRenderer<
 	MissileTurretModel
 	> {
 
-	public MissileTurretRenderer(EntityRendererFactory.Context ctx) {
+	public MissileTurretRenderer(EntityRendererProvider.Context ctx) {
 		super(
 			ctx,
-			new MissileTurretModel(ctx.getPart(ModEntityModels.MISSILE_TURRET)),
+			new MissileTurretModel(ctx.bakeLayer(ModEntityModels.MISSILE_TURRET)),
 			MissileTurretRenderState::new
 		);
 
@@ -27,8 +29,8 @@ public class MissileTurretRenderer extends BaseTurretRenderer<
 	// OVERRIDE //
 	// //////// //
 	@Override
-	public void updateRenderState(MissileTurretEntity turret, MissileTurretRenderState state, float tickProgress) {
-		super.updateRenderState(turret, state, tickProgress);
+	public void extractRenderState(@NonNull MissileTurretEntity turret, @NonNull MissileTurretRenderState state, float tickProgress) {
+		super.extractRenderState(turret, state, tickProgress);
 
 		state.maxRange = turret.getMaxAttackRange();
 	}

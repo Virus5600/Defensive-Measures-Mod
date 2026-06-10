@@ -2,13 +2,13 @@ package com.virus5600.defensive_measures.gui.screen.ingame;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.gl.RenderPipelines;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.ScreenPos;
-import net.minecraft.client.gui.screen.ButtonTextures;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.WidgetSprites;
+import net.minecraft.client.gui.navigation.ScreenPosition;
+import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.entity.player.Inventory;
 
 import com.virus5600.defensive_measures.DefensiveMeasures;
 import com.virus5600.defensive_measures.gui.screen.book.BlueprintWidget;
@@ -16,48 +16,48 @@ import com.virus5600.defensive_measures.screen.TurretAssemblyStationScreenHandle
 
 @Environment(EnvType.CLIENT)
 public class TurretAssemblyStationScreen extends BaseRecipeBookScreen<TurretAssemblyStationScreenHandler> {
-	private static final Identifier TEXTURE = Identifier.of(DefensiveMeasures.MOD_ID, "textures/gui/container/turret_assembly_station.png");
+	private static final Identifier TEXTURE = Identifier.fromNamespaceAndPath(DefensiveMeasures.MOD_ID, "textures/gui/container/turret_assembly_station.png");
 
-	public TurretAssemblyStationScreen(TurretAssemblyStationScreenHandler screenHandler, PlayerInventory inventory, Text title) {
+	public TurretAssemblyStationScreen(TurretAssemblyStationScreenHandler screenHandler, Inventory inventory, Component title) {
 		super(screenHandler, new BlueprintWidget(screenHandler), inventory, title);
 	}
 
 	protected void init() {
-		this.backgroundWidth = 256;
-		this.backgroundHeight = 242;
+		this.imageWidth = 256;
+		this.imageHeight = 242;
 
-		this.titleX = 29;
-		this.titleY = 6;
+		this.titleLabelX = 29;
+		this.titleLabelY = 6;
 
-		this.playerInventoryTitleX = 65;
-		this.playerInventoryTitleY = this.backgroundHeight - 96;
+		this.inventoryLabelX = 65;
+		this.inventoryLabelY = this.imageHeight - 96;
 
 		super.init();
 	}
 
-	protected ScreenPos getRecipeBookButtonPos() {
-		return new ScreenPos(
-			this.x + 27,
+	protected ScreenPosition getRecipeBookButtonPos() {
+		return new ScreenPosition(
+			this.leftPos + 27,
 			this.height / 2 + 55
 		);
 	}
 
 	@Override
-	protected ButtonTextures getButtonTexture() {
-		return new ButtonTextures(
-			Identifier.of(DefensiveMeasures.MOD_ID, "blueprint/button"),
-			Identifier.of(DefensiveMeasures.MOD_ID, "blueprint/button_highlighted")
+	protected WidgetSprites getButtonTexture() {
+		return new WidgetSprites(
+			Identifier.fromNamespaceAndPath(DefensiveMeasures.MOD_ID, "blueprint/button"),
+			Identifier.fromNamespaceAndPath(DefensiveMeasures.MOD_ID, "blueprint/button_highlighted")
 		);
 	}
 
-	protected void drawBackground(DrawContext context, float deltaTicks, int mouseX, int mouseY) {
-		int x = this.x;
-		int y = (this.height - this.backgroundHeight) / 2;
+	protected void renderBg(GuiGraphics context, float deltaTicks, int mouseX, int mouseY) {
+		int x = this.leftPos;
+		int y = (this.height - this.imageHeight) / 2;
 
-		context.drawTexture(
+		context.blit(
 			RenderPipelines.GUI_TEXTURED, TEXTURE,
 			x, y, 0.0F, 0.0F,
-			this.backgroundWidth, this.backgroundHeight,
+			this.imageWidth, this.imageHeight,
 			256, 256
 		);
 	}

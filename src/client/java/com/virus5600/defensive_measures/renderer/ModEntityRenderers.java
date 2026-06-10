@@ -1,6 +1,6 @@
 package com.virus5600.defensive_measures.renderer;
 
-import net.minecraft.client.render.entity.EntityRendererFactories;
+import net.minecraft.client.renderer.entity.EntityRenderers;
 
 import com.virus5600.defensive_measures.DefensiveMeasures;
 import com.virus5600.defensive_measures.entity.ModEntities;
@@ -26,27 +26,27 @@ public class ModEntityRenderers {
 		// /////// //
 
 		// v1.0.0-beta
-		EntityRendererFactories.register(ModEntities.CANNON_TURRET, CannonTurretRenderer::new);
-		EntityRendererFactories.register(ModEntities.BALLISTA_TURRET, BallistaTurretRenderer::new);
-		EntityRendererFactories.register(ModEntities.MG_TURRET, MGTurretRenderer::new);
+		EntityRenderers.register(ModEntities.CANNON_TURRET, CannonTurretRenderer::new);
+		EntityRenderers.register(ModEntities.BALLISTA_TURRET, BallistaTurretRenderer::new);
+		EntityRenderers.register(ModEntities.MG_TURRET, MGTurretRenderer::new);
 
 		// v1.1.0-beta
-		EntityRendererFactories.register(ModEntities.AA_TURRET, AATurretRenderer::new);
-		EntityRendererFactories.register(ModEntities.FLAME_TURRET, FlameTurretRenderer::new);
-		EntityRendererFactories.register(ModEntities.MISSILE_TURRET, MissileTurretRenderer::new);
+		EntityRenderers.register(ModEntities.AA_TURRET, AATurretRenderer::new);
+		EntityRenderers.register(ModEntities.FLAME_TURRET, FlameTurretRenderer::new);
+		EntityRenderers.register(ModEntities.MISSILE_TURRET, MissileTurretRenderer::new);
 
 		// /////////// //
 		// PROJECTILES //
 		// /////////// //
 
 		// v1.0.0-beta
-		EntityRendererFactories.register(ModEntities.CANNONBALL, CannonballRenderer::new);
-		EntityRendererFactories.register(ModEntities.BALLISTA_BOLT, BallistaBoltRenderer::new);
-		EntityRendererFactories.register(ModEntities.MG_BULLET, MGBulletRenderer::new);
+		EntityRenderers.register(ModEntities.CANNONBALL, CannonballRenderer::new);
+		EntityRenderers.register(ModEntities.BALLISTA_BOLT, BallistaBoltRenderer::new);
+		EntityRenderers.register(ModEntities.MG_BULLET, MGBulletRenderer::new);
 
 		// v1.1.0-beta
-		EntityRendererFactories.register(ModEntities.FLAK_PROJECTILE, FlakProjectileRenderer::new);
-		EntityRendererFactories.register(ModEntities.FLAMMABLE_AEROSOL, FlammableAerosolRenderer::new);
-		EntityRendererFactories.register(ModEntities.MICRO_MISSILE, MicroMissileRenderer::new);
+		EntityRenderers.register(ModEntities.FLAK_PROJECTILE, FlakProjectileRenderer::new);
+		EntityRenderers.register(ModEntities.FLAMMABLE_AEROSOL, FlammableAerosolRenderer::new);
+		EntityRenderers.register(ModEntities.MICRO_MISSILE, MicroMissileRenderer::new);
 	}
 }

@@ -1,6 +1,6 @@
 package com.virus5600.defensive_measures.renderer.entity;
 
-import net.minecraft.client.render.entity.EntityRendererFactory;
+import net.minecraft.client.renderer.entity.EntityRendererProvider;
 
 import com.virus5600.defensive_measures.entity.turrets.tier2.AATurretEntity;
 import com.virus5600.defensive_measures.model.ModEntityModels;
@@ -13,10 +13,10 @@ public class AATurretRenderer extends BaseTurretRenderer<
 	AATurretModel
 	> {
 
-	public AATurretRenderer(EntityRendererFactory.Context ctx) {
+	public AATurretRenderer(EntityRendererProvider.Context ctx) {
 		super(
 			ctx,
-			new AATurretModel(ctx.getPart(ModEntityModels.AA_TURRET)),
+			new AATurretModel(ctx.bakeLayer(ModEntityModels.AA_TURRET)),
 			BaseTurretRenderState::new
 		);
 

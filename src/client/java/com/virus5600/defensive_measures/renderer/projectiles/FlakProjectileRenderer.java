@@ -1,11 +1,13 @@
 package com.virus5600.defensive_measures.renderer.projectiles;
 
-import net.minecraft.client.render.entity.EntityRendererFactory;
+import net.minecraft.client.renderer.entity.EntityRendererProvider;
 
 import com.virus5600.defensive_measures.entity.projectiles.FlakProjectileEntity;
 import com.virus5600.defensive_measures.model.ModEntityModels;
 import com.virus5600.defensive_measures.model.projectiles.FlakProjectileModel;
 import com.virus5600.defensive_measures.renderer.projectiles.state.BaseProjectileRenderState;
+
+import org.jspecify.annotations.NonNull;
 
 public class FlakProjectileRenderer extends BaseProjectileRenderer<
 	FlakProjectileEntity,
@@ -13,19 +15,19 @@ public class FlakProjectileRenderer extends BaseProjectileRenderer<
 	FlakProjectileModel
 	> {
 
-	public FlakProjectileRenderer(EntityRendererFactory.Context ctx) {
+	public FlakProjectileRenderer(EntityRendererProvider.Context ctx) {
 		super(
 			ctx,
-			new FlakProjectileModel(ctx.getPart(ModEntityModels.FLAK_PROJECTILE)),
+			new FlakProjectileModel(ctx.bakeLayer(ModEntityModels.FLAK_PROJECTILE)),
 			0.5f,
 			BaseProjectileRenderState::new
 		);
 	}
 
 	@Override
-	public void updateRenderState(FlakProjectileEntity entity, BaseProjectileRenderState state, float tickProgress) {
-		super.updateRenderState(entity, state, tickProgress);
+	public void extractRenderState(@NonNull FlakProjectileEntity entity, @NonNull BaseProjectileRenderState state, float tickProgress) {
+		super.extractRenderState(entity, state, tickProgress);
 
-		state.pitch = entity.getLerpedPitch(tickProgress);
+		state.pitch = entity.getXRot(tickProgress);
 	}
 }

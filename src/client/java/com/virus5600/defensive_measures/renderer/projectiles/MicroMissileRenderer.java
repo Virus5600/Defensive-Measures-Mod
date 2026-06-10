@@ -1,6 +1,6 @@
 package com.virus5600.defensive_measures.renderer.projectiles;
 
-import net.minecraft.client.render.entity.EntityRendererFactory;
+import net.minecraft.client.renderer.entity.EntityRendererProvider;
 
 import com.virus5600.defensive_measures.entity.projectiles.MicroMissileEntity;
 import com.virus5600.defensive_measures.model.ModEntityModels;
@@ -13,10 +13,10 @@ public class MicroMissileRenderer extends BaseProjectileRenderer<
 	MicroMissileModel
 	> {
 
-	public MicroMissileRenderer(EntityRendererFactory.Context ctx) {
+	public MicroMissileRenderer(EntityRendererProvider.Context ctx) {
 		super(
 			ctx,
-			new MicroMissileModel(ctx.getPart(ModEntityModels.MICRO_MISSILE)),
+			new MicroMissileModel(ctx.bakeLayer(ModEntityModels.MICRO_MISSILE)),
 			0.5f,
 			BaseProjectileRenderState::new
 		);

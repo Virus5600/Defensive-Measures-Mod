@@ -1,6 +1,9 @@
 package com.virus5600.defensive_measures.model.projectiles;
 
 import net.minecraft.client.model.*;
+import net.minecraft.client.model.geom.ModelPart;
+import net.minecraft.client.model.geom.PartPose;
+import net.minecraft.client.model.geom.builders.*;
 
 import com.virus5600.defensive_measures.renderer.projectiles.state.BaseProjectileRenderState;
 
@@ -13,19 +16,19 @@ public class MicroMissileModel extends BaseProjectileModel<BaseProjectileRenderS
 		super(root, "missile_turret", TEXTURES);
 	}
 
-	public static TexturedModelData getTexturedModelData() {
-		ModelData modelData = new ModelData();
-		ModelPartData modelPartData = modelData.getRoot();
+	public static LayerDefinition getTexturedModelData() {
+		MeshDefinition modelData = new MeshDefinition();
+		PartDefinition modelPartData = modelData.getRoot();
 
-		ModelPartData projectile = modelPartData.addChild("projectile", ModelPartBuilder.create()
-			.uv(24, 14).cuboid(-0.5F, -0.5F, -1.0F, 1.0F, 1.0F, 19.0F, new Dilation(0.0F))
-			.uv(42, 32).cuboid(-0.5F, -0.5F, -1.5F, 1.0F, 1.0F, 1.0F, new Dilation(-0.125F)), ModelTransform.origin(0.0F, 1.0F, -8.0F));
-		projectile.addChild("fins", ModelPartBuilder.create()
-			.uv(40, 32).cuboid(0.0F, -1.0F, 7.5F, 0.0F, 1.0F, 2.0F, new Dilation(0.0F))
-			.uv(44, 32).cuboid(0.0F, 0F, 7.5F, 0.0F, 1.0F, 2.0F, new Dilation(0.0F))
-			.uv(43, 31).cuboid(-1.0F, 0.0F, 7.5F, 1.0F, 0.0F, 2.0F, new Dilation(0.0F))
-			.uv(39, 31).cuboid(0.0F, 0.0F, 7.5F, 1.0F, 0.0F, 2.0F, new Dilation(0.0F)), ModelTransform.origin(0.0F, 0.0F, 8.5F));
+		PartDefinition projectile = modelPartData.addOrReplaceChild("projectile", CubeListBuilder.create()
+			.texOffs(24, 14).addBox(-0.5F, -0.5F, -1.0F, 1.0F, 1.0F, 19.0F, new CubeDeformation(0.0F))
+			.texOffs(42, 32).addBox(-0.5F, -0.5F, -1.5F, 1.0F, 1.0F, 1.0F, new CubeDeformation(-0.125F)), PartPose.offset(0.0F, 1.0F, -8.0F));
+		projectile.addOrReplaceChild("fins", CubeListBuilder.create()
+			.texOffs(40, 32).addBox(0.0F, -1.0F, 7.5F, 0.0F, 1.0F, 2.0F, new CubeDeformation(0.0F))
+			.texOffs(44, 32).addBox(0.0F, 0F, 7.5F, 0.0F, 1.0F, 2.0F, new CubeDeformation(0.0F))
+			.texOffs(43, 31).addBox(-1.0F, 0.0F, 7.5F, 1.0F, 0.0F, 2.0F, new CubeDeformation(0.0F))
+			.texOffs(39, 31).addBox(0.0F, 0.0F, 7.5F, 1.0F, 0.0F, 2.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, 0.0F, 8.5F));
 
-		return TexturedModelData.of(modelData, 64, 64);
+		return LayerDefinition.create(modelData, 64, 64);
 	}
 }

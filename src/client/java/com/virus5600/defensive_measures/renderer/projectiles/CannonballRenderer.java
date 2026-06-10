@@ -1,6 +1,6 @@
 package com.virus5600.defensive_measures.renderer.projectiles;
 
-import net.minecraft.client.render.entity.EntityRendererFactory;
+import net.minecraft.client.renderer.entity.EntityRendererProvider;
 
 import com.virus5600.defensive_measures.entity.projectiles.CannonballEntity;
 import com.virus5600.defensive_measures.model.ModEntityModels;
@@ -13,10 +13,10 @@ public class CannonballRenderer extends BaseProjectileRenderer<
 	CannonballModel
 	> {
 
-	public CannonballRenderer(EntityRendererFactory.Context ctx) {
+	public CannonballRenderer(EntityRendererProvider.Context ctx) {
 		super(
 			ctx,
-			new CannonballModel(ctx.getPart(ModEntityModels.CANNONBALL)),
+			new CannonballModel(ctx.bakeLayer(ModEntityModels.CANNONBALL)),
 			0.5f,
 			BaseProjectileRenderState::new
 		);

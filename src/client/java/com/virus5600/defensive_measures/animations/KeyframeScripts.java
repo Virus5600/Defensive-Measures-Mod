@@ -1,15 +1,15 @@
 package com.virus5600.defensive_measures.animations;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityDimensions;
-import net.minecraft.entity.damage.DamageSource;
-import net.minecraft.particle.BlockParticleEffect;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.util.collection.Pool;
-import net.minecraft.world.World;
-import net.minecraft.world.explosion.ExplosionBehavior;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.core.particles.ExplosionParticleInfo;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.util.random.WeightedList;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityDimensions;
+import net.minecraft.world.level.ExplosionDamageCalculator;
+import net.minecraft.world.level.Level;
 
 import com.virus5600.defensive_measures.entity.damage.ModDamageSources;
 import com.virus5600.defensive_measures.entity.damage.ModDamageTypes;
@@ -21,7 +21,7 @@ public class KeyframeScripts {
 
 	static {
 		EXPLODE_SCRIPT = (animState, state, pos) -> {
-			ClientWorld world = MinecraftClient.getInstance().world;
+			ClientLevel world = Minecraft.getInstance().level;
 
 			if (world == null) { return; }
 
@@ -34,15 +34,15 @@ public class KeyframeScripts {
 				dim = entity.getDimensions(entity.getPose());
 			}
 
-			world.createExplosion(
-				entity, src, new ExplosionBehavior(),
-				pos.getX(), pos.getY(), pos.getZ(),
+			world.explode(
+				entity, src, new ExplosionDamageCalculator(),
+				pos.x(), pos.y(), pos.z(),
 				dim.width() + 0.5f, false,
-				World.ExplosionSourceType.NONE,
+				Level.ExplosionInteraction.NONE,
 				ModParticles.FLAK_EXPLOSION,
 				ModParticles.FLAK_EXPLOSION,
-				Pool.<BlockParticleEffect>builder().build(),
-				SoundEvents.ENTITY_GENERIC_EXPLODE
+				WeightedList.<ExplosionParticleInfo>builder().build(),
+				SoundEvents.GENERIC_EXPLODE
 			);
 		};
 	}

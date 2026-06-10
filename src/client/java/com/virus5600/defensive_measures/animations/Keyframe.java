@@ -1,7 +1,7 @@
 package com.virus5600.defensive_measures.animations;
 
-import net.minecraft.client.render.entity.state.EntityRenderState;
-import net.minecraft.entity.AnimationState;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
+import net.minecraft.world.entity.AnimationState;
 
 import com.virus5600.defensive_measures.model.entity.BaseTurretModel;
 import com.virus5600.defensive_measures.renderer.entity.state.BaseTurretRenderState;
@@ -14,11 +14,11 @@ import com.virus5600.defensive_measures.renderer.entity.state.BaseTurretRenderSt
  * However, this {@code Keyframe} class is just a complementary interface for the {@link FXKeyframe},
  * which are then used in the {@code setAngles} method via the {@code additionalDeathAnimProcedures}
  * and {@code additionalShootAnimProcedures} called inside the
- * {@link BaseTurretModel#setAngles(BaseTurretRenderState) setAngles} method. As such, this
+ * {@link BaseTurretModel#setupAnim(BaseTurretRenderState) setAngles} method. As such, this
  * interface is not meant to be implemented by any class other than any keyframe related procedures.
  *
  * @see FXKeyframe
- * @see BaseTurretModel#setAngles(BaseTurretRenderState)
+ * @see BaseTurretModel#setupAnim(BaseTurretRenderState)
  *
  * @since 1.1.0-beta
  * @author <a href="https://github.com/Virus5600">Virus5600</a>

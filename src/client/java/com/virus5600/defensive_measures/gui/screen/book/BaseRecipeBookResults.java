@@ -2,24 +2,24 @@ package com.virus5600.defensive_measures.gui.screen.book;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.Click;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.ButtonTextures;
-import net.minecraft.client.gui.screen.recipebook.CurrentIndexProvider;
-import net.minecraft.client.gui.screen.recipebook.RecipeAlternativesWidget;
-import net.minecraft.client.gui.screen.recipebook.RecipeResultCollection;
-import net.minecraft.client.gui.tooltip.Tooltip;
-import net.minecraft.client.gui.widget.ClickableWidget;
-import net.minecraft.client.gui.widget.TexturedButtonWidget;
-import net.minecraft.client.recipebook.ClientRecipeBook;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.item.ItemStack;
-import net.minecraft.recipe.NetworkRecipeId;
-import net.minecraft.recipe.display.SlotDisplayContexts;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.context.ContextParameterMap;
+import net.minecraft.client.ClientRecipeBook;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.gui.components.ImageButton;
+import net.minecraft.client.gui.components.Tooltip;
+import net.minecraft.client.gui.components.WidgetSprites;
+import net.minecraft.client.gui.screens.recipebook.OverlayRecipeComponent;
+import net.minecraft.client.gui.screens.recipebook.RecipeCollection;
+import net.minecraft.client.gui.screens.recipebook.SlotSelectTime;
+import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
+import net.minecraft.util.context.ContextMap;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.display.RecipeDisplayId;
+import net.minecraft.world.item.crafting.display.SlotDisplayContext;
 
 import java.util.List;
 import java.util.Objects;
@@ -31,38 +31,38 @@ import org.jetbrains.annotations.Nullable;
 
 @Environment(EnvType.CLIENT)
 public class BaseRecipeBookResults {
-	protected static final ButtonTextures PAGE_BACKWARD_TEXTURES = new ButtonTextures(Identifier.ofVanilla("recipe_book/page_backward"), Identifier.ofVanilla("recipe_book/page_backward_highlighted"));
-	protected static final ButtonTextures PAGE_FORWARD_TEXTURES = new ButtonTextures(Identifier.ofVanilla("recipe_book/page_forward"), Identifier.ofVanilla("recipe_book/page_forward_highlighted"));
+	protected static final WidgetSprites PAGE_BACKWARD_TEXTURES = new WidgetSprites(Identifier.withDefaultNamespace("recipe_book/page_backward"), Identifier.withDefaultNamespace("recipe_book/page_backward_highlighted"));
+	protected static final WidgetSprites PAGE_FORWARD_TEXTURES = new WidgetSprites(Identifier.withDefaultNamespace("recipe_book/page_forward"), Identifier.withDefaultNamespace("recipe_book/page_forward_highlighted"));
 
 	private final BaseRecipeBookWidget<?> recipeBookWidget;
-	private final RecipeAlternativesWidget altWidget;
+	private final OverlayRecipeComponent altWidget;
 	private final List<BaseAnimatedResultButton> resultsButtons = Lists.newArrayListWithCapacity(20);
 
-	private MinecraftClient client;
+	private Minecraft client;
 	private ClientRecipeBook recipeBook;
-	private List<RecipeResultCollection> resultCollections;
+	private List<RecipeCollection> resultCollections;
 	private boolean filteringCraftable;
-	private @Nullable TexturedButtonWidget nextPageBtn;
-	private @Nullable TexturedButtonWidget prevPageBtn;
+	private @Nullable ImageButton nextPageBtn;
+	private @Nullable ImageButton prevPageBtn;
 	private @Nullable BaseAnimatedResultButton hoveredResultButton;
-	private @Nullable NetworkRecipeId lastClickedRecipe;
-	private @Nullable RecipeResultCollection resultCollection;
+	private @Nullable RecipeDisplayId lastClickedRecipe;
+	private @Nullable RecipeCollection resultCollection;
 	private int pageCount;
 	private int currentPage;
 	protected int resultCellSize = 25;
 	protected int resultGridTopMargin = 31;
 	protected int resultGridLeftMargin = 11;
 
-	public BaseRecipeBookResults(BaseRecipeBookWidget<?> recipeBookWidget, CurrentIndexProvider currentIndexProvider) {
+	public BaseRecipeBookResults(BaseRecipeBookWidget<?> recipeBookWidget, SlotSelectTime currentIndexProvider) {
 		this.recipeBookWidget = recipeBookWidget;
-		this.altWidget = new RecipeAlternativesWidget(currentIndexProvider, false);
+		this.altWidget = new OverlayRecipeComponent(currentIndexProvider, false);
 
 		for (int i = 0; i < this.getSlotCount(); ++i) {
 			this.resultsButtons.add(new BaseAnimatedResultButton(currentIndexProvider));
 		}
 	}
 
-	public void initialize(MinecraftClient client, int parentLeft, int parentTop) {
+	public void initialize(Minecraft client, int parentLeft, int parentTop) {
 		if (client.player == null) {
 			throw new NullPointerException("Client player is null. Ensure that the client is fully initialized before calling this method.");
 		}
@@ -95,11 +95,11 @@ public class BaseRecipeBookResults {
 			throw new NullPointerException(exceptionMsg);
 		}
 
-		this.prevPageBtn.setTooltip(Tooltip.of(this.getPrevPageTooltip()));
-		this.nextPageBtn.setTooltip(Tooltip.of(this.getNextPageTooltip()));
+		this.prevPageBtn.setTooltip(Tooltip.create(this.getPrevPageTooltip()));
+		this.nextPageBtn.setTooltip(Tooltip.create(this.getNextPageTooltip()));
 	}
 
-	public void setResults(List<RecipeResultCollection> resultCollections, boolean resetCurrentPage, boolean filteringCraftable) {
+	public void setResults(List<RecipeCollection> resultCollections, boolean resetCurrentPage, boolean filteringCraftable) {
 		this.resultCollections = resultCollections;
 		this.filteringCraftable = filteringCraftable;
 		this.pageCount = (int) Math.ceil((double) resultCollections.size() / (double) this.getSlotCount());
@@ -112,18 +112,18 @@ public class BaseRecipeBookResults {
 	}
 
 	protected void refreshResultButtons() {
-		if (this.client.world == null) {
+		if (this.client.level == null) {
 			throw new NullPointerException("Client world is null. Ensure that the client is fully initialized before calling this method.");
 		}
 
 		int i = this.getSlotCount() * this.currentPage;
-		ContextParameterMap cpm = SlotDisplayContexts.createParameters(this.client.world);
+		ContextMap cpm = SlotDisplayContext.fromLevel(this.client.level);
 
 		for (int j = 0; j < this.resultsButtons.size(); j++) {
 			BaseAnimatedResultButton btn = this.resultsButtons.get(j);
 
 			if (i + j < this.resultCollections.size()) {
-				RecipeResultCollection rrc = this.resultCollections.get(i + j);
+				RecipeCollection rrc = this.resultCollections.get(i + j);
 
 				btn.showResultCollection(rrc, this.filteringCraftable, this, cpm);
 				btn.visible = true;
@@ -150,11 +150,11 @@ public class BaseRecipeBookResults {
 		}
 	}
 
-	public void draw(DrawContext context, int x, int y, int mouseX, int mouseY, float deltaTicks) {
+	public void draw(GuiGraphics context, int x, int y, int mouseX, int mouseY, float deltaTicks) {
 		if (this.pageCount > 1) {
-			Text text = Text.translatable("gui.recipebook.page", this.currentPage + 1, this.pageCount);
-			int i = this.client.textRenderer.getWidth(text);
-			context.drawTextWithShadow(this.client.textRenderer, text, x - i / 2 + 73, y + 141, -1);
+			Component text = Component.translatable("gui.recipebook.page", this.currentPage + 1, this.pageCount);
+			int i = this.client.font.width(text);
+			context.drawString(this.client.font, text, x - i / 2 + 73, y + 141, -1);
 		}
 
 		this.hoveredResultButton = null;
@@ -162,7 +162,7 @@ public class BaseRecipeBookResults {
 		for(BaseAnimatedResultButton animatedResultButton : this.resultsButtons) {
 			animatedResultButton.render(context, mouseX, mouseY, deltaTicks);
 
-			if (animatedResultButton.visible && animatedResultButton.isSelected()) {
+			if (animatedResultButton.visible && animatedResultButton.isHoveredOrFocused()) {
 				this.hoveredResultButton = animatedResultButton;
 			}
 		}
@@ -175,30 +175,30 @@ public class BaseRecipeBookResults {
 			this.nextPageBtn.render(context, mouseX, mouseY, deltaTicks);
 		}
 
-		context.createNewRootLayer();
+		context.nextStratum();
 		this.altWidget.render(context, mouseX, mouseY, deltaTicks);
 	}
 
-	public void drawTooltip(DrawContext context, int x, int y) {
-		if (this.client.currentScreen != null &&
+	public void drawTooltip(GuiGraphics context, int x, int y) {
+		if (this.client.screen != null &&
 			this.hoveredResultButton != null &&
 			!this.altWidget.isVisible()) {
 			ItemStack itemStack = this.hoveredResultButton.getDisplayStack();
-			Identifier identifier = itemStack.get(DataComponentTypes.TOOLTIP_STYLE);
+			Identifier identifier = itemStack.get(DataComponents.TOOLTIP_STYLE);
 
-			context.drawTooltip(
-				this.client.textRenderer,
+			context.setComponentTooltipForNextFrame(
+				this.client.font,
 				this.hoveredResultButton.getTooltip(itemStack),
 				x, y, identifier
 			);
 		}
 	}
 
-	public @Nullable NetworkRecipeId getLastClickedRecipe() {
+	public @Nullable RecipeDisplayId getLastClickedRecipe() {
 		return this.lastClickedRecipe;
 	}
 
-	public @Nullable RecipeResultCollection getLastClickedResults() {
+	public @Nullable RecipeCollection getLastClickedResults() {
 		return this.resultCollection;
 	}
 
@@ -206,7 +206,7 @@ public class BaseRecipeBookResults {
 		this.altWidget.setVisible(false);
 	}
 
-	public boolean mouseClicked(Click click, int left, int top, int width, int height, boolean doubled) {
+	public boolean mouseClicked(MouseButtonEvent click, int left, int top, int width, int height, boolean doubled) {
 		Objects.requireNonNull(this.prevPageBtn);
 		Objects.requireNonNull(this.nextPageBtn);
 
@@ -215,8 +215,8 @@ public class BaseRecipeBookResults {
 
 		if (this.altWidget.isVisible()) {
 			if (this.altWidget.mouseClicked(click, doubled)) {
-				this.lastClickedRecipe = this.altWidget.getLastClickedRecipe();
-				this.resultCollection = this.altWidget.getResults();
+				this.lastClickedRecipe = this.altWidget.getLastRecipeClicked();
+				this.resultCollection = this.altWidget.getRecipeCollection();
 			} else {
 				this.altWidget.setVisible(false);
 			}
@@ -231,9 +231,9 @@ public class BaseRecipeBookResults {
 			this.refreshResultButtons();
 			return true;
 		} else {
-			Objects.requireNonNull(this.client.world, "Client world is null. Ensure that the client is fully initialized before calling this method.");
+			Objects.requireNonNull(this.client.level, "Client world is null. Ensure that the client is fully initialized before calling this method.");
 
-			ContextParameterMap contextParameterMap = SlotDisplayContexts.createParameters(this.client.world);
+			ContextMap contextParameterMap = SlotDisplayContext.fromLevel(this.client.level);
 
 			for(BaseAnimatedResultButton animatedResultButton : this.resultsButtons) {
 				if (animatedResultButton.mouseClicked(click, doubled)) {
@@ -241,7 +241,7 @@ public class BaseRecipeBookResults {
 						this.lastClickedRecipe = animatedResultButton.getCurrentId();
 						this.resultCollection = animatedResultButton.getResultCollection();
 					} else if (click.button() == 1 && !this.altWidget.isVisible() && !animatedResultButton.hasSingleResult()) {
-						this.altWidget.showAlternativesForResult(animatedResultButton.getResultCollection(), contextParameterMap, this.filteringCraftable, animatedResultButton.getX(), animatedResultButton.getY(), left + width / 2, top + 13 + height / 2, (float)animatedResultButton.getWidth());
+						this.altWidget.init(animatedResultButton.getResultCollection(), contextParameterMap, this.filteringCraftable, animatedResultButton.getX(), animatedResultButton.getY(), left + width / 2, top + 13 + height / 2, (float)animatedResultButton.getWidth());
 					}
 
 					return true;
@@ -252,7 +252,7 @@ public class BaseRecipeBookResults {
 		}
 	}
 
-	public void onRecipeDisplayed(NetworkRecipeId recipeId) {
+	public void onRecipeDisplayed(RecipeDisplayId recipeId) {
 		this.recipeBookWidget.onRecipeDisplayed(recipeId);
 	}
 
@@ -260,7 +260,7 @@ public class BaseRecipeBookResults {
 		return this.recipeBook;
 	}
 
-	protected void forEachButton(Consumer<ClickableWidget> action) {
+	protected void forEachButton(Consumer<AbstractWidget> action) {
 		this.resultsButtons.forEach(action);
 	}
 
@@ -275,16 +275,16 @@ public class BaseRecipeBookResults {
 		return 5;
 	}
 
-	protected Text getPrevPageTooltip() {
-		return Text.translatable("gui.recipebook.previous_page");
+	protected Component getPrevPageTooltip() {
+		return Component.translatable("gui.recipebook.previous_page");
 	}
 
-	protected Text getNextPageTooltip() {
-		return Text.translatable("gui.recipebook.next_page");
+	protected Component getNextPageTooltip() {
+		return Component.translatable("gui.recipebook.next_page");
 	}
 
-	protected TexturedButtonWidget getPrevPageBtn(int parentLeft, int parentTop) {
-		return new TexturedButtonWidget(
+	protected ImageButton getPrevPageBtn(int parentLeft, int parentTop) {
+		return new ImageButton(
 			parentLeft + 38, parentTop + 137, 12, 17,
 			PAGE_BACKWARD_TEXTURES,
 			(buttonWidget) -> this.hideShowPageButtons(),
@@ -292,8 +292,8 @@ public class BaseRecipeBookResults {
 		);
 	}
 
-	protected TexturedButtonWidget getNextPageBtn(int parentLeft, int parentTop) {
-		return new TexturedButtonWidget(
+	protected ImageButton getNextPageBtn(int parentLeft, int parentTop) {
+		return new ImageButton(
 			parentLeft + 93, parentTop + 137, 12, 17,
 			PAGE_FORWARD_TEXTURES,
 			(buttonWidget) -> this.hideShowPageButtons(),
