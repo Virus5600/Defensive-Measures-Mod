@@ -10,7 +10,7 @@ import com.virus5600.defensive_measures.recipe.book.ModRecipeBookCategories;
 import java.util.List;
 
 @Environment(EnvType.CLIENT)
-public enum ModRecipeBookType implements ExtendedRecipeBookCategory {
+public enum ModRecipeBookCategory implements ExtendedRecipeBookCategory {
 	TURRET_ASSEMBLY_STATION(
 		ModRecipeBookCategories.TAS_TURRETS,
 		ModRecipeBookCategories.TAS_PARTS,
@@ -21,13 +21,13 @@ public enum ModRecipeBookType implements ExtendedRecipeBookCategory {
 	)
 	;
 
-	private final List<RecipeBookCategory> categories;
+	private final List<RecipeBookCategory> includedCategories;
 
-	ModRecipeBookType(final RecipeBookCategory... categories) {
-		this.categories =  List.of(categories);
+	ModRecipeBookCategory(final RecipeBookCategory... includedCategories) {
+		this.includedCategories =  List.of(includedCategories);
 	}
 
-	public List<RecipeBookCategory> getCategories() {
-		return this.categories;
+	public List<RecipeBookCategory> includedCategories() {
+		return this.includedCategories;
 	}
 }

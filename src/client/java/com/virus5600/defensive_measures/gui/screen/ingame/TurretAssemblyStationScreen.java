@@ -11,7 +11,7 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
 
 import com.virus5600.defensive_measures.DefensiveMeasures;
-import com.virus5600.defensive_measures.gui.screen.book.BlueprintWidget;
+import com.virus5600.defensive_measures.gui.screen.book.BlueprintComponent;
 import com.virus5600.defensive_measures.screen.TurretAssemblyStationScreenHandler;
 
 @Environment(EnvType.CLIENT)
@@ -22,7 +22,7 @@ public class TurretAssemblyStationScreen extends BaseRecipeBookScreen<TurretAsse
 		TurretAssemblyStationScreenHandler screenHandler, Inventory inventory, Component title
 	) {
 		super(
-			screenHandler, new BlueprintWidget(screenHandler), inventory, title,
+			screenHandler, new BlueprintComponent(screenHandler), inventory, title,
 			256, 242
 		);
 	}
@@ -52,11 +52,13 @@ public class TurretAssemblyStationScreen extends BaseRecipeBookScreen<TurretAsse
 		);
 	}
 
-	public void extractBackground(GuiGraphicsExtractor context, int mouseX, int mouseY, float deltaTicks) {
+	public void extractBackground(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float deltaTicks) {
+		super.extractBackground(graphics, mouseX, mouseY, deltaTicks);
+
 		int x = this.leftPos;
 		int y = (this.height - this.imageHeight) / 2;
 
-		context.blit(
+		graphics.blit(
 			RenderPipelines.GUI_TEXTURED, TEXTURE,
 			x, y, 0.0F, 0.0F,
 			this.imageWidth, this.imageHeight,
