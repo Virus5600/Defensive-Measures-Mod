@@ -19,7 +19,10 @@
 
 	"environment": "*",
 	"mixins": [
-		"dm.client.mixins.json"
+		{
+			"config": "dm.client.mixins.json",
+			"environment": "client"
+		}
 	],
 	"entrypoints": {
 		"main": [

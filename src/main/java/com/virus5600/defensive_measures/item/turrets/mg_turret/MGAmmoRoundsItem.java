@@ -8,7 +8,7 @@ public class MGAmmoRoundsItem extends Item {
 		super(
 			settings
 				.maxCount(32)
-				.rarity(Rarity.UNCOMMON)
+				.rarity(Rarity.COMMON)
 		);
 	}
 }

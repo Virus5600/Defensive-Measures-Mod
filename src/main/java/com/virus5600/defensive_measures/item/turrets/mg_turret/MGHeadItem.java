@@ -8,7 +8,7 @@ public class MGHeadItem extends Item {
 		super(
 			settings
 				.maxCount(16)
-				.rarity(Rarity.UNCOMMON)
+				.rarity(Rarity.COMMON)
 		);
 	}
 }
