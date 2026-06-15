@@ -8,7 +8,7 @@ public class MGAmmoCaseItem extends Item {
 		super(
 			settings
 				.stacksTo(16)
-				.rarity(Rarity.UNCOMMON)
+				.rarity(Rarity.COMMON)
 		);
 	}
 }

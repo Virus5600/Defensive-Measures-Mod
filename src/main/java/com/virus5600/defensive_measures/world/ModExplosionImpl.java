@@ -200,6 +200,8 @@ public class ModExplosionImpl extends ServerExplosion {
 	 *
 	 * @apiNote This method still reverts to the vanilla formula via {@link #explode()} if the
 	 * exploding entity is not an instance of {@link ExplosiveProjectileEntity}.
+	 *
+	 * @implNote The graphing calculator could be found at <a href="https://www.desmos.com/calculator/pdm27kw9oe">this link</a>.
 	 */
 	public int explode(boolean destroyBlocks) {
 		// If not an instance of the custom explosive entity, then use the vanilla explosion.

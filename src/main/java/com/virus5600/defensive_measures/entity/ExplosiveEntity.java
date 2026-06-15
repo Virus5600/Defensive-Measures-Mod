@@ -63,6 +63,8 @@ public interface ExplosiveEntity {
 	 * {@link ModExplosionImpl ModExplosionImpl#damageEntity(ProjectileEntity, Entity, List, boolean, double)},
 	 * adding a damage falloff formula on entities inside the outer radius, and further processing
 	 * the final damage based on the entity's size and exposed parts against the explosion.
+	 *
+	 * @implNote The graphing calculator could be found at <a href="https://www.desmos.com/calculator/pdm27kw9oe">this link</a>.
 	 */
 	double getBaseDamage();
 

@@ -16,6 +16,7 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.Difficulty;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -1102,7 +1103,7 @@ public abstract class TurretEntity extends Mob implements Itemable, RangedAttack
 
 	@Override
 	public boolean canAttack(@NonNull LivingEntity target) {
-		return true;
+		return (!(target instanceof Player) || this.level().getDifficulty() != Difficulty.PEACEFUL) && target.canBeSeenAsEnemy();
 	}
 
 	public boolean isWithinRange(Entity entity, double minRange, double maxRange) {

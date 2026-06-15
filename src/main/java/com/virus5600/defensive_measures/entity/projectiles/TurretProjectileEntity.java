@@ -628,7 +628,9 @@ public abstract class TurretProjectileEntity extends Projectile {
 	public void tick() {
 		super.tick();
 
-		this.updateAnimations();
+		if (this.level().isClientSide()) {
+			this.updateAnimations();
+		}
 	}
 
 	// //////////////////////////////// //

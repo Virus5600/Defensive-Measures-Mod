@@ -10,6 +10,7 @@ import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.item.Item;
@@ -137,7 +138,7 @@ public class AATurretEntity extends TurretEntity {
 		super.defineSynchedData(builder);
 	}
 
-	public static @NotNull net.minecraft.world.entity.ai.attributes.AttributeSupplier.Builder setAttributes() {
+	public static @NotNull AttributeSupplier.Builder setAttributes() {
 		TurretEntity.setTurretMaxHealth(100);
 		TurretEntity.setTurretMaxRange(96 + ModEntities.AA_TURRET.getDimensions().eyeHeight());
 
@@ -273,6 +274,11 @@ public class AATurretEntity extends TurretEntity {
 		// Calls all the previous animation logics first before handling
 		// particle logic
 		super.updateAnimations();
+	}
+
+	@Override
+	public boolean canAttack(final @NonNull LivingEntity target) {
+		return RegistryHelper.isOf(target.getType(), ModEntityTypeTags.FLYING_HOSTILES) && super.canAttack(target);
 	}
 
 	// ///////////////// //
