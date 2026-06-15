@@ -1,6 +1,6 @@
 package com.virus5600.defensive_measures.recipe;
 
-import net.minecraft.recipe.RecipeSerializer;
+import net.minecraft.world.item.crafting.RecipeSerializer;
 
 import com.virus5600.defensive_measures.DefensiveMeasures;
 import com.virus5600.defensive_measures._helper.RegistryHelper;
@@ -13,9 +13,11 @@ public class ModRecipeSerializers {
 	}
 
 	static {
-		TAS_SERIALIZER = RegistryHelper.registerRecipeSerializer("tas_shaped", BaseCraftingRecipe.createSerializer(
-			TASShapedRecipe.CODEC,
-			TASShapedRecipe.PACKET_CODEC
-		));
+		TAS_SERIALIZER = RegistryHelper.registerRecipeSerializer(
+			"tas_shaped", BaseCraftingRecipe.createSerializer(
+				TASShapedRecipe.MAP_CODEC,
+				TASShapedRecipe.STREAM_CODEC
+			)
+		);
 	}
 }

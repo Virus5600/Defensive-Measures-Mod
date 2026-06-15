@@ -1,12 +1,12 @@
 package com.virus5600.defensive_measures.particle;
 
-import com.virus5600.defensive_measures.DefensiveMeasures;
-
 import net.fabricmc.fabric.api.particle.v1.FabricParticleTypes;
-import net.minecraft.particle.SimpleParticleType;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.Registry;
-import net.minecraft.util.Identifier;
+import net.minecraft.core.Registry;
+import net.minecraft.core.particles.SimpleParticleType;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.Identifier;
+
+import com.virus5600.defensive_measures.DefensiveMeasures;
 
 /**
  * Class containing all the particle types used by the mod. This is
@@ -32,8 +32,8 @@ public class ModParticles {
 
 	private static SimpleParticleType register(String identifier, boolean shouldAlwaysSpawn) {
 		return Registry.register(
-			Registries.PARTICLE_TYPE,
-			Identifier.of(DefensiveMeasures.MOD_ID, identifier),
+			BuiltInRegistries.PARTICLE_TYPE,
+			Identifier.fromNamespaceAndPath(DefensiveMeasures.MOD_ID, identifier),
 			FabricParticleTypes.simple(shouldAlwaysSpawn)
 		);
 	}

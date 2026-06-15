@@ -1,20 +1,21 @@
 package com.virus5600.defensive_measures.entity.projectiles;
 
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.damage.DamageSource;
-import net.minecraft.entity.damage.DamageTypes;
-import net.minecraft.entity.mob.MobEntity;
-import net.minecraft.particle.ParticleEffect;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.World;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.Mth;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.damagesource.DamageTypes;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.level.Level;
 
 import com.virus5600.defensive_measures.entity.turrets.tier2.AATurretEntity;
 import com.virus5600.defensive_measures.particle.ModParticles;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
 
 /**
  * The projectile used by {@link AATurretEntity}.
@@ -43,8 +44,8 @@ public class FlakProjectileEntity extends CannonballEntity {
 	// CONSTRUCTORS //
 	// //////////// //
 	public FlakProjectileEntity(
-		EntityType<? extends CannonballEntity> entityType,
-		World world
+            EntityType<? extends CannonballEntity> entityType,
+            Level world
 	) {
 		super(entityType, world);
 	}
@@ -60,7 +61,7 @@ public class FlakProjectileEntity extends CannonballEntity {
 	 * @return {@code null} as the flak projectile does not have a trail particle effect.
 	 */
 	@Override @Nullable
-	protected ParticleEffect getTrailParticleType() {
+	protected ParticleOptions getTrailParticleType() {
 		return null;
 	}
 
@@ -69,7 +70,7 @@ public class FlakProjectileEntity extends CannonballEntity {
 	 * @return {@link ModParticles#FLAK_EXPLOSION} as the small explosion particle effect for the flak projectile.
 	 */
 	@Override @NotNull
-	protected ParticleEffect getSmallExplosionParticleType() {
+	protected ParticleOptions getSmallExplosionParticleType() {
 		return ModParticles.FLAK_EXPLOSION;
 	}
 
@@ -78,13 +79,13 @@ public class FlakProjectileEntity extends CannonballEntity {
 	 * @return {@link ModParticles#FLAK_EXPLOSION} as the large explosion particle effect for the flak projectile.
 	 */
 	@Override @NotNull
-	protected ParticleEffect getLargeExplosionParticleType() {
+	protected ParticleOptions getLargeExplosionParticleType() {
 		return ModParticles.FLAK_EXPLOSION;
 	}
 
 	@Override
-	protected double getGravity() {
-		return this.isTouchingWater() ? 0.0625 : 0;
+	protected double getDefaultGravity() {
+		return this.isInWater() ? 0.0625 : 0;
 	}
 
 	@Override
@@ -95,8 +96,8 @@ public class FlakProjectileEntity extends CannonballEntity {
 	// PUBLIC
 
 	@Override
-	public boolean damage(ServerWorld world, DamageSource source, float amount) {
-		if (source.isOf(DamageTypes.EXPLOSION)) {
+	public boolean hurtServer(@NonNull ServerLevel world, @NonNull DamageSource source, float amount) {
+		if (source.is(DamageTypes.EXPLOSION)) {
 			this.doDamage();
 			return true;
 		}
@@ -107,17 +108,17 @@ public class FlakProjectileEntity extends CannonballEntity {
 	public void tick() {
 		super.tick();
 
-		if (this.getEntityWorld() instanceof ServerWorld world) {
+		if (this.level() instanceof ServerLevel world) {
 			// Update the distance traveled by this projectile
-			this.distanceTraveled = (float) this.getSpawnPos()
-				.distanceTo(this.getEntityPos());
+			this.moveDist = (float) this.getSpawnPos()
+				.distanceTo(this.position());
 
 			// If there's an owner, identify its target and get its distance from the owner.
-			if (this.getOwner() instanceof MobEntity entity) {
+			if (this.getOwner() instanceof Mob entity) {
 				LivingEntity target = entity.getTarget();
 
 				if (target != null) {
-					this.targetDistance = target.getEntityPos()
+					this.targetDistance = target.position()
 						.distanceTo(this.getSpawnPos());
 				}
 			}
@@ -125,24 +126,24 @@ public class FlakProjectileEntity extends CannonballEntity {
 			// Creates a variable fuse trigger near the target
 			double varTargetDistance = this.targetDistance +
 				(this.targetDistance *
-					(world.random.nextBetween(-2, 2) / 100.0));
+					(world.getRandom().nextIntBetweenInclusive(-2, 2) / 100.0));
 
 			// Calculate the age threshold based on the projectile's speed, with a minimum of 20
 			// ticks (1 second). This makes the projectile explode faster if it's moving faster,
 			// and slower if it's moving slower, but it will always explode after at least 20 ticks.
-			double variableVelLen = this.getVelocity().length() +
-				MathHelper.nextDouble(
+			double variableVelLen = this.getDeltaMovement().length() +
+				Mth.nextDouble(
 					world.getRandom(),
-					-this.getVelocity().length() * 0.1,
-					this.getVelocity().length() * 0.1
+					-this.getDeltaMovement().length() * 0.1,
+					this.getDeltaMovement().length() * 0.1
 				);
-			double ageThreshold = MathHelper.clamp((variableVelLen / 5) * 20, 20, Double.MAX_VALUE);
+			double ageThreshold = Mth.clamp((variableVelLen / 5) * 20, 20, Double.MAX_VALUE);
 
 			// Explodes this projectile if it hits the minimum threshold (only if the target's
 			// distance is 0 or more) or if it's age is more than the age threshold (which is
 			// determined by the projectile's speed, with a minimum of 20 ticks or 1 second).
-			if ((this.targetDistance > -1 && this.distanceTraveled >= varTargetDistance) ||
-				((this.targetDistance == -1 && this.age >= ageThreshold))) {
+			if ((this.targetDistance > -1 && this.moveDist >= varTargetDistance) ||
+				((this.targetDistance == -1 && this.tickCount >= ageThreshold))) {
 				this.doDamage();
 			}
 		}
@@ -152,8 +153,8 @@ public class FlakProjectileEntity extends CannonballEntity {
 	public void doDamage() {
 		super.doDamage();
 
-		if (this.getEntityWorld() instanceof ServerWorld world) {
-			world.spawnParticles(
+		if (this.level() instanceof ServerLevel world) {
+			world.sendParticles(
 				ModParticles.FLAK_EXPLOSION,
 				true, true,
 				this.getX(), this.getEyeY(), this.getZ(),

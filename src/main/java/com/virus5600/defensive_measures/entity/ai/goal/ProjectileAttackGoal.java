@@ -1,10 +1,9 @@
 package com.virus5600.defensive_measures.entity.ai.goal;
 
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.RangedAttackMob;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
-
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.monster.RangedAttackMob;
+import net.minecraft.world.phys.Vec3;
 
 import com.virus5600.defensive_measures._util.MathUtil;
 import com.virus5600.defensive_measures.entity.turrets.TurretEntity;
@@ -14,7 +13,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.EnumSet;
 
 /**
- * Literally a copy of {@link net.minecraft.entity.ai.goal.ProjectileAttackGoal ProjectileAttackGoal}
+ * Literally a copy of {@link net.minecraft.world.entity.ai.goal.RangedAttackGoal ProjectileAttackGoal}
  * aside from some additional timing related methods to allow for more control over what the entity
  * is doing during the attack. This goal is primarily designed to work on
  * {@link TurretEntity turret entities} that can shoot projectiles at a target.
@@ -23,7 +22,7 @@ import java.util.EnumSet;
  *
  * <ul>
  * 	<li>
- * 	    {@link #canStart()} to determine if the turret can start attacking the target.<br>
+ * 	    {@link #canUse()} to determine if the turret can start attacking the target.<br>
  * 		This method is modified to also check if the target is within the rotation limits of the turret.
  * 	</li>
  *
@@ -56,12 +55,12 @@ import java.util.EnumSet;
  *
  * <b>NOTE:</b> {@code getShootingPitch(LivingEntity)} and {@code getShootingYaw(LivingEntity)} are
  * 			yet to be implemented as they are not yet needed.
- * @see net.minecraft.entity.ai.goal.ProjectileAttackGoal ProjectileAttackGoal
+ * @see net.minecraft.world.entity.ai.goal.RangedAttackGoal ProjectileAttackGoal
  *
  * @since 1.0.0-beta
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
  */
-public class ProjectileAttackGoal extends net.minecraft.entity.ai.goal.ProjectileAttackGoal {
+public class ProjectileAttackGoal extends net.minecraft.world.entity.ai.goal.RangedAttackGoal {
 	private final TurretEntity mob;
 	private final RangedAttackMob owner;
 	@Nullable
@@ -103,12 +102,12 @@ public class ProjectileAttackGoal extends net.minecraft.entity.ai.goal.Projectil
 			this.minShootRange = minShootRange;
 			this.squaredMaxShootRange = maxShootRange * maxShootRange;
 			this.squaredMinShootRange = minShootRange * minShootRange;
-			this.setControls(EnumSet.of(Control.MOVE, Control.LOOK));
+			this.setFlags(EnumSet.of(Flag.MOVE, Flag.LOOK));
 		}
 	}
 
 	@Override
-	public boolean canStart() {
+	public boolean canUse() {
 		LivingEntity livingEntity = this.mob.getTarget();
 		if (livingEntity != null &&
 			livingEntity.isAlive() &&
@@ -122,9 +121,9 @@ public class ProjectileAttackGoal extends net.minecraft.entity.ai.goal.Projectil
 	}
 
 	@Override
-	public boolean shouldContinue() {
+	public boolean canContinueToUse() {
 		if (this.target != null) {
-			return this.canStart() || this.target.isAlive() && !this.mob.getNavigation().isIdle();
+			return this.canUse() || this.target.isAlive() && !this.mob.getNavigation().isDone();
 		}
 		return false;
 	}
@@ -140,8 +139,8 @@ public class ProjectileAttackGoal extends net.minecraft.entity.ai.goal.Projectil
 	@Override
 	public void tick() {
 		if (this.target != null) {
-			double squaredDistance = this.mob.squaredDistanceTo(this.target.getX(), this.target.getY(), this.target.getZ());
-			boolean canBeSeen = this.mob.getVisibilityCache().canSee(this.target) && this.isWithinRotationLimit(this.target);
+			double squaredDistance = this.mob.distanceToSqr(this.target.getX(), this.target.getY(), this.target.getZ());
+			boolean canBeSeen = this.mob.getSensing().hasLineOfSight(this.target) && this.isWithinRotationLimit(this.target);
 			boolean isPastMaxRange = squaredDistance > (double) this.squaredMaxShootRange,
 				isPastMinRange = squaredDistance < (double) this.squaredMinShootRange,
 				isInRange = !isPastMaxRange && !isPastMinRange,
@@ -156,13 +155,13 @@ public class ProjectileAttackGoal extends net.minecraft.entity.ai.goal.Projectil
 			if (isInRange && isStillSeen) {
 				this.mob.getNavigation().stop();
 			} else {
-				this.mob.getNavigation().startMovingTo(this.target, this.mobSpeed);
+				this.mob.getNavigation().moveTo(this.target, this.mobSpeed);
 			}
 
-			float minPitch = -this.mob.getMaxLookPitchChange();
-			float maxPitch = -this.mob.getMinLookPitchChange();
-			float minYaw = -this.mob.getMaxHeadRotation();
-			float maxYaw = -this.mob.getMinHeadRotation();
+			float minPitch = -this.mob.getMaxHeadXRot();
+			float maxPitch = -this.mob.getMinHeadXRot();
+			float minYaw = -this.mob.getMaxHeadYRot();
+			float maxYaw = -this.mob.getMinHeadYRot();
 
 			this.mob.setTrackedShooting(false);
 			this.mob.getLookControl().lookAt(
@@ -177,15 +176,15 @@ public class ProjectileAttackGoal extends net.minecraft.entity.ai.goal.Projectil
 				}
 
 				float nextShotScaler = (float) Math.sqrt(squaredDistance) / this.maxShootRange;
-				float pullProgress = MathHelper.clamp(nextShotScaler, 0.1F, 1.0F);
+				float pullProgress = Mth.clamp(nextShotScaler, 0.1F, 1.0F);
 
 				this.mob.setTrackedShooting(true);
-				this.owner.shootAt(this.target, pullProgress);
-				this.updateCountdownTicks = MathHelper.floor(nextShotScaler * (float) (this.maxIntervalTicks - this.minIntervalTicks) + (float) this.minIntervalTicks);
+				this.owner.performRangedAttack(this.target, pullProgress);
+				this.updateCountdownTicks = Mth.floor(nextShotScaler * (float) (this.maxIntervalTicks - this.minIntervalTicks) + (float) this.minIntervalTicks);
 			} else if (this.updateCountdownTicks < 0) {
 				this.mob.setTrackedShooting(false);
-				this.updateCountdownTicks = MathHelper.floor(
-					MathHelper.lerp(Math.sqrt(squaredDistance) / (double) this.maxShootRange, this.minIntervalTicks, this.maxIntervalTicks)
+				this.updateCountdownTicks = Mth.floor(
+					Mth.lerp(Math.sqrt(squaredDistance) / (double) this.maxShootRange, this.minIntervalTicks, this.maxIntervalTicks)
 				);
 			}
 		}
@@ -250,18 +249,18 @@ public class ProjectileAttackGoal extends net.minecraft.entity.ai.goal.Projectil
 	 * @return The pitch angle in degrees.
 	 */
 	public float getShootingPitch(LivingEntity target, boolean shouldClamp) {
-		Vec3d velocity = this.mob
+		Vec3 velocity = this.mob
 			.getProjectileVelocityData(target)
-			.getVelocity();
+			.getDeltaMovement();
 
-		float maxPitch = this.mob.getMaxLookPitchChange();
-		float minPitch = this.mob.getMinLookPitchChange();
+		float maxPitch = this.mob.getMaxHeadXRot();
+		float minPitch = this.mob.getMinHeadXRot();
 
-		float vx = MathHelper.sqrt((float) (velocity.x * velocity.x + velocity.z * velocity.z));
+		float vx = Mth.sqrt((float) (velocity.x * velocity.x + velocity.z * velocity.z));
 		float p = (float) MathUtil.radToDeg(-Math.atan2(velocity.y, vx));
 
 		if (shouldClamp) {
-			p = MathHelper.clamp(p, minPitch, maxPitch);
+			p = Mth.clamp(p, minPitch, maxPitch);
 		}
 
 		return p;
@@ -277,18 +276,18 @@ public class ProjectileAttackGoal extends net.minecraft.entity.ai.goal.Projectil
 	 * @return The yaw angle in degrees.
 	 */
 	public float getShootingYaw(LivingEntity target, boolean shouldClamp) {
-		Vec3d velocity = this.mob
+		Vec3 velocity = this.mob
 			.getProjectileVelocityData(target)
-			.getVelocity();
+			.getDeltaMovement();
 
-		float maxYaw = this.mob.getMaxHeadRotation();
-		float minYaw = this.mob.getMinHeadRotation();
+		float maxYaw = this.mob.getMaxHeadYRot();
+		float minYaw = this.mob.getMinHeadYRot();
 
 		float y = (float) Math.atan2(velocity.z, velocity.x);
 		y *= (float) (180.0 / Math.PI);
 
 		if (shouldClamp) {
-			y = MathHelper.clamp(y, minYaw, maxYaw);
+			y = Mth.clamp(y, minYaw, maxYaw);
 		}
 
 		return y;
@@ -301,10 +300,10 @@ public class ProjectileAttackGoal extends net.minecraft.entity.ai.goal.Projectil
 	 * @return {@code true} if the target is within the rotation limits of the turret, {@code false} otherwise.
 	 */
 	public boolean isWithinRotationLimit(LivingEntity target) {
-		float minPitch = -this.mob.getMaxLookPitchChange();
-		float maxPitch = -this.mob.getMinLookPitchChange();
-		float minYaw = -this.mob.getMaxHeadRotation();
-		float maxYaw = -this.mob.getMinHeadRotation();
+		float minPitch = -this.mob.getMaxHeadXRot();
+		float maxPitch = -this.mob.getMinHeadXRot();
+		float minYaw = -this.mob.getMaxHeadYRot();
+		float maxYaw = -this.mob.getMinHeadYRot();
 
 		float targetPitch = this.getShootingPitch(target, false);
 		float targetYaw = this.getShootingYaw(target, false);

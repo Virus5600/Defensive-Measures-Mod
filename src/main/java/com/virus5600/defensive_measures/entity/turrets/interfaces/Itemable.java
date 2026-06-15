@@ -1,23 +1,23 @@
 package com.virus5600.defensive_measures.entity.turrets.interfaces;
 
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.NbtComponent;
-import net.minecraft.entity.ItemEntity;
-import net.minecraft.entity.effect.StatusEffectInstance;
-import net.minecraft.entity.mob.MobEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtList;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtOps;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.sound.SoundEvent;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.util.Mth;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.CustomData;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
 
 import com.virus5600.defensive_measures.advancement.criterion.ModCriterion;
 import com.virus5600.defensive_measures.entity.turrets.TurretEntity;
@@ -52,9 +52,9 @@ public interface Itemable {
 
 	/**
 	 * Copies the data from the given NBT to this entity.
-	 * @param nbt {@link NbtCompound} The NBT to copy the data from.
+	 * @param nbt {@link CompoundTag} The NBT to copy the data from.
 	 */
-	void copyDataFromNbt(NbtCompound nbt);
+	void copyDataFromNbt(CompoundTag nbt);
 
 	/**
 	 * Retrieves the item this turret is from.
@@ -71,30 +71,30 @@ public interface Itemable {
 	/**
 	 * Copies the data from this entity to the given stack.
 	 *
-	 * @param entity {@link MobEntity} The entity to copy the data from.
+	 * @param entity {@link Mob} The entity to copy the data from.
 	 * @param stack {@link ItemStack} The stack to copy the data to.
 	 */
-	static void copyDataToStack(MobEntity entity, ItemStack stack) {
+	static void copyDataToStack(Mob entity, ItemStack stack) {
 		// Sets the name
-		stack.set(DataComponentTypes.CUSTOM_NAME, entity.hasCustomName() ? entity.getCustomName() : stack.getName());
+		stack.set(DataComponents.CUSTOM_NAME, entity.hasCustomName() ? entity.getCustomName() : stack.getHoverName());
 
 		// Finalized NBT
-		NbtCompound nbtCompound = new NbtCompound();
+		CompoundTag nbtCompound = new CompoundTag();
 		// For storing active entity status effects
-		NbtList effectList = new NbtList();
+		ListTag effectList = new ListTag();
 
-		entity.getActiveStatusEffects().forEach((entry, effectInstance) -> {
-			NbtCompound effectNbt = new NbtCompound();
+		entity.getActiveEffectsMap().forEach((entry, effectInstance) -> {
+			CompoundTag effectNbt = new CompoundTag();
 
 			// Store the effect key
-			entry.getKey().ifPresent(
-				key -> effectNbt.putString("id", key.getValue().toString())
+			entry.unwrapKey().ifPresent(
+				key -> effectNbt.putString("id", key.identifier().toString())
 			);
 
 			// Then store the effect instance
 			effectNbt.put(
 				"effect",
-				StatusEffectInstance.CODEC
+				MobEffectInstance.CODEC
 					.encodeStart(NbtOps.INSTANCE, effectInstance)
 					.getOrThrow()
 			);
@@ -106,10 +106,10 @@ public interface Itemable {
 		});
 
 		// Sets the NBT
-		nbtCompound.putBoolean("NoAI", entity.isAiDisabled());
+		nbtCompound.putBoolean("NoAI", entity.isNoAi());
 		nbtCompound.putBoolean("Silent", entity.isSilent());
-		nbtCompound.putBoolean("NoGravity", entity.hasNoGravity());
-		nbtCompound.putBoolean("Glowing", entity.isGlowing());
+		nbtCompound.putBoolean("NoGravity", entity.isNoGravity());
+		nbtCompound.putBoolean("Glowing", entity.isCurrentlyGlowing());
 		nbtCompound.putBoolean("Invulnerable", entity.isInvulnerable());
 		nbtCompound.putFloat("Health", entity.getHealth());
 		nbtCompound.putFloat("MaxHealth", entity.getMaxHealth());
@@ -120,17 +120,17 @@ public interface Itemable {
 			nbtCompound.putInt("TurretLevel", turretEntity.getTrackedLevel());
 		}
 
-		stack.set(DataComponentTypes.CUSTOM_DATA, NbtComponent.of(nbtCompound));
+		stack.set(DataComponents.CUSTOM_DATA, CustomData.of(nbtCompound));
 	}
 
 	/**
 	 * Copies the data from the given NBT to this entity.
 	 *
-	 * @param entity {@link MobEntity} The entity to copy the data to.
-	 * @param nbt {@link NbtCompound} The NBT to copy the data from.
+	 * @param entity {@link Mob} The entity to copy the data to.
+	 * @param nbt {@link CompoundTag} The NBT to copy the data from.
 	 */
-	static void copyDataFromNbt(MobEntity entity, NbtCompound nbt) {
-		entity.setComponent(DataComponentTypes.CUSTOM_DATA, NbtComponent.of(nbt));
+	static void copyDataFromNbt(Mob entity, CompoundTag nbt) {
+		entity.setComponent(DataComponents.CUSTOM_DATA, CustomData.of(nbt));
 	}
 
 	/**
@@ -140,42 +140,42 @@ public interface Itemable {
 	 * @param entity The entity to retrieve the item from.
 	 * @param tool The tool the player is using to retrieve the item.
 	 * @param modItem The item to retrieve.
-	 * @return {@link Optional<ActionResult>} The result of the action.
+	 * @return {@link Optional<InteractionResult>} The result of the action.
 	 * @param <T> The type of entity.
 	 */
-	static <T extends TurretEntity> Optional<ActionResult> tryItem(PlayerEntity player, Hand hand, T entity, Item tool, Item modItem) {
-		ItemStack itemStack = player.getStackInHand(hand);
+	static <T extends TurretEntity> Optional<InteractionResult> tryItem(Player player, InteractionHand hand, T entity, Item tool, Item modItem) {
+		ItemStack itemStack = player.getItemInHand(hand);
 		if (itemStack.getItem() == tool && entity.isAlive()) {
-			World world = entity.getEntityWorld();
+			Level world = entity.level();
 
-			if (!world.isClient()) {
+			if (!world.isClientSide()) {
 				entity.playSound(entity.getEntityRemoveSound(), 1.0f, new Random().nextFloat(0.75f, 1.25f));
 
-				if (player.isCreative() && !player.isSneaking()) {
+				if (player.isCreative() && !player.isShiftKeyDown()) {
 					entity.discard();
-					return Optional.of(ActionResult.SUCCESS);
+					return Optional.of(InteractionResult.SUCCESS);
 				}
 
 				ItemStack stack = new ItemStack(modItem);
 				entity.copyDataToStack(stack);
 
-				Vec3d entityPos = entity.getEntityPos();
+				Vec3 entityPos = entity.position();
 
-				float x = (float) entityPos.getX() + 0.5f;
-				float y = (float) entityPos.getY() + 0.5f;
-				float z = (float) entityPos.getZ() + 0.5f;
-				double vx = MathHelper.nextDouble(world.random, -0.1, 0.1);
-				double vy = MathHelper.nextDouble(world.random, 0.0, 0.1);
-				double vz = MathHelper.nextDouble(world.random, -0.1, 0.1);
+				float x = (float) entityPos.x() + 0.5f;
+				float y = (float) entityPos.y() + 0.5f;
+				float z = (float) entityPos.z() + 0.5f;
+				double vx = Mth.nextDouble(world.getRandom(), -0.1, 0.1);
+				double vy = Mth.nextDouble(world.getRandom(), 0.0, 0.1);
+				double vz = Mth.nextDouble(world.getRandom(), -0.1, 0.1);
 
 				entity.discard();
 				ItemEntity itemStackEntity = new ItemEntity(world, x, y, z, stack, vx, vy, vz);
-				world.spawnEntity(itemStackEntity);
+				world.addFreshEntity(itemStackEntity);
 
-				ModCriterion.TURRET_ITEM_RETRIEVED_CRITERION.trigger((ServerPlayerEntity) player, stack);
+				ModCriterion.TURRET_ITEM_RETRIEVED_CRITERION.trigger((ServerPlayer) player, stack);
 			}
 
-			return Optional.of(ActionResult.SUCCESS);
+			return Optional.of(InteractionResult.SUCCESS);
 		}
 		return Optional.empty();
 	}

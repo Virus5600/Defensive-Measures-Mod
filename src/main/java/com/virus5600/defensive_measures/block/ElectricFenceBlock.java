@@ -1,120 +1,124 @@
 package com.virus5600.defensive_measures.block;
 
 import com.mojang.serialization.MapCodec;
-import net.minecraft.block.*;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityCollisionHandler;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.pathing.NavigationType;
-import net.minecraft.entity.damage.DamageSource;
-import net.minecraft.fluid.Fluid;
-import net.minecraft.fluid.FluidState;
-import net.minecraft.fluid.Fluids;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.particle.ParticleTypes;
-import net.minecraft.registry.tag.BlockTags;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.sound.SoundEvent;
-import net.minecraft.state.StateManager;
-import net.minecraft.state.property.Property;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.random.Random;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.world.BlockView;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldAccess;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.InsideBlockEffectApplier;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.CrossCollisionBlock;
+import net.minecraft.world.level.block.FenceGateBlock;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.pathfinder.PathComputationType;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.level.material.Fluids;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.VoxelShape;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
 
 import com.virus5600.defensive_measures.entity.damage.ModDamageSources;
 import com.virus5600.defensive_measures.entity.damage.ModDamageTypes;
 import com.virus5600.defensive_measures.registry.tag.ModBlockTags;
 
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 
-import net.minecraft.world.WorldView;
-import net.minecraft.world.tick.ScheduledTickView;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.ScheduledTickAccess;
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
-public class ElectricFenceBlock extends HorizontalConnectingBlock {
-	public static final MapCodec<ElectricFenceBlock> CODEC = createCodec(ElectricFenceBlock::new);
+public class ElectricFenceBlock extends CrossCollisionBlock {
+	public static final MapCodec<ElectricFenceBlock> CODEC = simpleCodec(ElectricFenceBlock::new);
 
 	private final Function<BlockState, VoxelShape> cullingShapeFunction;
 
-	public ElectricFenceBlock(Settings settings) {
+	public ElectricFenceBlock(Properties settings) {
 		super(4.0F, 16.0F, 4.0F, 16.0F, 24.0F, settings);
 
-		this.setDefaultState(
-			this.getStateManager()
-				.getDefaultState()
-				.with(NORTH, false)
-				.with(EAST, false)
-				.with(WEST, false)
-				.with(SOUTH, false)
-				.with(WATERLOGGED, false)
+		this.registerDefaultState(
+			this.getStateDefinition()
+				.any()
+				.setValue(NORTH, false)
+				.setValue(EAST, false)
+				.setValue(WEST, false)
+				.setValue(SOUTH, false)
+				.setValue(WATERLOGGED, false)
 		);
 
-		this.cullingShapeFunction = this.createShapeFunction(
+		this.cullingShapeFunction = this.makeShapes(
 			4.0F, 16.0F,
 			2.0F, 6.0F, 15.0F
 		);
 	}
 
 	@Override
-	protected VoxelShape getCullingShape(BlockState state) {
+	protected @NonNull VoxelShape getOcclusionShape(@NonNull BlockState state) {
 		return this.cullingShapeFunction.apply(state);
 	}
 
 	@Override
-	protected VoxelShape getCameraCollisionShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
-		return this.getOutlineShape(state, world, pos, context);
+	protected @NonNull VoxelShape getVisualShape(@NonNull BlockState state, @NonNull BlockGetter world, @NonNull BlockPos pos, @NonNull CollisionContext context) {
+		return this.getShape(state, world, pos, context);
 	}
 
 	@Override
-	protected boolean canPathfindThrough(BlockState state, NavigationType type) {
+	protected boolean isPathfindable(@NonNull BlockState state, @NonNull PathComputationType type) {
 		return true;
 	}
 
 	@Override
-	protected void onEntityCollision(BlockState state, World world, BlockPos pos, Entity entity, EntityCollisionHandler handler, boolean bl) {
+	protected void entityInside(@NonNull BlockState state, @NonNull Level world, @NonNull BlockPos pos, @NonNull Entity entity, @NonNull InsideBlockEffectApplier handler, boolean bl) {
 		if (entity instanceof LivingEntity) {
-			if (world instanceof ServerWorld serverWorld) {
+			if (world instanceof ServerLevel serverWorld) {
 				// Damage the entity
 				DamageSource dmgSrc = ModDamageSources.create(world, ModDamageTypes.ELECTRICITY, null, null);
-				entity.damage(serverWorld, dmgSrc, this.getDamageDealt(state));
+				entity.hurtServer(serverWorld, dmgSrc, this.getDamageDealt(state));
 
 				// Spawn Electric Particles
-				serverWorld.spawnParticles(
+				serverWorld.sendParticles(
 					ParticleTypes.ELECTRIC_SPARK,
 					entity.getX(), entity.getY() + 1, entity.getZ(),
 					3, 0.25, 0.25, 0.25,
-					(serverWorld.getRandom().nextBetween(-2, 2) / 10f)
+					(serverWorld.getRandom().nextIntBetweenInclusive(-2, 2) / 10f)
 				);
 			}
 		}
 	}
 
 	@Override
-	protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+	protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
 		builder.add(NORTH, EAST, WEST, SOUTH, WATERLOGGED);
 	}
 
 	@Override
-	protected BlockState getStateForNeighborUpdate(BlockState state, WorldView world, ScheduledTickView tickView, BlockPos pos, Direction direction, BlockPos neighborPos, BlockState neighborState, Random random) {
-		if (state.get(WATERLOGGED)) {
-			tickView.scheduleFluidTick(pos, Fluids.WATER, Fluids.WATER.getTickRate(world));
+	protected @NonNull BlockState updateShape(BlockState state, @NonNull LevelReader world, @NonNull ScheduledTickAccess tickView, @NonNull BlockPos pos, @NonNull Direction direction, @NonNull BlockPos neighborPos, @NonNull BlockState neighborState, @NonNull RandomSource random) {
+		if (state.getValue(WATERLOGGED)) {
+			tickView.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(world));
 		}
 
 		return direction.getAxis().isHorizontal() ?
-			state.with(
-				FACING_PROPERTIES.get(direction),
+			state.setValue(
+				PROPERTY_BY_DIRECTION.get(direction),
 				this.canConnect(
 					neighborState,
-					neighborState.isSideSolidFullSquare(world, neighborPos, direction.getOpposite()),
+					neighborState.isFaceSturdy(world, neighborPos, direction.getOpposite()),
 					direction.getOpposite())) :
-			super.getStateForNeighborUpdate(
+			super.updateShape(
 				state, world, tickView,
 				pos, direction,
 				neighborPos, neighborState,
@@ -122,10 +126,10 @@ public class ElectricFenceBlock extends HorizontalConnectingBlock {
 	}
 
 	@Override
-	public BlockState getPlacementState(ItemPlacementContext ctx) {
-		BlockView blockView = ctx.getWorld();
-		BlockPos blockPos = ctx.getBlockPos();
-		FluidState fluidState = ctx.getWorld().getFluidState(ctx.getBlockPos());
+	public BlockState getStateForPlacement(BlockPlaceContext ctx) {
+		BlockGetter blockView = ctx.getLevel();
+		BlockPos blockPos = ctx.getClickedPos();
+		FluidState fluidState = ctx.getLevel().getFluidState(ctx.getClickedPos());
 
 		BlockPos blockPos2 = blockPos.north();
 		BlockPos blockPos3 = blockPos.east();
@@ -137,53 +141,53 @@ public class ElectricFenceBlock extends HorizontalConnectingBlock {
 		BlockState blockState3 = blockView.getBlockState(blockPos4);
 		BlockState blockState4 = blockView.getBlockState(blockPos5);
 
-		return super.getPlacementState(ctx)
-			.with(
+		return Objects.requireNonNull(super.getStateForPlacement(ctx))
+			.setValue(
 				NORTH,
 				this.canConnect(
 					blockState,
-					blockState.isSideSolidFullSquare(blockView, blockPos2, Direction.SOUTH),
+					blockState.isFaceSturdy(blockView, blockPos2, Direction.SOUTH),
 					Direction.SOUTH))
-			.with(
+			.setValue(
 				EAST,
 				this.canConnect(
 					blockState2,
-					blockState2.isSideSolidFullSquare(blockView, blockPos3, Direction.WEST),
+					blockState2.isFaceSturdy(blockView, blockPos3, Direction.WEST),
 					Direction.WEST))
-			.with(
+			.setValue(
 				SOUTH,
 				this.canConnect(
 					blockState3,
-					blockState3.isSideSolidFullSquare(blockView, blockPos4, Direction.NORTH),
+					blockState3.isFaceSturdy(blockView, blockPos4, Direction.NORTH),
 					Direction.NORTH))
-			.with(
+			.setValue(
 				WEST,
 				this.canConnect(
 					blockState4,
-					blockState4.isSideSolidFullSquare(blockView, blockPos5, Direction.EAST),
+					blockState4.isFaceSturdy(blockView, blockPos5, Direction.EAST),
 					Direction.EAST))
-			.with(
+			.setValue(
 				WATERLOGGED,
-				fluidState.getFluid() == Fluids.WATER);
+				fluidState.getType() == Fluids.WATER);
 	}
 
 	private boolean canConnectToFence(BlockState state) {
-		return (state.isIn(BlockTags.FENCES) &&
-			state.isIn(BlockTags.WOODEN_FENCES) == this.getDefaultState().isIn(BlockTags.WOODEN_FENCES)) ||
-			state.isIn(ModBlockTags.ELECTRIC_FENCE)
+		return (state.is(BlockTags.FENCES) &&
+			state.is(BlockTags.WOODEN_FENCES) == this.defaultBlockState().is(BlockTags.WOODEN_FENCES)) ||
+			state.is(ModBlockTags.ELECTRIC_FENCE)
 			;
 	}
 
 	public boolean canConnect(BlockState state, boolean neighborIsFullSquare, Direction dir) {
 		Block block = state.getBlock();
 		boolean canConnectToFence = this.canConnectToFence(state);
-		boolean isFenceGate = block instanceof FenceGateBlock && FenceGateBlock.canWallConnect(state, dir);
+		boolean isFenceGate = block instanceof FenceGateBlock && FenceGateBlock.connectsToDirection(state, dir);
 
-		return !cannotConnect(state) && neighborIsFullSquare || canConnectToFence || isFenceGate;
+		return !isExceptionForConnection(state) && neighborIsFullSquare || canConnectToFence || isFenceGate;
 	}
 
 	@Override
-	public MapCodec<ElectricFenceBlock> getCodec() {
+	public @NonNull MapCodec<ElectricFenceBlock> codec() {
 		return CODEC;
 	}
 
@@ -206,22 +210,22 @@ public class ElectricFenceBlock extends HorizontalConnectingBlock {
 	// ///////////////// //
 
 	@Override
-	public boolean canFillWithFluid(@Nullable LivingEntity filler, BlockView world, BlockPos pos, BlockState state, Fluid fluid) {
+	public boolean canPlaceLiquid(@Nullable LivingEntity filler, @NonNull BlockGetter world, @NonNull BlockPos pos, @NonNull BlockState state, @NonNull Fluid fluid) {
 		return false;
 	}
 
 	@Override
-	public boolean tryFillWithFluid(WorldAccess world, BlockPos pos, BlockState state, FluidState fluidState) {
+	public boolean placeLiquid(@NonNull LevelAccessor world, @NonNull BlockPos pos, @NonNull BlockState state, @NonNull FluidState fluidState) {
 		return false;
 	}
 
 	@Override
-	public ItemStack tryDrainFluid(@Nullable LivingEntity drainer, WorldAccess world, BlockPos pos, BlockState state) {
+	public @NonNull ItemStack pickupBlock(@Nullable LivingEntity drainer, @NonNull LevelAccessor world, @NonNull BlockPos pos, @NonNull BlockState state) {
 		return ItemStack.EMPTY;
 	}
 
 	@Override
-	public Optional<SoundEvent> getBucketFillSound() {
+	public @NonNull Optional<SoundEvent> getPickupSound() {
 		return Optional.empty();
 	}
 }

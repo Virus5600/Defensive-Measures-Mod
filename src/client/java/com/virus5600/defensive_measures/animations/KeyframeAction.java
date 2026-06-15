@@ -1,7 +1,7 @@
 package com.virus5600.defensive_measures.animations;
 
-import net.minecraft.entity.AnimationState;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.entity.AnimationState;
+import net.minecraft.world.phys.Vec3;
 
 import com.virus5600.defensive_measures.renderer.entity.state.BaseTurretRenderState;
 
@@ -27,5 +27,5 @@ public interface KeyframeAction {
 	 * @param state		The current render state of the turret, which may include information such as the turret's level, idle animation state, and other relevant data related to the turret's rendering.
 	 * @param pos		The global (world) position where the action should be executed. This position is not the offsets provided when creating a ScriptKeyframe instance, but rather the actual position in the game world where the action should take place.
 	 */
-	void execute(AnimationState animState, BaseTurretRenderState state, Vec3d pos);
+	void execute(AnimationState animState, BaseTurretRenderState state, Vec3 pos);
 }

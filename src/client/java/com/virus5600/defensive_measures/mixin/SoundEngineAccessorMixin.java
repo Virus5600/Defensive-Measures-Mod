@@ -2,9 +2,10 @@ package com.virus5600.defensive_measures.mixin;
 
 import java.util.Map;
 
-import net.minecraft.client.sound.Channel;
-import net.minecraft.client.sound.SoundInstance;
-import net.minecraft.client.sound.SoundSystem;
+import net.minecraft.client.resources.sounds.SoundInstance;
+import net.minecraft.client.sounds.ChannelAccess;
+import net.minecraft.client.sounds.SoundEngine;
+
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -12,13 +13,13 @@ import org.spongepowered.asm.mixin.Shadow;
 import com.virus5600.defensive_measures.DefensiveMeasures;
 import com.virus5600.defensive_measures._helper.accessor.SoundSystemAccess;
 
-@Mixin(SoundSystem.class)
-public abstract class SoundSystemAccessorMixin implements SoundSystemAccess {
-	@Shadow @Final private Map<SoundInstance, Channel.SourceManager> sources;
+@Mixin(SoundEngine.class)
+public abstract class SoundEngineAccessorMixin implements SoundSystemAccess {
+	@Shadow @Final private Map<SoundInstance, ChannelAccess.ChannelHandle> instanceToChannel;
 
 	@Override
 	public boolean dm$isStopped(SoundInstance soundInstance) {
-		Channel.SourceManager sourceManager = this.sources.get(soundInstance);
+		ChannelAccess.ChannelHandle sourceManager = this.instanceToChannel.get(soundInstance);
 
 		if (sourceManager == null) {
 			DefensiveMeasures.LOGGER.warn("Missing sound source for sound instance: {}", soundInstance);
@@ -28,4 +29,3 @@ public abstract class SoundSystemAccessorMixin implements SoundSystemAccess {
 		return sourceManager.isStopped();
 	}
 }
-

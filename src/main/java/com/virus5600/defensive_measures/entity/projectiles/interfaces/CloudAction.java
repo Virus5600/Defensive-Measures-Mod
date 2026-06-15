@@ -1,6 +1,6 @@
 package com.virus5600.defensive_measures.entity.projectiles.interfaces;
 
-import net.minecraft.entity.LivingEntity;
+import net.minecraft.world.entity.LivingEntity;
 
 import com.virus5600.defensive_measures.entity.projectiles.AreaCloudEntity;
 

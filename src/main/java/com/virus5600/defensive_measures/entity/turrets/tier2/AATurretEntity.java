@@ -2,23 +2,24 @@ package com.virus5600.defensive_measures.entity.turrets.tier2;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.goal.ActiveTargetGoal;
-import net.minecraft.entity.attribute.DefaultAttributeContainer;
-import net.minecraft.entity.attribute.EntityAttributes;
-import net.minecraft.entity.damage.DamageSource;
-import net.minecraft.entity.data.DataTracker.Builder;
-import net.minecraft.entity.effect.StatusEffects;
-import net.minecraft.entity.mob.MobEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.sound.SoundEvent;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
+import net.minecraft.network.syncher.SynchedEntityData.Builder;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
 
+import com.virus5600.defensive_measures._helper.RegistryHelper;
 import com.virus5600.defensive_measures._util.MathUtil;
 import com.virus5600.defensive_measures.entity.ModEntities;
 import com.virus5600.defensive_measures.entity.TurretMaterial;
@@ -30,6 +31,7 @@ import com.virus5600.defensive_measures.sound.ModSoundEvents;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -73,8 +75,8 @@ public class AATurretEntity extends TurretEntity {
 	 * The time is calculated in ticks and by default, it's 10 seconds <b>(20 ticks times 10 seconds)</b>.
 	 */
 	private static final int TOTAL_ATT_COOLDOWN = 20 * 10;
-	private static final Vec3d HINGE_POS;
-	private static final List<Vec3d> BARRELS;
+	private static final Vec3 HINGE_POS;
+	private static final List<Vec3> BARRELS;
 	private static final double[] DAMAGE;
 	private static final byte[] PIERCE_LEVELS;
 	/**
@@ -89,7 +91,7 @@ public class AATurretEntity extends TurretEntity {
 	// //////////// //
 	// CONSTRUCTORS //
 	// //////////// //
-	public AATurretEntity(EntityType<? extends TurretEntity> entityType, World world) {
+	public AATurretEntity(EntityType<? extends TurretEntity> entityType, Level world) {
 		super(entityType, world, TurretMaterial.METAL, ModEntities.FLAK_PROJECTILE, ModItems.AA_TURRET);
 
 		this.setShootSound(ModSoundEvents.TURRET_ANTI_AIR_SHOOT);
@@ -104,7 +106,7 @@ public class AATurretEntity extends TurretEntity {
 	// INITIALIZERS //
 	// //////////// //
 	@Override
-	public void initGoals() {
+	public void registerGoals() {
 		// Goal instances
 		this.attackGoal = new ProjectileAttackGoal(
 			this, 0,
@@ -112,37 +114,37 @@ public class AATurretEntity extends TurretEntity {
 		);
 
 		// Set the standard goals
-		super.initGoals();
+		super.registerGoals();
 	}
 
 	@Override
-	protected ActiveTargetGoal<?> getActiveTargetGoal() {
-		return new ActiveTargetGoal<>(
-			this, MobEntity.class, 80,
+	protected NearestAttackableTargetGoal<?> getActiveTargetGoal() {
+		return new NearestAttackableTargetGoal<>(
+			this, Mob.class, 80,
 			true, false,
 			this::targetPredicate
 		);
 	}
 
 	@Override
-	protected boolean targetPredicate(LivingEntity target, ServerWorld world) {
+	protected boolean targetPredicate(LivingEntity target, ServerLevel world) {
 		return this.attackGoal.isWithinRotationLimit(target) &&
-			target.getType().isIn(ModEntityTypeTags.FLYING_HOSTILES);
+			RegistryHelper.isOf(target.getType(), ModEntityTypeTags.FLYING_HOSTILES);
 	}
 
 	@Override
-	protected void initDataTracker(Builder builder) {
+	protected void defineSynchedData(@NonNull Builder builder) {
 		// Initialize standard data trackers
-		super.initDataTracker(builder);
+		super.defineSynchedData(builder);
 	}
 
-	public static @NotNull DefaultAttributeContainer.Builder setAttributes() {
+	public static @NotNull AttributeSupplier.Builder setAttributes() {
 		TurretEntity.setTurretMaxHealth(100);
 		TurretEntity.setTurretMaxRange(96 + ModEntities.AA_TURRET.getDimensions().eyeHeight());
 
 		return TurretEntity.setAttributes()
-			.add(EntityAttributes.ARMOR, 2)
-			.add(EntityAttributes.ARMOR_TOUGHNESS, 1);
+			.add(Attributes.ARMOR, 2)
+			.add(Attributes.ARMOR_TOUGHNESS, 1);
 	}
 
 	// /////////////// //
@@ -150,7 +152,7 @@ public class AATurretEntity extends TurretEntity {
 	// /////////////// //
 
 	@Override
-	public void shootAt(LivingEntity target, float pullProgress) {
+	public void performRangedAttack(@NonNull LivingEntity target, float pullProgress) {
 		TurretProjectileVelocity velocityData = this.getProjectileVelocityData(target);
 		super.shootAt(velocityData);
 	}
@@ -165,7 +167,7 @@ public class AATurretEntity extends TurretEntity {
 	// /////////////////// //
 
 	@Override @Nullable
-	protected SoundEvent getHurtSound(DamageSource src) {
+	protected SoundEvent getHurtSound(@NonNull DamageSource src) {
 		return ModSoundEvents.TURRET_ANTI_AIR_HURT;
 	}
 
@@ -175,7 +177,7 @@ public class AATurretEntity extends TurretEntity {
 	}
 
 	@Override
-	public int getMinLookPitchChange() {
+	public int getMinHeadXRot() {
 		return 0;
 	}
 
@@ -212,27 +214,27 @@ public class AATurretEntity extends TurretEntity {
 		return (int) (1.5F * 20);
 	}
 
-	protected List<Vec3d> getTurretProjectileSpawn() {
-		List<Vec3d> barrels = new ArrayList<>();
+	protected List<Vec3> getTurretProjectileSpawn() {
+		List<Vec3> barrels = new ArrayList<>();
 
-		for (Vec3d barrel : BARRELS) {
-			Vec3d barrelOrigin = this.getRelativePosFrom(
-				this.getEyePos(), HINGE_POS,
+		for (Vec3 barrel : BARRELS) {
+			Vec3 barrelOrigin = this.getRelativePosFrom(
+				this.getEyePosition(), HINGE_POS,
 				false
 			);
 
-			Vec3d barrelPos = this.getRelativePosFrom(
+			Vec3 barrelPos = this.getRelativePosFrom(
 				barrelOrigin, barrel,
 				true
 			);
 
-			float pitchRad = MathUtil.degToRad(this.getPitch());
-			float yawRad = MathUtil.degToRad(this.getHeadYaw());
+			float pitchRad = MathUtil.degToRad(this.getXRot());
+			float yawRad = MathUtil.degToRad(this.getYHeadRot());
 
 			barrels.add(
-				barrelPos.subtract(this.getEyePos())
-					.rotateY(yawRad)
-					.rotateX(pitchRad)
+				barrelPos.subtract(this.getEyePosition())
+					.yRot(yawRad)
+					.xRot(pitchRad)
 			);
 		}
 
@@ -274,6 +276,11 @@ public class AATurretEntity extends TurretEntity {
 		super.updateAnimations();
 	}
 
+	@Override
+	public boolean canAttack(final @NonNull LivingEntity target) {
+		return RegistryHelper.isOf(target.getType(), ModEntityTypeTags.FLYING_HOSTILES) && super.canAttack(target);
+	}
+
 	// ///////////////// //
 	// STATIC INITIALIZE //
 	// ///////////////// //
@@ -291,10 +298,10 @@ public class AATurretEntity extends TurretEntity {
 			2
 		};
 
-		HINGE_POS = new Vec3d(0, 0.0625, -0.59375);
+		HINGE_POS = new Vec3(0, 0.0625, -0.59375);
 
 		BARRELS = List.of(
-			new Vec3d(0, 0, 2.5)
+			new Vec3(0, 0, 2.5)
 		);
 
 		healables = Map.of(
@@ -305,7 +312,7 @@ public class AATurretEntity extends TurretEntity {
 
 		effectSource = Map.of(
 			Items.IRON_BLOCK, List.<Object[]>of(
-				new Object[] { StatusEffects.RESISTANCE, 60, 2 }
+				new Object[] { MobEffects.RESISTANCE, 60, 2 }
 			)
 		);
 	}

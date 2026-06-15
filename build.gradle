@@ -1,9 +1,9 @@
 plugins {
-	id 'fabric-loom' version "${loom_version}"
+	id 'net.fabricmc.fabric-loom' version "${loom_version}"
 	id 'maven-publish'
 }
 
-version = project.mod_version
+version = "${project.mod_version}-${project.minecraft_version}"
 group = project.maven_group
 
 base {
@@ -49,11 +49,11 @@ loom {
 dependencies {
 	// To change the versions see the gradle.properties file
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
-	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
-	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+
+	implementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
 	// Fabric API. This is technically optional, but you probably want it anyway.
-	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+	implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
 
 	// Testing
 	testImplementation "net.fabricmc:fabric-loader-junit:${project.loader_version}"
@@ -73,7 +73,7 @@ processResources {
 	}
 }
 
-def targetJavaVersion = 21
+def targetJavaVersion = 25
 tasks.withType(JavaCompile).configureEach {
 	it.options.encoding = "UTF-8"
 
@@ -97,6 +97,9 @@ java {
 	tasks.withType(JavaCompile).configureEach {
 		options.compilerArgs.add('-parameters')
 	}
+
+	sourceCompatibility = JavaLanguageVersion.of(targetJavaVersion)
+	targetCompatibility = JavaLanguageVersion.of(targetJavaVersion)
 }
 
 jar {

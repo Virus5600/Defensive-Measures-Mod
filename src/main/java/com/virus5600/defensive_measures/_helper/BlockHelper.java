@@ -1,10 +1,10 @@
 package com.virus5600.defensive_measures._helper;
 
-import com.virus5600.defensive_measures.registry.tag.ModBlockTags;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
 
 import com.virus5600.defensive_measures.entity.projectiles.MGBulletEntity;
+import com.virus5600.defensive_measures.registry.tag.ModBlockTags;
 
 /**
  * Contains all utility methods that can be used for the {@link Block Block} and
@@ -32,7 +32,7 @@ public final class BlockHelper {
 	 * @return boolean
 	 */
 	public static boolean isDirt(BlockState state) {
-		return state.isIn(ModBlockTags.DIRT);
+		return state.is(ModBlockTags.DIRT);
 	}
 
 	/**
@@ -43,7 +43,7 @@ public final class BlockHelper {
 	 * @return boolean
 	 */
 	public static boolean isGlass(BlockState state) {
-		return state.isIn(ModBlockTags.GLASS);
+		return state.is(ModBlockTags.GLASS);
 	}
 
 	/**
@@ -54,7 +54,7 @@ public final class BlockHelper {
 	 * @return boolean
 	 */
 	public static boolean isGrainy(BlockState state) {
-		return state.isIn(ModBlockTags.GRAINY);
+		return state.is(ModBlockTags.GRAINY);
 	}
 
 	/**
@@ -65,7 +65,7 @@ public final class BlockHelper {
 	 * @return boolean
 	 */
 	public static boolean isGreenery(BlockState state) {
-		return state.isIn(ModBlockTags.GREENERY);
+		return state.is(ModBlockTags.GREENERY);
 	}
 
 	/**
@@ -76,7 +76,7 @@ public final class BlockHelper {
 	 * @return boolean
 	 */
 	public static boolean isMetal(BlockState state) {
-		return state.isIn(ModBlockTags.METAL);
+		return state.is(ModBlockTags.METAL);
 	}
 
 	/**
@@ -87,7 +87,7 @@ public final class BlockHelper {
 	 * @return boolean
 	 */
 	public static boolean isStone(BlockState state) {
-		return state.isIn(ModBlockTags.STONE);
+		return state.is(ModBlockTags.STONE);
 	}
 
 	/**
@@ -98,7 +98,7 @@ public final class BlockHelper {
 	 * @return boolean
 	 */
 	public static boolean isWood(BlockState state) {
-		return state.isIn(ModBlockTags.WOOD);
+		return state.is(ModBlockTags.WOOD);
 	}
 
 	/**

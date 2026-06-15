@@ -2,20 +2,20 @@ package com.virus5600.defensive_measures.model;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.model.ModelPart;
-import net.minecraft.client.render.entity.model.EntityModel;
-import net.minecraft.client.render.entity.state.EntityRenderState;
-import net.minecraft.util.Identifier;
+import net.minecraft.client.model.EntityModel;
+import net.minecraft.client.model.geom.ModelPart;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
+import net.minecraft.resources.Identifier;
 
 import com.virus5600.defensive_measures.DefensiveMeasures;
 import com.virus5600.defensive_measures.model.entity.BaseTurretModel;
 import com.virus5600.defensive_measures.model.projectiles.BaseProjectileModel;
 import com.virus5600.defensive_measures.renderer.entity.state.BaseTurretRenderState;
 
+import java.util.Arrays;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.Arrays;
 
 /**
  * This class serves as the base model for all models in the mod. It extends
@@ -78,10 +78,10 @@ public class BaseModel<T extends EntityRenderState> extends EntityModel<T> {
 		super(root);
 
 		texturePath = "textures/entity/" + texturePath;
-		this.texturePath = Identifier.of(DefensiveMeasures.MOD_ID, texturePath);
+		this.texturePath = Identifier.fromNamespaceAndPath(DefensiveMeasures.MOD_ID, texturePath);
 
 		this.textures = Arrays.stream(textures)
-			.map(texture -> Identifier.of(
+			.map(texture -> Identifier.fromNamespaceAndPath(
 				DefensiveMeasures.MOD_ID,
 				this.texturePath.getPath() + "/" + texture
 			))
@@ -106,6 +106,11 @@ public class BaseModel<T extends EntityRenderState> extends EntityModel<T> {
 
 	@Nullable
 	public Identifier getBaseTexture() {
+		if (this.baseTexture == null) {
+			return this.getTextures() != null ?
+				this.getTextures()[0] : null;
+		}
+
 		return this.baseTexture;
 	}
 }

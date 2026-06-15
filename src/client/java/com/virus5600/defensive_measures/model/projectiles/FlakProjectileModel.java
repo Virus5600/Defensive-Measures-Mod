@@ -1,6 +1,9 @@
 package com.virus5600.defensive_measures.model.projectiles;
 
 import net.minecraft.client.model.*;
+import net.minecraft.client.model.geom.ModelPart;
+import net.minecraft.client.model.geom.PartPose;
+import net.minecraft.client.model.geom.builders.*;
 
 import com.virus5600.defensive_measures.renderer.projectiles.state.BaseProjectileRenderState;
 
@@ -13,14 +16,14 @@ public class FlakProjectileModel extends BaseProjectileModel<BaseProjectileRende
 		super(root, "aa_turret", TEXTURES);
 	}
 
-	public static TexturedModelData getTexturedModelData() {
-		ModelData modelData = new ModelData();
-		ModelPartData modelPartData = modelData.getRoot();
+	public static LayerDefinition getTexturedModelData() {
+		MeshDefinition modelData = new MeshDefinition();
+		PartDefinition modelPartData = modelData.getRoot();
 
-		modelPartData.addChild("projectile", ModelPartBuilder.create()
-			.uv(0, 0).cuboid(-0.5F, -0.5F, -0.5F, 1.0F, 1.0F, 3.0F, new Dilation(0.0F))
-			.uv(0, 4).cuboid(-0.5F, -0.5F, -1.25F, 1.0F, 1.0F, 1.0F, new Dilation(-0.125F)), ModelTransform.origin(0.0F, 0.5F, -0.5F));
+		modelPartData.addOrReplaceChild("projectile", CubeListBuilder.create()
+			.texOffs(0, 0).addBox(-0.5F, -0.5F, -0.5F, 1.0F, 1.0F, 3.0F, new CubeDeformation(0.0F))
+			.texOffs(0, 4).addBox(-0.5F, -0.5F, -1.25F, 1.0F, 1.0F, 1.0F, new CubeDeformation(-0.125F)), PartPose.offset(0.0F, 0.5F, -0.5F));
 
-		return TexturedModelData.of(modelData, 8, 8);
+		return LayerDefinition.create(modelData, 8, 8);
 	}
 }

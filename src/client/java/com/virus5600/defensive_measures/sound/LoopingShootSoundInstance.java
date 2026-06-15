@@ -1,18 +1,24 @@
 package com.virus5600.defensive_measures.sound;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.sound.*;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvent;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.random.Random;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.client.resources.sounds.AbstractTickableSoundInstance;
+import net.minecraft.client.resources.sounds.EntityBoundSoundInstance;
+import net.minecraft.client.resources.sounds.SoundInstance;
+import net.minecraft.client.resources.sounds.TickableSoundInstance;
+import net.minecraft.client.sounds.SoundManager;
+import net.minecraft.client.sounds.WeighedSoundEvents;
+import net.minecraft.resources.Identifier;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.RandomSource;
 
 import com.virus5600.defensive_measures._helper.accessor.SoundManagerAccess;
 import com.virus5600.defensive_measures._helper.accessor.SoundSystemAccess;
 import com.virus5600.defensive_measures.entity.turrets.TurretEntity;
 
 import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
 
 import java.util.Optional;
 
@@ -25,7 +31,7 @@ import java.util.Optional;
  * removed from the world.<br>
  * <br>
  * When starting this instance, do not use the {@link SoundManager#play(SoundInstance)} or the
- * {@link SoundManager#play(SoundInstance, int)}. Instead, use the {@link #startLoop()}
+ * {@link SoundManager#playDelayed(SoundInstance, int)}. Instead, use the {@link #startLoop()}
  * method to play the sound instance properly. Using the two former methods will cause the start
  * sound to be skipped and the loop sound to play immediately, which is not the intended behavior.
  *
@@ -34,7 +40,7 @@ import java.util.Optional;
  * @since 1.1.0-beta
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
  */
-public class LoopingShootSoundInstance extends MovingSoundInstance {
+public class LoopingShootSoundInstance extends AbstractTickableSoundInstance {
 	private final TurretEntity turret;
 
 	protected SoundEvent startSound;
@@ -51,9 +57,9 @@ public class LoopingShootSoundInstance extends MovingSoundInstance {
 	// //////////// //
 
 	public LoopingShootSoundInstance(
-		TurretEntity turret,
-		SoundEvent startSound, SoundEvent loopSound, SoundEvent endSound,
-		SoundCategory category, boolean randomPitch
+            TurretEntity turret,
+            SoundEvent startSound, SoundEvent loopSound, SoundEvent endSound,
+            SoundSource category, boolean randomPitch
 	) {
 		this(
 			turret,
@@ -65,16 +71,16 @@ public class LoopingShootSoundInstance extends MovingSoundInstance {
 	}
 
 	public LoopingShootSoundInstance(
-		TurretEntity turret,
-		SoundEvent startSound, SoundEvent loopSound, SoundEvent endSound,
-		SoundCategory category
+            TurretEntity turret,
+            SoundEvent startSound, SoundEvent loopSound, SoundEvent endSound,
+            SoundSource category
 	) {
-		super(loopSound, category, SoundInstance.createRandom());
+		super(loopSound, category, SoundInstance.createUnseededRandom());
 
 		this.turret = turret;
 
-		this.repeat = true;
-		this.repeatDelay = 0;
+		this.looping = true;
+		this.delay = 0;
 
 		this.startSound =  startSound;
 		this.loopSound =  loopSound;
@@ -92,40 +98,40 @@ public class LoopingShootSoundInstance extends MovingSoundInstance {
 	// /////////////// //
 
 	@Override
-	public boolean canPlay() {
+	public boolean canPlaySound() {
 		return !this.turret.isSilent();
 	}
 
 	@Override
-	public boolean shouldAlwaysPlay() {
+	public boolean canStartSilent() {
 		return true;
 	}
 
 	@Override
 	public void tick() {
-		ClientPlayerEntity player = MinecraftClient.getInstance().player;
+		LocalPlayer player = Minecraft.getInstance().player;
 
-		if (this.turret == null || (player != null && player.isDead()) && !this.isEndLoopTriggered) {
+		if (this.turret == null || (player != null && player.isDeadOrDying()) && !this.isEndLoopTriggered) {
 			this.endLoop();
 			return;
 		}
 
 		// Handles the case that the turret is removed/gone
-		boolean isDead = this.turret.isDead();
+		boolean isDead = this.turret.isDeadOrDying();
 		boolean isRemoved = this.turret.isRemoved();
 		boolean hasTarget = this.turret.getTrackedLockedButNotAttacking() ||
 			this.turret.getTrackedShooting() ||
 			this.turret.hasTarget();
 
 		// Once the start sound is done...
-		if (this.startSoundInstance != null && this.startSoundInstance.isDone()) {
+		if (this.startSoundInstance != null && this.startSoundInstance.isStopped()) {
 			// Start playing the loop by setting the volume to 100.
 			if (!this.isLoopPlaying) {
 				// If the end loop is already triggered...
 				if (this.isEndLoopTriggered) {
 					// ... and if the end sound is finished, mark this instance as done.
-					if (this.endSoundInstance.isDone() && this.getSoundSystem().dm$isStopped(endSoundInstance)) {
-						this.setDone();
+					if (this.endSoundInstance.isStopped() && this.getSoundSystem().dm$isStopped(endSoundInstance)) {
+						this.stop();
 						return;
 					}
 				}
@@ -186,7 +192,7 @@ public class LoopingShootSoundInstance extends MovingSoundInstance {
 	}
 
 	public void updateSound() {
-		WeightedSoundSet wss = this.getSoundSet(MinecraftClient.getInstance().getSoundManager());
+		WeighedSoundEvents wss = this.resolve(Minecraft.getInstance().getSoundManager());
 
 		if (wss != null) {
 			this.pitch = this.getPitch();
@@ -200,7 +206,7 @@ public class LoopingShootSoundInstance extends MovingSoundInstance {
 
 	protected SoundSystemAccess getSoundSystem() {
 		return (SoundSystemAccess) ((SoundManagerAccess)
-			MinecraftClient
+			Minecraft
 				.getInstance()
 				.getSoundManager())
 			.dm$getSoundSystem();
@@ -209,8 +215,8 @@ public class LoopingShootSoundInstance extends MovingSoundInstance {
 	public TickableSoundInstance queueSound(SoundEvent sound, boolean now) {
 		LoopingShootSoundInstance shootSoundInstance = this;
 
-		EntityTrackingSoundInstance soundInstance = new EntityTrackingSoundInstance(
-			sound, this.getCategory(),
+		EntityBoundSoundInstance soundInstance = new EntityBoundSoundInstance(
+			sound, this.getSource(),
 			1f, this.getPitch(),
 			this.turret,
 			this.getRandom().nextLong()
@@ -221,18 +227,18 @@ public class LoopingShootSoundInstance extends MovingSoundInstance {
 			private Optional<Boolean> canPlay = Optional.empty();
 
 			@Override
-			public boolean shouldAlwaysPlay() {
+			public boolean canStartSilent() {
 				if (this.shouldAlwaysPlay.isEmpty()) {
-					this.shouldAlwaysPlay = Optional.of(shootSoundInstance.shouldAlwaysPlay());
+					this.shouldAlwaysPlay = Optional.of(shootSoundInstance.canStartSilent());
 				}
 
 				return this.shouldAlwaysPlay.get();
 			}
 
 			@Override
-			public boolean canPlay() {
+			public boolean canPlaySound() {
 				if (this.canPlay.isEmpty()) {
-					this.canPlay = Optional.of(shootSoundInstance.canPlay());
+					this.canPlay = Optional.of(shootSoundInstance.canPlaySound());
 				}
 
 				return this.canPlay.get();
@@ -243,19 +249,19 @@ public class LoopingShootSoundInstance extends MovingSoundInstance {
 				super.tick();
 
 				if (turret == null) {
-					this.setDone();
+					this.stop();
 					return;
 				}
 
 				boolean isThisDone = ((SoundSystemAccess) ((SoundManagerAccess)
-					MinecraftClient
+					Minecraft
 						.getInstance()
 						.getSoundManager())
 					.dm$getSoundSystem())
 					.dm$isStopped(this);
 
 				if (isThisDone) {
-					this.setDone();
+					this.stop();
 				}
 			}
 		};
@@ -264,13 +270,13 @@ public class LoopingShootSoundInstance extends MovingSoundInstance {
 	}
 
 	public TickableSoundInstance queueSound(TickableSoundInstance soundInstance, boolean now) {
-		SoundManager manager =  MinecraftClient.getInstance().getSoundManager();
+		SoundManager manager =  Minecraft.getInstance().getSoundManager();
 
 		if (now) {
 			manager.play(soundInstance);
 		}
 		else {
-			manager.playNextTick(soundInstance);
+			manager.queueTickingSound(soundInstance);
 		}
 
 		return soundInstance;
@@ -281,10 +287,10 @@ public class LoopingShootSoundInstance extends MovingSoundInstance {
 			return 1f;
 		}
 
-		return this.volume * this.sound.getVolume().get(this.random);
+		return this.volume * this.sound.getVolume().sample(this.random);
 	}
 
-	public Random getRandom() {
+	public RandomSource getRandom() {
 		return this.random;
 	}
 
@@ -296,15 +302,15 @@ public class LoopingShootSoundInstance extends MovingSoundInstance {
 
 	@Nullable
 	@Override
-	public WeightedSoundSet getSoundSet(SoundManager soundManager) {
-		if (this.getId().equals(SoundManager.INTENTIONALLY_EMPTY_ID)) {
+	public WeighedSoundEvents resolve(@NonNull SoundManager soundManager) {
+		if (this.getIdentifier().equals(SoundManager.INTENTIONALLY_EMPTY_SOUND_LOCATION)) {
 			this.sound = SoundManager.INTENTIONALLY_EMPTY_SOUND;
-			return SoundManager.INTENTIONALLY_EMPTY_SOUND_SET;
+			return SoundManager.INTENTIONALLY_EMPTY_SOUND_EVENT;
 		}
 		else {
-			WeightedSoundSet weightedSoundSet = soundManager.get(this.getId());
+			WeighedSoundEvents weightedSoundSet = soundManager.getSoundEvent(this.getIdentifier());
 			if (weightedSoundSet == null) {
-				this.sound = SoundManager.MISSING_SOUND;
+				this.sound = SoundManager.EMPTY_SOUND;
 			}
 			else {
 				this.sound = weightedSoundSet.getSound(this.random);
@@ -315,12 +321,12 @@ public class LoopingShootSoundInstance extends MovingSoundInstance {
 	}
 
 	@Override
-	public String toString() {
+	public @NonNull String toString() {
 		boolean hasStarted = this.startSoundInstance != null &&
 			this.getSoundSystem().dm$isStopped(this.startSoundInstance);
 
 		Identifier currentId =  hasStarted ?
-			this.getId() : this.startSound.id();
+			this.getIdentifier() : this.startSound.location();
 
 		return "LoopingShootSoundInstance[" +
 			currentId +

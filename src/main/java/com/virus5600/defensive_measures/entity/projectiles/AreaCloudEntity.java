@@ -1,26 +1,27 @@
 package com.virus5600.defensive_measures.entity.projectiles;
 
-import net.minecraft.block.piston.PistonBehavior;
-import net.minecraft.entity.*;
-import net.minecraft.entity.damage.DamageSource;
-import net.minecraft.entity.data.DataTracker.Builder;
-import net.minecraft.entity.data.DataTracker;
-import net.minecraft.entity.data.TrackedData;
-import net.minecraft.entity.data.TrackedDataHandlerRegistry;
-import net.minecraft.entity.projectile.ProjectileUtil;
-import net.minecraft.particle.ParticleEffect;
-import net.minecraft.particle.ParticleTypes;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.RaycastContext;
-import net.minecraft.world.World;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData.Builder;
+import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.Mth;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.EntityReference;
+import net.minecraft.world.entity.projectile.ProjectileUtil;
+import net.minecraft.world.level.ClipContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.material.PushReaction;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
 
-import com.virus5600.defensive_measures.entity.turrets.tier2.FlameTurretEntity;
 import com.virus5600.defensive_measures.entity.projectiles.interfaces.CloudAction;
+import com.virus5600.defensive_measures.entity.turrets.tier2.FlameTurretEntity;
 
 import java.util.List;
 import java.util.Map;
@@ -74,16 +75,16 @@ import org.jspecify.annotations.NonNull;
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
  */
 public abstract class AreaCloudEntity extends TurretProjectileEntity {
-	private static final TrackedData<Float> RADIUS;
-	private static final TrackedData<Boolean> WAITING;
-	private static final TrackedData<ParticleEffect> PARTICLE;
+	private static final EntityDataAccessor<Float> RADIUS;
+	private static final EntityDataAccessor<Boolean> WAITING;
+	private static final EntityDataAccessor<ParticleOptions> PARTICLE;
 
-	protected static final ParticleEffect DEFAULT_PARTICLE = ParticleTypes.GUST;
+	protected static final ParticleOptions DEFAULT_PARTICLE = ParticleTypes.GUST;
 
 	private final Map<Entity, Integer> affectedEntities = Maps.newHashMap();
 
 	private CloudAction cloudAction;
-	private @Nullable ParticleEffect customParticle;
+	private @Nullable ParticleOptions customParticle;
 	/**
 	 * The target radius of the cloud. This is used to define the radius that the cloud will try to
 	 * reach when it grows or shrinks.<br>
@@ -124,19 +125,15 @@ public abstract class AreaCloudEntity extends TurretProjectileEntity {
 	// //////////// //
 	// CONSTRUCTORS //
 	// //////////// //
-	public AreaCloudEntity(EntityType<? extends AreaCloudEntity> entityType, World world) {
+	public AreaCloudEntity(EntityType<? extends AreaCloudEntity> entityType, Level world) {
 		super(entityType, world);
 
 		if (this.cloudAction == null) {
-			this.cloudAction = (cloud, target) -> {
-				target.addVelocity(
-					0,
-					0.1,
-					0
-				);
-
-				target.fallDistance = 0f;
-			};
+			this.cloudAction = (_, target) -> target.push(
+				0,
+				0.1,
+				0
+			);
 		}
 	}
 
@@ -144,12 +141,12 @@ public abstract class AreaCloudEntity extends TurretProjectileEntity {
 	// INITIALIZERS //
 	// //////////// //
 	@Override
-	protected void initDataTracker(@NonNull Builder builder) {
-		super.initDataTracker(builder);
+	protected void defineSynchedData(@NonNull Builder builder) {
+		super.defineSynchedData(builder);
 
-		builder.add(RADIUS, 3f)
-			.add(WAITING, false)
-			.add(PARTICLE, DEFAULT_PARTICLE);
+		builder.define(RADIUS, 3f)
+			.define(WAITING, false)
+			.define(PARTICLE, DEFAULT_PARTICLE);
 	}
 
 	// //////////// //
@@ -157,47 +154,47 @@ public abstract class AreaCloudEntity extends TurretProjectileEntity {
 	// //////////// //
 
 	public void setRadius(float radius) {
-		if (!this.getEntityWorld().isClient()) {
-			radius = MathHelper.clamp(radius, 0f, 32f);
-			this.getDataTracker().set(RADIUS, radius);
+		if (!this.level().isClientSide()) {
+			radius = Mth.clamp(radius, 0f, 32f);
+			this.getEntityData().set(RADIUS, radius);
 		}
 	}
 
-	public void calculateDimensions() {
+	public void refreshDimensions() {
 		double x = this.getX();
 		double y = this.getY();
 		double z = this.getZ();
 
-		super.calculateDimensions();
+		super.refreshDimensions();
 
-		this.setPosition(x, y, z);
+		this.setPos(x, y, z);
 	}
 
 	public float getRadius() {
-		return this.getDataTracker().get(RADIUS);
+		return this.getEntityData().get(RADIUS);
 	}
 
 	protected void setWaiting(boolean waiting) {
-		this.getDataTracker().set(WAITING, waiting);
+		this.getEntityData().set(WAITING, waiting);
 	}
 
 	public boolean isWaiting() {
-		return this.getDataTracker().get(WAITING);
+		return this.getEntityData().get(WAITING);
 	}
 
-	public void setParticleType(@Nullable ParticleEffect customParticle) {
+	public void setParticleType(@Nullable ParticleOptions customParticle) {
 		this.customParticle = customParticle;
 
 		if (this.customParticle != null) {
-			this.dataTracker.set(PARTICLE, this.customParticle);
+			this.entityData.set(PARTICLE, this.customParticle);
 		}
 		else {
-			this.dataTracker.set(PARTICLE, DEFAULT_PARTICLE);
+			this.entityData.set(PARTICLE, DEFAULT_PARTICLE);
 		}
 	}
 
-	public ParticleEffect getParticleType() {
-		return this.getDataTracker().get(PARTICLE);
+	public ParticleOptions getParticleType() {
+		return this.getEntityData().get(PARTICLE);
 	}
 
 	// ///////////////// //
@@ -210,12 +207,12 @@ public abstract class AreaCloudEntity extends TurretProjectileEntity {
 	 *
 	 * @return the default particle for this cloud instance.
 	 */
-	protected ParticleEffect getDefaultParticle() {
+	protected ParticleOptions getDefaultParticle() {
 		return DEFAULT_PARTICLE;
 	}
 
 	@Override
-	protected double getGravity() {
+	protected double getDefaultGravity() {
 		return 0.025;
 	}
 
@@ -281,7 +278,7 @@ public abstract class AreaCloudEntity extends TurretProjectileEntity {
 	 * @param targetRadius the target radius of the cloud. Setting to current radius will make the cloud static in terms of radius change.
 	 */
 	public void setTargetRadius(float targetRadius) {
-		targetRadius = MathHelper.clamp(targetRadius, 0f, 32f);
+		targetRadius = Mth.clamp(targetRadius, 0f, 32f);
 
 		this.targetRadius = targetRadius;
 	}
@@ -304,7 +301,7 @@ public abstract class AreaCloudEntity extends TurretProjectileEntity {
 	 * @param targetAge the target age of the cloud in ticks.
 	 */
 	public void setTargetAge(int targetAge) {
-		targetAge = MathHelper.clamp(targetAge, -1, Integer.MAX_VALUE);
+		targetAge = Mth.clamp(targetAge, -1, Integer.MAX_VALUE);
 
 		this.targetAge = targetAge;
 	}
@@ -398,7 +395,7 @@ public abstract class AreaCloudEntity extends TurretProjectileEntity {
 	 * @param delay the amount of the cooldown (in ticks) that will be applied to an entity before another instance of effect/behavior can be applied to a target.
 	 */
 	public void setReApplicationDelay(int delay) {
-		this.reApplicationDelay = MathHelper.abs(delay);
+		this.reApplicationDelay = Mth.abs(delay);
 	}
 
 	public int getReApplicationDelay() {
@@ -445,7 +442,7 @@ public abstract class AreaCloudEntity extends TurretProjectileEntity {
 		if (!this.affectedEntities.containsKey(target)) {
 
 			// Put the entity on cooldown
-			this.affectedEntities.put(target, this.age + this.getReApplicationDelay());
+			this.affectedEntities.put(target, this.tickCount + this.getReApplicationDelay());
 
 			// EXECUTE CUSTOM SCRIPT: Apply fire, cryo, etc.
 			if (this.getCloudAction() != null) {
@@ -461,39 +458,39 @@ public abstract class AreaCloudEntity extends TurretProjectileEntity {
 	protected void move() {
 		this.applyDrag();
 
-		HitResult hitResult = ProjectileUtil.getCollision(this, this::canHit, RaycastContext.ShapeType.COLLIDER);
+		HitResult hitResult = ProjectileUtil.getHitResultOnMoveVector(this, this::canHitEntity, ClipContext.Block.COLLIDER);
 
-		Vec3d pos = this.getEntityPos();
+		Vec3 pos = this.position();
 		if (hitResult.getType() != HitResult.Type.MISS) {
-			pos = hitResult.getPos();
+			pos = hitResult.getLocation();
 		} else {
-			pos = pos.add(this.getVelocity());
+			pos = pos.add(this.getDeltaMovement());
 		}
 
-		ProjectileUtil.setRotationFromVelocity(this, 0.2F);
+		ProjectileUtil.rotateTowardsMovement(this, 0.2F);
 
-		this.setPosition(pos);
-		this.tickBlockCollision();
+		this.setPos(pos);
+		this.applyEffectsFromBlocks();
 		this.applyGravity();
 	}
 
 	@Override
-	public EntityDimensions getDimensions(EntityPose pose) {
-		return EntityDimensions.changing(this.getRadius() * 2.0F, 0.5F);
+	public @NonNull EntityDimensions getDimensions(@NonNull Pose pose) {
+		return EntityDimensions.scalable(this.getRadius() * 2.0F, 0.5F);
 	}
 
 	@Override
-	public PistonBehavior getPistonBehavior() {
-		return PistonBehavior.IGNORE;
+	public @NonNull PushReaction getPistonPushReaction() {
+		return PushReaction.IGNORE;
 	}
 
 	@Override
-	public void onTrackedDataSet(TrackedData<?> data) {
+	public void onSyncedDataUpdated(@NonNull EntityDataAccessor<?> data) {
 		if (RADIUS.equals(data)) {
-			this.calculateDimensions();
+			this.refreshDimensions();
 		}
 
-		super.onTrackedDataSet(data);
+		super.onSyncedDataUpdated(data);
 	}
 
 	@Override
@@ -501,7 +498,7 @@ public abstract class AreaCloudEntity extends TurretProjectileEntity {
 		this.move();
 		super.tick();
 
-		if (this.getEntityWorld() instanceof ServerWorld serverWorld) {
+		if (this.level() instanceof ServerLevel serverWorld) {
 			this.serverTick(serverWorld);
 		}
 		else {
@@ -518,8 +515,8 @@ public abstract class AreaCloudEntity extends TurretProjectileEntity {
 		float cloudRadius = this.getRadius();
 
 		if (!isWaiting || !this.random.nextBoolean()) {
-			ParticleEffect particleEffect = this.getParticleType();
-			World world = this.getEntityWorld();
+			ParticleOptions particleEffect = this.getParticleType();
+			Level world = this.level();
 
 			int cloudArea;
 			float currentCloudRadius;
@@ -529,28 +526,28 @@ public abstract class AreaCloudEntity extends TurretProjectileEntity {
 				currentCloudRadius = 0.2F;
 			}
 			else {
-				cloudArea = MathHelper.ceil((float) Math.PI * cloudRadius * cloudRadius);
+				cloudArea = Mth.ceil((float) Math.PI * cloudRadius * cloudRadius);
 				currentCloudRadius = cloudRadius;
 			}
 
 			for (int i = 0; i < cloudArea; ++i) {
 				float theta = this.random.nextFloat() * ((float) Math.PI * 2F);
-				float targetRadPos = MathHelper.sqrt(this.random.nextFloat()) * currentCloudRadius;
+				float targetRadPos = Mth.sqrt(this.random.nextFloat()) * currentCloudRadius;
 
-				double x = this.getX() + (double) (MathHelper.cos(theta) * targetRadPos);
+				double x = this.getX() + (double) (Mth.cos(theta) * targetRadPos);
 				double y = this.getY();
-				double z = this.getZ() + (double) (MathHelper.sin(theta) * targetRadPos);
+				double z = this.getZ() + (double) (Mth.sin(theta) * targetRadPos);
 
 				if (particleEffect.getType() == ParticleTypes.ENTITY_EFFECT) {
 					if (isWaiting && this.random.nextBoolean()) {
-						world.addImportantParticleClient(
+						world.addAlwaysVisibleParticle(
 							DEFAULT_PARTICLE,
 							x, y, z,
 							0.0F, 0.0F, 0.0F
 						);
 					}
 					else {
-						world.addImportantParticleClient(
+						world.addAlwaysVisibleParticle(
 							particleEffect,
 							x, y, z,
 							0.0F, 0.0F,  0.0F
@@ -558,14 +555,14 @@ public abstract class AreaCloudEntity extends TurretProjectileEntity {
 					}
 				}
 				else if (isWaiting) {
-					world.addImportantParticleClient(
+					world.addAlwaysVisibleParticle(
 						particleEffect,
 						x, y, z,
 						0.0F, 0.0F, 0.0F
 					);
 				}
 				else {
-					world.addImportantParticleClient(
+					world.addAlwaysVisibleParticle(
 						particleEffect,
 						x, y, z,
 						((double) 0.5F - this.random.nextDouble()) * 0.15,
@@ -582,11 +579,11 @@ public abstract class AreaCloudEntity extends TurretProjectileEntity {
 	 *
 	 * @param world the world this entity is in
 	 */
-	protected void serverTick(ServerWorld world) {
+	protected void serverTick(ServerLevel world) {
 		// Discards the entity if it has existed for longer than its duration (if it has a duration)
 		// or if it has reached its target radius.
-		if ((this.getDuration() != -1 && this.age - this.getWaitTime() >= this.getDuration()) ||
-			(MathHelper.abs(this.getRadius()) >= Math.abs(this.getTargetRadius()))
+		if ((this.getDuration() != -1 && this.tickCount - this.getWaitTime() >= this.getDuration()) ||
+			(Mth.abs(this.getRadius()) >= Math.abs(this.getTargetRadius()))
 		) {
 			this.discard();
 		}
@@ -595,7 +592,7 @@ public abstract class AreaCloudEntity extends TurretProjectileEntity {
 		// since it's common for all area clouds.
 		else {
 			boolean isWaiting = this.isWaiting();
-			boolean stillWaiting = this.age < this.getWaitTime();
+			boolean stillWaiting = this.tickCount < this.getWaitTime();
 
 			// Update waiting status
 			if (isWaiting != stillWaiting) {
@@ -612,7 +609,7 @@ public abstract class AreaCloudEntity extends TurretProjectileEntity {
 					// Makes sure that the cloud is discarded once it reaches its minimum or
 					// maximum size, or when the age reaches its target age (if it has a target age).
 					if ((radius < 0.5F || radius > 32F) ||
-						(this.getTargetAge() > 0 && this.age > this.getTargetAge())
+						(this.getTargetAge() > 0 && this.tickCount > this.getTargetAge())
 					) {
 						this.discard();
 						return;
@@ -621,7 +618,7 @@ public abstract class AreaCloudEntity extends TurretProjectileEntity {
 					this.setRadius(radius);
 				}
 				else {
-					if (this.getTargetAge() > 0 && this.age > this.getTargetAge()) {
+					if (this.getTargetAge() > 0 && this.tickCount > this.getTargetAge()) {
 						this.discard();
 					}
 				}
@@ -629,10 +626,10 @@ public abstract class AreaCloudEntity extends TurretProjectileEntity {
 				// 1. Clean the global cooldown map
 				this.affectedEntities
 					.entrySet()
-					.removeIf((entry) -> this.age >= entry.getValue());
+					.removeIf((entry) -> this.tickCount >= entry.getValue());
 
 				// 2. Grab everything in the general area
-				List<LivingEntity> targets = this.getEntityWorld().getNonSpectatingEntities(LivingEntity.class, this.getBoundingBox());
+				List<LivingEntity> targets = this.level().getEntitiesOfClass(LivingEntity.class, this.getBoundingBox());
 
 				// 3. Process them cleanly
 				for (LivingEntity target : targets) {
@@ -648,29 +645,29 @@ public abstract class AreaCloudEntity extends TurretProjectileEntity {
 	// CUSTOM DATA READING AND WRITING //
 	// /////////////////////////////// //
 	@Override
-	public void readCustomData(@NonNull ReadView view) {
-		this.targetAge = view.getInt("TargetAge", this.targetAge);
-		this.age = view.getInt("Age", 0);
-		this.duration = view.getInt("Duration", this.duration);
-		this.waitTime = view.getInt("WaitTime", this.waitTime);
-		this.reApplicationDelay = view.getInt("ReApplicationDelay", this.reApplicationDelay);
-		this.durationOnUse = view.getInt("DurationOnUse", this.durationOnUse);
-		this.targetRadius = view.getFloat("TargetRadius", this.targetRadius);
-		this.radiusOnUse = view.getFloat("RadiusOnUse", this.radiusOnUse);
-		this.radiusGrowth = view.getFloat("RadiusPerTick", this.radiusGrowth);
-		this.setRadius(view.getFloat("Radius", this.getRadius()));
-		this.owner = LazyEntityReference.fromData(view, "Owner");
+	public void readAdditionalSaveData(@NonNull ValueInput view) {
+		this.targetAge = view.getIntOr("TargetAge", this.targetAge);
+		this.tickCount = view.getIntOr("Age", 0);
+		this.duration = view.getIntOr("Duration", this.duration);
+		this.waitTime = view.getIntOr("WaitTime", this.waitTime);
+		this.reApplicationDelay = view.getIntOr("ReApplicationDelay", this.reApplicationDelay);
+		this.durationOnUse = view.getIntOr("DurationOnUse", this.durationOnUse);
+		this.targetRadius = view.getFloatOr("TargetRadius", this.targetRadius);
+		this.radiusOnUse = view.getFloatOr("RadiusOnUse", this.radiusOnUse);
+		this.radiusGrowth = view.getFloatOr("RadiusPerTick", this.radiusGrowth);
+		this.setRadius(view.getFloatOr("Radius", this.getRadius()));
+		this.owner = EntityReference.read(view, "Owner");
 
 		this.setParticleType(
-			view.read("custom_particle", ParticleTypes.TYPE_CODEC)
+			view.read("custom_particle", ParticleTypes.CODEC)
 				.orElse(this.getDefaultParticle())
 		);
 	}
 
 	@Override
-	public void writeCustomData(@NonNull WriteView view) {
+	public void addAdditionalSaveData(@NonNull ValueOutput view) {
 		view.putInt("TargetAge", this.targetAge);
-		view.putInt("Age", this.age);
+		view.putInt("Age", this.tickCount);
 		view.putInt("Duration", this.duration);
 		view.putInt("WaitTime", this.waitTime);
 		view.putInt("ReapplicationDelay", this.reApplicationDelay);
@@ -679,8 +676,8 @@ public abstract class AreaCloudEntity extends TurretProjectileEntity {
 		view.putFloat("RadiusOnUse", this.radiusOnUse);
 		view.putFloat("RadiusPerTick", this.radiusGrowth);
 		view.putFloat("Radius", this.getRadius());
-		LazyEntityReference.writeData(this.owner, view, "Owner");
-		view.putNullable("custom_particle", ParticleTypes.TYPE_CODEC, this.customParticle);
+		EntityReference.store(this.owner, view, "Owner");
+		view.storeNullable("custom_particle", ParticleTypes.CODEC, this.customParticle);
 	}
 
 	// ///////////// //
@@ -688,7 +685,7 @@ public abstract class AreaCloudEntity extends TurretProjectileEntity {
 	// ///////////// //
 
 	@Override
-	public final boolean damage(ServerWorld world, DamageSource source, float amount) {
+	public final boolean hurtServer(@NonNull ServerLevel world, @NonNull DamageSource source, float amount) {
 		return false;
 	}
 
@@ -720,8 +717,8 @@ public abstract class AreaCloudEntity extends TurretProjectileEntity {
 	// STATIC INITIALIZE //
 	// ///////////////// //
 	static {
-		RADIUS = DataTracker.registerData(AreaCloudEntity.class, TrackedDataHandlerRegistry.FLOAT);
-		WAITING = DataTracker.registerData(AreaCloudEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
-		PARTICLE = DataTracker.registerData(AreaCloudEntity.class, TrackedDataHandlerRegistry.PARTICLE);
+		RADIUS = SynchedEntityData.defineId(AreaCloudEntity.class, EntityDataSerializers.FLOAT);
+		WAITING = SynchedEntityData.defineId(AreaCloudEntity.class, EntityDataSerializers.BOOLEAN);
+		PARTICLE = SynchedEntityData.defineId(AreaCloudEntity.class, EntityDataSerializers.PARTICLE);
 	}
 }

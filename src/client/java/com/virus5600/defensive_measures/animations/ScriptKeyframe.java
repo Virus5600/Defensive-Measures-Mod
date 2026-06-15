@@ -1,10 +1,10 @@
 package com.virus5600.defensive_measures.animations;
 
-import com.virus5600.defensive_measures._util.MathUtil;
-import net.minecraft.client.render.entity.state.EntityRenderState;
-import net.minecraft.entity.AnimationState;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
+import net.minecraft.world.entity.AnimationState;
+import net.minecraft.world.phys.Vec3;
 
+import com.virus5600.defensive_measures._util.MathUtil;
 import com.virus5600.defensive_measures.renderer.entity.state.BaseTurretRenderState;
 
 import org.jetbrains.annotations.Nullable;
@@ -20,7 +20,7 @@ import org.jetbrains.annotations.Nullable;
  * @see KeyframeAction
  * @since 1.1.0-beta
  */
-public record ScriptKeyframe(double getTime, KeyframeAction script, Vec3d pos) implements Keyframe {
+public record ScriptKeyframe(double getTime, KeyframeAction script, Vec3 pos) implements Keyframe {
 	// //////////// //
 	// CONSTRUCTORS //
 	// //////////// //
@@ -38,7 +38,7 @@ public record ScriptKeyframe(double getTime, KeyframeAction script, Vec3d pos) i
 	 * @param script The action to be executed when the keyframe is applied.
 	 */
 	public ScriptKeyframe(double time, KeyframeAction script) {
-		this(time, script, Vec3d.ZERO);
+		this(time, script, Vec3.ZERO);
 	}
 
 	/**
@@ -94,7 +94,7 @@ public record ScriptKeyframe(double getTime, KeyframeAction script, Vec3d pos) i
 	 * @param pos    The position in 3D space where the script should be executed.
 	 * @return A new instance of ScriptKeyframe with the specified time, script, and position for script execution.
 	 */
-	public static ScriptKeyframe of(double time, KeyframeAction script, Vec3d pos) {
+	public static ScriptKeyframe of(double time, KeyframeAction script, Vec3 pos) {
 		return new ScriptKeyframe(time, script, pos);
 	}
 
@@ -122,9 +122,9 @@ public record ScriptKeyframe(double getTime, KeyframeAction script, Vec3d pos) i
 	public void apply(AnimationState animState, EntityRenderState s) {
 		if (this.script != null) {
 			if (s instanceof BaseTurretRenderState state) {
-				Vec3d globalPos = MathUtil.getRelativePos(
+				Vec3 globalPos = MathUtil.getRelativePos(
 					state.eyePos, this.pos(),
-					state.relativeHeadYaw, state.pitch
+					state.yRot, state.xRot
 				);
 
 				this.script.execute(

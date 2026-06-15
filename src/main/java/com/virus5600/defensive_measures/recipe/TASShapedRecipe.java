@@ -1,50 +1,66 @@
 package com.virus5600.defensive_measures.recipe;
 
 import com.mojang.serialization.MapCodec;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStackTemplate;
+import net.minecraft.world.item.crafting.*;
+import net.minecraft.world.item.crafting.display.RecipeDisplay;
+import net.minecraft.world.item.crafting.display.SlotDisplay;
+
 import com.virus5600.defensive_measures.item.ModItems;
 import com.virus5600.defensive_measures.recipe.display.TASCraftingRecipeDisplay;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.codec.PacketCodecs;
-import net.minecraft.recipe.Ingredient;
-import net.minecraft.recipe.Recipe;
-import net.minecraft.recipe.RecipeSerializer;
-import net.minecraft.recipe.RecipeType;
-import net.minecraft.recipe.display.RecipeDisplay;
-import net.minecraft.recipe.display.ShapedCraftingRecipeDisplay;
-import net.minecraft.recipe.display.SlotDisplay;
-import net.minecraft.recipe.input.CraftingRecipeInput;
 
-import com.virus5600.defensive_measures.recipe.book.ModCraftingRecipeCategory;
+import com.google.common.annotations.VisibleForTesting;
+import org.jspecify.annotations.NonNull;
 
 import java.util.List;
+import java.util.Optional;
 
-public class TASShapedRecipe extends BaseCraftingRecipe<CraftingRecipeInput> {
+public class TASShapedRecipe extends BaseCraftingRecipe<CraftingInput> {
+	public static final MapCodec<TASShapedRecipe> MAP_CODEC;
+	public static final StreamCodec<RegistryFriendlyByteBuf, TASShapedRecipe> STREAM_CODEC;
+	public static final RecipeSerializer<TASShapedRecipe> SERIALIZER;
 
-	public static final MapCodec<TASShapedRecipe> CODEC;
-	public static final PacketCodec<RegistryByteBuf, TASShapedRecipe> PACKET_CODEC;
+	protected final CustomShapedRecipePattern pattern;
+	protected final ItemStackTemplate result;
 
-	public TASShapedRecipe(String group, ModCraftingRecipeCategory category, CustomShapedRecipe recipe, ItemStack result, boolean showNotification) {
-		super(group, category, recipe, result, showNotification);
+	public TASShapedRecipe(CommonInfo commonInfo, ModCraftingBookInfo bookInfo, CustomShapedRecipePattern pattern, ItemStackTemplate result) {
+		super(commonInfo, bookInfo, pattern, result);
+
+		this.pattern = pattern;
+		this.result = result;
+	}
+
+	// /////// //
+	// METHODS //
+	// /////// //
+
+	protected PlacementInfo createPlacementInfo() {
+		return PlacementInfo.createFromOptionals(this.pattern.ingredients());
+	}
+
+	@VisibleForTesting
+	public List<Optional<Ingredient>> getIngredients() {
+		return this.pattern.ingredients();
 	}
 
 	// //////////////// //
 	// OVERRIDE METHODS //
 	// //////////////// //
 
-	public List<RecipeDisplay> getDisplays() {
+	public @NonNull List<RecipeDisplay> display() {
 		return List.of(new TASCraftingRecipeDisplay(
-			this.recipe.getWidth(),
-			this.recipe.getHeight(),
-			this.recipe.getIngredients()
+			this.recipe.width(),
+			this.recipe.height(),
+			this.recipe.ingredients()
 				.stream()
 				.map((ingredient) ->
-					ingredient.map(Ingredient::toDisplay)
-						.orElse(SlotDisplay.EmptySlotDisplay.INSTANCE))
+					ingredient.map(Ingredient::display)
+						.orElse(SlotDisplay.Empty.INSTANCE))
 				.toList(),
-			new SlotDisplay.StackSlotDisplay(this.result),
+			new SlotDisplay.ItemStackSlotDisplay(this.result),
 			new SlotDisplay.ItemSlotDisplay(ModItems.TURRET_ASSEMBLY_STATION)
 		));
 	}
@@ -53,36 +69,47 @@ public class TASShapedRecipe extends BaseCraftingRecipe<CraftingRecipeInput> {
 	// ABSTRACT METHODS //
 	// //////////////// //
 
-	@Override
-	public RecipeType<? extends Recipe<CraftingRecipeInput>> getType() {
-		return ModRecipeTypes.TAS_RECIPE_TYPE;
+	protected CustomShapedRecipePattern pattern() {
+		return this.pattern;
 	}
 
 	// ///////////////// //
 	// INTERFACE METHODS //
 	// ///////////////// //
 
-	@Override
-	public RecipeSerializer<? extends BaseCraftingRecipe<CraftingRecipeInput>> getSerializer() {
+	@Override @NonNull
+	public RecipeType<? extends Recipe<CraftingInput>> getType() {
+		return ModRecipeTypes.TAS_RECIPE_TYPE;
+	}
+
+	@Override @NonNull
+	public RecipeSerializer<? extends BaseCraftingRecipe<CraftingInput>> getSerializer() {
 		return ModRecipeSerializers.TAS_SERIALIZER;
 	}
 
+	@NonNull
+	public ItemStack assemble(@NonNull CraftingInput input) {
+		return this.result.create();
+	}
+
+	// ////// //
+	// STATIC //
+	// ////// //
+
 	static {
-		CODEC = BaseCraftingRecipe.createCodec(
+		MAP_CODEC = BaseCraftingRecipe.createMapCodec(
 			7, 7,
-			ModCraftingRecipeCategory.CODEC,
-			ModCraftingRecipeCategory.MISC,
-			BaseCraftingRecipe::getCategory,
+			ModCraftingBookInfo.MAP_CODEC,
 			TASShapedRecipe::new
 		);
 
-		PACKET_CODEC = PacketCodec.tuple(
-			PacketCodecs.STRING, BaseCraftingRecipe::getGroup,
-			ModCraftingRecipeCategory.PACKET_CODEC, BaseCraftingRecipe::getCategory,
-			CustomShapedRecipe.PACKET_CODEC, recipe -> recipe.recipe,
-			ItemStack.PACKET_CODEC, recipe -> recipe.result,
-			PacketCodecs.BOOLEAN, BaseCraftingRecipe::showNotification,
-			TASShapedRecipe::new
+		STREAM_CODEC = StreamCodec.composite(
+			CommonInfo.STREAM_CODEC, recipe -> recipe.commonInfo,
+			ModCraftingBookInfo.STREAM_CODEC, recipe -> recipe.bookInfo,
+			CustomShapedRecipePattern.STREAM_CODEC, recipe -> recipe.pattern,
+			ItemStackTemplate.STREAM_CODEC, (o) -> o.result, TASShapedRecipe::new
 		);
+
+		SERIALIZER = ModRecipeSerializers.TAS_SERIALIZER;
 	}
 }

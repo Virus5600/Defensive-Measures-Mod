@@ -1,19 +1,22 @@
 package com.virus5600.defensive_measures.model.entity;
 
-import com.virus5600.defensive_measures.particle.ModParticles;
-import net.minecraft.client.model.*;
-import net.minecraft.particle.ParticleTypes;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.client.model.geom.ModelPart;
+import net.minecraft.client.model.geom.PartPose;
+import net.minecraft.client.model.geom.builders.*;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.world.phys.Vec3;
 
 import com.virus5600.defensive_measures._util.MathUtil;
 import com.virus5600.defensive_measures.animations.FXKeyframe;
 import com.virus5600.defensive_measures.animations.Keyframe;
 import com.virus5600.defensive_measures.animations.entity.MissileTurretAnimation;
+import com.virus5600.defensive_measures.particle.ModParticles;
 import com.virus5600.defensive_measures.renderer.entity.state.MissileTurretRenderState;
 
 import java.util.PriorityQueue;
 import java.util.Queue;
 
+import org.jspecify.annotations.NonNull;
 
 public class MissileTurretModel extends BaseTurretModel<MissileTurretRenderState> {
 	private final static Queue<? extends Keyframe> SHOOT_KEYFRAMES;
@@ -43,53 +46,53 @@ public class MissileTurretModel extends BaseTurretModel<MissileTurretRenderState
 			.getChild("radar_dish");
 	}
 
-	public static TexturedModelData getTexturedModelData() {
-		ModelData modelData = new ModelData();
-		ModelPartData modelPartData = modelData.getRoot();
+	public static LayerDefinition getTexturedModelData() {
+		MeshDefinition modelData = new MeshDefinition();
+		PartDefinition modelPartData = modelData.getRoot();
 
-		ModelPartData base = modelPartData.addChild("base", ModelPartBuilder.create().uv(104, 68).cuboid(-16.0F, -2.0F, -10.0F, 4.0F, 2.0F, 20.0F, new Dilation(0.0F))
-			.uv(122, 31).cuboid(12.0F, -2.0F, -10.0F, 4.0F, 2.0F, 20.0F, new Dilation(0.0F))
-			.uv(122, 53).cuboid(-10.0F, -2.0F, 12.0F, 20.0F, 2.0F, 4.0F, new Dilation(0.0F))
-			.uv(122, 59).cuboid(-10.0F, -2.0F, -16.0F, 20.0F, 2.0F, 4.0F, new Dilation(0.0F))
-			.uv(88, 126).cuboid(-10.0F, -3.0F, -12.0F, 20.0F, 3.0F, 2.0F, new Dilation(0.0F))
-			.uv(52, 68).cuboid(-12.0F, -3.0F, -12.0F, 2.0F, 3.0F, 24.0F, new Dilation(0.0F))
-			.uv(0, 68).cuboid(10.0F, -3.0F, -12.0F, 2.0F, 3.0F, 24.0F, new Dilation(0.0F))
-			.uv(104, 90).cuboid(-10.0F, -3.0F, 10.0F, 20.0F, 3.0F, 2.0F, new Dilation(0.0F))
-			.uv(0, 0).cuboid(-10.0F, -2.0F, -10.0F, 20.0F, 2.0F, 20.0F, new Dilation(0.0F)), ModelTransform.origin(0.0F, 24.0F, 0.0F));
+		PartDefinition base = modelPartData.addOrReplaceChild("base", CubeListBuilder.create().texOffs(104, 68).addBox(-16.0F, -2.0F, -10.0F, 4.0F, 2.0F, 20.0F, new CubeDeformation(0.0F))
+			.texOffs(122, 31).addBox(12.0F, -2.0F, -10.0F, 4.0F, 2.0F, 20.0F, new CubeDeformation(0.0F))
+			.texOffs(122, 53).addBox(-10.0F, -2.0F, 12.0F, 20.0F, 2.0F, 4.0F, new CubeDeformation(0.0F))
+			.texOffs(122, 59).addBox(-10.0F, -2.0F, -16.0F, 20.0F, 2.0F, 4.0F, new CubeDeformation(0.0F))
+			.texOffs(88, 126).addBox(-10.0F, -3.0F, -12.0F, 20.0F, 3.0F, 2.0F, new CubeDeformation(0.0F))
+			.texOffs(52, 68).addBox(-12.0F, -3.0F, -12.0F, 2.0F, 3.0F, 24.0F, new CubeDeformation(0.0F))
+			.texOffs(0, 68).addBox(10.0F, -3.0F, -12.0F, 2.0F, 3.0F, 24.0F, new CubeDeformation(0.0F))
+			.texOffs(104, 90).addBox(-10.0F, -3.0F, 10.0F, 20.0F, 3.0F, 2.0F, new CubeDeformation(0.0F))
+			.texOffs(0, 0).addBox(-10.0F, -2.0F, -10.0F, 20.0F, 2.0F, 20.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, 24.0F, 0.0F));
 
-		ModelPartData stand = base.addChild("stand", ModelPartBuilder.create().uv(0, 51).cuboid(-8.0F, -3.0F, -8.0F, 16.0F, 1.0F, 16.0F, new Dilation(0.0F))
-			.uv(80, 0).cuboid(-4.0F, -5.0F, -4.0F, 8.0F, 2.0F, 8.0F, new Dilation(0.0F)), ModelTransform.origin(0.0F, 0.0F, 0.0F));
+		PartDefinition stand = base.addOrReplaceChild("stand", CubeListBuilder.create().texOffs(0, 51).addBox(-8.0F, -3.0F, -8.0F, 16.0F, 1.0F, 16.0F, new CubeDeformation(0.0F))
+			.texOffs(80, 0).addBox(-4.0F, -5.0F, -4.0F, 8.0F, 2.0F, 8.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, 0.0F, 0.0F));
 
-		ModelPartData column = stand.addChild("column", ModelPartBuilder.create().uv(0, 128).cuboid(-2.0F, -10.0F, -2.0F, 4.0F, 10.0F, 4.0F, new Dilation(0.0F)), ModelTransform.origin(0.0F, -5.0F, 0.0F));
+		PartDefinition column = stand.addOrReplaceChild("column", CubeListBuilder.create().texOffs(0, 128).addBox(-2.0F, -10.0F, -2.0F, 4.0F, 10.0F, 4.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, -5.0F, 0.0F));
 
-		ModelPartData swivel = column.addChild("swivel", ModelPartBuilder.create().uv(80, 10).cuboid(-4.0F, -2.0F, -4.0F, 8.0F, 2.0F, 8.0F, new Dilation(0.0F))
-			.uv(56, 128).cuboid(6.1213F, -12.1213F, -2.0F, 2.0F, 8.0F, 4.0F, new Dilation(0.0F))
-			.uv(44, 128).cuboid(-8.1213F, -12.1213F, -2.0F, 2.0F, 8.0F, 4.0F, new Dilation(0.0F)), ModelTransform.origin(0.0F, -10.0F, 0.0F));
-		swivel.addChild("swivel_r1", ModelPartBuilder.create().uv(82, 131).cuboid(-3.0F, 0.0F, -2.0F, 3.0F, 2.0F, 4.0F, new Dilation(0.0F)), ModelTransform.of(-4.0F, -2.0F, 0.0F, 0.0F, 0.0F, 0.7854F));
-		swivel.addChild("swivel_r2", ModelPartBuilder.create().uv(68, 128).cuboid(0.0F, 0.0F, -2.0F, 3.0F, 2.0F, 4.0F, new Dilation(0.0F)), ModelTransform.of(4.0F, -2.0F, 0.0F, 0.0F, 0.0F, -0.7854F));
+		PartDefinition swivel = column.addOrReplaceChild("swivel", CubeListBuilder.create().texOffs(80, 10).addBox(-4.0F, -2.0F, -4.0F, 8.0F, 2.0F, 8.0F, new CubeDeformation(0.0F))
+			.texOffs(56, 128).addBox(6.1213F, -12.1213F, -2.0F, 2.0F, 8.0F, 4.0F, new CubeDeformation(0.0F))
+			.texOffs(44, 128).addBox(-8.1213F, -12.1213F, -2.0F, 2.0F, 8.0F, 4.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, -10.0F, 0.0F));
+		swivel.addOrReplaceChild("swivel_r1", CubeListBuilder.create().texOffs(82, 131).addBox(-3.0F, 0.0F, -2.0F, 3.0F, 2.0F, 4.0F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(-4.0F, -2.0F, 0.0F, 0.0F, 0.0F, 0.7854F));
+		swivel.addOrReplaceChild("swivel_r2", CubeListBuilder.create().texOffs(68, 128).addBox(0.0F, 0.0F, -2.0F, 3.0F, 2.0F, 4.0F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(4.0F, -2.0F, 0.0F, 0.0F, 0.0F, -0.7854F));
 
-		ModelPartData head = swivel.addChild("head", ModelPartBuilder.create().uv(44, 95).cuboid(-5.0F, -5.75F, -11.0F, 1.0F, 12.0F, 21.0F, new Dilation(0.0F))
-			.uv(112, 0).cuboid(-6.0F, -4.75F, -11.0F, 1.0F, 10.0F, 21.0F, new Dilation(0.0F))
-			.uv(0, 22).cuboid(-4.0F, -4.75F, -10.0F, 8.0F, 10.0F, 19.0F, new Dilation(0.0F))
-			.uv(54, 22).cuboid(-4.0F, 5.25F, -11.0F, 8.0F, 2.0F, 21.0F, new Dilation(0.0F))
-			.uv(64, 45).cuboid(-4.0F, -6.75F, -11.0F, 8.0F, 2.0F, 21.0F, new Dilation(0.0F))
-			.uv(88, 95).cuboid(5.0F, -4.75F, -11.0F, 1.0F, 10.0F, 21.0F, new Dilation(0.0F))
-			.uv(0, 95).cuboid(4.0F, -5.75F, -11.0F, 1.0F, 12.0F, 21.0F, new Dilation(0.0F))
-			.uv(30, 128).cuboid(5.1F, -2.75F, -3.0F, 1.0F, 6.0F, 6.0F, new Dilation(0.0F))
-			.uv(16, 128).cuboid(-6.1F, -2.75F, -3.0F, 1.0F, 6.0F, 6.0F, new Dilation(0.0F)), ModelTransform.origin(0.0F, -10.25F, 0.0F));
+		PartDefinition head = swivel.addOrReplaceChild("head", CubeListBuilder.create().texOffs(44, 95).addBox(-5.0F, -5.75F, -11.0F, 1.0F, 12.0F, 21.0F, new CubeDeformation(0.0F))
+			.texOffs(112, 0).addBox(-6.0F, -4.75F, -11.0F, 1.0F, 10.0F, 21.0F, new CubeDeformation(0.0F))
+			.texOffs(0, 22).addBox(-4.0F, -4.75F, -10.0F, 8.0F, 10.0F, 19.0F, new CubeDeformation(0.0F))
+			.texOffs(54, 22).addBox(-4.0F, 5.25F, -11.0F, 8.0F, 2.0F, 21.0F, new CubeDeformation(0.0F))
+			.texOffs(64, 45).addBox(-4.0F, -6.75F, -11.0F, 8.0F, 2.0F, 21.0F, new CubeDeformation(0.0F))
+			.texOffs(88, 95).addBox(5.0F, -4.75F, -11.0F, 1.0F, 10.0F, 21.0F, new CubeDeformation(0.0F))
+			.texOffs(0, 95).addBox(4.0F, -5.75F, -11.0F, 1.0F, 12.0F, 21.0F, new CubeDeformation(0.0F))
+			.texOffs(30, 128).addBox(5.1F, -2.75F, -3.0F, 1.0F, 6.0F, 6.0F, new CubeDeformation(0.0F))
+			.texOffs(16, 128).addBox(-6.1F, -2.75F, -3.0F, 1.0F, 6.0F, 6.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, -10.25F, 0.0F));
 
-		ModelPartData radar = head.addChild("radar", ModelPartBuilder.create().uv(0, 12).cuboid(-2.0F, -1.0F, -2.0F, 4.0F, 1.0F, 4.0F, new Dilation(0.0F))
-			.uv(8, 0).cuboid(-0.5F, -3.5F, -0.5F, 1.0F, 3.0F, 1.0F, new Dilation(-0.375F)), ModelTransform.origin(0.0F, -6.75F, 6.0F));
+		PartDefinition radar = head.addOrReplaceChild("radar", CubeListBuilder.create().texOffs(0, 12).addBox(-2.0F, -1.0F, -2.0F, 4.0F, 1.0F, 4.0F, new CubeDeformation(0.0F))
+			.texOffs(8, 0).addBox(-0.5F, -3.5F, -0.5F, 1.0F, 3.0F, 1.0F, new CubeDeformation(-0.375F)), PartPose.offset(0.0F, -6.75F, 6.0F));
 
-		ModelPartData radar_dish = radar.addChild("radar_dish", ModelPartBuilder.create(), ModelTransform.origin(0.0F, -3.125F, 0.0F));
-		radar_dish.addChild("radar_dish_r1", ModelPartBuilder.create().uv(4, 0).cuboid(-2.75F, -1.5F, -2.125F, 1.0F, 3.0F, 1.0F, new Dilation(-0.38F))
-			.uv(0, 0).cuboid(1.75F, -1.5F, -2.125F, 1.0F, 3.0F, 1.0F, new Dilation(-0.38F))
-			.uv(0, 6).cuboid(-2.5F, 0.75F, -2.125F, 5.0F, 1.0F, 1.0F, new Dilation(-0.38F))
-			.uv(0, 4).cuboid(-2.5F, -1.75F, -2.125F, 5.0F, 1.0F, 1.0F, new Dilation(-0.38F))
-			.uv(0, 8).cuboid(-2.5F, -1.5F, -1.875F, 5.0F, 3.0F, 1.0F, new Dilation(-0.38F))
-			.uv(12, 0).cuboid(-0.5F, -0.5F, -2.625F, 1.0F, 1.0F, 3.0F, new Dilation(-0.38F)), ModelTransform.of(0.0F, 0.0F, 0.0F, -0.6109F, 0.0F, 0.0F));
+		PartDefinition radar_dish = radar.addOrReplaceChild("radar_dish", CubeListBuilder.create(), PartPose.offset(0.0F, -3.125F, 0.0F));
+		radar_dish.addOrReplaceChild("radar_dish_r1", CubeListBuilder.create().texOffs(4, 0).addBox(-2.75F, -1.5F, -2.125F, 1.0F, 3.0F, 1.0F, new CubeDeformation(-0.38F))
+			.texOffs(0, 0).addBox(1.75F, -1.5F, -2.125F, 1.0F, 3.0F, 1.0F, new CubeDeformation(-0.38F))
+			.texOffs(0, 6).addBox(-2.5F, 0.75F, -2.125F, 5.0F, 1.0F, 1.0F, new CubeDeformation(-0.38F))
+			.texOffs(0, 4).addBox(-2.5F, -1.75F, -2.125F, 5.0F, 1.0F, 1.0F, new CubeDeformation(-0.38F))
+			.texOffs(0, 8).addBox(-2.5F, -1.5F, -1.875F, 5.0F, 3.0F, 1.0F, new CubeDeformation(-0.38F))
+			.texOffs(12, 0).addBox(-0.5F, -0.5F, -2.625F, 1.0F, 1.0F, 3.0F, new CubeDeformation(-0.38F)), PartPose.offsetAndRotation(0.0F, 0.0F, 0.0F, -0.6109F, 0.0F, 0.0F));
 
-		return TexturedModelData.of(modelData, 256, 256);
+		return LayerDefinition.create(modelData, 256, 256);
 	}
 
 	// /////////////// //
@@ -97,8 +100,8 @@ public class MissileTurretModel extends BaseTurretModel<MissileTurretRenderState
 	// /////////////// //
 
 	@Override
-	public void setAngles(MissileTurretRenderState state) {
-		super.setAngles(state);
+	public void setupAnim(@NonNull MissileTurretRenderState state) {
+		super.setupAnim(state);
 
 		float maxRange = state.maxRange;
 		float rpm;
@@ -117,9 +120,9 @@ public class MissileTurretModel extends BaseTurretModel<MissileTurretRenderState
 		}
 
 		float degreesPerTick = rpm * 0.3f;
-		float delta = (state.age * degreesPerTick) % 360f;
+		float delta = (state.ageInTicks * degreesPerTick) % 360f;
 		float newAngle = MathUtil.degToRad(delta);
-		this.RADAR_DISH.setAngles(0, newAngle, 0);
+		this.RADAR_DISH.setRotation(0, newAngle, 0);
 	}
 
 	// /////////////////// //
@@ -149,14 +152,14 @@ public class MissileTurretModel extends BaseTurretModel<MissileTurretRenderState
 	static {
 		SHOOT_KEYFRAMES = new PriorityQueue<>() {
 			{
-				add(FXKeyframe.of(0.0, ModParticles.CANNON_FLASH, new Vec3d(0, 0.1875, -0.5625)));
-				add(FXKeyframe.of(0.165, ParticleTypes.CLOUD, new Vec3d(0, 0.1875, -0.5625)));
+				add(FXKeyframe.of(0.0, ModParticles.CANNON_FLASH, new Vec3(0, 0.1875, -0.5625)));
+				add(FXKeyframe.of(0.165, ParticleTypes.CLOUD, new Vec3(0, 0.1875, -0.5625)));
 
-				add(FXKeyframe.of(0.33, ModParticles.CANNON_FLASH, new Vec3d(0, 0, -0.5625)));
-				add(FXKeyframe.of(0.495, ParticleTypes.CLOUD, new Vec3d(0, 0, -0.5625)));
+				add(FXKeyframe.of(0.33, ModParticles.CANNON_FLASH, new Vec3(0, 0, -0.5625)));
+				add(FXKeyframe.of(0.495, ParticleTypes.CLOUD, new Vec3(0, 0, -0.5625)));
 
-				add(FXKeyframe.of(0.66, ModParticles.CANNON_FLASH, new Vec3d(0, -0.1875, -0.5625)));
-				add(FXKeyframe.of(0.825, ParticleTypes.CLOUD, new Vec3d(0, -0.1875, -0.5625)));
+				add(FXKeyframe.of(0.66, ModParticles.CANNON_FLASH, new Vec3(0, -0.1875, -0.5625)));
+				add(FXKeyframe.of(0.825, ParticleTypes.CLOUD, new Vec3(0, -0.1875, -0.5625)));
 			}
 		};
 	}

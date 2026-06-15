@@ -1,14 +1,14 @@
 package com.virus5600.defensive_measures._util;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.random.Random;
+import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.phys.Vec3;
 
 /**
  * Contains all related math utility methods that can be used almost everywhere. This is to
  * suplement or shorten some procedures that would otherwise be too long or complicated to write in
- * a single line, such as calculating the {@link #getRelativePos(Vec3d, Vec3d, float, float) relative
+ * a single line, such as calculating the {@link #getRelativePos(Vec3, Vec3, float, float) relative
  * position} of a point from an origin with a certain rotation, which is also repeatedly used
  * in the codebase.
  *
@@ -40,13 +40,13 @@ public class MathUtil {
 	 *
 	 * @return Vec3d the relative position of this point from the provided origin.
 	 */
-	public static Vec3d getRelativePos(Vec3d origin, double xOffset, double yOffset, double zOffset, float yaw, float pitch) {
+	public static Vec3 getRelativePos(Vec3 origin, double xOffset, double yOffset, double zOffset, float yaw, float pitch) {
 		float pitchRad = degToRad(pitch);
 		float yawRad = degToRad(yaw);
 
-		Vec3d rotated = new Vec3d(xOffset, yOffset, zOffset)
-			.rotateX(pitchRad)
-			.rotateY(yawRad);
+		Vec3 rotated = new Vec3(xOffset, yOffset, zOffset)
+			.xRot(pitchRad)
+			.yRot(yawRad);
 
 		return origin.add(rotated);
 	}
@@ -69,11 +69,11 @@ public class MathUtil {
 	 *
 	 * @return Vec3d the relative position of this point from the provided origin.
 	 */
-	public static Vec3d getRelativePos(Vec3d origin, double xOffset, double yOffset, double zOffset, float yaw) {
-		Vec3d rotated = new Vec3d(xOffset, yOffset, zOffset);
+	public static Vec3 getRelativePos(Vec3 origin, double xOffset, double yOffset, double zOffset, float yaw) {
+		Vec3 rotated = new Vec3(xOffset, yOffset, zOffset);
 
 		float yawRad = degToRad(yaw);
-		rotated = rotated.rotateY(yawRad);
+		rotated = rotated.yRot(yawRad);
 
 		return origin.add(rotated);
 	}
@@ -95,8 +95,8 @@ public class MathUtil {
 	 *
 	 * @return {@code Vec3d} the relative position of this point from the provided origin.
 	 */
-	public static Vec3d getRelativePos(Vec3d origin, Vec3d offsets, float yaw, float pitch) {
-		return getRelativePos(origin, offsets.getX(), offsets.getY(), offsets.getZ(), yaw, pitch);
+	public static Vec3 getRelativePos(Vec3 origin, Vec3 offsets, float yaw, float pitch) {
+		return getRelativePos(origin, offsets.x(), offsets.y(), offsets.z(), yaw, pitch);
 	}
 
 	/**
@@ -115,8 +115,8 @@ public class MathUtil {
 	 *
 	 * @return {@code Vec3d} The relative position of this point from the provided origin.
 	 */
-	public static Vec3d getRelativePos(Vec3d origin, Vec3d offsets, float yaw) {
-		return getRelativePos(origin, offsets.getX(), offsets.getY(), offsets.getZ(), yaw);
+	public static Vec3 getRelativePos(Vec3 origin, Vec3 offsets, float yaw) {
+		return getRelativePos(origin, offsets.x(), offsets.y(), offsets.z(), yaw);
 	}
 
 	// ///////// //
@@ -130,8 +130,8 @@ public class MathUtil {
 	 *
 	 * @return {@code Vec3d} the movement direction of the entity.
 	 */
-	public static Vec3d getMovementDirection(Entity mob) {
-		return getMovementDirection(mob.getYaw(), mob.getPitch());
+	public static Vec3 getMovementDirection(Entity mob) {
+		return getMovementDirection(mob.getYRot(), mob.getXRot());
 	}
 
 	/**
@@ -142,7 +142,7 @@ public class MathUtil {
 	 *
 	 * @return {@code Vec3d} the movement direction of the entity.
 	 */
-	public static Vec3d getMovementDirection(double yaw, double pitch) {
+	public static Vec3 getMovementDirection(double yaw, double pitch) {
 		double yawRad = degToRad(yaw);
 		double pitchRad = degToRad(pitch);
 
@@ -150,11 +150,11 @@ public class MathUtil {
 		double y = -Math.sin(pitchRad);
 		double z = Math.cos(yawRad) * Math.cos(pitchRad);
 
-		return new Vec3d(x, y, z).normalize();
+		return new Vec3(x, y, z).normalize();
 	}
 
-	public static Vec3d getTargetDirection(Entity origin, Entity target) {
-		return target.getEntityPos().subtract(origin.getEntityPos()).normalize();
+	public static Vec3 getTargetDirection(Entity origin, Entity target) {
+		return target.position().subtract(origin.position()).normalize();
 	}
 
 	// ///////////////////// //
@@ -272,19 +272,19 @@ public class MathUtil {
 	 * @return {@code int} a random integer between 0 and 100 (inclusive).
 	 */
 	public static int random() {
-		return MathHelper.nextInt(Random.create(), 0, 100);
+		return Mth.nextInt(RandomSource.create(), 0, 100);
 	}
 
 	public static double random(double min, double max) {
-		return MathHelper.nextDouble(Random.create(), min, max);
+		return Mth.nextDouble(RandomSource.create(), min, max);
 	}
 
 	public static float random(float min, float max) {
-		return MathHelper.nextFloat(Random.create(), min, max);
+		return Mth.nextFloat(RandomSource.create(), min, max);
 	}
 
 	public static int random(int min, int max) {
-		return MathHelper.nextInt(Random.create(), min, max);
+		return Mth.nextInt(RandomSource.create(), min, max);
 	}
 
 	public static long random(long min, long max) {

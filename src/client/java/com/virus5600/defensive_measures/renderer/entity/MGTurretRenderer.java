@@ -1,6 +1,6 @@
 package com.virus5600.defensive_measures.renderer.entity;
 
-import net.minecraft.client.render.entity.EntityRendererFactory;
+import net.minecraft.client.renderer.entity.EntityRendererProvider;
 
 import com.virus5600.defensive_measures.entity.turrets.tier1.MGTurretEntity;
 import com.virus5600.defensive_measures.model.ModEntityModels;
@@ -13,10 +13,10 @@ public class MGTurretRenderer extends BaseTurretRenderer<
 	MGTurretModel
 	> {
 
-	public MGTurretRenderer(EntityRendererFactory.Context ctx) {
+	public MGTurretRenderer(EntityRendererProvider.Context ctx) {
 		super(
 			ctx,
-			new MGTurretModel(ctx.getPart(ModEntityModels.MG_TURRET)),
+			new MGTurretModel(ctx.bakeLayer(ModEntityModels.MG_TURRET)),
 			BaseTurretRenderState::new
 		);
 	}

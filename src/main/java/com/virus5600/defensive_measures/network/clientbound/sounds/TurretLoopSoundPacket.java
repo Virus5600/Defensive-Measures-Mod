@@ -1,15 +1,17 @@
 package com.virus5600.defensive_measures.network.clientbound.sounds;
 
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.codec.PacketCodecs;
-import net.minecraft.network.packet.CustomPayload;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvent;
-import net.minecraft.util.Identifier;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.Identifier;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundSource;
 
-import com.virus5600.defensive_measures.entity.turrets.interfaces.LoopableShootingSound;
 import com.virus5600.defensive_measures.DefensiveMeasures;
+import com.virus5600.defensive_measures.entity.turrets.interfaces.LoopableShootingSound;
+
+import org.jspecify.annotations.NonNull;
 
 import io.netty.buffer.ByteBuf;
 
@@ -27,35 +29,35 @@ import io.netty.buffer.ByteBuf;
  * @param soundCategory The loopSound category to play the loopSound under. This is used by the client to determine the volume and other properties of the loopSound when it is played.
  */
 public record TurretLoopSoundPacket(
-	int entityId, boolean start,
-	SoundEvent startSound, SoundEvent loopSound, SoundEvent endSound,
-	SoundCategory soundCategory
-) implements CustomPayload {
-	private static final PacketCodec<ByteBuf, SoundCategory> SOUND_CATEGORY_CODEC;
+        int entityId, boolean start,
+        SoundEvent startSound, SoundEvent loopSound, SoundEvent endSound,
+        SoundSource soundCategory
+) implements CustomPacketPayload {
+	private static final StreamCodec<ByteBuf, SoundSource> SOUND_CATEGORY_CODEC;
 
 	public static final Identifier ID;
-	public static final Id<TurretLoopSoundPacket> PAYLOAD_ID;
-	public static final PacketCodec<RegistryByteBuf, TurretLoopSoundPacket> CODEC_STREAM;
+	public static final Type<TurretLoopSoundPacket> PAYLOAD_ID;
+	public static final StreamCodec<RegistryFriendlyByteBuf, TurretLoopSoundPacket> CODEC_STREAM;
 
-	@Override
-	public Id<? extends CustomPayload> getId() {
+	@Override @NonNull
+	public Type<? extends CustomPacketPayload> type() {
 		return PAYLOAD_ID;
 	}
 
 	static {
-		SOUND_CATEGORY_CODEC = PacketCodecs.string(32)
-			.xmap(
-				(name) -> SoundCategory.valueOf(name.toUpperCase()),
-				SoundCategory::getName);
+		SOUND_CATEGORY_CODEC = ByteBufCodecs.stringUtf8(32)
+			.map(
+				(name) -> SoundSource.valueOf(name.toUpperCase()),
+				SoundSource::getName);
 
-		ID = Identifier.of(DefensiveMeasures.MOD_ID, "turret_loop_sound");
-		PAYLOAD_ID = new Id<>(ID);
-		CODEC_STREAM = PacketCodec.tuple(
-			PacketCodecs.INTEGER, TurretLoopSoundPacket::entityId,
-			PacketCodecs.BOOLEAN, TurretLoopSoundPacket::start,
-			SoundEvent.PACKET_CODEC, TurretLoopSoundPacket::startSound,
-			SoundEvent.PACKET_CODEC, TurretLoopSoundPacket::loopSound,
-			SoundEvent.PACKET_CODEC, TurretLoopSoundPacket::endSound,
+		ID = Identifier.fromNamespaceAndPath(DefensiveMeasures.MOD_ID, "turret_loop_sound");
+		PAYLOAD_ID = new Type<>(ID);
+		CODEC_STREAM = StreamCodec.composite(
+			ByteBufCodecs.INT, TurretLoopSoundPacket::entityId,
+			ByteBufCodecs.BOOL, TurretLoopSoundPacket::start,
+			SoundEvent.DIRECT_STREAM_CODEC, TurretLoopSoundPacket::startSound,
+			SoundEvent.DIRECT_STREAM_CODEC, TurretLoopSoundPacket::loopSound,
+			SoundEvent.DIRECT_STREAM_CODEC, TurretLoopSoundPacket::endSound,
 			SOUND_CATEGORY_CODEC, TurretLoopSoundPacket::soundCategory,
 			TurretLoopSoundPacket::new
 		);

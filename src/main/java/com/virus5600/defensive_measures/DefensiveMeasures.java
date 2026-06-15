@@ -1,5 +1,7 @@
 package com.virus5600.defensive_measures;
 
+import net.fabricmc.api.ModInitializer;
+
 import com.virus5600.defensive_measures.advancement.criterion.ModCriterion;
 import com.virus5600.defensive_measures.block.ModBlocks;
 import com.virus5600.defensive_measures.command.ModCommands;
@@ -16,7 +18,6 @@ import com.virus5600.defensive_measures.recipe.book.ModRecipeBookCategories;
 import com.virus5600.defensive_measures.screen.ModScreenHandlers;
 import com.virus5600.defensive_measures.sound.ModSoundEvents;
 import com.virus5600.defensive_measures.stat.ModStats;
-import net.fabricmc.api.ModInitializer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

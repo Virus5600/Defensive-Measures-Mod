@@ -1,12 +1,12 @@
 package com.virus5600.defensive_measures.item;
 
-import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
-import net.minecraft.item.ItemGroup;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.Registry;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
+import net.fabricmc.fabric.api.creativetab.v1.FabricCreativeModeTab;
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.item.CreativeModeTab;
 
 import com.virus5600.defensive_measures.DefensiveMeasures;
 import com.virus5600.defensive_measures.block.ModBlocks;
@@ -22,28 +22,28 @@ import com.virus5600.defensive_measures.block.ModBlocks;
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
  */
 public class ModItemGroups {
-	public static final RegistryKey<ItemGroup> DMI_KEY = RegistryKey.of(Registries.ITEM_GROUP.getKey(), Identifier.of(DefensiveMeasures.MOD_ID, "defensive_measures_items"));
-	public static final ItemGroup DEFENSIVE_MEASURES_ITEMS = FabricItemGroup.builder()
-		.displayName(Text.translatable("itemGroup.dm.defensive_measures.items"))
-		.icon(ModItems.CANNON_HEAD::getDefaultStack)
+	public static final ResourceKey<CreativeModeTab> DMI_KEY = ResourceKey.create(BuiltInRegistries.CREATIVE_MODE_TAB.key(), Identifier.fromNamespaceAndPath(DefensiveMeasures.MOD_ID, "defensive_measures_items"));
+	public static final CreativeModeTab DEFENSIVE_MEASURES_ITEMS = FabricCreativeModeTab.builder()
+		.title(Component.translatable("itemGroup.dm.defensive_measures.items"))
+		.icon(ModItems.CANNON_HEAD::getDefaultInstance)
 		.build();
 
-	public static final RegistryKey<ItemGroup> DME_KEY = RegistryKey.of(Registries.ITEM_GROUP.getKey(), Identifier.of(DefensiveMeasures.MOD_ID, "defensive_measures_equipments"));
-	public static final ItemGroup DEFENSIVE_MEASURES_EQUIPMENTS = FabricItemGroup.builder()
-		.displayName(Text.translatable("itemGroup.dm.defensive_measures.equipments"))
-		.icon(ModItems.TURRET_REMOVER::getDefaultStack)
+	public static final ResourceKey<CreativeModeTab> DME_KEY = ResourceKey.create(BuiltInRegistries.CREATIVE_MODE_TAB.key(), Identifier.fromNamespaceAndPath(DefensiveMeasures.MOD_ID, "defensive_measures_equipments"));
+	public static final CreativeModeTab DEFENSIVE_MEASURES_EQUIPMENTS = FabricCreativeModeTab.builder()
+		.title(Component.translatable("itemGroup.dm.defensive_measures.equipments"))
+		.icon(ModItems.TURRET_REMOVER::getDefaultInstance)
 		.build();
 
-	public static final RegistryKey<ItemGroup> DMTR_KEY = RegistryKey.of(Registries.ITEM_GROUP.getKey(), Identifier.of(DefensiveMeasures.MOD_ID, "defensive_measures_traps"));
-	public static final ItemGroup DEFENSIVE_MEASURES_TRAPS = FabricItemGroup.builder()
-		.displayName(Text.translatable("itemGroup.dm.defensive_measures.traps"))
-		.icon(() -> ModBlocks.ELECTRIC_FENCE.asItem().getDefaultStack())
+	public static final ResourceKey<CreativeModeTab> DMTR_KEY = ResourceKey.create(BuiltInRegistries.CREATIVE_MODE_TAB.key(), Identifier.fromNamespaceAndPath(DefensiveMeasures.MOD_ID, "defensive_measures_traps"));
+	public static final CreativeModeTab DEFENSIVE_MEASURES_TRAPS = FabricCreativeModeTab.builder()
+		.title(Component.translatable("itemGroup.dm.defensive_measures.traps"))
+		.icon(() -> ModBlocks.ELECTRIC_FENCE.asItem().getDefaultInstance())
 		.build();
 
-	public static final RegistryKey<ItemGroup> DMTT_KEY = RegistryKey.of(Registries.ITEM_GROUP.getKey(), Identifier.of(DefensiveMeasures.MOD_ID, "defensive_measures_turrets"));
-	public static final ItemGroup DEFENSIVE_MEASURES_TURRETS = FabricItemGroup.builder()
-		.displayName(Text.translatable("itemGroup.dm.defensive_measures.turrets"))
-		.icon(ModItems.CANNON_TURRET::getDefaultStack)
+	public static final ResourceKey<CreativeModeTab> DMTT_KEY = ResourceKey.create(BuiltInRegistries.CREATIVE_MODE_TAB.key(), Identifier.fromNamespaceAndPath(DefensiveMeasures.MOD_ID, "defensive_measures_turrets"));
+	public static final CreativeModeTab DEFENSIVE_MEASURES_TURRETS = FabricCreativeModeTab.builder()
+		.title(Component.translatable("itemGroup.dm.defensive_measures.turrets"))
+		.icon(ModItems.CANNON_TURRET::getDefaultInstance)
 		.build();
 
 	// ////////////// //
@@ -53,9 +53,9 @@ public class ModItemGroups {
 	public static void registerModItemGroups() {
 		DefensiveMeasures.LOGGER.info("REGISTERING ITEM GROUPS FOR {}...", DefensiveMeasures.MOD_NAME);
 
-		Registry.register(Registries.ITEM_GROUP, DMI_KEY, DEFENSIVE_MEASURES_ITEMS);
-		Registry.register(Registries.ITEM_GROUP, DME_KEY, DEFENSIVE_MEASURES_EQUIPMENTS);
-		Registry.register(Registries.ITEM_GROUP, DMTR_KEY, DEFENSIVE_MEASURES_TRAPS);
-		Registry.register(Registries.ITEM_GROUP, DMTT_KEY, DEFENSIVE_MEASURES_TURRETS);
+		Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB, DMI_KEY, DEFENSIVE_MEASURES_ITEMS);
+		Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB, DME_KEY, DEFENSIVE_MEASURES_EQUIPMENTS);
+		Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB, DMTR_KEY, DEFENSIVE_MEASURES_TRAPS);
+		Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB, DMTT_KEY, DEFENSIVE_MEASURES_TURRETS);
 	}
 }

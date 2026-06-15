@@ -1,17 +1,19 @@
 package com.virus5600.defensive_measures.item.turrets.mg_turret;
 
-import net.minecraft.component.type.TooltipDisplayComponent;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.mob.MobEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.tooltip.TooltipType;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.Rarity;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Rarity;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipDisplay;
 
-import com.virus5600.defensive_measures.entity.turrets.tier1.MGTurretEntity;
 import com.virus5600.defensive_measures.entity.turrets.TurretEntity;
+import com.virus5600.defensive_measures.entity.turrets.tier1.MGTurretEntity;
 import com.virus5600.defensive_measures.item.turrets.TurretItem;
+
+import org.jspecify.annotations.NonNull;
 
 import java.lang.reflect.Type;
 import java.util.function.Consumer;
@@ -23,23 +25,23 @@ import java.util.function.Consumer;
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
  */
 public class MGTurretItem extends TurretItem {
-	public MGTurretItem(EntityType<? extends MobEntity> type, net.minecraft.item.Item.Settings settings) {
+	public MGTurretItem(EntityType<? extends Mob> type, Properties settings) {
 		super(
 			type,
 			settings
-				.maxCount(16)
+				.stacksTo(16)
 				.rarity(Rarity.UNCOMMON)
 		);
 	}
 
 	@Override
-	public void appendTooltip(ItemStack stack, TooltipContext context, TooltipDisplayComponent displayComponent, Consumer<Text> textConsumer, TooltipType type) {
-		super.appendTooltip(stack, context, displayComponent, textConsumer, type);
+	public void appendHoverText(ItemStack stack, @NonNull TooltipContext context, @NonNull TooltipDisplay displayComponent, @NonNull Consumer<Component> textConsumer, @NonNull TooltipFlag type) {
+		super.appendHoverText(stack, context, displayComponent, textConsumer, type);
 
 		for (int i = 1; i <= 3; i++) {
 			textConsumer.accept(
-				Text.translatable("itemTooltip.dm.mg_turret.line" + i)
-					.formatted(Formatting.GRAY)
+				Component.translatable("itemTooltip.dm.mg_turret.line" + i)
+					.withStyle(ChatFormatting.GRAY)
 			);
 		}
 	}

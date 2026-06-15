@@ -1,18 +1,18 @@
 package com.virus5600.defensive_measures.entity.projectiles;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.data.DataTracker.Builder;
-import net.minecraft.particle.ParticleTypes;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.world.RaycastContext;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.network.syncher.SynchedEntityData.Builder;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.level.ClipContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 /**
  * {@code KineticProjectileEntity} is an abstract class that extends {@link TurretProjectileEntity}.
@@ -39,7 +39,7 @@ public abstract class KineticProjectileEntity extends TurretProjectileEntity {
 	// ///////////// //
 	// CONSTRUCTORS //
 	// ///////////// //
-	public KineticProjectileEntity(EntityType<? extends TurretProjectileEntity> entityType, World world) {
+	public KineticProjectileEntity(EntityType<? extends TurretProjectileEntity> entityType, Level world) {
 		super(entityType, world);
 		this.setDamage(4);
 		this.setPierceLevel(this.getMaxPierceLevel());
@@ -52,8 +52,8 @@ public abstract class KineticProjectileEntity extends TurretProjectileEntity {
 
 	// PROTECTED
 	@Override
-	protected void initDataTracker(Builder builder) {
-		super.initDataTracker(builder);
+	protected void defineSynchedData(Builder builder) {
+		super.defineSynchedData(builder);
 	}
 
 	// /////////////// //
@@ -63,25 +63,25 @@ public abstract class KineticProjectileEntity extends TurretProjectileEntity {
 	@Override
 	protected void move() {
 		boolean isClipping = !this.isNoClip();
-		Vec3d velocity = this.getVelocity();
-		BlockPos blockPos = this.getBlockPos();
-		BlockState blockState = this.getEntityWorld().getBlockState(blockPos);
+		Vec3 velocity = this.getDeltaMovement();
+		BlockPos blockPos = this.blockPosition();
+		BlockState blockState = this.level().getBlockState(blockPos);
 
 		// If this projectile is clipping and colliding with a block...
 		if (!blockState.isAir() && isClipping) {
-			VoxelShape voxelShape = blockState.getCollisionShape(this.getEntityWorld(), blockPos);
+			VoxelShape voxelShape = blockState.getCollisionShape(this.level(), blockPos);
 
 			// ... and if the block has a collision shape (i.e. it's not a block like tall grass or
 			// flowers that have no collision shape)...
 			if (!voxelShape.isEmpty()) {
-				Vec3d pos = this.getEntityPos();
+				Vec3 pos = this.position();
 
 				// ... and if the projectile's position is within any of the collision boxes of the
 				// block, then the projectile is considered to be in the ground, and its velocity
 				// is set to zero.
-				for (Box box : voxelShape.getBoundingBoxes()) {
-					if (box.offset(blockPos).contains(pos)) {
-						this.setVelocity(Vec3d.ZERO);
+				for (AABB box : voxelShape.toAabbs()) {
+					if (box.move(blockPos).contains(pos)) {
+						this.setDeltaMovement(Vec3.ZERO);
 						this.setInGround(true);
 						break;
 					}
@@ -92,7 +92,7 @@ public abstract class KineticProjectileEntity extends TurretProjectileEntity {
 		// If this projectile is in ground and clipping it...
 		if (this.isInGround() && isClipping) {
 			// ... and the the world isn't client...
-			if (!this.getEntityWorld().isClient()) {
+			if (!this.level().isClientSide()) {
 				// ... and if the block state that the projectile is in is different from the block
 				// state that it was in when it first collided with the block, and if the
 				// projectile should fall, then the projectile falls.
@@ -105,22 +105,22 @@ public abstract class KineticProjectileEntity extends TurretProjectileEntity {
 				}
 
 				// ... finally, set this on fire if fire ticks is more than 0.
-				this.setOnFire(this.getFireTicks() > 0);
+				this.setSharedFlagOnFire(this.getRemainingFireTicks() > 0);
 			}
 
 			++this.inGroundTime;
 			// ... and if it is stil alive, then tick the block collision logic.
 			if (this.isAlive()) {
-				this.tickBlockCollision();
+				this.applyEffectsFromBlocks();
 			}
 		}
 		// ... else...
 		else {
 			this.inGroundTime = 0;
-			Vec3d pos = this.getEntityPos();
+			Vec3 pos = this.position();
 
 			// ... if it is touching water, spawn bubble particles at the projectile's position.
-			if (this.isTouchingWater()) {
+			if (this.isInWater()) {
 				this.spawnBubbleParticles(pos);
 			}
 
@@ -131,8 +131,8 @@ public abstract class KineticProjectileEntity extends TurretProjectileEntity {
 			// to make them more visible.
 			if (this.isCritical()) {
 				for (int i = 0; i < 4; i++) {
-					this.getEntityWorld()
-						.addParticleClient(
+					this.level()
+						.addParticle(
 							ParticleTypes.CRIT,
 							pos.x + velocity.x * (double)i / 4.0,
 							pos.y + velocity.y * (double)i / 4.0,
@@ -148,32 +148,32 @@ public abstract class KineticProjectileEntity extends TurretProjectileEntity {
 			// and the pitch to the angle between the velocity vector and the horizontal plane.
 			float yawDeg;
 			if (!isClipping) {
-				yawDeg = (float) (MathHelper.atan2(-velocity.x, -velocity.z) * 180.0F / (float) Math.PI);
+				yawDeg = (float) (Mth.atan2(-velocity.x, -velocity.z) * 180.0F / (float) Math.PI);
 			}
 			// ... otherwise, set the yaw to the angle of the velocity vector, but without negating
 			// the x and z components, since the projectile is clipping and thus, the yaw should be
 			// based on the direction of the velocity vector rather than the opposite direction.
 			else {
-				yawDeg = (float) (MathHelper.atan2(velocity.x, velocity.z) * 180.0F / (float) Math.PI);
+				yawDeg = (float) (Mth.atan2(velocity.x, velocity.z) * 180.0F / (float) Math.PI);
 			}
 
-			float pitchDeg = (float)(MathHelper.atan2(velocity.y, velocity.horizontalLength()) * 180.0F / (float)Math.PI);
+			float pitchDeg = (float)(Mth.atan2(velocity.y, velocity.horizontalDistance()) * 180.0F / (float)Math.PI);
 
-			this.setPitch(updateRotation(this.getPitch(), pitchDeg));
-			this.setYaw(updateRotation(this.getYaw(), yawDeg));
-			this.tickLeftOwner();
+			this.setXRot(lerpRotation(this.getXRot(), pitchDeg));
+			this.setYRot(lerpRotation(this.getYRot(), yawDeg));
+			this.checkLeftOwner();
 
 			// ... and if it is clipping, perform a raycast to check for collisions with blocks
 			// along the projectile's path, and if there is a collision, apply the collision logic
 			// to the hit result.
 			if (isClipping) {
-				BlockHitResult hitResult = this.getEntityWorld()
-					.getCollisionsIncludingWorldBorder(
-						new RaycastContext(
+				BlockHitResult hitResult = this.level()
+					.clipIncludingBorder(
+						new ClipContext(
 							pos,
 							pos.add(velocity),
-							RaycastContext.ShapeType.COLLIDER,
-							RaycastContext.FluidHandling.NONE,
+							ClipContext.Block.COLLIDER,
+							ClipContext.Fluid.NONE,
 							this
 						)
 					);
@@ -182,8 +182,8 @@ public abstract class KineticProjectileEntity extends TurretProjectileEntity {
 			}
 			// ... otherwise, just move the projectile by its velocity and tick the block collision logic.
 			else {
-				this.setPosition(pos.add(velocity));
-				this.tickBlockCollision();
+				this.setPos(pos.add(velocity));
+				this.applyEffectsFromBlocks();
 			}
 
 			// ... and if it is clipping, apply drag to the velocity, and if it is also not in
@@ -198,15 +198,15 @@ public abstract class KineticProjectileEntity extends TurretProjectileEntity {
 
 	@Override
 	public void tick() {
-		BlockPos blockPos = this.getBlockPos();
-		BlockState blockState = this.getEntityWorld().getBlockState(blockPos);
+		BlockPos blockPos = this.blockPosition();
+		BlockState blockState = this.level().getBlockState(blockPos);
 
 		if (this.shake > 0) {
 			--this.shake;
 		}
 
-		if (this.isTouchingWaterOrRain() || blockState.isOf(Blocks.POWDER_SNOW)) {
-			this.extinguish();
+		if (this.isInWaterOrRain() || blockState.is(Blocks.POWDER_SNOW)) {
+			this.clearFire();
 		}
 
 		this.move();

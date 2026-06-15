@@ -9,6 +9,11 @@
 
 	"block.dm.turret_assembly_station": "Turret Assembly Station",
 
+	"item.dm.bolt_head": "Bolt Head",
+	"item.dm.electric_fence": "Electric Fence",
+
+	"item.dm.turret_assembly_station": "Turret Assembly Station",
+
 	"item.dm.turret_remover": "拆卸工具",
 
 	"item.dm.cannon_base" : "炮塔底座",

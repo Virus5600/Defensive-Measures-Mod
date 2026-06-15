@@ -1,6 +1,6 @@
 package com.virus5600.defensive_measures.renderer.projectiles;
 
-import net.minecraft.client.render.entity.EntityRendererFactory;
+import net.minecraft.client.renderer.entity.EntityRendererProvider;
 
 import com.virus5600.defensive_measures.entity.projectiles.FlammableAerosolEntity;
 import com.virus5600.defensive_measures.model.ModEntityModels;
@@ -13,10 +13,10 @@ public class FlammableAerosolRenderer extends BaseProjectileRenderer<
 	FlammableAerosolModel
 	> {
 
-	public FlammableAerosolRenderer(EntityRendererFactory.Context ctx) {
+	public FlammableAerosolRenderer(EntityRendererProvider.Context ctx) {
 		super(
 			ctx,
-			new FlammableAerosolModel(ctx.getPart(ModEntityModels.FLAMMABLE_AEROSOL)),
+			new FlammableAerosolModel(ctx.bakeLayer(ModEntityModels.FLAMMABLE_AEROSOL)),
 			0.0f,
 			BaseProjectileRenderState::new
 		);

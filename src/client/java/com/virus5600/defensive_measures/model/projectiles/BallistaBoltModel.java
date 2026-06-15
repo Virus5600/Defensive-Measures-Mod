@@ -2,6 +2,10 @@ package com.virus5600.defensive_measures.model.projectiles;
 
 import net.minecraft.client.model.*;
 
+import net.minecraft.client.model.geom.ModelPart;
+import net.minecraft.client.model.geom.PartPose;
+import net.minecraft.client.model.geom.builders.*;
+
 import com.virus5600.defensive_measures.renderer.projectiles.state.BaseProjectileRenderState;
 
 public class BallistaBoltModel extends BaseProjectileModel<BaseProjectileRenderState> {
@@ -13,18 +17,18 @@ public class BallistaBoltModel extends BaseProjectileModel<BaseProjectileRenderS
 		super(root, "ballista", TEXTURES);
 	}
 
-	public static TexturedModelData getTexturedModelData() {
-		ModelData modelData = new ModelData();
-		ModelPartData modelPartData = modelData.getRoot();
+	public static LayerDefinition getTexturedModelData() {
+		MeshDefinition modelData = new MeshDefinition();
+		PartDefinition modelPartData = modelData.getRoot();
 
-		ModelPartData bolt = modelPartData.addChild("bolt", ModelPartBuilder.create().uv(0, 0).cuboid(-0.5F, -0.5F, -3.0F, 1.0F, 1.0F, 19.0F, new Dilation(0.0F)), ModelTransform.origin(0.0F, 0.5F, 0.0F));
+		PartDefinition bolt = modelPartData.addOrReplaceChild("bolt", CubeListBuilder.create().texOffs(0, 0).addBox(-0.5F, -0.5F, -3.0F, 1.0F, 1.0F, 19.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, 0.5F, 0.0F));
 
-		ModelPartData point = bolt.addChild("point", ModelPartBuilder.create(), ModelTransform.origin(0.0F, 0.0F, 0.0F));
-		point.addChild("point_r1", ModelPartBuilder.create().uv(46, 71).cuboid(0.0F, -0.5F, -1.0F, 1.0F, 1.0F, 3.0F, new Dilation(0.0F)), ModelTransform.of(0.0F, 0.0F, -1.675F, 0.0F, 0.4189F, 0.0F));
-		point.addChild("point_r2", ModelPartBuilder.create().uv(38, 71).cuboid(-1.0F, -0.5F, -1.0F, 1.0F, 1.0F, 3.0F, new Dilation(0.0F)), ModelTransform.of(0.0F, 0.0F, -1.675F, 0.0F, -0.4189F, 0.0F));
-		point.addChild("point_r3", ModelPartBuilder.create().uv(0, 71).cuboid(-0.5F, 0.0F, -1.0F, 1.0F, 1.0F, 3.0F, new Dilation(0.0F)), ModelTransform.of(0.0F, 0.0F, -1.675F, -0.4189F, 0.0F, 0.0F));
-		point.addChild("point_r4", ModelPartBuilder.create().uv(54, 70).cuboid(-0.5F, -1.0F, -1.0F, 1.0F, 1.0F, 3.0F, new Dilation(0.0F)), ModelTransform.of(0.0F, 0.0F, -1.675F, 0.4189F, 0.0F, 0.0F));
+		PartDefinition point = bolt.addOrReplaceChild("point", CubeListBuilder.create(), PartPose.offset(0.0F, 0.0F, 0.0F));
+		point.addOrReplaceChild("point_r1", CubeListBuilder.create().texOffs(46, 71).addBox(0.0F, -0.5F, -1.0F, 1.0F, 1.0F, 3.0F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(0.0F, 0.0F, -1.675F, 0.0F, 0.4189F, 0.0F));
+		point.addOrReplaceChild("point_r2", CubeListBuilder.create().texOffs(38, 71).addBox(-1.0F, -0.5F, -1.0F, 1.0F, 1.0F, 3.0F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(0.0F, 0.0F, -1.675F, 0.0F, -0.4189F, 0.0F));
+		point.addOrReplaceChild("point_r3", CubeListBuilder.create().texOffs(0, 71).addBox(-0.5F, 0.0F, -1.0F, 1.0F, 1.0F, 3.0F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(0.0F, 0.0F, -1.675F, -0.4189F, 0.0F, 0.0F));
+		point.addOrReplaceChild("point_r4", CubeListBuilder.create().texOffs(54, 70).addBox(-0.5F, -1.0F, -1.0F, 1.0F, 1.0F, 3.0F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(0.0F, 0.0F, -1.675F, 0.4189F, 0.0F, 0.0F));
 
-		return TexturedModelData.of(modelData, 128, 128);
+		return LayerDefinition.create(modelData, 128, 128);
 	}
 }

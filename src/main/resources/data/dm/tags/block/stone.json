@@ -1,7 +1,7 @@
 {
 	"replace": false,
 	"values": [
-		"#c:concrete",
+		"#c:concretes",
 		"#minecraft:base_stone_overworld",
 		"#minecraft:base_stone_nether",
 		"#minecraft:stone_bricks",

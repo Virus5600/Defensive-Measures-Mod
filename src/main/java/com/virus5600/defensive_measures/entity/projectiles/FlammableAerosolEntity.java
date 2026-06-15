@@ -1,11 +1,11 @@
 package com.virus5600.defensive_measures.entity.projectiles;
 
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.damage.DamageSource;
-import net.minecraft.particle.ParticleEffect;
-import net.minecraft.particle.ParticleTypes;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.world.World;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.level.Level;
 
 import com.virus5600.defensive_measures.entity.damage.ModDamageSources;
 import com.virus5600.defensive_measures.entity.damage.ModDamageTypes;
@@ -33,7 +33,7 @@ import com.virus5600.defensive_measures.entity.turrets.tier2.FlameTurretEntity;
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
  */
 public class FlammableAerosolEntity extends AreaCloudEntity {
-	protected static final ParticleEffect DEFAULT_PARTICLE = ParticleTypes.FLAME;
+	protected static final ParticleOptions DEFAULT_PARTICLE = ParticleTypes.FLAME;
 	protected static final int DEFAULT_FIRE_DURATION = 50;
 
 	/**
@@ -45,7 +45,7 @@ public class FlammableAerosolEntity extends AreaCloudEntity {
 	// //////////// //
 	// CONSTRUCTORS //
 	// //////////// //
-	public FlammableAerosolEntity(EntityType<? extends AreaCloudEntity> entityType, World world) {
+	public FlammableAerosolEntity(EntityType<? extends AreaCloudEntity> entityType, Level world) {
 		super(entityType, world);
 
 		// Sets the base attribute of this area cloud...
@@ -69,9 +69,9 @@ public class FlammableAerosolEntity extends AreaCloudEntity {
 		// Sets the action of this cloud to damaging the entity and setting it on fire for a short
 		// period of time...
 		cloud.setCloudAction((cloudEntity, target) -> {
-			if (target.getEntityWorld() instanceof ServerWorld serverWorld &&
+			if (target.level() instanceof ServerLevel serverWorld &&
 			cloudEntity instanceof FlammableAerosolEntity ce) {
-				target.setOnFireFor(ce.getFireDuration() / 20f);
+				target.igniteForSeconds(ce.getFireDuration() / 20f);
 
 				DamageSource src = ModDamageSources.create(
 					serverWorld,
@@ -79,7 +79,7 @@ public class FlammableAerosolEntity extends AreaCloudEntity {
 					cloudEntity, cloudEntity.getOwner()
 				);
 
-				target.damage(
+				target.hurtServer(
 					serverWorld, src,
 					(float) ce.getDamage()
 				);
@@ -92,7 +92,7 @@ public class FlammableAerosolEntity extends AreaCloudEntity {
 	// ///////////////// //
 
 	@Override
-	protected ParticleEffect getDefaultParticle() {
+	protected ParticleOptions getDefaultParticle() {
 		return DEFAULT_PARTICLE;
 	}
 

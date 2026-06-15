@@ -1,12 +1,13 @@
 package com.virus5600.defensive_measures.sound;
 
+import net.minecraft.core.Holder;
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.Identifier;
+import net.minecraft.sounds.SoundEvent;
+
 import com.virus5600.defensive_measures.DefensiveMeasures;
 
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.Registry;
-import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.sound.SoundEvent;
-import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -76,16 +77,16 @@ public class ModSoundEvents {
 	public static final SoundEvent ROCKET_EXPLOSION = ModSoundEvents.registerSoundEvent("generic.rocket.explode");
 
 	private static SoundEvent registerSoundEvent(final String soundID) {
-		Identifier identifier = Identifier.of(DefensiveMeasures.MOD_ID, soundID);
+		Identifier identifier = Identifier.fromNamespaceAndPath(DefensiveMeasures.MOD_ID, soundID);
 		return Registry.register(
-			Registries.SOUND_EVENT,
+			BuiltInRegistries.SOUND_EVENT,
 			identifier,
-			SoundEvent.of(identifier)
+			SoundEvent.createVariableRangeEvent(identifier)
 		);
 	}
 
-	public static RegistryEntry<SoundEvent> asRegistryEntry(@NotNull SoundEvent sound) {
-		return Registries.SOUND_EVENT.getEntry(sound);
+	public static Holder<SoundEvent> asRegistryEntry(@NotNull SoundEvent sound) {
+		return BuiltInRegistries.SOUND_EVENT.wrapAsHolder(sound);
 	}
 
 	public static void registerSoundEvents() {

@@ -1,14 +1,14 @@
 package com.virus5600.defensive_measures._helper.accessor;
 
-import net.minecraft.client.sound.Source;
-import net.minecraft.client.sound.SoundInstance;
-import net.minecraft.client.sound.SoundManager;
+import com.mojang.blaze3d.audio.Channel;
+import net.minecraft.client.resources.sounds.SoundInstance;
+import net.minecraft.client.sounds.SoundManager;
 
 import com.virus5600.defensive_measures.sound.LoopingShootSoundInstance;
 
 /**
  * Chaining from the {@link SoundManagerAccess} interface, this interface calls the private field
- * {@link Source#isStopped()}, allowing sound instances like the {@link LoopingShootSoundInstance}
+ * {@link Channel#stopped()}, allowing sound instances like the {@link LoopingShootSoundInstance}
  * class to utilize said method and check if the audio buffer is stopped, allowing for a more
  * seamless stitching of sounds.
  *

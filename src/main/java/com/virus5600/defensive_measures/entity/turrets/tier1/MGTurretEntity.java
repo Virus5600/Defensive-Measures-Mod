@@ -1,31 +1,31 @@
 package com.virus5600.defensive_measures.entity.turrets.tier1;
 
-import com.virus5600.defensive_measures.entity.turrets.TurretEntity;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.attribute.DefaultAttributeContainer.Builder;
-import net.minecraft.entity.attribute.EntityAttributes;
-import net.minecraft.entity.damage.DamageSource;
-import net.minecraft.entity.data.DataTracker;
-import net.minecraft.entity.effect.StatusEffects;
-import net.minecraft.entity.mob.MobEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.sound.SoundEvent;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
-
-import org.jetbrains.annotations.Nullable;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.ai.attributes.AttributeSupplier.Builder;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
 
 import com.virus5600.defensive_measures.entity.ModEntities;
 import com.virus5600.defensive_measures.entity.TurretMaterial;
 import com.virus5600.defensive_measures.entity.ai.goal.ProjectileAttackGoal;
+import com.virus5600.defensive_measures.entity.turrets.TurretEntity;
 import com.virus5600.defensive_measures.item.ModItems;
 import com.virus5600.defensive_measures.particle.ModParticles;
 import com.virus5600.defensive_measures.sound.ModSoundEvents;
+
+import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
 
 import java.util.List;
 import java.util.Map;
@@ -66,7 +66,7 @@ public class MGTurretEntity extends TurretEntity {
 	 * cooldown attribute and will be handled by the {@link #tick() tick()} method.
 	 */
 	private static final int TOTAL_ATT_COOLDOWN = (int) (20 * 3.75);
-	private static final Map<Offsets, List<Vec3d>> OFFSETS;
+	private static final Map<Offsets, List<Vec3>> OFFSETS;
 	private static final double[] DAMAGE;
 	private static final byte[] PIERCE_LEVELS;
 
@@ -82,7 +82,7 @@ public class MGTurretEntity extends TurretEntity {
 	// //////////// //
 	// CONSTRUCTORS //
 	// //////////// //
-	public MGTurretEntity(EntityType<? extends MobEntity> entityType, World world) {
+	public MGTurretEntity(EntityType<? extends Mob> entityType, Level world) {
 		super(entityType, world, TurretMaterial.METAL, ModEntities.MG_BULLET, ModItems.MG_TURRET);
 
 		this.setShootSound(ModSoundEvents.TURRET_MG_SHOOT);
@@ -97,18 +97,18 @@ public class MGTurretEntity extends TurretEntity {
 	// INITIALIZERS //
 	// //////////// //
 	@Override
-	protected void initGoals() {
+	protected void registerGoals() {
 		// Goal instances
 		this.attackGoal = new ProjectileAttackGoal(this, 0, TOTAL_ATT_COOLDOWN, this.getMaxAttackRange(), this.getMinAttackRange());
 
 		// Set the standard goals
-		super.initGoals();
+		super.registerGoals();
 	}
 
 	@Override
-	protected void initDataTracker(DataTracker.Builder builder) {
+	protected void defineSynchedData(net.minecraft.network.syncher.SynchedEntityData.@NonNull Builder builder) {
 		// Initialize standard data trackers
-		super.initDataTracker(builder);
+		super.defineSynchedData(builder);
 	}
 
 	public static Builder setAttributes() {
@@ -116,8 +116,8 @@ public class MGTurretEntity extends TurretEntity {
 		TurretEntity.setTurretMaxRange(20 + ModEntities.MG_TURRET.getDimensions().eyeHeight());
 
 		return TurretEntity.setAttributes()
-			.add(EntityAttributes.ARMOR, 2)
-			.add(EntityAttributes.ARMOR_TOUGHNESS, 1);
+			.add(Attributes.ARMOR, 2)
+			.add(Attributes.ARMOR_TOUGHNESS, 1);
 	}
 
 	// /////////////// //
@@ -125,7 +125,7 @@ public class MGTurretEntity extends TurretEntity {
 	// /////////////// //
 
 	@Override
-	public void shootAt(LivingEntity target, float pullProgress) {
+	public void performRangedAttack(@NonNull LivingEntity target, float pullProgress) {
 		TurretProjectileVelocity velocityData = this.getProjectileVelocityData(target);
 
 		super.shootBurst(5, 5, velocityData);
@@ -136,7 +136,7 @@ public class MGTurretEntity extends TurretEntity {
 	// /////////////////// //
 
 	@Override @Nullable
-	protected SoundEvent getHurtSound(DamageSource source) {
+	protected SoundEvent getHurtSound(@NonNull DamageSource source) {
 		return ModSoundEvents.TURRET_MG_HURT;
 	}
 
@@ -146,7 +146,7 @@ public class MGTurretEntity extends TurretEntity {
 	}
 
 	@Override
-	public int getMinLookPitchChange() {
+	public int getMinHeadXRot() {
 		return -28;
 	}
 
@@ -174,13 +174,13 @@ public class MGTurretEntity extends TurretEntity {
 		return (int) (1.5F * 20);
 	}
 
-	protected List<Vec3d> getTurretProjectileSpawn() {
+	protected List<Vec3> getTurretProjectileSpawn() {
 		return OFFSETS.get(Offsets.BARREL);
 	}
 
 	public TurretProjectileVelocity getProjectileVelocityData(LivingEntity target) {
-		float dist = (float) this.getEntityPos()
-			.distanceTo(target.getEntityPos());
+		float dist = (float) this.position()
+			.distanceTo(target.position());
 
 		return TurretProjectileVelocity
 			.init(this)
@@ -217,15 +217,15 @@ public class MGTurretEntity extends TurretEntity {
 
 		// Handles the Flash particle for when the MG shoots
 		if (isShooting || stillShooting) {
-			Vec3d barrelPos = this.getRelativePos(
+			Vec3 barrelPos = this.getRelativePos(
 				this.getCurrentBarrel(false)
 					.add(0, 0, 0.05)
 			);
 
-			this.getEntityWorld()
-				.addParticleClient(
+			this.level()
+				.addParticle(
 					ModParticles.SUSPENDED_SPARKS,
-					barrelPos.getX(), barrelPos.getY(), barrelPos.getZ(),
+					barrelPos.x(), barrelPos.y(), barrelPos.z(),
 					0, 0, 0
 				);
 		}
@@ -257,7 +257,7 @@ public class MGTurretEntity extends TurretEntity {
 
 		OFFSETS = Map.of(
 			Offsets.BARREL, List.of(
-				new Vec3d(0.0, 0.0, 0.5)
+				new Vec3(0.0, 0.0, 0.5)
 			)
 		);
 
@@ -269,7 +269,7 @@ public class MGTurretEntity extends TurretEntity {
 
 		effectSource = Map.of(
 			Items.IRON_BLOCK, List.<Object[]>of(
-				new Object[] { StatusEffects.RESISTANCE, 60, 2 }
+				new Object[] { MobEffects.RESISTANCE, 60, 2 }
 			)
 		);
 	}

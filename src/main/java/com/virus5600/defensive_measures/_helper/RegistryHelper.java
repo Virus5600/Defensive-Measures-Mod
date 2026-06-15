@@ -1,32 +1,33 @@
 package com.virus5600.defensive_measures._helper;
 
-import com.virus5600.defensive_measures.stat.ModStats;
-import net.minecraft.block.AbstractBlock;
-import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.damage.DamageType;
-import net.minecraft.item.Item;
-import net.minecraft.item.Items;
-import net.minecraft.recipe.Recipe;
-import net.minecraft.recipe.RecipeSerializer;
-import net.minecraft.recipe.RecipeType;
-import net.minecraft.recipe.book.RecipeBookCategory;
-import net.minecraft.recipe.display.RecipeDisplay;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.Registry;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.registry.tag.TagKey;
-import net.minecraft.resource.featuretoggle.FeatureFlags;
-import net.minecraft.screen.ScreenHandler;
-import net.minecraft.screen.ScreenHandlerType;
-import net.minecraft.stat.StatFormatter;
-import net.minecraft.stat.StatType;
-import net.minecraft.stat.Stats;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
+import net.minecraft.core.Holder;
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.stats.StatFormatter;
+import net.minecraft.stats.StatType;
+import net.minecraft.stats.Stats;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.damagesource.DamageType;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.flag.FeatureFlags;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Item.Properties;
+import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeBookCategory;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.world.item.crafting.display.RecipeDisplay;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockBehaviour;
 
 import com.virus5600.defensive_measures.DefensiveMeasures;
 
@@ -46,92 +47,128 @@ import java.util.function.Function;
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
  */
 public final class RegistryHelper {
-	// Block Registry
-	private static RegistryKey<Block> createBlockKey(String name) {
-		return RegistryKey.of(RegistryKeys.BLOCK, Identifier.of(DefensiveMeasures.MOD_ID, name));
+	// Holder
+	public static Holder<Block> getHolder(Block block) {
+		return BuiltInRegistries.BLOCK.wrapAsHolder(block);
 	}
 
-	public static Block registerBlock(String path, Function<AbstractBlock.Settings, Block> function, AbstractBlock.Settings settings) {
+	public static Holder<EntityType<?>> getHolder(EntityType<?> entityType) {
+		return BuiltInRegistries.ENTITY_TYPE.wrapAsHolder(entityType);
+	}
+
+	public static boolean isOf(EntityType<?> entityType, TagKey<EntityType<?>> tag) {
+		return getHolder(entityType).is(tag);
+	}
+
+	// Block Registry
+	private static ResourceKey<Block> createBlockKey(String name) {
+		return ResourceKey.create(Registries.BLOCK, Identifier.fromNamespaceAndPath(DefensiveMeasures.MOD_ID, name));
+	}
+
+	public static Block registerBlock(String path, Function<BlockBehaviour.Properties, Block> function, BlockBehaviour.Properties settings) {
 		return Blocks.register(createBlockKey(path), function, settings);
 	}
 
 	// Item Registry
-	private static RegistryKey<Item> createItemKey(String path) {
-		return RegistryKey.of(RegistryKeys.ITEM, Identifier.of(DefensiveMeasures.MOD_ID, path));
+	private static ResourceKey<Item> createItemKey(String path) {
+		return ResourceKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath(DefensiveMeasures.MOD_ID, path));
 	}
 
-	public static Item registerItem(String path, Function<Item.Settings, Item> factory, Item.Settings settings) {
-		return Items.register(createItemKey(path), factory, settings);
+	@SuppressWarnings("OptionalGetWithoutIsPresent")
+	private static ResourceKey<Item> createBlockItemKey(Block block) {
+		ResourceKey<Block> key = getHolder(block).unwrapKey().get();
+		return ResourceKey.create(Registries.ITEM, key.identifier());
 	}
 
-	public static Item registerItem(String path, Function<Item.Settings, Item> factory) {
-		return Items.register(createItemKey(path), factory, new Item.Settings());
+	public static Item registerItem(String path, Function<Properties, Item> factory, Properties settings) {
+		return registerItem(createItemKey(path), factory, settings);
+	}
+
+	public static Item registerItem(ResourceKey<Item> key, Function<Properties, Item> factory, Properties settings) {
+		settings.setId(key);
+		Item item = factory.apply(settings);
+
+		if (item instanceof BlockItem blockItem) {
+			blockItem.registerBlocks(Item.BY_BLOCK, item);
+		}
+
+		return Registry.register(BuiltInRegistries.ITEM, key, item);
+	}
+
+	public static Item registerItem(String path, Function<Properties, Item> factory) {
+		return registerItem(path, factory, new Properties());
 	}
 
 	public static Item registerItem(Block block) {
-		return Items.register(block);
+		Properties prop = new Properties();
+
+		return registerItem(
+			createBlockItemKey(block),
+			settings -> new BlockItem(block, settings),
+			prop
+		);
 	}
 
 	// Tag Registry
 	public static TagKey<Block> createBlockTagKey(String path) {
-		return TagKey.of(RegistryKeys.BLOCK, Identifier.of(DefensiveMeasures.MOD_ID, path));
+		return TagKey.create(Registries.BLOCK, Identifier.fromNamespaceAndPath(DefensiveMeasures.MOD_ID, path));
 	}
 
 	public static TagKey<EntityType<?>> createEntityTypeTagKey(String path) {
-		return TagKey.of(RegistryKeys.ENTITY_TYPE, Identifier.of(DefensiveMeasures.MOD_ID, path));
+		return TagKey.create(Registries.ENTITY_TYPE, Identifier.fromNamespaceAndPath(DefensiveMeasures.MOD_ID, path));
 	}
 
 	public static TagKey<Item> createItemTagKey(String path) {
-		return TagKey.of(RegistryKeys.ITEM, Identifier.of(DefensiveMeasures.MOD_ID, path));
+		return TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath(DefensiveMeasures.MOD_ID, path));
 	}
 
 	// Entity Registry
-	private static RegistryKey<EntityType<?>> createEntityKey(String path) {
-		return RegistryKey.of(RegistryKeys.ENTITY_TYPE, Identifier.of(DefensiveMeasures.MOD_ID, path));
+	private static ResourceKey<EntityType<?>> createEntityKey(String path) {
+		return ResourceKey.create(Registries.ENTITY_TYPE, Identifier.fromNamespaceAndPath(DefensiveMeasures.MOD_ID, path));
 	}
 
 	public static <T extends Entity> EntityType<T> registerEntity(String path, EntityType.Builder<T> builder) {
-		RegistryKey<EntityType<?>> key = createEntityKey(path);
+		ResourceKey<EntityType<?>> key = createEntityKey(path);
 
 		return Registry.register(
-			Registries.ENTITY_TYPE,
+			BuiltInRegistries.ENTITY_TYPE,
 			key,
 			builder.build(key)
 		);
 	}
 
 	// Damage Type Registry
-	public static RegistryKey<DamageType> getDamageTypeKey(String path) {
-		return RegistryKey.of(RegistryKeys.DAMAGE_TYPE, Identifier.of(DefensiveMeasures.MOD_ID, path));
+	public static ResourceKey<DamageType> getDamageTypeKey(String path) {
+		return ResourceKey.create(Registries.DAMAGE_TYPE, Identifier.fromNamespaceAndPath(DefensiveMeasures.MOD_ID, path));
 	}
 
 	// Stats Registry
 	public static Identifier registerStat(String id, StatFormatter formatter) {
-		Identifier identifier = Identifier.of(DefensiveMeasures.MOD_ID, id);
-		Registry.register(Registries.CUSTOM_STAT, identifier, identifier);
-		Stats.CUSTOM.getOrCreateStat(identifier, formatter);
+		Identifier identifier = Identifier.fromNamespaceAndPath(DefensiveMeasures.MOD_ID, id);
+		Registry.register(BuiltInRegistries.CUSTOM_STAT, identifier, identifier);
+		Stats.CUSTOM.get(identifier, formatter);
 		return identifier;
 	}
 
 	public static <T> StatType<T> registerStatType(String id, Registry<T> registry) {
-		Text text = Text.translatable("stat_type." + DefensiveMeasures.MOD_ID + "." + id);
-		return Registry.register(Registries.STAT_TYPE, id, new StatType<>(registry, text));
+		Component text = Component.translatable("stat_type." + DefensiveMeasures.MOD_ID + "." + id);
+		return Registry.register(BuiltInRegistries.STAT_TYPE, id, new StatType<>(registry, text));
 	}
 
 	// Screen Handler Type Registry
-	public static <T extends ScreenHandler> ScreenHandlerType<T> registerScreenHandlerType(String id, ScreenHandlerType.Factory<T> factory) {
+	public static <T extends AbstractContainerMenu> MenuType<T> registerScreenHandlerType(String id, MenuType.MenuSupplier<T> factory) {
 		return Registry.register(
-			Registries.SCREEN_HANDLER,
-			Identifier.of(DefensiveMeasures.MOD_ID, id),
-			new ScreenHandlerType<>(factory, FeatureFlags.VANILLA_FEATURES)
+			BuiltInRegistries.MENU,
+			Identifier.fromNamespaceAndPath(DefensiveMeasures.MOD_ID, id),
+			new MenuType<>(factory, FeatureFlags.VANILLA_SET)
 		);
 	}
 
 	// Recipe Related Registry
-	public static <T extends Recipe<?>>RecipeType<T> registerRecipeType(String id) {
+	public static <T extends Recipe<?>> RecipeType<T> registerRecipeType(String id) {
 		return Registry.register(
-			Registries.RECIPE_TYPE,
-			Identifier.of(DefensiveMeasures.MOD_ID, id),
+			BuiltInRegistries.RECIPE_TYPE,
+			Identifier.fromNamespaceAndPath(DefensiveMeasures.MOD_ID, id),
 			new RecipeType<T>() {
 				public String toString() {
 					return id;
@@ -142,21 +179,21 @@ public final class RegistryHelper {
 
 	public static <S extends RecipeSerializer<T>, T extends Recipe<?>> S registerRecipeSerializer(String id, S recipeSerializer) {
 		return Registry.register(
-			Registries.RECIPE_SERIALIZER,
-			Identifier.of(DefensiveMeasures.MOD_ID, id),
+			BuiltInRegistries.RECIPE_SERIALIZER,
+			Identifier.fromNamespaceAndPath(DefensiveMeasures.MOD_ID, id),
 			recipeSerializer
 		);
 	}
 
-	public static <S extends RecipeDisplay.Serializer<T>, T extends RecipeDisplay> S registerRecipeDisplay(String id, S recipeDisplaySerializer) {
+	public static <S extends RecipeDisplay.Type<T>, T extends RecipeDisplay> S registerRecipeDisplay(String id, S recipeDisplaySerializer) {
 		return Registry.register(
-			Registries.RECIPE_DISPLAY,
-			Identifier.of(DefensiveMeasures.MOD_ID, id),
+			BuiltInRegistries.RECIPE_DISPLAY,
+			Identifier.fromNamespaceAndPath(DefensiveMeasures.MOD_ID, id),
 			recipeDisplaySerializer
 		);
 	}
 
 	public static RecipeBookCategory registerRecipeBookCat(String id) {
-		return Registry.register(Registries.RECIPE_BOOK_CATEGORY, id, new RecipeBookCategory());
+		return Registry.register(BuiltInRegistries.RECIPE_BOOK_CATEGORY, id, new RecipeBookCategory());
 	}
 }

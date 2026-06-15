@@ -6,7 +6,7 @@ jobs:
     strategy:
       matrix:
         version:
-          - {minecraft_version: "1.21.11", java: 21, loader: fabric, api: "0.141.4"}
+          - {minecraft_version: "26.1.2", java: 25, loader: fabric, api: "0.151.0"}
         os:
           - ubuntu-latest
 

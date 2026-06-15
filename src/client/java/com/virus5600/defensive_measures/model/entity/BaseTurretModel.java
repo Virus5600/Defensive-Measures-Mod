@@ -1,13 +1,13 @@
 package com.virus5600.defensive_measures.model.entity;
 
-import com.virus5600.defensive_measures._util.MathUtil;
-import net.minecraft.client.model.ModelPart;
-import net.minecraft.client.render.entity.animation.Animation;
-import net.minecraft.client.render.entity.animation.AnimationDefinition;
-import net.minecraft.client.render.entity.state.EntityRenderState;
-import net.minecraft.entity.AnimationState;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.client.animation.AnimationDefinition;
+import net.minecraft.client.animation.KeyframeAnimation;
+import net.minecraft.client.model.geom.ModelPart;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.AnimationState;
 
+import com.virus5600.defensive_measures._util.MathUtil;
 import com.virus5600.defensive_measures.animations.Keyframe;
 import com.virus5600.defensive_measures.entity.turrets.TurretEntity;
 import com.virus5600.defensive_measures.model.BaseModel;
@@ -15,6 +15,7 @@ import com.virus5600.defensive_measures.renderer.entity.state.BaseTurretRenderSt
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
 
 import java.util.*;
 
@@ -61,13 +62,13 @@ public abstract class BaseTurretModel<S extends BaseTurretRenderState> extends B
 	 * The shooting animation of the turret. This is used to render the shooting animation of the
 	 * turret when it shoots.
 	 */
-	protected final Animation shootAnim;
+	protected final KeyframeAnimation shootAnim;
 
 	/**
 	 * The death animation of the turret. This is used to render the death animation of the turret
 	 * when it dies.
 	 */
-	protected final Animation deathAnim;
+	protected final KeyframeAnimation deathAnim;
 	protected final float shootAnimLen;
 	protected final float deathAnimLen;
 
@@ -107,8 +108,8 @@ public abstract class BaseTurretModel<S extends BaseTurretRenderState> extends B
 	 * @see #baseTexture
 	 */
 	public BaseTurretModel(
-		@NotNull ModelPart root, @NotNull String texturePath, @NotNull String[] textures,
-		@NotNull ModelPart neck, @NotNull ModelPart head
+            @NotNull ModelPart root, @NotNull String texturePath, @NotNull String[] textures,
+            @NotNull ModelPart neck, @NotNull ModelPart head
 	) {
 		this(root, texturePath, textures, neck, head, null, null);
 	}
@@ -130,9 +131,9 @@ public abstract class BaseTurretModel<S extends BaseTurretRenderState> extends B
 	 * @see #baseTexture
 	 */
 	public BaseTurretModel(
-		@NotNull ModelPart root, @NotNull String texturePath, @NotNull String[] textures,
-		@NotNull ModelPart neck, @NotNull ModelPart head,
-		@Nullable AnimationDefinition shootAnim, @Nullable AnimationDefinition deathAnim
+            @NotNull ModelPart root, @NotNull String texturePath, @NotNull String[] textures,
+            @NotNull ModelPart neck, @NotNull ModelPart head,
+            @Nullable AnimationDefinition shootAnim, @Nullable AnimationDefinition deathAnim
 	) {
 		super(root, texturePath, textures);
 
@@ -160,18 +161,18 @@ public abstract class BaseTurretModel<S extends BaseTurretRenderState> extends B
 
 		// Sets the common animation parts that may/not be used by all turret models
 		this.shootAnim = shootAnim != null ?
-			shootAnim.createAnimation(root) :
+			shootAnim.bake(root) :
 			AnimationDefinition.Builder
-				.create(this.shootAnimLen / 1000)
+				.withLength(this.shootAnimLen / 1000)
 				.build()
-				.createAnimation(root);
+				.bake(root);
 
 		this.deathAnim = deathAnim != null ?
-			deathAnim.createAnimation(root) :
+			deathAnim.bake(root) :
 			AnimationDefinition.Builder
-				.create(this.deathAnimLen / 1000)
+				.withLength(this.deathAnimLen / 1000)
 				.build()
-				.createAnimation(root);
+				.bake(root);
 	}
 
 	// /////////////// //
@@ -194,19 +195,19 @@ public abstract class BaseTurretModel<S extends BaseTurretRenderState> extends B
 	 * @param state The current state of the turret.
 	 */
 	@Override
-	public void setAngles(S state) {
-		super.setAngles(state);
+	public void setupAnim(@NonNull S state) {
+		super.setupAnim(state);
 
 		// ANIMATION HANDLING (& ADDITIONAL PROCEDURES)
 		if (this.shootAnim != null) {
 			if ((this.getShootAnimProcedure(state.id) == null &&
-				state.shootAnimationState.getTimeInMilliseconds(state.age) > 0 &&
-				!state.shootAnimationState.isRunning())
+				state.shootAnimationState.getTimeInMillis(state.ageInTicks) > 0 &&
+				!state.shootAnimationState.isStarted())
 			) {
 				this.setShootAnimProcedure(state.id, this.getShootAnimProcedureInstance());
 			}
 
-			this.shootAnim.apply(state.shootAnimationState, state.age);
+			this.shootAnim.apply(state.shootAnimationState, state.ageInTicks);
 			this.additionalShootAnimProcedures(state.shootAnimationState, state);
 		}
 		else {
@@ -215,14 +216,14 @@ public abstract class BaseTurretModel<S extends BaseTurretRenderState> extends B
 
 		if (this.deathAnim != null) {
 			if (this.getDeathAnimProcedure(state.id) == null &&
-				state.deathAnimationState.getTimeInMilliseconds(state.age) > 0 &&
-				!state.deathAnimationState.isRunning()
+				state.deathAnimationState.getTimeInMillis(state.ageInTicks) > 0 &&
+				!state.deathAnimationState.isStarted()
 			) {
 				Queue<? extends Keyframe> procedure = this.getDeathAnimProcedureInstance();
 				this.setDeathAnimProcedure(state.id, procedure);
 			}
 
-			this.deathAnim.apply(state.deathAnimationState, state.age);
+			this.deathAnim.apply(state.deathAnimationState, state.ageInTicks);
 			this.additionalDeathAnimProcedures(state.deathAnimationState, state);
 		}
 		else {
@@ -237,8 +238,8 @@ public abstract class BaseTurretModel<S extends BaseTurretRenderState> extends B
 		}
 
 		// HEAD ANGLE HANDLING
-		float headYaw = state.relativeHeadYaw + state.bodyYaw + 180;
-		float headPitch = state.pitch;
+		float headYaw = state.yRot + state.bodyRot + 180;
+		float headPitch = state.xRot;
 
 		// If default head pitch is not 0, use it when it's idle.
 		if (this.getDefaultHeadPitch() != 0 && state.hasTarget) {
@@ -257,14 +258,14 @@ public abstract class BaseTurretModel<S extends BaseTurretRenderState> extends B
 	 * @param headPitch The vertical angle the turret should rotate to. This is used to determine the pitch rotation of the head.
 	 */
 	protected void setHeadAngles(float headYaw, float headPitch) {
-		headPitch = MathHelper.clamp(
+		headPitch = Mth.clamp(
 			headPitch,
 			-this.getMaxPitch(),
 			-this.getMinPitch()
 		);
 
-		this.neck.yaw = MathUtil.degToRad(headYaw);
-		this.head.pitch = MathUtil.degToRad(headPitch);
+		this.neck.yRot = MathUtil.degToRad(headYaw);
+		this.head.xRot = MathUtil.degToRad(headPitch);
 	}
 
 	// ///////////////// //
@@ -339,12 +340,12 @@ public abstract class BaseTurretModel<S extends BaseTurretRenderState> extends B
 	 * @param state	 The current state of the turret.
 	 */
 	protected void additionalShootAnimProcedures(AnimationState animState, S state) {
-		long ms = animState.getTimeInMilliseconds(state.age);
+		long ms = animState.getTimeInMillis(state.ageInTicks);
 		UUID id = state.id;
 		Queue<? extends Keyframe> procedure = this.getShootAnimProcedure(id);
 		Keyframe keyframe = procedure == null ? null : procedure.peek();
 
-		if (animState.isRunning() && keyframe != null) {
+		if (animState.isStarted() && keyframe != null) {
 			if (keyframe.getTimeMS() <= ms) {
 				keyframe.apply(animState, state);
 				procedure.remove();
@@ -371,12 +372,12 @@ public abstract class BaseTurretModel<S extends BaseTurretRenderState> extends B
 	 * @param state	 The current state of the turret.
 	 */
 	protected void additionalDeathAnimProcedures(AnimationState animState, S state) {
-		long ms = animState.getTimeInMilliseconds(state.age);
+		long ms = animState.getTimeInMillis(state.ageInTicks);
 		UUID id = state.id;
 		Queue<? extends Keyframe> procedure = this.getDeathAnimProcedure(id);
 		Keyframe keyframe = procedure == null ? null : procedure.peek();
 
-		if (animState.isRunning() && keyframe != null) {
+		if (animState.isStarted() && keyframe != null) {
 			if (keyframe.getTimeMS() <= ms) {
 				keyframe.apply(animState, state);
 				procedure.remove();

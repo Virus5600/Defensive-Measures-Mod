@@ -1,38 +1,38 @@
 package com.virus5600.defensive_measures.entity.turrets.tier1;
 
-import com.virus5600.defensive_measures.entity.turrets.TurretEntity;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.attribute.DefaultAttributeContainer;
-import net.minecraft.entity.attribute.EntityAttributes;
-import net.minecraft.entity.damage.DamageSource;
-import net.minecraft.entity.data.DataTracker.Builder;
-import net.minecraft.entity.effect.StatusEffects;
-import net.minecraft.entity.mob.MobEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.sound.SoundEvent;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
-
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import net.minecraft.network.syncher.SynchedEntityData.Builder;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
 
 import com.virus5600.defensive_measures.entity.ModEntities;
 import com.virus5600.defensive_measures.entity.TurretMaterial;
 import com.virus5600.defensive_measures.entity.ai.goal.ProjectileAttackGoal;
+import com.virus5600.defensive_measures.entity.turrets.TurretEntity;
 import com.virus5600.defensive_measures.item.ModItems;
 import com.virus5600.defensive_measures.particle.ModParticles;
 import com.virus5600.defensive_measures.sound.ModSoundEvents;
 
-import java.util.Map;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -67,7 +67,7 @@ public class CannonTurretEntity extends TurretEntity {
 	 * The time is calculated in ticks and by default, it's 5 seconds <b>(20 ticks times 5 seconds)</b>.
 	 */
 	private static final int TOTAL_ATT_COOLDOWN = 20 * 5;
-	private static final Map<Offsets, List<Vec3d>> OFFSETS;
+	private static final Map<Offsets, List<Vec3>> OFFSETS;
 	private static final Map<Item, SoundEvent> HEAL_SOUNDS;
 	private static final double[] DAMAGE;
 	private static final byte[] PIERCE_LEVELS;
@@ -83,7 +83,7 @@ public class CannonTurretEntity extends TurretEntity {
 	// //////////// //
 	// CONSTRUCTORS //
 	// //////////// //
-	public CannonTurretEntity(EntityType<? extends MobEntity> entityType, World world) {
+	public CannonTurretEntity(EntityType<? extends Mob> entityType, Level world) {
 		super(entityType, world, TurretMaterial.METAL, ModEntities.CANNONBALL, ModItems.CANNON_TURRET);
 
 		this.setShootSound(ModSoundEvents.TURRET_CANNON_SHOOT);
@@ -98,27 +98,27 @@ public class CannonTurretEntity extends TurretEntity {
 	// INITIALIZERS //
 	// //////////// //
 	@Override
-	protected void initGoals() {
+	protected void registerGoals() {
 		// Goal instances
 		this.attackGoal = new ProjectileAttackGoal(this, 0, TOTAL_ATT_COOLDOWN, this.getMaxAttackRange(), this.getMinAttackRange());
 
 		// Set the standard goals
-		super.initGoals();
+		super.registerGoals();
 	}
 
 	@Override
-	protected void initDataTracker(Builder builder) {
+	protected void defineSynchedData(@NonNull Builder builder) {
 		// Initialize standard data trackers
-		super.initDataTracker(builder);
+		super.defineSynchedData(builder);
 	}
 
-	public static @NotNull DefaultAttributeContainer.Builder setAttributes() {
+	public static @NotNull net.minecraft.world.entity.ai.attributes.AttributeSupplier.Builder setAttributes() {
 		TurretEntity.setTurretMaxHealth(50);
 		TurretEntity.setTurretMaxRange(24 + ModEntities.CANNON_TURRET.getDimensions().eyeHeight());
 
 		return TurretEntity.setAttributes()
-			.add(EntityAttributes.ARMOR, 3)
-			.add(EntityAttributes.ARMOR_TOUGHNESS, 2);
+			.add(Attributes.ARMOR, 3)
+			.add(Attributes.ARMOR_TOUGHNESS, 2);
 	}
 
 	// /////////////// //
@@ -126,7 +126,7 @@ public class CannonTurretEntity extends TurretEntity {
 	// /////////////// //
 
 	@Override
-	public void shootAt(LivingEntity target, float pullProgress) {
+	public void performRangedAttack(@NonNull LivingEntity target, float pullProgress) {
 		TurretProjectileVelocity velocityData = this.getProjectileVelocityData(target);
 
 		velocityData.setUncertainty(
@@ -138,14 +138,14 @@ public class CannonTurretEntity extends TurretEntity {
 	}
 
 	@Override
-	public ActionResult interactMob(PlayerEntity player, Hand hand) {
-		Item usedItem = player.getStackInHand(hand).getItem();
+	public @NonNull InteractionResult mobInteract(Player player, @NonNull InteractionHand hand) {
+		Item usedItem = player.getItemInHand(hand).getItem();
 
 		if (this.isHealableItem(usedItem) && this.getHealSound() != ModSoundEvents.TURRET_REPAIR_WOOD) {
 			this.setHealSound(HEAL_SOUNDS.get(usedItem));
 		}
 
-		return super.interactMob(player, hand);
+		return super.mobInteract(player, hand);
 	}
 
 	@Override
@@ -153,7 +153,7 @@ public class CannonTurretEntity extends TurretEntity {
 		super.tick();
 
 		// Client Side
-		if (this.getEntityWorld().isClient()) {
+		if (this.level().isClientSide()) {
 			this.updateAnimations();
 		}
 	}
@@ -163,18 +163,18 @@ public class CannonTurretEntity extends TurretEntity {
 	// /////////////////// //
 
 	@Override
-	public int getMaxLookPitchChange() {
+	public int getMaxHeadXRot() {
 		return 23;
 	}
 
 	@Override
-	public int getMinLookPitchChange() {
+	public int getMinHeadXRot() {
 		return -20;
 	}
 
 	@Nullable
 	@Override
-	protected SoundEvent getHurtSound(DamageSource source) {
+	protected SoundEvent getHurtSound(@NonNull DamageSource source) {
 		return ModSoundEvents.TURRET_CANNON_HURT;
 	}
 
@@ -223,13 +223,13 @@ public class CannonTurretEntity extends TurretEntity {
 		return (int) (1F * 20);
 	}
 
-	protected List<Vec3d> getTurretProjectileSpawn() {
+	protected List<Vec3> getTurretProjectileSpawn() {
 		return OFFSETS.get(Offsets.BARREL);
 	}
 
 	public TurretProjectileVelocity getProjectileVelocityData(LivingEntity target) {
-		float dist = (float) getEntityPos()
-			.distanceTo(target.getEntityPos());
+		float dist = (float) position()
+			.distanceTo(target.position());
 
 		return TurretProjectileVelocity
 			.init(this)
@@ -271,28 +271,28 @@ public class CannonTurretEntity extends TurretEntity {
 
 		// Handles Fuse particle for when locked but not yet shooting
 		if (!isShooting && isLockedButNotAttacking) {
-			Vec3d fusePos = this.getRelativePos(
+			Vec3 fusePos = this.getRelativePos(
 				OFFSETS.get(Offsets.FUSE).getFirst()
 			);
 
-			this.getEntityWorld()
-				.addParticleClient(
+			this.level()
+				.addParticle(
 					ModParticles.CANNON_FUSE,
-					fusePos.getX(), fusePos.getY(), fusePos.getZ(),
+					fusePos.x(), fusePos.y(), fusePos.z(),
 					0, 0.225, -0.5
 				);
 		}
 
 		// Handles the Flash particle for when the cannon shoots
 		if (isShooting) {
-			Vec3d barrelPos = this.getRelativePos(this.getCurrentBarrel(false)),
-				velocityModifier = this.getRelativePos(0, 0, 1.5).subtract(this.getEyePos());
+			Vec3 barrelPos = this.getRelativePos(this.getCurrentBarrel(false)),
+				velocityModifier = this.getRelativePos(0, 0, 1.5).subtract(this.getEyePosition());
 
-			this.getEntityWorld()
-				.addParticleClient(
+			this.level()
+				.addParticle(
 					ModParticles.CANNON_FLASH,
-					barrelPos.getX(), barrelPos.getY(), barrelPos.getZ(),
-					velocityModifier.getX(), velocityModifier.getY(), velocityModifier.getZ()
+					barrelPos.x(), barrelPos.y(), barrelPos.z(),
+					velocityModifier.x(), velocityModifier.y(), velocityModifier.z()
 				);
 		}
 	}
@@ -323,10 +323,10 @@ public class CannonTurretEntity extends TurretEntity {
 
 		OFFSETS = Map.of(
 			Offsets.BARREL, List.of(
-				new Vec3d(0, 0, 0.875)
+				new Vec3(0, 0, 0.875)
 			),
 			Offsets.FUSE, List.of(
-				new Vec3d(0, 0.25, -0.55)
+				new Vec3(0, 0.25, -0.55)
 			)
 		);
 
@@ -344,7 +344,7 @@ public class CannonTurretEntity extends TurretEntity {
 
 		effectSource = Map.of(
 			Items.IRON_BLOCK, List.<Object[]>of(
-				new Object[] { StatusEffects.RESISTANCE, 60, 2 }
+				new Object[] { MobEffects.RESISTANCE, 60, 2 }
 			)
 		);
 	}

@@ -2,15 +2,16 @@ package com.virus5600.defensive_measures.particle.custom.emitters;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.Particle;
-import net.minecraft.client.particle.ParticleFactory;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.particle.SimpleParticleType;
-import net.minecraft.util.math.random.Random;
+import net.minecraft.client.particle.ParticleProvider;
+import net.minecraft.core.particles.SimpleParticleType;
+import net.minecraft.util.RandomSource;
 
 import com.virus5600.defensive_measures.particle.ModParticles;
 import com.virus5600.defensive_measures.particle.custom.FlakCloudParticle;
 import com.virus5600.defensive_measures.particle.custom.FlakParticle;
+import org.jspecify.annotations.NonNull;
 
 /**
  * Defines the particles emitted by a larger caliber of {@link com.virus5600.defensive_measures.entity.projectiles.FlakProjectileEntity Flak Projectile}
@@ -27,12 +28,12 @@ import com.virus5600.defensive_measures.particle.custom.FlakParticle;
 @Environment(EnvType.CLIENT)
 public class FlakExplosionEmitter extends CustomEmitter {
 	// CONSTRUCTORS //
-	public FlakExplosionEmitter(ClientWorld world, double x, double y, double z, double vx, double vy, double vz) {
+	public FlakExplosionEmitter(ClientLevel world, double x, double y, double z, double vx, double vy, double vz) {
 		super(world, ModParticles.FLAK, x, y, z, 9);
 
-		this.velocityX = vx;
-		this.velocityY = vy;
-		this.velocityZ = vz;
+		this.xd = vx;
+		this.yd = vy;
+		this.zd = vz;
 
 		this.forceShow = true;
 
@@ -54,8 +55,8 @@ public class FlakExplosionEmitter extends CustomEmitter {
 
 	//  FACTORY //
 	@Environment(EnvType.CLIENT)
-	public static class Factory implements ParticleFactory<SimpleParticleType> {
-		public Particle createParticle(SimpleParticleType simpleParticleType, ClientWorld world, double x, double y, double z, double vx, double vy, double vz, Random random) {
+	public static class Factory implements ParticleProvider<SimpleParticleType> {
+		public Particle createParticle(@NonNull SimpleParticleType simpleParticleType, @NonNull ClientLevel world, double x, double y, double z, double vx, double vy, double vz, @NonNull RandomSource random) {
 			return new FlakExplosionEmitter(world, x, y, z, vx, vy, vz);
 		}
 	}

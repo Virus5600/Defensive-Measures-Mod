@@ -2,15 +2,15 @@ package com.virus5600.defensive_measures.recipebook;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.recipe.book.RecipeBookCategory;
-import net.minecraft.recipe.book.RecipeBookGroup;
+import net.minecraft.world.item.crafting.ExtendedRecipeBookCategory;
+import net.minecraft.world.item.crafting.RecipeBookCategory;
 
 import com.virus5600.defensive_measures.recipe.book.ModRecipeBookCategories;
 
 import java.util.List;
 
 @Environment(EnvType.CLIENT)
-public enum ModRecipeBookType implements RecipeBookGroup {
+public enum ModRecipeBookCategory implements ExtendedRecipeBookCategory {
 	TURRET_ASSEMBLY_STATION(
 		ModRecipeBookCategories.TAS_TURRETS,
 		ModRecipeBookCategories.TAS_PARTS,
@@ -21,13 +21,13 @@ public enum ModRecipeBookType implements RecipeBookGroup {
 	)
 	;
 
-	private final List<RecipeBookCategory> categories;
+	private final List<RecipeBookCategory> includedCategories;
 
-	ModRecipeBookType(final RecipeBookCategory... categories) {
-		this.categories =  List.of(categories);
+	ModRecipeBookCategory(final RecipeBookCategory... includedCategories) {
+		this.includedCategories =  List.of(includedCategories);
 	}
 
-	public List<RecipeBookCategory> getCategories() {
-		return this.categories;
+	public List<RecipeBookCategory> includedCategories() {
+		return this.includedCategories;
 	}
 }

@@ -2,31 +2,32 @@ package com.virus5600.defensive_measures.advancement.criterion;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.advancements.Criterion;
+import net.minecraft.advancements.criterion.ContextAwarePredicate;
+import net.minecraft.advancements.criterion.EntityPredicate;
+import net.minecraft.advancements.criterion.ItemPredicate;
+import net.minecraft.advancements.criterion.SimpleCriterionTrigger;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.item.ItemStack;
 
-import net.minecraft.advancement.AdvancementCriterion;
-import net.minecraft.advancement.criterion.AbstractCriterion;
-import net.minecraft.item.ItemStack;
-import net.minecraft.predicate.entity.EntityPredicate;
-import net.minecraft.predicate.entity.LootContextPredicate;
-import net.minecraft.predicate.item.ItemPredicate;
-import net.minecraft.server.network.ServerPlayerEntity;
+import org.jspecify.annotations.NonNull;
 
 import java.util.Optional;
 
-public class TurretItemRetrievedCriterion extends AbstractCriterion<TurretItemRetrievedCriterion.Conditions> {
-	@Override
-	public Codec<TurretItemRetrievedCriterion.Conditions> getConditionsCodec() {
+public class TurretItemRetrievedCriterion extends SimpleCriterionTrigger<TurretItemRetrievedCriterion.Conditions> {
+	@Override @NonNull
+	public Codec<TurretItemRetrievedCriterion.Conditions> codec() {
 		return TurretItemRetrievedCriterion.Conditions.CODEC;
 	}
 
-    public void trigger(ServerPlayerEntity player, ItemStack stack) {
+    public void trigger(ServerPlayer player, ItemStack stack) {
         super.trigger(player, conditions -> conditions.matches(stack));
     }
 
-	public record Conditions(Optional<LootContextPredicate> player, Optional<ItemPredicate> item) implements AbstractCriterion.Conditions {
+	public record Conditions(Optional<ContextAwarePredicate> player, Optional<ItemPredicate> item) implements SimpleCriterionTrigger.SimpleInstance {
         public static final Codec<TurretItemRetrievedCriterion.Conditions> CODEC = RecordCodecBuilder.create(
 				instance -> instance.group(
-					EntityPredicate.LOOT_CONTEXT_PREDICATE_CODEC
+					EntityPredicate.ADVANCEMENT_CODEC
 						.optionalFieldOf("player")
 						.forGetter(TurretItemRetrievedCriterion.Conditions::player),
 					ItemPredicate.CODEC
@@ -36,9 +37,9 @@ public class TurretItemRetrievedCriterion extends AbstractCriterion<TurretItemRe
 				.apply(instance, TurretItemRetrievedCriterion.Conditions::new)
 		);
 
-		public static AdvancementCriterion<com.virus5600.defensive_measures.advancement.criterion.TurretItemRetrievedCriterion.Conditions> create(ItemPredicate.Builder item) {
+		public static Criterion<com.virus5600.defensive_measures.advancement.criterion.TurretItemRetrievedCriterion.Conditions> create(ItemPredicate.Builder item) {
 			return ModCriterion.TURRET_ITEM_RETRIEVED_CRITERION
-				.create(
+				.createCriterion(
 					new TurretItemRetrievedCriterion.Conditions(
 						Optional.empty(),
 						Optional.of(item.build())
