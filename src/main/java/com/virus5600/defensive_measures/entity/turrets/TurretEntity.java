@@ -1942,7 +1942,7 @@ public abstract class TurretEntity extends Mob implements Itemable, RangedAttack
 	 * @return {@code int} The duration of the turret's setup animation in ticks.
 	 *
 	 * @apiNote Must be manually updated whenever the setup animation duration on the client side is updated
-	 * @implNote The default duration is 2.5 seconds (50 ticks) as it is also the duration of the fallback animation when none is defined for this turret.
+	 * @implNote The default duration is 2.5 seconds (50 ticks) as it is also the duration of the fallback animation when none is defined for this turret. If multiple animations with different duration are present, use the longest duration as this method's return value.
 	 */
 	protected int getSetupAnimDuration() {
 		return (int) (2.5F * 20);
@@ -1955,7 +1955,7 @@ public abstract class TurretEntity extends Mob implements Itemable, RangedAttack
 	 * @return {@code int} The duration of the turret's teardown animation in ticks.
 	 *
 	 * @apiNote Must be manually updated whenever the teardown animation duration on the client side is updated
-	 * @implNote The default duration is 2.5 seconds (50 ticks) as it is also the duration of the fallback animation when none is defined for this turret.
+	 * @implNote The default duration is 2.5 seconds (50 ticks) as it is also the duration of the fallback animation when none is defined for this turret. If multiple animations with different duration are present, use the longest duration as this method's return value.
 	 */
 	protected int getTeardownAnimDuration() {
 		return (int) (2.5F * 20);

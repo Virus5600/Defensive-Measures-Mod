@@ -5,7 +5,7 @@ import net.minecraft.client.model.geom.ModelPart;
 
 public class CommonTurretAnimation {
 	public static KeyframeAnimation createDefaultSetupAnimation(ModelPart root, float height) {
-		float startHeight = -height * 16.0F;
+		float startHeight = -Math.abs(height) * 16.0F;
 
 		return AnimationDefinition.Builder.withLength(2.5f)
 			.addAnimation("root", new AnimationChannel(AnimationChannel.Targets.POSITION,
@@ -17,7 +17,7 @@ public class CommonTurretAnimation {
 	}
 
 	public static KeyframeAnimation createDefaultTeardownAnimation(ModelPart root, float height) {
-		float endHeight = -height * 16.0F;
+		float endHeight = -Math.abs(height) * 16.0F;
 
 		return AnimationDefinition.Builder.withLength(2.5f)
 			.addAnimation("root", new AnimationChannel(AnimationChannel.Targets.POSITION,

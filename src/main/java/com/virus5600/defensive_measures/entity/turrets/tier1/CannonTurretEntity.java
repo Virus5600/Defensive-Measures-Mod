@@ -299,6 +299,16 @@ public class CannonTurretEntity extends TurretEntity {
 		}
 	}
 
+	@Override
+	protected int getSetupAnimDuration() {
+		return (int) (2.0F * 20);
+	}
+
+	@Override
+	protected int getTeardownAnimDuration() {
+		return (int) (1.75F * 20);
+	}
+
 	// /////////////////// //
 	// LOCAL CLASSES/ENUMS //
 	// /////////////////// //

@@ -19,7 +19,6 @@ import org.jetbrains.annotations.Nullable;
 import org.jspecify.annotations.NonNull;
 
 import java.util.*;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -231,15 +230,15 @@ public abstract class BaseTurretModel<S extends BaseTurretRenderState> extends B
 				.bake(root);
 
 		this.setupAnims = setupAnims == null || setupAnims.length == 0 ?
-			(KeyframeAnimation[]) Stream.of(CommonTurretAnimation.createDefaultSetupAnimation(root, height), 2.5F)
-				.toArray()
+			Stream.of(CommonTurretAnimation.createDefaultSetupAnimation(root, height))
+				.toArray(KeyframeAnimation[]::new)
 			: Stream.of(setupAnims).filter(Objects::nonNull)
 				.map(def -> def.bake(root))
 				.toArray(KeyframeAnimation[]::new);
 
 		this.teardownAnims = teardownAnims == null || teardownAnims.length == 0 ?
-			(KeyframeAnimation[]) Stream.of(CommonTurretAnimation.createDefaultTeardownAnimation(root, height), 2.5F)
-				.toArray()
+			Stream.of(CommonTurretAnimation.createDefaultTeardownAnimation(root, height))
+				.toArray(KeyframeAnimation[]::new)
 			: Stream.of(teardownAnims).filter(Objects::nonNull)
 				.map(def -> def.bake(root))
 				.toArray(KeyframeAnimation[]::new);
@@ -340,10 +339,13 @@ public abstract class BaseTurretModel<S extends BaseTurretRenderState> extends B
 			if (this.getDefaultHeadPitch() != 0 && state.hasTarget) {
 				headPitch = this.getDefaultHeadPitch();
 			}
-
 		}
 
-		this.setHeadAngles(headYaw, headPitch);
+		// Only set head angles while the animation isn't started yet and if the head angle isn't at 180 yet.
+		boolean in180Deg = Math.abs(Mth.wrapDegrees(state.yRot)) < 181F && Math.abs(Mth.wrapDegrees(state.yRot)) > 179F;
+		if (!(state.setupAnimationState.isStarted() || state.teardownAnimationState.isStarted()) && !in180Deg) {
+			this.setHeadAngles(headYaw, headPitch);
+		}
 	}
 
 	/**
