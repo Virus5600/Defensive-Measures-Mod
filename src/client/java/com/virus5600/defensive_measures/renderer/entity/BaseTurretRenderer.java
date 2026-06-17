@@ -75,6 +75,12 @@ public abstract class BaseTurretRenderer<
 	public void extractRenderState(@NonNull T turretEntity, @NonNull S turretRenderState, float tickProgress) {
 		super.extractRenderState(turretEntity, turretRenderState, tickProgress);
 
+		turretRenderState.isSettingUp = turretEntity.isSettingUp();
+		turretRenderState.isTearingDown = turretEntity.isTearingDown();
+
+		turretRenderState.setupAnimationState.copyFrom(turretEntity.getSetupAnimationState());
+		turretRenderState.teardownAnimationState.copyFrom(turretEntity.getTeardownAnimationState());
+
 		turretRenderState.idleAnimationState.copyFrom(turretEntity.getIdleAnimationState());
 		turretRenderState.shootAnimationState.copyFrom(turretEntity.getShootAnimationState());
 		turretRenderState.deathAnimationState.copyFrom(turretEntity.getDeathAnimationState());

@@ -21,7 +21,8 @@ public class MGTurretModel extends BaseTurretModel<BaseTurretRenderState> {
 			root.getChild("turret").getChild("body").getChild("head"),
 
 			MGTurretAnimation.ANIM_MG_SHOOT,
-			MGTurretAnimation.ANIM_MG_DEATH
+			MGTurretAnimation.ANIM_MG_DEATH,
+			0.625f
 		);
 	}
 

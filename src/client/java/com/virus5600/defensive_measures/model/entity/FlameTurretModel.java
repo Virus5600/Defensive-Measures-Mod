@@ -35,7 +35,8 @@ public class FlameTurretModel extends BaseTurretModel<BaseTurretRenderState> {
 			root.getChild("base").getChild("neck").getChild("head").getChild("nozzle"),
 
 			FlameTurretAnimation.ANIM_FLAME_SHOOT,
-			FlameTurretAnimation.ANIM_FLAME_DEATH
+			FlameTurretAnimation.ANIM_FLAME_DEATH,
+			2f
 		);
 	}
 

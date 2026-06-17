@@ -9,6 +9,7 @@ import net.minecraft.world.entity.AnimationState;
 
 import com.virus5600.defensive_measures._util.MathUtil;
 import com.virus5600.defensive_measures.animations.Keyframe;
+import com.virus5600.defensive_measures.animations.entity.CommonTurretAnimation;
 import com.virus5600.defensive_measures.entity.turrets.TurretEntity;
 import com.virus5600.defensive_measures.model.BaseModel;
 import com.virus5600.defensive_measures.renderer.entity.state.BaseTurretRenderState;
@@ -18,6 +19,8 @@ import org.jetbrains.annotations.Nullable;
 import org.jspecify.annotations.NonNull;
 
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * A base model for turrets which handles all the common logic for rendering
@@ -69,6 +72,18 @@ public abstract class BaseTurretModel<S extends BaseTurretRenderState> extends B
 	 * when it dies.
 	 */
 	protected final KeyframeAnimation deathAnim;
+	/**
+	 * The setup animations that this turret can play when placed or spawned.
+	 */
+	protected final Map<KeyframeAnimation, Float> setupAnims;
+	/**
+	 * The teardown animations that this turret can play when taken (using the
+	 * {@link com.virus5600.defensive_measures.item.equipments.TurretRemoverItem Turret Remover}).
+	 */
+	protected final Map<KeyframeAnimation, Float> teardownAnims;
+	protected final KeyframeAnimation[] setupAnimArray;
+	protected final KeyframeAnimation[] teardownAnimArray;
+
 	protected final float shootAnimLen;
 	protected final float deathAnimLen;
 
@@ -95,7 +110,7 @@ public abstract class BaseTurretModel<S extends BaseTurretRenderState> extends B
 	 * render the turret entity and apply default configurations.
 	 * <br><br>
 	 * Using this overloaded constructor will set the shooting and death animation to {@code null}.
-	 * Use {@link BaseTurretModel#BaseTurretModel(ModelPart, String, String[], ModelPart, ModelPart, AnimationDefinition, AnimationDefinition)}
+	 * Use {@link BaseTurretModel#BaseTurretModel(ModelPart, String, String[], ModelPart, ModelPart, AnimationDefinition, AnimationDefinition, AnimationDefinition[], AnimationDefinition[], float)}
 	 * if a shooting or death, or both animation exists.
 	 *
 	 * @param root The root model part of this model.
@@ -109,9 +124,15 @@ public abstract class BaseTurretModel<S extends BaseTurretRenderState> extends B
 	 */
 	public BaseTurretModel(
             @NotNull ModelPart root, @NotNull String texturePath, @NotNull String[] textures,
-            @NotNull ModelPart neck, @NotNull ModelPart head
+            @NotNull ModelPart neck, @NotNull ModelPart head,
+			float height
 	) {
-		this(root, texturePath, textures, neck, head, null, null);
+		this(
+			root, texturePath, textures, neck, head,
+			null, null,
+			null, null,
+			height
+		);
 	}
 
 	/**
@@ -131,11 +152,48 @@ public abstract class BaseTurretModel<S extends BaseTurretRenderState> extends B
 	 * @see #baseTexture
 	 */
 	public BaseTurretModel(
+		@NotNull ModelPart root, @NotNull String texturePath, @NotNull String[] textures,
+		@NotNull ModelPart neck, @NotNull ModelPart head,
+		@Nullable AnimationDefinition shootAnim, @Nullable AnimationDefinition deathAnim,
+		float height
+	) {
+		this(
+			root, texturePath, textures, neck, head,
+			shootAnim, deathAnim,
+			null, null,
+			height
+		);
+	}
+
+	/**
+	 * Constructs a new {@link BaseTurretModel} with the specified model part,
+	 * texture path, and bone names. These will be used by this model to
+	 * render the turret entity and apply default configurations.
+	 *
+	 * @param root The root model part of this model.
+	 * @param texturePath The path of the texture this model will use.
+	 * @param textures The file name(s) that this model will use.
+	 * @param neck The model part that serves as the neck of the turret. This part will rotate along the yaw axis.
+	 * @param head The model part that servesas the head of the turret. This part will rotate along the pitch axis.
+	 * @param shootAnim The shoot animation. {@code null} if none.
+	 * @param deathAnim The death animation. {@code null} if none.
+	 * @param setupAnims The setup animations. {@code null} if none.
+	 * @param teardownAnims The teardown animations. {@code null} if none.
+	 *
+	 * @see #texturePath
+	 * @see #baseTexture
+	 */
+	public BaseTurretModel(
             @NotNull ModelPart root, @NotNull String texturePath, @NotNull String[] textures,
             @NotNull ModelPart neck, @NotNull ModelPart head,
-            @Nullable AnimationDefinition shootAnim, @Nullable AnimationDefinition deathAnim
+            @Nullable AnimationDefinition shootAnim, @Nullable AnimationDefinition deathAnim,
+			@Nullable AnimationDefinition[] setupAnims, @Nullable AnimationDefinition[] teardownAnims,
+			float height
 	) {
 		super(root, texturePath, textures);
+
+		// Adds 25% more height for safety measures.
+		height *= 1.25F;
 
 		// Set the common model parts used by all turret models
 		this.neck = neck;
@@ -173,6 +231,27 @@ public abstract class BaseTurretModel<S extends BaseTurretRenderState> extends B
 				.withLength(this.deathAnimLen / 1000)
 				.build()
 				.bake(root);
+
+		this.setupAnims = setupAnims == null || setupAnims.length == 0 ?
+			Map.of(CommonTurretAnimation.createDefaultSetupAnimation(root, height), 2.5F)
+			: Stream.of(setupAnims).filter(Objects::nonNull)
+			.collect(Collectors.toMap(
+				def -> def.bake(root),
+				AnimationDefinition::lengthInSeconds
+			))
+		;
+
+		this.teardownAnims = teardownAnims == null || teardownAnims.length == 0 ?
+			Map.of(CommonTurretAnimation.createDefaultTeardownAnimation(root, height), 2.5F)
+			: Stream.of(teardownAnims).filter(Objects::nonNull)
+			.collect(Collectors.toMap(
+				def -> def.bake(root),
+				AnimationDefinition::lengthInSeconds
+			))
+		;
+
+		this.setupAnimArray = this.setupAnims.keySet().toArray(new KeyframeAnimation[0]);
+		this.teardownAnimArray = this.teardownAnims.keySet().toArray(new KeyframeAnimation[0]);
 	}
 
 	// /////////////// //
@@ -197,6 +276,28 @@ public abstract class BaseTurretModel<S extends BaseTurretRenderState> extends B
 	@Override
 	public void setupAnim(@NonNull S state) {
 		super.setupAnim(state);
+
+		// Play the setup animation if the state says we are setting up
+		if (state.isSettingUp && !this.setupAnims.isEmpty()) {
+			getRandomAnimation(
+				this.setupAnimArray,
+				state.id
+			).apply(
+				state.setupAnimationState,
+				state.ageInTicks
+			);
+		}
+
+		// Play the teardown animation if the state says we are tearing down
+		if (state.isTearingDown && !this.teardownAnims.isEmpty()) {
+			getRandomAnimation(
+				this.teardownAnimArray,
+				state.id
+			).apply(
+				state.teardownAnimationState,
+				state.ageInTicks
+			);
+		}
 
 		// ANIMATION HANDLING (& ADDITIONAL PROCEDURES)
 		if (this.shootAnim != null) {
@@ -402,6 +503,21 @@ public abstract class BaseTurretModel<S extends BaseTurretRenderState> extends B
 	 */
 	protected float getDefaultHeadPitch() {
 		return 0;
+	}
+
+	/**
+	 * Gets a random animation from an array of provided one.
+	 *
+	 * @return A random keyframe animation.
+	 */
+	protected static KeyframeAnimation getRandomAnimation(KeyframeAnimation[] animations, UUID entityId) {
+		if (animations == null || animations.length == 0) {
+			return null;
+		}
+
+		Random seededRandom = new Random(entityId.getLeastSignificantBits());
+		int index = seededRandom.nextInt(animations.length);
+		return animations[index];
 	}
 
 	// //////////////// //

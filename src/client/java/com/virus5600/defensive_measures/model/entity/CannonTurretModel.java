@@ -22,7 +22,8 @@ public class CannonTurretModel extends BaseTurretModel<BaseTurretRenderState> {
 			root.getChild("stand").getChild("head"),
 
 			CannonTurretAnimation.ANIM_CANNON_SHOOT,
-			CannonTurretAnimation.ANIM_CANNON_DEATH
+			CannonTurretAnimation.ANIM_CANNON_DEATH,
+			1f
 		);
 	}
 

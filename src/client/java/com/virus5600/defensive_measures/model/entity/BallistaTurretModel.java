@@ -22,7 +22,8 @@ public class BallistaTurretModel extends BaseTurretModel<BaseTurretRenderState> 
 			root.getChild("base").getChild("head").getChild("bow"),
 
 			BallistaTurretAnimation.ANIM_BALLISTA_SHOOT,
-			BallistaTurretAnimation.ANIM_BALLISTA_DEATH
+			BallistaTurretAnimation.ANIM_BALLISTA_DEATH,
+			1f
 		);
 
 	}

@@ -448,7 +448,9 @@ public class FlameTurretEntity extends TurretEntity implements LoopableShootingS
 	protected void updateAnimations() {
 		super.updateAnimations();
 
-		this.lightLighter();
+		if (!this.isSettingUp() && !this.isTearingDown()) {
+			this.lightLighter();
+		}
 	}
 
 	// ///////////////// //

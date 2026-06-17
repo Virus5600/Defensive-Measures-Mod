@@ -40,7 +40,8 @@ public class AATurretModel extends BaseTurretModel<BaseTurretRenderState> {
 			root.getChild("base").getChild("horizontal_traverse").getChild("gun"),
 
 			AATurretAnimation.ANIM_AA_TURRET_SHOOT,
-			AATurretAnimation.ANIM_AA_TURRET_DEATH
+			AATurretAnimation.ANIM_AA_TURRET_DEATH,
+			2f
 		);
 	}
 

@@ -34,7 +34,8 @@ public class MissileTurretModel extends BaseTurretModel<MissileTurretRenderState
 			root.getChild("base").getChild("stand").getChild("column").getChild("swivel").getChild("head"),
 
 			null,
-			MissileTurretAnimation.ANIM_MISSILE_TURRET_DEATH
+			MissileTurretAnimation.ANIM_MISSILE_TURRET_DEATH,
+			2f
 		);
 
 		this.RADAR_DISH = root.getChild("base")
