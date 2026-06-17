@@ -75,14 +75,12 @@ public abstract class BaseTurretModel<S extends BaseTurretRenderState> extends B
 	/**
 	 * The setup animations that this turret can play when placed or spawned.
 	 */
-	protected final Map<KeyframeAnimation, Float> setupAnims;
+	protected final KeyframeAnimation[] setupAnims;
 	/**
 	 * The teardown animations that this turret can play when taken (using the
 	 * {@link com.virus5600.defensive_measures.item.equipments.TurretRemoverItem Turret Remover}).
 	 */
-	protected final Map<KeyframeAnimation, Float> teardownAnims;
-	protected final KeyframeAnimation[] setupAnimArray;
-	protected final KeyframeAnimation[] teardownAnimArray;
+	protected final KeyframeAnimation[] teardownAnims;
 
 	protected final float shootAnimLen;
 	protected final float deathAnimLen;
@@ -233,25 +231,18 @@ public abstract class BaseTurretModel<S extends BaseTurretRenderState> extends B
 				.bake(root);
 
 		this.setupAnims = setupAnims == null || setupAnims.length == 0 ?
-			Map.of(CommonTurretAnimation.createDefaultSetupAnimation(root, height), 2.5F)
+			(KeyframeAnimation[]) Stream.of(CommonTurretAnimation.createDefaultSetupAnimation(root, height), 2.5F)
+				.toArray()
 			: Stream.of(setupAnims).filter(Objects::nonNull)
-			.collect(Collectors.toMap(
-				def -> def.bake(root),
-				AnimationDefinition::lengthInSeconds
-			))
-		;
+				.map(def -> def.bake(root))
+				.toArray(KeyframeAnimation[]::new);
 
 		this.teardownAnims = teardownAnims == null || teardownAnims.length == 0 ?
-			Map.of(CommonTurretAnimation.createDefaultTeardownAnimation(root, height), 2.5F)
+			(KeyframeAnimation[]) Stream.of(CommonTurretAnimation.createDefaultTeardownAnimation(root, height), 2.5F)
+				.toArray()
 			: Stream.of(teardownAnims).filter(Objects::nonNull)
-			.collect(Collectors.toMap(
-				def -> def.bake(root),
-				AnimationDefinition::lengthInSeconds
-			))
-		;
-
-		this.setupAnimArray = this.setupAnims.keySet().toArray(new KeyframeAnimation[0]);
-		this.teardownAnimArray = this.teardownAnims.keySet().toArray(new KeyframeAnimation[0]);
+				.map(def -> def.bake(root))
+				.toArray(KeyframeAnimation[]::new);
 	}
 
 	// /////////////// //
@@ -278,9 +269,9 @@ public abstract class BaseTurretModel<S extends BaseTurretRenderState> extends B
 		super.setupAnim(state);
 
 		// Play the setup animation if the state says we are setting up
-		if (state.isSettingUp && !this.setupAnims.isEmpty()) {
+		if (state.isSettingUp && this.setupAnims != null && this.setupAnims.length > 0) {
 			getRandomAnimation(
-				this.setupAnimArray,
+				this.setupAnims,
 				state.id
 			).apply(
 				state.setupAnimationState,
@@ -289,62 +280,67 @@ public abstract class BaseTurretModel<S extends BaseTurretRenderState> extends B
 		}
 
 		// Play the teardown animation if the state says we are tearing down
-		if (state.isTearingDown && !this.teardownAnims.isEmpty()) {
-			getRandomAnimation(
-				this.teardownAnimArray,
-				state.id
-			).apply(
-				state.teardownAnimationState,
-				state.ageInTicks
-			);
-		}
-
-		// ANIMATION HANDLING (& ADDITIONAL PROCEDURES)
-		if (this.shootAnim != null) {
-			if ((this.getShootAnimProcedure(state.id) == null &&
-				state.shootAnimationState.getTimeInMillis(state.ageInTicks) > 0 &&
-				!state.shootAnimationState.isStarted())
-			) {
-				this.setShootAnimProcedure(state.id, this.getShootAnimProcedureInstance());
+		if (state.isTearingDown && this.teardownAnims != null && this.teardownAnims.length > 0) {
+			if (state.teardownAnimationState.isStarted()) {
+				getRandomAnimation(
+					this.teardownAnims,
+					state.id
+				).apply(
+					state.teardownAnimationState,
+					state.ageInTicks
+				);
 			}
-
-			this.shootAnim.apply(state.shootAnimationState, state.ageInTicks);
-			this.additionalShootAnimProcedures(state.shootAnimationState, state);
-		}
-		else {
-			this.setShootAnimProcedure(state.id, null);
-		}
-
-		if (this.deathAnim != null) {
-			if (this.getDeathAnimProcedure(state.id) == null &&
-				state.deathAnimationState.getTimeInMillis(state.ageInTicks) > 0 &&
-				!state.deathAnimationState.isStarted()
-			) {
-				Queue<? extends Keyframe> procedure = this.getDeathAnimProcedureInstance();
-				this.setDeathAnimProcedure(state.id, procedure);
-			}
-
-			this.deathAnim.apply(state.deathAnimationState, state.ageInTicks);
-			this.additionalDeathAnimProcedures(state.deathAnimationState, state);
-		}
-		else {
-			this.setDeathAnimProcedure(state.id, null);
-		}
-
-		// Garbage Collector
-		Queue<? extends Keyframe> deathProcedure = this.getDeathAnimProcedure(state.id);
-		if (state.dead && (deathProcedure == null || deathProcedure.isEmpty())) {
-			this.setShootAnimProcedure(state.id, null);
-			this.setDeathAnimProcedure(state.id, null);
 		}
 
 		// HEAD ANGLE HANDLING
 		float headYaw = state.yRot + state.bodyRot + 180;
 		float headPitch = state.xRot;
 
-		// If default head pitch is not 0, use it when it's idle.
-		if (this.getDefaultHeadPitch() != 0 && state.hasTarget) {
-			headPitch = this.getDefaultHeadPitch();
+		if (!(state.isSettingUp || state.isTearingDown)) {
+			// ANIMATION HANDLING (& ADDITIONAL PROCEDURES)
+			if (this.shootAnim != null) {
+				if ((this.getShootAnimProcedure(state.id) == null &&
+					state.shootAnimationState.getTimeInMillis(state.ageInTicks) > 0 &&
+					!state.shootAnimationState.isStarted())
+				) {
+					this.setShootAnimProcedure(state.id, this.getShootAnimProcedureInstance());
+				}
+
+				this.shootAnim.apply(state.shootAnimationState, state.ageInTicks);
+				this.additionalShootAnimProcedures(state.shootAnimationState, state);
+			}
+			else {
+				this.setShootAnimProcedure(state.id, null);
+			}
+
+			if (this.deathAnim != null) {
+				if (this.getDeathAnimProcedure(state.id) == null &&
+					state.deathAnimationState.getTimeInMillis(state.ageInTicks) > 0 &&
+					!state.deathAnimationState.isStarted()
+				) {
+					Queue<? extends Keyframe> procedure = this.getDeathAnimProcedureInstance();
+					this.setDeathAnimProcedure(state.id, procedure);
+				}
+
+				this.deathAnim.apply(state.deathAnimationState, state.ageInTicks);
+				this.additionalDeathAnimProcedures(state.deathAnimationState, state);
+			}
+			else {
+				this.setDeathAnimProcedure(state.id, null);
+			}
+
+			// Garbage Collector
+			Queue<? extends Keyframe> deathProcedure = this.getDeathAnimProcedure(state.id);
+			if (state.dead && (deathProcedure == null || deathProcedure.isEmpty())) {
+				this.setShootAnimProcedure(state.id, null);
+				this.setDeathAnimProcedure(state.id, null);
+			}
+
+			// If default head pitch is not 0, use it when it's idle.
+			if (this.getDefaultHeadPitch() != 0 && state.hasTarget) {
+				headPitch = this.getDefaultHeadPitch();
+			}
+
 		}
 
 		this.setHeadAngles(headYaw, headPitch);

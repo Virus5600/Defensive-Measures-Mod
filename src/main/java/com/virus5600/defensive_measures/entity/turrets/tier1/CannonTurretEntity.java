@@ -152,8 +152,10 @@ public class CannonTurretEntity extends TurretEntity {
 	public void tick() {
 		super.tick();
 
+		boolean isSettingOrTearing = this.isSettingUp() || this.isTearingDown();
+
 		// Client Side
-		if (this.level().isClientSide()) {
+		if (this.level().isClientSide() && !isSettingOrTearing) {
 			this.updateAnimations();
 		}
 	}

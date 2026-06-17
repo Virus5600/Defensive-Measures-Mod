@@ -608,6 +608,7 @@ public abstract class TurretEntity extends Mob implements Itemable, RangedAttack
 		this.hasAiOnSpawn = !this.isNoAi();
 
 		this.setNoAi(true);
+		this.setYHeadRot(180F);
 		this.setSettingUpStatus(true);
 		this.setupAnimationState.start(this.tickCount);
 	}
@@ -620,8 +621,8 @@ public abstract class TurretEntity extends Mob implements Itemable, RangedAttack
 		this.hasAiOnSpawn = !this.isNoAi();
 
 		this.setNoAi(true);
+		this.lerpHeadTo(180F, 5);
 		this.setTearingDownStatus(true);
-		this.teardownAnimationState.start(this.tickCount);
 	}
 
 	private void endTeardownAnim() {
@@ -768,6 +769,10 @@ public abstract class TurretEntity extends Mob implements Itemable, RangedAttack
 		// Turret Remover Interaction
 		if (!this.level().isClientSide() && item.getItem().equals(ModItems.TURRET_REMOVER)
 			&& !this.level().isClientSide()) {
+			if (this.isTearingDown()) {
+				return InteractionResult.PASS;
+			}
+
 			if (isSurvival) {
 				item.hurtAndBreak(1, player, hand.asEquipmentSlot());
 			}
@@ -939,7 +944,8 @@ public abstract class TurretEntity extends Mob implements Itemable, RangedAttack
 				}
 			}
 
-			if (this.isTearingDown()) {
+			boolean in180Deg = Math.abs(Mth.wrapDegrees(this.getYHeadRot())) < 181F && Math.abs(Mth.wrapDegrees(this.getYHeadRot())) > 179F;
+			if (this.isTearingDown() && in180Deg) {
 				this.teardownTicks++;
 				if (this.teardownTicks >= this.getTeardownAnimDuration()) {
 					this.setTearingDownStatus(false);
@@ -1020,8 +1026,10 @@ public abstract class TurretEntity extends Mob implements Itemable, RangedAttack
 				}
 			}
 
+			boolean isSettingOrTearing = this.isSettingUp() || this.isTearingDown();
+
 			// Using the idle pitch
-			if (this.getIdlePitch().isPresent()) {
+			if (this.getIdlePitch().isPresent() && !isSettingOrTearing) {
 				this.setTrackedLockedButNotAttacking(this.getTarget() != null);
 
 				float idlePitch = this.getIdlePitch().get();
@@ -1030,9 +1038,9 @@ public abstract class TurretEntity extends Mob implements Itemable, RangedAttack
 					this.setXRot(idlePitch);
 					this.setTrackedPitch(idlePitch);
 				}
-			}
 
-			this.setTrackedPitch(this.getXRot());
+				this.setTrackedPitch(this.getXRot());
+			}
 		}
 	}
 
@@ -2028,26 +2036,36 @@ public abstract class TurretEntity extends Mob implements Itemable, RangedAttack
 	protected void updateAnimations() {
 		this.idleAnimationState.startIfStopped(this.tickCount);
 
+		boolean in180Deg = Math.abs(this.getYHeadRot()) < 181F && Math.abs(this.getYHeadRot()) > 179F;
+
 		this.setupAnimationState.animateWhen(this.isSettingUp(), this.tickCount);
-		this.teardownAnimationState.animateWhen(this.isTearingDown(), this.tickCount);
+		this.teardownAnimationState.animateWhen(this.isTearingDown() && in180Deg, this.tickCount);
 
-		if (this.isDeadOrDying()) {
-			this.deathAnimationState.startIfStopped(this.tickCount);
+		if (this.isTearingDown()) {
+			return;
 		}
 
-		float elapsedTime = this.shootAnimationState.getTimeInMillis(this.tickCount);
-		float reload = (this.getTotalAttCooldown() / 50f) * 1000;
+		boolean isSettingOrTearing = this.isSettingUp() || this.isTearingDown();
 
-		boolean isAnimPlaying = this.shootAnimationState.isStarted();
-		boolean isAttacking = elapsedTime >= reload;
-		boolean isShooting = this.getTrackedShooting();
+		if (!isSettingOrTearing) {
+			if (this.isDeadOrDying()) {
+				this.deathAnimationState.startIfStopped(this.tickCount);
+			}
 
-		if (isShooting) {
-			this.shootAnimationState.startIfStopped(this.tickCount);
-		}
+			float elapsedTime = this.shootAnimationState.getTimeInMillis(this.tickCount);
+			float reload = (this.getTotalAttCooldown() / 50f) * 1000;
 
-		if (!isShooting && isAnimPlaying && isAttacking && elapsedTime > 1000) {
-			this.shootAnimationState.stop();
+			boolean isAnimPlaying = this.shootAnimationState.isStarted();
+			boolean isAttacking = elapsedTime >= reload;
+			boolean isShooting = this.getTrackedShooting();
+
+			if (isShooting) {
+				this.shootAnimationState.startIfStopped(this.tickCount);
+			}
+
+			if (!isShooting && isAnimPlaying && isAttacking && elapsedTime > 1000) {
+				this.shootAnimationState.stop();
+			}
 		}
 	}
 
