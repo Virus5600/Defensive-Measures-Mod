@@ -1,6 +1,5 @@
 package com.virus5600.defensive_measures.model.entity;
 
-import net.minecraft.client.model.*;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
@@ -13,15 +12,19 @@ import com.virus5600.defensive_measures.animations.FXKeyframe;
 import com.virus5600.defensive_measures.animations.Keyframe;
 import com.virus5600.defensive_measures.animations.ScriptKeyframe;
 import com.virus5600.defensive_measures.animations.entity.FlameTurretAnimation;
-import com.virus5600.defensive_measures.renderer.entity.state.BaseTurretRenderState;
+import com.virus5600.defensive_measures.renderer.entity.state.FlameTurretRenderState;
+
+import org.jspecify.annotations.NonNull;
 
 import java.util.PriorityQueue;
 import java.util.Queue;
 
 import static com.virus5600.defensive_measures.animations.KeyframeScripts.EXPLODE_SCRIPT;
 
-public class FlameTurretModel extends BaseTurretModel<BaseTurretRenderState> {
+public class FlameTurretModel extends BaseTurretModel<FlameTurretRenderState> {
 	private final static Queue<? extends Keyframe> DEATH_KEYFRAMES;
+
+	private final ModelPart lighterTip;
 
 	protected final static String[] TEXTURES = new String[]{
 		"flame_turret.png"
@@ -34,10 +37,11 @@ public class FlameTurretModel extends BaseTurretModel<BaseTurretRenderState> {
 			root.getChild("base").getChild("neck"),
 			root.getChild("base").getChild("neck").getChild("head").getChild("nozzle"),
 
-			FlameTurretAnimation.ANIM_FLAME_SHOOT,
-			FlameTurretAnimation.ANIM_FLAME_DEATH,
+			null, FlameTurretAnimation.ANIM_FLAME_DEATH,
 			2f
 		);
+
+		this.lighterTip = root.getChild("base").getChild("neck").getChild("head").getChild("nozzle").getChild("lighter").getChild("tip");
 	}
 
 	public static LayerDefinition getTexturedModelData() {
@@ -88,6 +92,13 @@ public class FlameTurretModel extends BaseTurretModel<BaseTurretRenderState> {
 		}
 
 		return BaseTurretModel.DEFAULT_EMPTY_KEYFRAME;
+	}
+
+	@Override
+	public void setupAnim(@NonNull FlameTurretRenderState state) {
+		super.setupAnim(state);
+
+		this.lighterTip.xRot = state.lighterPitch;
 	}
 
 	// //////////////// //

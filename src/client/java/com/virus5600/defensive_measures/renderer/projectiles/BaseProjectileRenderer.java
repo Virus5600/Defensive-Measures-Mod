@@ -57,10 +57,6 @@ public abstract class BaseProjectileRenderer<
 
 		state.pitch = entity.getXRot(tickProgress);
 		state.yaw = entity.getYRot(tickProgress);
-
-		state.pitch *= entity instanceof ExplosiveProjectileEntity ? -1 : 1;
-		state.yaw *= entity instanceof ExplosiveProjectileEntity ? -1 : 1;
-		state.yaw += entity instanceof ExplosiveProjectileEntity ? 180 : 0;
 	}
 
 	@Override
@@ -68,8 +64,8 @@ public abstract class BaseProjectileRenderer<
 		stack.pushPose();
 
 		if (this.shouldLookAtDir()) {
-			stack.mulPose(Axis.XP.rotationDegrees(state.pitch));
-			stack.mulPose(Axis.YP.rotationDegrees(state.yaw - 180F));
+			stack.mulPose(Axis.YN.rotationDegrees(state.yaw + 180F));
+			stack.mulPose(Axis.XN.rotationDegrees(state.pitch));
 		}
 
 		Identifier textureId = this.getTexture(state);

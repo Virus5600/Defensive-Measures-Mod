@@ -334,17 +334,12 @@ public abstract class BaseTurretModel<S extends BaseTurretRenderState> extends B
 				this.setShootAnimProcedure(state.id, null);
 				this.setDeathAnimProcedure(state.id, null);
 			}
-
-			// If default head pitch is not 0, use it when it's idle.
-			if (this.getDefaultHeadPitch() != 0 && state.hasTarget) {
-				headPitch = this.getDefaultHeadPitch();
-			}
 		}
 
-		// Only set head angles while the animation isn't started yet or if the head angle isn't at 180 yet when the animations are to be played.
-		boolean in180Deg = Math.abs(Mth.wrapDegrees(state.yRot)) < 181F && Math.abs(Mth.wrapDegrees(state.yRot)) > 179F;
+		// Only set head angles while the animation isn't started yet or if the head angle isn't at 0° yet when the animations are to be played.
+		boolean isFacingNorth = Math.abs(Mth.wrapDegrees(headYaw)) == 0F;
 		boolean setupOrTeardownPlaying = state.setupAnimationState.isStarted() || state.teardownAnimationState.isStarted();
-		if (!setupOrTeardownPlaying || !in180Deg) {
+		if (!setupOrTeardownPlaying || !isFacingNorth) {
 			this.setHeadAngles(headYaw, headPitch);
 		}
 	}

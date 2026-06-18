@@ -586,6 +586,7 @@ public abstract class TurretEntity extends Mob implements Itemable, RangedAttack
 		this.yBodyRotO = 0.0f;
 		this.setOldPosAndRot();
 
+		this.setInvulnerable(true);
 		this.startSetupAnim();
 
 		if (spawnReason == EntitySpawnReason.SPAWN_ITEM_USE) {
@@ -974,6 +975,7 @@ public abstract class TurretEntity extends Mob implements Itemable, RangedAttack
 				this.tryAttachOrFall();
 				this.setPos(newPos);
 				this.level().gameEvent(this, GameEvent.TELEPORT, newPos);
+				this.setInvulnerable(false);
 
 				if (this.getDeltaMovement() == Vec3.ZERO && this.level().isClientSide() && !this.isPassenger()) {
 					this.xOld = this.getX();
@@ -1029,16 +1031,27 @@ public abstract class TurretEntity extends Mob implements Itemable, RangedAttack
 			boolean isSettingOrTearing = this.isSettingUp() || this.isTearingDown();
 
 			// Using the idle pitch
-			if (this.getIdlePitch().isPresent() && !isSettingOrTearing) {
+			if (!isSettingOrTearing) {
 				this.setTrackedLockedButNotAttacking(this.getTarget() != null);
 
-				float idlePitch = this.getIdlePitch().get();
-
 				if (this.getTarget() == null) {
+					float idlePitch = this.getIdlePitch().orElse(this.getXRot());
+
 					this.setXRot(idlePitch);
 					this.setTrackedPitch(idlePitch);
-				}
 
+					if (this.velocityData != null) {
+						this.velocityData = null;
+					}
+				}
+				else {
+					float shootingPitch = this.getShootingPitch().orElse(this.getXRot());
+
+					this.setXRot(shootingPitch);
+					this.setTrackedPitch(shootingPitch);
+				}
+			}
+			else {
 				this.setTrackedPitch(this.getXRot());
 			}
 		}
@@ -2175,16 +2188,20 @@ public abstract class TurretEntity extends Mob implements Itemable, RangedAttack
 			this.setProjectileVelocity(projectile, velocityData);
 
 			// Set projectile direction
+			this.velocityData = velocityData;
 			Vec3 dir = velocityData.getDeltaMovement().normalize();
-			float pitch = MathUtil.radToDeg((float) Mth.atan2(dir.y(), Math.sqrt(dir.x() * dir.x() + dir.z() * dir.z())));
-			float yaw = MathUtil.radToDeg((float) Mth.atan2(dir.x(), dir.z()));
+			float yaw = -MathUtil.radToDeg((float) Mth.atan2(dir.x(), dir.z()));
+			float pitch = this.getShootingPitch()
+				.orElse(MathUtil.radToDeg(
+					(float) Mth.atan2(
+						dir.y(),
+						dir.horizontalDistance()
+					)
+				)
+			);
 
-			pitch *= projectile instanceof ExplosiveProjectileEntity ? -1 : 1;
-			yaw *= projectile instanceof ExplosiveProjectileEntity ? -1 : 1;
-			yaw += projectile instanceof ExplosiveProjectileEntity ? 180 : 0;
-
-			projectile.setYRot(yaw);
 			projectile.setXRot(pitch);
+			projectile.setYRot(yaw);
 			projectile.setYHeadRot(yaw);
 			projectile.setYBodyRot(yaw);
 
@@ -2265,6 +2282,28 @@ public abstract class TurretEntity extends Mob implements Itemable, RangedAttack
 	 */
 	public Optional<Float> getIdlePitch() {
 		return Optional.empty();
+	}
+
+	public Optional<Float> getShootingPitch() {
+		if (this.velocityData == null) {
+			return Optional.empty();
+		}
+
+		Vec3 dir = this.velocityData.getDeltaMovement().normalize();
+		float shootingPitch = MathUtil.radToDeg(
+			(float) Mth.atan2(
+				dir.y(),
+				dir.horizontalDistance()
+			)
+		);
+
+		shootingPitch = Math.clamp(
+			shootingPitch,
+			this.getMinHeadXRot(),
+			this.getMaxHeadXRot()
+		);
+
+		return Optional.of(-shootingPitch);
 	}
 
 	// ///////////// //

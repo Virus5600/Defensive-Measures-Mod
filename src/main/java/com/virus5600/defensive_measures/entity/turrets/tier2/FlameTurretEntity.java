@@ -10,6 +10,7 @@ import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffects;
@@ -129,7 +130,7 @@ public class FlameTurretEntity extends TurretEntity implements LoopableShootingS
 
 	private float currentLighterPos = 0;
 	private boolean wasShooting = false;
-
+	public float lighterPitch = 0f;
 
 	// //////////// //
 	// CONSTRUCTORS //
@@ -251,6 +252,11 @@ public class FlameTurretEntity extends TurretEntity implements LoopableShootingS
 				newPos.x(), newPos.y(), newPos.z(),
 				0, 0, 0
 			);
+
+		// Rotates the lighter tip to match particle's position.
+		this.lighterPitch = this.hasTarget() ?
+			MathUtil.degToRad(Mth.rotLerp(0.2f, MathUtil.radToDeg(this.lighterPitch), -30F))
+			: MathUtil.degToRad(Mth.rotLerp(0.2f, MathUtil.radToDeg(this.lighterPitch), 0));
 	}
 
 	@Override

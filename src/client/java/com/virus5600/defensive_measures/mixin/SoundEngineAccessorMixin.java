@@ -22,10 +22,11 @@ public abstract class SoundEngineAccessorMixin implements SoundSystemAccess {
 		ChannelAccess.ChannelHandle sourceManager = this.instanceToChannel.get(soundInstance);
 
 		if (sourceManager == null) {
-			DefensiveMeasures.LOGGER.warn("Missing sound source for sound instance: {}", soundInstance);
+			DefensiveMeasures.LOGGER.warn("Missing sound manager for sound instance: {}", soundInstance);
 			return true;
 		}
 
+		sourceManager.release();
 		return sourceManager.isStopped();
 	}
 }
