@@ -341,9 +341,10 @@ public abstract class BaseTurretModel<S extends BaseTurretRenderState> extends B
 			}
 		}
 
-		// Only set head angles while the animation isn't started yet and if the head angle isn't at 180 yet.
+		// Only set head angles while the animation isn't started yet or if the head angle isn't at 180 yet when the animations are to be played.
 		boolean in180Deg = Math.abs(Mth.wrapDegrees(state.yRot)) < 181F && Math.abs(Mth.wrapDegrees(state.yRot)) > 179F;
-		if (!(state.setupAnimationState.isStarted() || state.teardownAnimationState.isStarted()) && !in180Deg) {
+		boolean setupOrTeardownPlaying = state.setupAnimationState.isStarted() || state.teardownAnimationState.isStarted();
+		if (!setupOrTeardownPlaying || !in180Deg) {
 			this.setHeadAngles(headYaw, headPitch);
 		}
 	}
