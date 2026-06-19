@@ -284,6 +284,13 @@ public class MissileTurretEntity extends TurretEntity implements UsesMissile {
 		super.updateAnimations();
 	}
 
+	protected int getSetupAnimDuration() {
+		return (int) (6.5F * 20);
+	}
+	protected int getTeardownAnimDuration() {
+		return (int) (6.5F * 20);
+	}
+
 	// /////////////////// //
 	// LOCAL CLASSES/ENUMS //
 	// /////////////////// //

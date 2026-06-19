@@ -1,5 +1,6 @@
 package com.virus5600.defensive_measures.model.entity;
 
+import net.minecraft.client.animation.AnimationDefinition;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
@@ -33,8 +34,9 @@ public class MissileTurretModel extends BaseTurretModel<MissileTurretRenderState
 			root.getChild("base").getChild("stand").getChild("column").getChild("swivel"),
 			root.getChild("base").getChild("stand").getChild("column").getChild("swivel").getChild("head"),
 
-			null,
-			MissileTurretAnimation.ANIM_MISSILE_TURRET_DEATH,
+			null, MissileTurretAnimation.ANIM_MISSILE_TURRET_DEATH,
+			new AnimationDefinition[] {MissileTurretAnimation.ANIM_MISSILE_TURRET_SETUP},
+			new AnimationDefinition[] {MissileTurretAnimation.ANIM_MISSILE_TURRET_TEARDOWN},
 			2f
 		);
 
@@ -44,7 +46,7 @@ public class MissileTurretModel extends BaseTurretModel<MissileTurretRenderState
 			.getChild("swivel")
 			.getChild("head")
 			.getChild("radar")
-			.getChild("radar_dish");
+			.getChild("upper_radar");
 	}
 
 	public static LayerDefinition getTexturedModelData() {
@@ -66,11 +68,17 @@ public class MissileTurretModel extends BaseTurretModel<MissileTurretRenderState
 
 		PartDefinition column = stand.addOrReplaceChild("column", CubeListBuilder.create().texOffs(0, 128).addBox(-2.0F, -10.0F, -2.0F, 4.0F, 10.0F, 4.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, -5.0F, 0.0F));
 
-		PartDefinition swivel = column.addOrReplaceChild("swivel", CubeListBuilder.create().texOffs(80, 10).addBox(-4.0F, -2.0F, -4.0F, 8.0F, 2.0F, 8.0F, new CubeDeformation(0.0F))
-			.texOffs(56, 128).addBox(6.1213F, -12.1213F, -2.0F, 2.0F, 8.0F, 4.0F, new CubeDeformation(0.0F))
-			.texOffs(44, 128).addBox(-8.1213F, -12.1213F, -2.0F, 2.0F, 8.0F, 4.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, -10.0F, 0.0F));
-		swivel.addOrReplaceChild("swivel_r1", CubeListBuilder.create().texOffs(82, 131).addBox(-3.0F, 0.0F, -2.0F, 3.0F, 2.0F, 4.0F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(-4.0F, -2.0F, 0.0F, 0.0F, 0.0F, 0.7854F));
-		swivel.addOrReplaceChild("swivel_r2", CubeListBuilder.create().texOffs(68, 128).addBox(0.0F, 0.0F, -2.0F, 3.0F, 2.0F, 4.0F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(4.0F, -2.0F, 0.0F, 0.0F, 0.0F, -0.7854F));
+		PartDefinition swivel = column.addOrReplaceChild("swivel", CubeListBuilder.create().texOffs(80, 10).addBox(-4.0F, -2.0F, -4.0F, 8.0F, 2.0F, 8.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, -10.0F, 0.0F));
+
+		PartDefinition swivel_right_arm = swivel.addOrReplaceChild("swivel_right_arm", CubeListBuilder.create(), PartPose.offset(-4.0F, -2.0F, 0.0F));
+
+		swivel_right_arm.addOrReplaceChild("swivel_lower_right_arm_r1", CubeListBuilder.create().texOffs(82, 131).addBox(-3.0F, 0.0F, -2.0F, 3.0F, 2.0F, 4.0F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.7854F));
+		swivel_right_arm.addOrReplaceChild("swivel_upper_right_arm", CubeListBuilder.create().texOffs(44, 128).addBox(-2.0F, -8.0F, -2.0F, 2.0F, 8.0F, 4.0F, new CubeDeformation(0.0F)), PartPose.offset(-2.1213F, -2.1213F, 0.0F));
+
+		PartDefinition swivel_left_arm = swivel.addOrReplaceChild("swivel_left_arm", CubeListBuilder.create(), PartPose.offset(4.0F, -2.0F, 0.0F));
+
+		swivel_left_arm.addOrReplaceChild("swivel_lower_left_arm_r1", CubeListBuilder.create().texOffs(68, 128).addBox(0.0F, 0.0F, -2.0F, 3.0F, 2.0F, 4.0F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(0.0F, 0.0F, 0.0F, 0.0F, 0.0F, -0.7854F));
+		swivel_left_arm.addOrReplaceChild("swivel_upper_left_arm", CubeListBuilder.create().texOffs(56, 128).addBox(0.0F, -8.0F, -2.0F, 2.0F, 8.0F, 4.0F, new CubeDeformation(0.0F)), PartPose.offset(2.1213F, -2.1213F, 0.0F));
 
 		PartDefinition head = swivel.addOrReplaceChild("head", CubeListBuilder.create().texOffs(44, 95).addBox(-5.0F, -5.75F, -11.0F, 1.0F, 12.0F, 21.0F, new CubeDeformation(0.0F))
 			.texOffs(112, 0).addBox(-6.0F, -4.75F, -11.0F, 1.0F, 10.0F, 21.0F, new CubeDeformation(0.0F))
@@ -82,16 +90,21 @@ public class MissileTurretModel extends BaseTurretModel<MissileTurretRenderState
 			.texOffs(30, 128).addBox(5.1F, -2.75F, -3.0F, 1.0F, 6.0F, 6.0F, new CubeDeformation(0.0F))
 			.texOffs(16, 128).addBox(-6.1F, -2.75F, -3.0F, 1.0F, 6.0F, 6.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, -10.25F, 0.0F));
 
-		PartDefinition radar = head.addOrReplaceChild("radar", CubeListBuilder.create().texOffs(0, 12).addBox(-2.0F, -1.0F, -2.0F, 4.0F, 1.0F, 4.0F, new CubeDeformation(0.0F))
-			.texOffs(8, 0).addBox(-0.5F, -3.5F, -0.5F, 1.0F, 3.0F, 1.0F, new CubeDeformation(-0.375F)), PartPose.offset(0.0F, -6.75F, 6.0F));
+		PartDefinition radar = head.addOrReplaceChild("radar", CubeListBuilder.create().texOffs(0, 12).addBox(-2.0F, -1.0F, -2.0F, 4.0F, 1.0F, 4.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, -6.75F, 6.0F));
 
-		PartDefinition radar_dish = radar.addOrReplaceChild("radar_dish", CubeListBuilder.create(), PartPose.offset(0.0F, -3.125F, 0.0F));
+		radar.addOrReplaceChild("radar_stand", CubeListBuilder.create().texOffs(8, 0).addBox(-0.5F, -2.5F, -0.5F, 1.0F, 3.0F, 1.0F, new CubeDeformation(-0.375F)), PartPose.offset(0.0F, -1.0F, 0.0F));
+
+		PartDefinition upper_radar = radar.addOrReplaceChild("upper_radar", CubeListBuilder.create(), PartPose.offset(0.0F, -3.125F, 0.0F));
+
+		upper_radar.addOrReplaceChild("upper_radar_r1", CubeListBuilder.create().texOffs(12, 0).addBox(-0.5F, -0.5F, -2.625F, 1.0F, 1.0F, 3.0F, new CubeDeformation(-0.38F)), PartPose.offsetAndRotation(0.0F, 0.0F, 0.0F, -0.6109F, 0.0F, 0.0F));
+
+		PartDefinition radar_dish = upper_radar.addOrReplaceChild("radar_dish", CubeListBuilder.create(), PartPose.offset(0.0F, 0.0F, 0.0F));
+
 		radar_dish.addOrReplaceChild("radar_dish_r1", CubeListBuilder.create().texOffs(4, 0).addBox(-2.75F, -1.5F, -2.125F, 1.0F, 3.0F, 1.0F, new CubeDeformation(-0.38F))
 			.texOffs(0, 0).addBox(1.75F, -1.5F, -2.125F, 1.0F, 3.0F, 1.0F, new CubeDeformation(-0.38F))
 			.texOffs(0, 6).addBox(-2.5F, 0.75F, -2.125F, 5.0F, 1.0F, 1.0F, new CubeDeformation(-0.38F))
 			.texOffs(0, 4).addBox(-2.5F, -1.75F, -2.125F, 5.0F, 1.0F, 1.0F, new CubeDeformation(-0.38F))
-			.texOffs(0, 8).addBox(-2.5F, -1.5F, -1.875F, 5.0F, 3.0F, 1.0F, new CubeDeformation(-0.38F))
-			.texOffs(12, 0).addBox(-0.5F, -0.5F, -2.625F, 1.0F, 1.0F, 3.0F, new CubeDeformation(-0.38F)), PartPose.offsetAndRotation(0.0F, 0.0F, 0.0F, -0.6109F, 0.0F, 0.0F));
+			.texOffs(0, 8).addBox(-2.5F, -1.5F, -1.875F, 5.0F, 3.0F, 1.0F, new CubeDeformation(-0.38F)), PartPose.offsetAndRotation(0.0F, 0.0F, 0.0F, -0.6109F, 0.0F, 0.0F));
 
 		return LayerDefinition.create(modelData, 256, 256);
 	}
