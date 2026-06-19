@@ -26,7 +26,6 @@ public abstract class SoundEngineAccessorMixin implements SoundSystemAccess {
 			return true;
 		}
 
-		sourceManager.release();
 		return sourceManager.isStopped();
 	}
 }
