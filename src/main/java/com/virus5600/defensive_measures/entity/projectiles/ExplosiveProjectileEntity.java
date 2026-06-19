@@ -1,5 +1,6 @@
 package com.virus5600.defensive_measures.entity.projectiles;
 
+import com.virus5600.defensive_measures._util.MathUtil;
 import net.minecraft.core.Holder;
 import net.minecraft.core.particles.ExplosionParticleInfo;
 import net.minecraft.core.particles.ParticleOptions;
@@ -13,6 +14,7 @@ import net.minecraft.server.level.ServerEntity;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.util.Mth;
 import net.minecraft.util.random.WeightedList;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageType;
@@ -226,7 +228,14 @@ public abstract class ExplosiveProjectileEntity extends TurretProjectileEntity i
 	 */
 	protected void addParticles(Vec3 pos) {
 		if (this.getTrailParticleType() != null) {
-			this.addParticles(pos, this.getTrailParticleType());
+			Vec3 offsetPos = MathUtil.getRelativePos(
+				pos,
+				this.trailOffset(),
+				-this.getYRot(),
+				-this.getXRot()
+			);
+
+			this.addParticles(offsetPos, this.getTrailParticleType());
 		}
 	}
 
@@ -237,7 +246,7 @@ public abstract class ExplosiveProjectileEntity extends TurretProjectileEntity i
 	 * this method will not add any particles.
 	 */
 	protected void addParticles() {
-		this.addParticles(this.getPositionCodec().getBase());
+		this.addParticles(this.getEyePosition());
 	}
 
 	protected void move() {
@@ -252,7 +261,13 @@ public abstract class ExplosiveProjectileEntity extends TurretProjectileEntity i
 			pos = pos.add(this.getDeltaMovement());
 		}
 
-		ProjectileUtil.rotateTowardsMovement(this, 0.2F);
+		Vec3 velocity = this.getDeltaMovement();
+		float pitchDeg = MathUtil.radToDeg((float) (Mth.atan2(velocity.y, velocity.horizontalDistance())));
+		float yawDeg = MathUtil.radToDeg((float) (Mth.atan2(velocity.x, velocity.z)));
+
+		this.setXRot(lerpRotation(this.getXRot(), -pitchDeg));
+		this.setYRot(lerpRotation(this.getYRot(), -yawDeg));
+
 		this.setPos(pos);
 		this.applyEffectsFromBlocks();
 		this.applyGravity();
@@ -261,7 +276,6 @@ public abstract class ExplosiveProjectileEntity extends TurretProjectileEntity i
 	@Override
 	public void tick() {
 		Entity owner = this.getOwner();
-		Vec3 pos = this.position();
 
 		int[] xz = new int[] {
 			this.chunkPosition().x(),
@@ -276,7 +290,7 @@ public abstract class ExplosiveProjectileEntity extends TurretProjectileEntity i
 
 			if (this.level().isClientSide()) {
 				// Trail Particle
-				this.addParticles(pos.add(0, 0.25, 0));
+				this.addParticles();
 			}
 			else {
 				HitResult hitResult;
@@ -321,6 +335,17 @@ public abstract class ExplosiveProjectileEntity extends TurretProjectileEntity i
 	// //////////////////////////// //
 	protected ClipContext.Block getRaycastShapeType() {
 		return ClipContext.Block.COLLIDER;
+	}
+
+	/**
+	 * Identifies where the trail will be spawned relative to the projectile's origin and direction.
+	 * By default, the return value is {@link Vec3#ZERO}.
+	 *
+	 * @return The offset vector for the trail particle. This vector is added to the projectile's position to determine where the trail particle will be spawned.
+	 */
+	@NotNull
+	protected Vec3 trailOffset() {
+		return Vec3.ZERO;
 	}
 
 	/**

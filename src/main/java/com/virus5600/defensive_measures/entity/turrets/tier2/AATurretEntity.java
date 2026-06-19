@@ -281,6 +281,14 @@ public class AATurretEntity extends TurretEntity {
 		return RegistryHelper.isOf(target.getType(), ModEntityTypeTags.FLYING_HOSTILES) && super.canAttack(target);
 	}
 
+	protected int getSetupAnimDuration() {
+		return (int) (5.0F * 20);
+	}
+
+	protected int getTeardownAnimDuration() {
+		return (int) (5.0F * 20);
+	}
+
 	// ///////////////// //
 	// STATIC INITIALIZE //
 	// ///////////////// //

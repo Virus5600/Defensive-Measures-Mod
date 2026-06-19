@@ -1,5 +1,6 @@
 package com.virus5600.defensive_measures.model.entity;
 
+import net.minecraft.client.animation.AnimationDefinition;
 import net.minecraft.client.model.*;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
@@ -22,7 +23,10 @@ public class BallistaTurretModel extends BaseTurretModel<BaseTurretRenderState> 
 			root.getChild("base").getChild("head").getChild("bow"),
 
 			BallistaTurretAnimation.ANIM_BALLISTA_SHOOT,
-			BallistaTurretAnimation.ANIM_BALLISTA_DEATH
+			BallistaTurretAnimation.ANIM_BALLISTA_DEATH,
+			new AnimationDefinition[] {BallistaTurretAnimation.ANIM_BALLISTA_SETUP},
+			new AnimationDefinition[] {BallistaTurretAnimation.ANIM_BALLISTA_TEARDOWN},
+			1f
 		);
 
 	}
@@ -48,16 +52,16 @@ public class BallistaTurretModel extends BaseTurretModel<BaseTurretRenderState> 
 			.texOffs(36, 58).addBox(2.0F, -5.0F, -2.0F, 1.0F, 5.0F, 4.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, -8.0F, 0.0F));
 
 		// Bow
-		PartDefinition bow = head.addOrReplaceChild("bow", CubeListBuilder.create().texOffs(38, 67).addBox(-3.5F, -1.5F, -1.0F, 2.0F, 2.0F, 2.0F, new CubeDeformation(0.0F))
-			.texOffs(46, 67).addBox(1.5F, -1.5F, -1.0F, 2.0F, 2.0F, 2.0F, new CubeDeformation(0.0F))
-			.texOffs(40, 18).addBox(-1.5F, 0.0F, -4.0F, 3.0F, 1.0F, 13.0F, new CubeDeformation(0.0F))
-			.texOffs(66, 57).addBox(-1.0F, 0.0F, -8.0F, 2.0F, 1.0F, 4.0F, new CubeDeformation(0.0F))
-			.texOffs(0, 40).addBox(1.0F, -1.0F, -8.0F, 1.0F, 1.0F, 17.0F, new CubeDeformation(0.0F))
-			.texOffs(40, 0).addBox(-2.0F, -1.0F, -8.0F, 1.0F, 1.0F, 17.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, -3.0F, 0.0F));
+		PartDefinition bow = head.addOrReplaceChild("bow", CubeListBuilder.create().texOffs(38, 67).addBox(-3.5F, -1.0F, -1.0F, 2.0F, 2.0F, 2.0F, new CubeDeformation(0.0F))
+			.texOffs(46, 67).addBox(1.5F, -1.0F, -1.0F, 2.0F, 2.0F, 2.0F, new CubeDeformation(0.0F))
+			.texOffs(40, 18).addBox(-1.5F, 0.5F, -4.0F, 3.0F, 1.0F, 13.0F, new CubeDeformation(0.0F))
+			.texOffs(66, 57).addBox(-1.0F, 0.5F, -8.0F, 2.0F, 1.0F, 4.0F, new CubeDeformation(0.0F))
+			.texOffs(0, 40).addBox(1.0F, -0.5F, -8.0F, 1.0F, 1.0F, 17.0F, new CubeDeformation(0.0F))
+			.texOffs(40, 0).addBox(-2.0F, -0.5F, -8.0F, 1.0F, 1.0F, 17.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, -3.5F, 0.0F));
 
 		// Bow Blade
 		PartDefinition bowBlade = bow.addOrReplaceChild("bowBlade", CubeListBuilder.create().texOffs(56, 57).addBox(1.0F, -4.0F, -1.0F, 3.0F, 9.0F, 2.0F, new CubeDeformation(0.0F))
-			.texOffs(0, 58).addBox(-4.0F, -4.0F, -1.0F, 3.0F, 9.0F, 2.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, -1.0F, -5.0F));
+			.texOffs(0, 58).addBox(-4.0F, -4.0F, -1.0F, 3.0F, 9.0F, 2.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, -0.5F, -5.0F));
 		// Inner Left Blade
 		PartDefinition innerLeftBlade = bowBlade.addOrReplaceChild("innerLeftBlade", CubeListBuilder.create().texOffs(72, 25).addBox(0.0F, -1.0F, -1.0F, 3.0F, 2.0F, 1.0F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(4.0F, -0.5F, 0.5F, 0.0F, -0.3491F, 0.0F));
 		// Outer Left Blade
@@ -69,7 +73,7 @@ public class BallistaTurretModel extends BaseTurretModel<BaseTurretRenderState> 
 
 		// Pulley
 		PartDefinition pulley = bow.addOrReplaceChild("pulley", CubeListBuilder.create().texOffs(16, 72).addBox(1.0F, -2.0F, 0.0F, 1.0F, 2.0F, 2.0F, new CubeDeformation(0.0F))
-			.texOffs(72, 28).addBox(-2.0F, -2.0F, 0.0F, 1.0F, 2.0F, 2.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, 0.0F, 9.0F));
+			.texOffs(72, 28).addBox(-2.0F, -2.0F, 0.0F, 1.0F, 2.0F, 2.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, 0.5F, 9.0F));
 
 		// Winch
 		PartDefinition winch = pulley.addOrReplaceChild("winch", CubeListBuilder.create(), PartPose.offset(0.0F, -1.0F, 1.0F));
@@ -83,7 +87,7 @@ public class BallistaTurretModel extends BaseTurretModel<BaseTurretRenderState> 
 			.texOffs(10, 63).addBox(-5.5F, -0.5F, -0.5F, 7.0F, 1.0F, 1.0F, new CubeDeformation(0.0F)), PartPose.offset(3.0F, 0.0F, 0.0F));
 
 		// Ram
-		PartDefinition ram = bow.addOrReplaceChild("ram", CubeListBuilder.create().texOffs(72, 40).addBox(-1.0F, -1.0F, 0.0F, 2.0F, 2.0F, 1.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, -1.0F, 7.0F));
+		PartDefinition ram = bow.addOrReplaceChild("ram", CubeListBuilder.create().texOffs(72, 40).addBox(-1.0F, -1.0F, 0.0F, 2.0F, 2.0F, 1.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, -0.5F, 7.0F));
 
 		// Rear Draw String
 		PartDefinition rearDrawString = ram.addOrReplaceChild("rearDrawString", CubeListBuilder.create(), PartPose.offset(0.0F, -0.5F, 0.5F));
@@ -99,7 +103,7 @@ public class BallistaTurretModel extends BaseTurretModel<BaseTurretRenderState> 
 		ram.addOrReplaceChild("rightString", CubeListBuilder.create().texOffs(66, 63).addBox(-10.75F, 0.0F, -0.5F, 11.0F, 0.0F, 1.0F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(-2.0F, -0.5F, 0.5F, 0.0F, -0.925F, 0.0F));
 
 		// Bolt
-		PartDefinition bolt = bow.addOrReplaceChild("bolt", CubeListBuilder.create().texOffs(0, 0).addBox(-0.5F, -0.5F, -0.25F, 1.0F, 1.0F, 19.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, -0.5F, -11.25F));
+		PartDefinition bolt = bow.addOrReplaceChild("bolt", CubeListBuilder.create().texOffs(0, 0).addBox(-0.5F, -0.5F, -0.25F, 1.0F, 1.0F, 19.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, 0.0F, -11.25F));
 
 		// Point
 		PartDefinition point = bolt.addOrReplaceChild("point", CubeListBuilder.create(), PartPose.offset(0.0F, 0.0F, 2.075F));

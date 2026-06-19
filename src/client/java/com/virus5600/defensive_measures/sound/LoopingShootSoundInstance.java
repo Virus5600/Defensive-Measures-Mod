@@ -128,9 +128,9 @@ public class LoopingShootSoundInstance extends AbstractTickableSoundInstance {
 			// Start playing the loop by setting the volume to 100.
 			if (!this.isLoopPlaying) {
 				// If the end loop is already triggered...
-				if (this.isEndLoopTriggered) {
+				if (this.isEndLoopTriggered && !this.isStopped()) {
 					// ... and if the end sound is finished, mark this instance as done.
-					if (this.endSoundInstance.isStopped() && this.getSoundSystem().dm$isStopped(endSoundInstance)) {
+					if (this.endSoundInstance != null && this.endSoundInstance.isStopped() && this.getSoundSystem().dm$isStopped(endSoundInstance)) {
 						this.stop();
 						return;
 					}
@@ -141,7 +141,6 @@ public class LoopingShootSoundInstance extends AbstractTickableSoundInstance {
 					this.isLoopPlaying = true;
 				}
 			}
-
 
 			// If dead, removed, or has no target, and the loop is already playing and the end loop
 			// hasn't been triggered yet. Then end the loop, playing the end sound.
@@ -178,9 +177,9 @@ public class LoopingShootSoundInstance extends AbstractTickableSoundInstance {
 	}
 
 	public void endLoop() {
+		this.volume = 0f;
 		this.isEndLoopTriggered = true;
 		this.isLoopPlaying = false;
-		this.volume = 0f;
 
 		this.endSoundInstance = this.queueSound(this.endSound, false);
 	}
@@ -284,7 +283,7 @@ public class LoopingShootSoundInstance extends AbstractTickableSoundInstance {
 
 	public float getVolume() {
 		if (this.sound == null) {
-			return 1f;
+			return this.isEndLoopTriggered ? 0f : 1f;
 		}
 
 		return this.volume * this.sound.getVolume().sample(this.random);

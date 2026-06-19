@@ -134,17 +134,24 @@ public interface Itemable {
 	}
 
 	/**
-	 * Attempts to retrieve the {@link Itemable Itemable Entity} as an item.
+	 * Attempts to retrieve the {@link Itemable Itemable Entity} as an item. This will also
+	 * automatically discard said entity if the {@code discard} parameter is set to {@code true}.
+	 * However, if the passed value is {@code false}, the entity must be manually discarded.
+	 *
 	 * @param player The player that is attempting to retrieve the item.
 	 * @param hand The hand the player is using to retrieve the item.
 	 * @param entity The entity to retrieve the item from.
 	 * @param tool The tool the player is using to retrieve the item.
-	 * @param modItem The item to retrieve.
+	 * @param dropItem The item to retrieve.
+	 * @param spawnItem Whether to spawn the item after retrieving the entity.
+	 * @param discard Whether to discard the entity after retrieving the item.
+	 *
 	 * @return {@link Optional<InteractionResult>} The result of the action.
 	 * @param <T> The type of entity.
 	 */
-	static <T extends TurretEntity> Optional<InteractionResult> tryItem(Player player, InteractionHand hand, T entity, Item tool, Item modItem) {
+	static <T extends TurretEntity> Optional<InteractionResult> tryItem(Player player, InteractionHand hand, T entity, Item tool, Item dropItem, boolean spawnItem, boolean discard) {
 		ItemStack itemStack = player.getItemInHand(hand);
+
 		if (itemStack.getItem() == tool && entity.isAlive()) {
 			Level world = entity.level();
 
@@ -152,25 +159,22 @@ public interface Itemable {
 				entity.playSound(entity.getEntityRemoveSound(), 1.0f, new Random().nextFloat(0.75f, 1.25f));
 
 				if (player.isCreative() && !player.isShiftKeyDown()) {
-					entity.discard();
+					if (discard) {
+						entity.discard();
+					}
+
 					return Optional.of(InteractionResult.SUCCESS);
 				}
 
-				ItemStack stack = new ItemStack(modItem);
-				entity.copyDataToStack(stack);
+				ItemStack stack = new ItemStack(dropItem);
+				if (spawnItem) {
+					ItemEntity itemStackEntity = tryItem(entity, dropItem, world);
+					world.addFreshEntity(itemStackEntity);
+				}
 
-				Vec3 entityPos = entity.position();
-
-				float x = (float) entityPos.x() + 0.5f;
-				float y = (float) entityPos.y() + 0.5f;
-				float z = (float) entityPos.z() + 0.5f;
-				double vx = Mth.nextDouble(world.getRandom(), -0.1, 0.1);
-				double vy = Mth.nextDouble(world.getRandom(), 0.0, 0.1);
-				double vz = Mth.nextDouble(world.getRandom(), -0.1, 0.1);
-
-				entity.discard();
-				ItemEntity itemStackEntity = new ItemEntity(world, x, y, z, stack, vx, vy, vz);
-				world.addFreshEntity(itemStackEntity);
+				if (discard) {
+					entity.discard();
+				}
 
 				ModCriterion.TURRET_ITEM_RETRIEVED_CRITERION.trigger((ServerPlayer) player, stack);
 			}
@@ -178,5 +182,21 @@ public interface Itemable {
 			return Optional.of(InteractionResult.SUCCESS);
 		}
 		return Optional.empty();
+	}
+
+	static <T extends TurretEntity> ItemEntity tryItem(T entity, Item dropItem, Level world) {
+		ItemStack stack = new ItemStack(dropItem);
+		entity.copyDataToStack(stack);
+
+		Vec3 entityPos = entity.position();
+
+		float x = (float) entityPos.x() + 0.5f;
+		float y = (float) entityPos.y() + 0.5f;
+		float z = (float) entityPos.z() + 0.5f;
+		double vx = Mth.nextDouble(world.getRandom(), -0.1, 0.1);
+		double vy = Mth.nextDouble(world.getRandom(), 0.0, 0.1);
+		double vz = Mth.nextDouble(world.getRandom(), -0.1, 0.1);
+
+		return new ItemEntity(world, x, y, z, stack, vx, vy, vz);
 	}
 }

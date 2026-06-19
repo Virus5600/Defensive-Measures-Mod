@@ -20,5 +20,7 @@ public class MicroMissileRenderer extends BaseProjectileRenderer<
 			0.5f,
 			BaseProjectileRenderState::new
 		);
+
+		this.shouldLookAtDir(true);
 	}
 }
