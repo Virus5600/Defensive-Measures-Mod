@@ -459,6 +459,14 @@ public class FlameTurretEntity extends TurretEntity implements LoopableShootingS
 		}
 	}
 
+	protected int getSetupAnimDuration() {
+		return (int) (7.0F * 20);
+	}
+
+	protected int getTeardownAnimDuration() {
+		return (int) (7.0F * 20);
+	}
+
 	// ///////////////// //
 	// INTERFACE METHODS //
 	// ///////////////// //
