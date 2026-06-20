@@ -1,6 +1,5 @@
 package com.virus5600.defensive_measures.entity.turrets.tier2;
 
-import com.virus5600.defensive_measures._helper.RegistryHelper;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.core.particles.ParticleOptions;
@@ -8,6 +7,7 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.network.syncher.SynchedEntityData.Builder;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.Mth;
@@ -17,6 +17,7 @@ import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.monster.Enemy;
@@ -27,6 +28,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 
+import com.virus5600.defensive_measures._helper.RegistryHelper;
 import com.virus5600.defensive_measures._util.MathUtil;
 import com.virus5600.defensive_measures.entity.ModEntities;
 import com.virus5600.defensive_measures.entity.TurretMaterial;
@@ -181,7 +183,7 @@ public class FlameTurretEntity extends TurretEntity implements LoopableShootingS
 	}
 
 	@Override
-	protected void defineSynchedData(SynchedEntityData.@NonNull Builder builder) {
+	protected void defineSynchedData(@NonNull Builder builder) {
 		// Initialize standard data trackers
 		super.defineSynchedData(builder);
 
@@ -190,7 +192,8 @@ public class FlameTurretEntity extends TurretEntity implements LoopableShootingS
 		;
 	}
 
-	public static @NotNull net.minecraft.world.entity.ai.attributes.AttributeSupplier.Builder setAttributes() {
+	@NotNull
+	public static AttributeSupplier.Builder setAttributes() {
 		TurretEntity.setTurretMaxHealth(150);
 		TurretEntity.setTurretMaxRange(10 + ModEntities.FLAME_TURRET.getDimensions().eyeHeight());
 

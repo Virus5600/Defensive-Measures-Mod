@@ -2065,19 +2065,9 @@ public abstract class TurretEntity extends Mob implements Itemable, RangedAttack
 				this.deathAnimationState.startIfStopped(this.tickCount);
 			}
 
-			float elapsedTime = this.shootAnimationState.getTimeInMillis(this.tickCount);
-			float reload = (this.getTotalAttCooldown() / 50f) * 1000;
-
-			boolean isAnimPlaying = this.shootAnimationState.isStarted();
-			boolean isAttacking = elapsedTime >= reload;
 			boolean isShooting = this.getTrackedShooting();
-
 			if (isShooting) {
-				this.shootAnimationState.startIfStopped(this.tickCount);
-			}
-
-			if (!isShooting && isAnimPlaying && isAttacking && elapsedTime > 1000) {
-				this.shootAnimationState.stop();
+				this.shootAnimationState.start(this.tickCount);
 			}
 		}
 	}
