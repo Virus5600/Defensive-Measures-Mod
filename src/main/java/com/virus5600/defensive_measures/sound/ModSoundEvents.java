@@ -76,6 +76,14 @@ public class ModSoundEvents {
 	public static final SoundEvent ROCKET_ENGINE_LOOP = ModSoundEvents.registerSoundEvent("generic.rocket.engine.loop");
 	public static final SoundEvent ROCKET_EXPLOSION = ModSoundEvents.registerSoundEvent("generic.rocket.explode");
 
+	// v1.2.0-beta
+	public final static SoundEvent TURRET_REPAIR_LEATHER = ModSoundEvents.registerSoundEvent("turret.repair.leather");
+
+	// PELLET TURRET
+	public static final SoundEvent TURRET_PELLET_HURT = ModSoundEvents.registerSoundEvent("turret.pellet_turret.hurt");
+	public static final SoundEvent TURRET_PELLET_DESTROYED = ModSoundEvents.registerSoundEvent("turret.pellet_turret.destroyed");
+	public static final SoundEvent TURRET_PELLET_SHOOT = ModSoundEvents.registerSoundEvent("turret.pellet_turret.shoot");
+
 	private static SoundEvent registerSoundEvent(final String soundID) {
 		Identifier identifier = Identifier.fromNamespaceAndPath(DefensiveMeasures.MOD_ID, soundID);
 		return Registry.register(

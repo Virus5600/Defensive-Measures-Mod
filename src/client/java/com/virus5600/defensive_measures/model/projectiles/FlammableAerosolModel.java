@@ -12,9 +12,9 @@ public class FlammableAerosolModel extends BaseProjectileModel<BaseProjectileRen
 		super(root);
 	}
 
-	public static LayerDefinition getTexturedModelData() {
-		MeshDefinition modelData = new MeshDefinition();
+	public static LayerDefinition createBodyLayer() {
+		MeshDefinition meshdefinition = new MeshDefinition();
 
-		return LayerDefinition.create(modelData, 8, 8);
+		return LayerDefinition.create(meshdefinition, 8, 8);
 	}
 }

@@ -1,0 +1,18 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"category": "turret",
+	"pattern": [
+		" s ",
+		"sfs",
+		"ls "
+	],
+	"key": {
+		"s": "minecraft:stick",
+		"f": "minecraft:flint",
+		"l": "minecraft:leather"
+	},
+	"result": {
+		"id": "dm:pellet_turret",
+		"count": 1
+	}
+}

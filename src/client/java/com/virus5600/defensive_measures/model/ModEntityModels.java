@@ -8,7 +8,9 @@ import net.minecraft.world.level.block.HangingSignBlock;
 import net.minecraft.world.level.block.state.properties.WoodType;
 
 import com.virus5600.defensive_measures.DefensiveMeasures;
-import com.virus5600.defensive_measures.model.entity.*;
+import com.virus5600.defensive_measures.model.entity.tier0.*;
+import com.virus5600.defensive_measures.model.entity.tier1.*;
+import com.virus5600.defensive_measures.model.entity.tier2.*;
 import com.virus5600.defensive_measures.model.projectiles.*;
 
 import java.util.Set;
@@ -34,6 +36,9 @@ public class ModEntityModels {
 	public static final ModelLayerLocation FLAME_TURRET = registerMain("flame_turret");
 	public static final ModelLayerLocation MISSILE_TURRET = registerMain("missile_turret");
 
+	// v1.2.0-beta
+	public static final ModelLayerLocation PELLET_TURRET = registerMain("pellet_turret");
+
 	// /////////// //
 	// PROJECTILES //
 	// /////////// //
@@ -48,6 +53,8 @@ public class ModEntityModels {
 	public static final ModelLayerLocation FLAMMABLE_AEROSOL = registerMain("flammable_aerosol");
 	public static final ModelLayerLocation MICRO_MISSILE = registerMain("micro_missile");
 
+	// v1.2.0-beta
+
 	public static void registerEntityModels() {
 		DefensiveMeasures.LOGGER.info("REGISTERING ENTITY MODELS FOR {}...", DefensiveMeasures.MOD_NAME);
 
@@ -56,28 +63,31 @@ public class ModEntityModels {
 		// /////// //
 
 		// v1.0.0-beta
-		ModelLayerRegistry.registerModelLayer(CANNON_TURRET, CannonTurretModel::getTexturedModelData);
-		ModelLayerRegistry.registerModelLayer(BALLISTA_TURRET, BallistaTurretModel::getTexturedModelData);
-		ModelLayerRegistry.registerModelLayer(MG_TURRET, MGTurretModel::getTexturedModelData);
+		ModelLayerRegistry.registerModelLayer(CANNON_TURRET, CannonTurretModel::createBodyLayer);
+		ModelLayerRegistry.registerModelLayer(BALLISTA_TURRET, BallistaTurretModel::createBodyLayer);
+		ModelLayerRegistry.registerModelLayer(MG_TURRET, MGTurretModel::createBodyLayer);
 
 		// v1.1.0-beta
-		ModelLayerRegistry.registerModelLayer(AA_TURRET, AATurretModel::getTexturedModelData);
-		ModelLayerRegistry.registerModelLayer(FLAME_TURRET, FlameTurretModel::getTexturedModelData);
-		ModelLayerRegistry.registerModelLayer(MISSILE_TURRET, MissileTurretModel::getTexturedModelData);
+		ModelLayerRegistry.registerModelLayer(AA_TURRET, AATurretModel::createBodyLayer);
+		ModelLayerRegistry.registerModelLayer(FLAME_TURRET, FlameTurretModel::createBodyLayer);
+		ModelLayerRegistry.registerModelLayer(MISSILE_TURRET, MissileTurretModel::createBodyLayer);
+
+		// v1.2.0-beta
+		ModelLayerRegistry.registerModelLayer(PELLET_TURRET, PelletTurretModel::createBodyLayer);
 
 		// /////////// //
 		// PROJECTILES //
 		// /////////// //
 
 		// v1.0.0-beta
-		ModelLayerRegistry.registerModelLayer(CANNONBALL, CannonballModel::getTexturedModelData);
-		ModelLayerRegistry.registerModelLayer(BALLISTA_BOLT, BallistaBoltModel::getTexturedModelData);
-		ModelLayerRegistry.registerModelLayer(MG_BULLET, MGBulletModel::getTexturedModelData);
+		ModelLayerRegistry.registerModelLayer(CANNONBALL, CannonballModel::createBodyLayer);
+		ModelLayerRegistry.registerModelLayer(BALLISTA_BOLT, BallistaBoltModel::createBodyLayer);
+		ModelLayerRegistry.registerModelLayer(MG_BULLET, MGBulletModel::createBodyLayer);
 
 		// v1.1.0-beta
-		ModelLayerRegistry.registerModelLayer(FLAK_PROJECTILE, FlakProjectileModel::getTexturedModelData);
-		ModelLayerRegistry.registerModelLayer(FLAMMABLE_AEROSOL, FlammableAerosolModel::getTexturedModelData);
-		ModelLayerRegistry.registerModelLayer(MICRO_MISSILE, MicroMissileModel::getTexturedModelData);
+		ModelLayerRegistry.registerModelLayer(FLAK_PROJECTILE, FlakProjectileModel::createBodyLayer);
+		ModelLayerRegistry.registerModelLayer(FLAMMABLE_AEROSOL, FlammableAerosolModel::createBodyLayer);
+		ModelLayerRegistry.registerModelLayer(MICRO_MISSILE, MicroMissileModel::createBodyLayer);
 	}
 
 	private static ModelLayerLocation registerMain(String id) {

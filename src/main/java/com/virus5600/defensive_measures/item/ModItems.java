@@ -22,6 +22,7 @@ import com.virus5600.defensive_measures.item.turrets.cannon.*;
 import com.virus5600.defensive_measures.item.turrets.flame_turret.*;
 import com.virus5600.defensive_measures.item.turrets.mg_turret.*;
 import com.virus5600.defensive_measures.item.turrets.missile_turret.*;
+import com.virus5600.defensive_measures.item.turrets.pellet_turret.*;
 
 import java.util.Arrays;
 import java.util.function.Function;
@@ -82,6 +83,9 @@ public class ModItems {
 
 	// MISSILE TURRET
 	public final static Item MISSILE_TURRET = registerItem("missile_turret", ModEntities.MISSILE_TURRET, MissileTurretItem::new);
+
+	// PELLET TURRET
+	public final static Item PELLET_TURRET = registerItem("pellet_turret", ModEntities.PELLET_TURRET, PelletTurretItem::new);
 
 	// ////////// //
 	// EQUIPMENTS //
@@ -241,6 +245,9 @@ public class ModItems {
 		};
 
 		DM_TURRETS = new Item[] {
+			// TIER 0
+			PELLET_TURRET,
+
 			// TIER 1
 			CANNON_TURRET,
 			BALLISTA_TURRET,

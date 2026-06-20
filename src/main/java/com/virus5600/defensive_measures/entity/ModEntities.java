@@ -8,6 +8,7 @@ import net.minecraft.world.entity.MobCategory;
 import com.virus5600.defensive_measures.DefensiveMeasures;
 import com.virus5600.defensive_measures._helper.RegistryHelper;
 import com.virus5600.defensive_measures.entity.projectiles.*;
+import com.virus5600.defensive_measures.entity.turrets.tier0.*;
 import com.virus5600.defensive_measures.entity.turrets.tier1.*;
 import com.virus5600.defensive_measures.entity.turrets.tier2.*;
 
@@ -73,6 +74,16 @@ public class ModEntities {
 			.sized(2F, 2F)
 			.clientTrackingRange(64)
 			.eyeHeight(1.5625F)
+	);
+
+	// v1.2.0-beta
+	public static final EntityType<PelletTurretEntity> PELLET_TURRET = RegistryHelper.registerEntity(
+		"pellet_turret",
+		Builder.
+			of(PelletTurretEntity::new, MobCategory.MISC)
+			.sized(0.625F, 1F)
+			.clientTrackingRange(16)
+			.eyeHeight(0.625F)
 	);
 
 	// PROJECTILES //
@@ -157,5 +168,8 @@ public class ModEntities {
 		FabricDefaultAttributeRegistry.register(ModEntities.AA_TURRET, AATurretEntity.setAttributes());
 		FabricDefaultAttributeRegistry.register(ModEntities.FLAME_TURRET, FlameTurretEntity.setAttributes());
 		FabricDefaultAttributeRegistry.register(ModEntities.MISSILE_TURRET, MissileTurretEntity.setAttributes());
+
+		// v1.2.0-beta
+		FabricDefaultAttributeRegistry.register(ModEntities.PELLET_TURRET, PelletTurretEntity.setAttributes());
 	}
 }

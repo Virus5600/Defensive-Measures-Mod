@@ -210,12 +210,14 @@ public abstract class TurretItem extends Item {
 			}
 		}
 
+		double healthPercent = (double) currentHealth / (double) maxHealth;
+
 		if (maxHealth != 0) {
 			textConsumer.accept(
 				Component.translatable(
 					"itemTooltip.dm.generic.health",
-					currentHealth, maxHealth)
-					.withStyle(ChatFormatting.RED)
+					currentHealth, maxHealth, healthPercent
+				).withStyle(ChatFormatting.RED)
 			);
 		}
 	}
