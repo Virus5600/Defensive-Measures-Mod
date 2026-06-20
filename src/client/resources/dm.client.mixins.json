@@ -3,8 +3,9 @@
 	"package": "com.virus5600.defensive_measures.mixin",
 	"compatibilityLevel": "JAVA_21",
 	"client": [
-		"SoundManagerMixin",
-		"SoundEngineAccessorMixin"
+		"sound.SoundManagerMixin",
+		"sound.SoundEngineAccessorMixin",
+		"model.ModelPartMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

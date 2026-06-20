@@ -1,4 +1,4 @@
-package com.virus5600.defensive_measures.mixin;
+package com.virus5600.defensive_measures.mixin.sound;
 
 import net.minecraft.client.sounds.SoundEngine;
 import net.minecraft.client.sounds.SoundManager;
@@ -7,7 +7,7 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 
-import com.virus5600.defensive_measures._helper.accessor.SoundManagerAccess;
+import com.virus5600.defensive_measures._helper.accessor.sound.SoundManagerAccess;
 
 @Mixin(SoundManager.class)
 public abstract class SoundManagerMixin implements SoundManagerAccess {

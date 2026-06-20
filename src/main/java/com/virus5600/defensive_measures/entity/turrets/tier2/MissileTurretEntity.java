@@ -28,6 +28,7 @@ import com.virus5600.defensive_measures.entity.turrets.interfaces.UsesMissile;
 import com.virus5600.defensive_measures.item.ModItems;
 import com.virus5600.defensive_measures.sound.ModSoundEvents;
 
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jspecify.annotations.NonNull;
 
@@ -127,7 +128,7 @@ public class MissileTurretEntity extends TurretEntity implements UsesMissile {
 		super.defineSynchedData(builder);
 	}
 
-	@NonNull
+	@NotNull
 	public static AttributeSupplier.Builder setAttributes() {
 		TurretEntity.setTurretMaxHealth(75);
 		TurretEntity.setTurretMaxRange(64 + ModEntities.MISSILE_TURRET.getDimensions().eyeHeight());

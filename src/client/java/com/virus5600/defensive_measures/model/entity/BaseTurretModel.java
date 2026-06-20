@@ -231,15 +231,19 @@ public abstract class BaseTurretModel<S extends BaseTurretRenderState> extends B
 				.bake(root);
 
 		this.setupAnims = setupAnims == null || setupAnims.length == 0 ?
-			Stream.of(CommonTurretAnimation.createDefaultSetupAnimation(root, height))
-				.toArray(KeyframeAnimation[]::new)
+			Stream.of(
+				CommonTurretAnimation.createPopUpSetupAnimation(root, height),
+				CommonTurretAnimation.createScaleUpSetupAnimation(root)
+			).toArray(KeyframeAnimation[]::new)
 			: Stream.of(setupAnims).filter(Objects::nonNull)
 				.map(def -> def.bake(root))
 				.toArray(KeyframeAnimation[]::new);
 
 		this.teardownAnims = teardownAnims == null || teardownAnims.length == 0 ?
-			Stream.of(CommonTurretAnimation.createDefaultTeardownAnimation(root, height))
-				.toArray(KeyframeAnimation[]::new)
+			Stream.of(
+				CommonTurretAnimation.createPopDownTeardownAnimation(root, height),
+				CommonTurretAnimation.createScaleDownAnimation(root)
+			).toArray(KeyframeAnimation[]::new)
 			: Stream.of(teardownAnims).filter(Objects::nonNull)
 				.map(def -> def.bake(root))
 				.toArray(KeyframeAnimation[]::new);

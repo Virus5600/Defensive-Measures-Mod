@@ -1,4 +1,4 @@
-package com.virus5600.defensive_measures.mixin;
+package com.virus5600.defensive_measures.mixin.sound;
 
 import java.util.Map;
 
@@ -11,7 +11,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 
 import com.virus5600.defensive_measures.DefensiveMeasures;
-import com.virus5600.defensive_measures._helper.accessor.SoundSystemAccess;
+import com.virus5600.defensive_measures._helper.accessor.sound.SoundSystemAccess;
 
 @Mixin(SoundEngine.class)
 public abstract class SoundEngineAccessorMixin implements SoundSystemAccess {
