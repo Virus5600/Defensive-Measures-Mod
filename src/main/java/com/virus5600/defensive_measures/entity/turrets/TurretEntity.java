@@ -55,11 +55,11 @@ import net.minecraft.world.phys.Vec3;
 
 import com.virus5600.defensive_measures.DefensiveMeasures;
 import com.virus5600.defensive_measures._util.MathUtil;
+import com.virus5600.defensive_measures.command.suggestions.AnimationSuggestionProvider.DMAnimation;
 import com.virus5600.defensive_measures.entity.TurretMaterial;
 import com.virus5600.defensive_measures.entity.ai.control.TurretLookControl;
 import com.virus5600.defensive_measures.entity.ai.goal.ProjectileAttackGoal;
 import com.virus5600.defensive_measures.entity.ai.goal.TargetOtherTeamGoal;
-import com.virus5600.defensive_measures.entity.projectiles.ExplosiveProjectileEntity;
 import com.virus5600.defensive_measures.entity.projectiles.TurretProjectileEntity;
 import com.virus5600.defensive_measures.entity.turrets.interfaces.Itemable;
 import com.virus5600.defensive_measures.entity.turrets.tier1.CannonTurretEntity;
@@ -222,6 +222,12 @@ public abstract class TurretEntity extends Mob implements Itemable, RangedAttack
 	 * having the turret without AI at first before enabling it if this field's value is {@code false}.
 	 */
 	private boolean hasAiOnSpawn = false;
+	/**
+	 * A simple tracker for when a turret is spawned intentionally invulnerable. This allows the
+	 * setup animation to play without the turret being damaged by external sources by having the
+	 * turret invulnerable at first before making it vulnerable if this field's value is {@code false}.
+	 */
+	private boolean invulnerableOnSpawn = false;
 
 	/**
 	 * The sound the turret makes when it is being healed.
@@ -586,6 +592,7 @@ public abstract class TurretEntity extends Mob implements Itemable, RangedAttack
 		this.yBodyRotO = 0.0f;
 		this.setOldPosAndRot();
 
+		this.invulnerableOnSpawn = this.isInvulnerable();
 		this.setInvulnerable(true);
 		this.startSetupAnim();
 
@@ -604,11 +611,17 @@ public abstract class TurretEntity extends Mob implements Itemable, RangedAttack
 	// /////////////// //
 
 	private void startSetupAnim() {
-		if (this.isSettingUp()) return;
+		this.startSetupAnim(false, true);
+	}
 
-		this.hasAiOnSpawn = !this.isNoAi();
+	private void startSetupAnim(boolean override, boolean disableAi) {
+		if (this.isSettingUp() && !override) return;
 
-		this.setNoAi(true);
+		if (disableAi) {
+			this.hasAiOnSpawn = !this.isNoAi();
+			this.setNoAi(true);
+		}
+
 		this.setYHeadRot(180F);
 		this.setSettingUpStatus(true);
 		this.setupAnimationState.start(this.tickCount);
@@ -619,15 +632,25 @@ public abstract class TurretEntity extends Mob implements Itemable, RangedAttack
 	}
 
 	private void startTeardownAnim() {
-		this.hasAiOnSpawn = !this.isNoAi();
+		this.startTeardownAnim(true);
+	}
 
-		this.setNoAi(true);
+	private void startTeardownAnim(boolean disableAi) {
+		if (disableAi) {
+			this.hasAiOnSpawn = !this.isNoAi();
+			this.setNoAi(true);
+		}
+
 		this.lerpHeadTo(180F, 5);
 		this.setTearingDownStatus(true);
 	}
 
 	private void endTeardownAnim() {
-		if (this.itemToDrop != null) {
+		this.endTeardownAnim(true);
+	}
+
+	private void endTeardownAnim(boolean dropItem) {
+		if (this.itemToDrop != null && dropItem) {
 			this.level().addFreshEntity(this.itemToDrop);
 			this.itemToDrop = null;
 		}
@@ -975,7 +998,10 @@ public abstract class TurretEntity extends Mob implements Itemable, RangedAttack
 				this.tryAttachOrFall();
 				this.setPos(newPos);
 				this.level().gameEvent(this, GameEvent.TELEPORT, newPos);
-				this.setInvulnerable(false);
+
+				if (this.isInvulnerable() != this.invulnerableOnSpawn) {
+					this.setInvulnerable(this.invulnerableOnSpawn);
+				}
 
 				if (this.getDeltaMovement() == Vec3.ZERO && this.level().isClientSide() && !this.isPassenger()) {
 					this.xOld = this.getX();
@@ -1089,6 +1115,62 @@ public abstract class TurretEntity extends Mob implements Itemable, RangedAttack
 		this.entityData.set(BURST_DELAY, 0);
 		this.burstDelayTimer = 0;
 		this.velocityData = null;
+	}
+
+	/**
+	 * Plays a specified animation from the current list of available common animations for the
+	 * turret. List of available animation can be found in {@link DMAnimation DMAnimation} enum.
+	 *
+	 * @param animation The name of the animation to play.
+	 *
+	 * @see DMAnimation DMAnimation
+	 */
+	public void playAnimation(String animation) {
+		if (animation == null || animation.isEmpty()) {
+			return;
+		}
+
+		animation = animation.toLowerCase();
+
+		if (animation.endsWith("-stop")) {
+			animation = animation.substring(0, animation.indexOf("-stop"));
+			switch (animation) {
+				case "shoot" -> {
+					this.shootAnimationState.stop();
+				}
+				case "death" -> {
+					this.deathAnimationState.stop();
+				}
+				case "idle" -> {
+					this.idleAnimationState.stop();
+				}
+				case "setup" -> {
+					this.endSetupAnim();
+				}
+				case "teardown" -> {
+					this.endTeardownAnim(false);
+				}
+			}
+		}
+		else {
+			switch (animation) {
+				case "shoot" -> {
+					this.shootAnimationState.start(this.tickCount);
+				}
+				case "death" -> {
+					this.deathAnimationState.start(this.tickCount);
+				}
+				case "idle" -> {
+					this.idleAnimationState.start(this.tickCount);
+				}
+				case "setup" -> {
+					this.startSetupAnim(true, false);
+				}
+				case "teardown" -> {
+					this.startTeardownAnim(false);
+				}
+			}
+		}
 	}
 
 	// //////////////////////////////// //
@@ -2047,8 +2129,6 @@ public abstract class TurretEntity extends Mob implements Itemable, RangedAttack
 	 */
 	@Environment(EnvType.CLIENT)
 	protected void updateAnimations() {
-		this.idleAnimationState.startIfStopped(this.tickCount);
-
 		boolean in180Deg = Math.abs(this.getYHeadRot()) < 181F && Math.abs(this.getYHeadRot()) > 179F;
 
 		this.setupAnimationState.animateWhen(this.isSettingUp(), this.tickCount);
@@ -2061,6 +2141,13 @@ public abstract class TurretEntity extends Mob implements Itemable, RangedAttack
 		boolean isSettingOrTearing = this.isSettingUp() || this.isTearingDown();
 
 		if (!isSettingOrTearing) {
+			// Randomly play the idle animation instead of having it constantly running.
+			this.idleAnimationState.animateWhen(
+				this.random.nextBoolean()
+					&& !this.idleAnimationState.isStarted(),
+				this.tickCount
+			);
+
 			if (this.isDeadOrDying()) {
 				this.deathAnimationState.startIfStopped(this.tickCount);
 			}

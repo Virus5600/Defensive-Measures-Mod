@@ -1,12 +1,16 @@
 package com.virus5600.defensive_measures.networking;
 
+import com.virus5600.defensive_measures.network.clientbound.entity.PlayAnimationPacket;
+import com.virus5600.defensive_measures.networking.receiver.entity.PlayAnimationPacketReceiver;
+import com.virus5600.defensive_measures.network.serverbound.entity.StopAnimationPacket;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 
 import com.virus5600.defensive_measures.DefensiveMeasures;
 import com.virus5600.defensive_measures.network.clientbound.sounds.TurretLoopSoundPacket;
-import com.virus5600.defensive_measures.networking.receiver.MicroMissileSpawnPacketReceiver;
-import com.virus5600.defensive_measures.networking.receiver.TurretLoopSoundReceiver;
+import com.virus5600.defensive_measures.networking.receiver.entity.MicroMissileSpawnPacketReceiver;
+import com.virus5600.defensive_measures.networking.receiver.sound.TurretLoopSoundReceiver;
+import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 
 /**
  * Class containing all the client packet identifiers used by the mod. This is usually used to
@@ -23,13 +27,17 @@ public class ModClientPackets {
 	public static void registerClientPackets() {
 		DefensiveMeasures.LOGGER.info("REGISTERING CLIENT PACKETS FOR {}...", DefensiveMeasures.MOD_NAME);
 
-		// ///////////// //
-		// C2S - INBOUND //
-		// ///////////// //
+		// /////// //
+		// INBOUND //
+		// /////// //
 
 		// v1.1.0-beta
 		ClientPlayNetworking.registerGlobalReceiver(TurretLoopSoundPacket.PAYLOAD_ID, TurretLoopSoundReceiver::handle);
 
 		ClientTickEvents.END_CLIENT_TICK.register(MicroMissileSpawnPacketReceiver::handle);
+
+		// v1.2.0-beta
+		ClientPlayNetworking.registerGlobalReceiver(PlayAnimationPacket.PAYLOAD_ID, PlayAnimationPacketReceiver::handle);
+
 	}
 }

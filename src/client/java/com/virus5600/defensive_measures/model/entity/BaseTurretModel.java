@@ -20,6 +20,7 @@ import org.jetbrains.annotations.Nullable;
 import org.jspecify.annotations.NonNull;
 
 import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -62,6 +63,11 @@ public abstract class BaseTurretModel<S extends BaseTurretRenderState> extends B
 	protected final ModelPart head;
 
 	/**
+	 * The idle animation that gets randomly played by the turret.
+	 */
+	protected final KeyframeAnimation idleAnim;
+
+	/**
 	 * The shooting animation of the turret. This is used to render the shooting animation of the
 	 * turret when it shoots.
 	 */
@@ -72,18 +78,41 @@ public abstract class BaseTurretModel<S extends BaseTurretRenderState> extends B
 	 * when it dies.
 	 */
 	protected final KeyframeAnimation deathAnim;
+
+	/**
+	 * A selected setup animation from one of the map entries from {@link #setupAnims}. This is
+	 * used to render the setup animation of the turret when it is being placed or spawned.
+	 */
+	protected final KeyframeAnimation setupAnim;
+
+	/**
+	 * A selected teardown animation from one of the map entries from {@link #teardownAnims}. This
+	 * is used to render the teardown animation of the turret when it is being taken (using the
+	 * {@link com.virus5600.defensive_measures.item.equipments.TurretRemoverItem Turret Remover}).
+	 */
+	protected final KeyframeAnimation teardownAnim;
+
 	/**
 	 * The setup animations that this turret can play when placed or spawned.
 	 */
-	protected final KeyframeAnimation[] setupAnims;
+	protected final Map<KeyframeAnimation, Float> setupAnims;
 	/**
 	 * The teardown animations that this turret can play when taken (using the
 	 * {@link com.virus5600.defensive_measures.item.equipments.TurretRemoverItem Turret Remover}).
 	 */
-	protected final KeyframeAnimation[] teardownAnims;
+	protected final Map<KeyframeAnimation, Float> teardownAnims;
 
-	protected final float shootAnimLen;
-	protected final float deathAnimLen;
+	public final float idleAnimLen;
+	public final float shootAnimLen;
+	public final float deathAnimLen;
+	public final float setupAnimLen;
+	public final float teardownAnimLen;
+
+	/**
+	 * An ID assigned to a (this) model to allow a stable randomization, allowing reusability of
+	 * randomized values every instance.
+	 */
+	public final UUID modelId = UUID.randomUUID();
 
 	protected final static Queue<? extends Keyframe> DEFAULT_EMPTY_KEYFRAME = new PriorityQueue<>() {
 		{
@@ -188,6 +217,41 @@ public abstract class BaseTurretModel<S extends BaseTurretRenderState> extends B
 			@Nullable AnimationDefinition[] setupAnims, @Nullable AnimationDefinition[] teardownAnims,
 			float height
 	) {
+		this(
+			root, texturePath, textures, neck, head,
+			shootAnim, deathAnim,
+			setupAnims, teardownAnims, null,
+			height
+		);
+	}
+
+	/**
+	 * Constructs a new {@link BaseTurretModel} with the specified model part,
+	 * texture path, and bone names. These will be used by this model to
+	 * render the turret entity and apply default configurations.
+	 *
+	 * @param root The root model part of this model.
+	 * @param texturePath The path of the texture this model will use.
+	 * @param textures The file name(s) that this model will use.
+	 * @param neck The model part that serves as the neck of the turret. This part will rotate along the yaw axis.
+	 * @param head The model part that servesas the head of the turret. This part will rotate along the pitch axis.
+	 * @param shootAnim The shoot animation. {@code null} if none.
+	 * @param deathAnim The death animation. {@code null} if none.
+	 * @param setupAnims The setup animations. {@code null} if none.
+	 * @param idleAnim The idle animation. {@code null} if none.
+	 * @param teardownAnims The teardown animations. {@code null} if none.
+	 *
+	 * @see #texturePath
+	 * @see #baseTexture
+	 */
+	public BaseTurretModel(
+		@NotNull ModelPart root, @NotNull String texturePath, @NotNull String[] textures,
+		@NotNull ModelPart neck, @NotNull ModelPart head,
+		@Nullable AnimationDefinition shootAnim, @Nullable AnimationDefinition deathAnim,
+		@Nullable AnimationDefinition[] setupAnims, @Nullable AnimationDefinition[] teardownAnims,
+		@Nullable AnimationDefinition idleAnim,
+		float height
+	) {
 		super(root, texturePath, textures);
 
 		// Adds 25% more height for safety measures.
@@ -212,10 +276,14 @@ public abstract class BaseTurretModel<S extends BaseTurretRenderState> extends B
 		int deathProcLenMS = lastKF == null ? 0 : lastKF.getTimeMS();
 
 		// Stores the animation lengths first...
+		this.idleAnimLen = idleAnim == null ? 0 : idleAnim.lengthInSeconds();
 		this.shootAnimLen = shootAnim == null ? shootProcLenMS : shootAnim.lengthInSeconds();
 		this.deathAnimLen = deathAnim == null ? deathProcLenMS : deathAnim.lengthInSeconds();
 
 		// Sets the common animation parts that may/not be used by all turret models
+		this.idleAnim = idleAnim != null ?
+			idleAnim.bake(root) : null;
+
 		this.shootAnim = shootAnim != null ?
 			shootAnim.bake(root) :
 			AnimationDefinition.Builder
@@ -230,23 +298,41 @@ public abstract class BaseTurretModel<S extends BaseTurretRenderState> extends B
 				.build()
 				.bake(root);
 
+		// Special cases - Setup & Teardown animations
 		this.setupAnims = setupAnims == null || setupAnims.length == 0 ?
 			Stream.of(
 				CommonTurretAnimation.createPopUpSetupAnimation(root, height),
 				CommonTurretAnimation.createScaleUpSetupAnimation(root)
-			).toArray(KeyframeAnimation[]::new)
+			).collect(Collectors.toMap(
+				anim -> anim.bake(root),
+				AnimationDefinition::lengthInSeconds
+			))
 			: Stream.of(setupAnims).filter(Objects::nonNull)
-				.map(def -> def.bake(root))
-				.toArray(KeyframeAnimation[]::new);
+				.collect(Collectors.toMap(
+					anim -> anim.bake(root),
+					AnimationDefinition::lengthInSeconds
+				));
 
 		this.teardownAnims = teardownAnims == null || teardownAnims.length == 0 ?
 			Stream.of(
 				CommonTurretAnimation.createPopDownTeardownAnimation(root, height),
 				CommonTurretAnimation.createScaleDownAnimation(root)
-			).toArray(KeyframeAnimation[]::new)
+			).collect(Collectors.toMap(
+				anim -> anim.bake(root),
+				AnimationDefinition::lengthInSeconds
+			))
 			: Stream.of(teardownAnims).filter(Objects::nonNull)
-				.map(def -> def.bake(root))
-				.toArray(KeyframeAnimation[]::new);
+			  .collect(Collectors.toMap(
+				  anim -> anim.bake(root),
+				  AnimationDefinition::lengthInSeconds
+			  ));
+
+		// Finalize setup and teardown selection
+		this.setupAnim = (KeyframeAnimation) this.setupAnims.keySet().toArray()[getRandomAnimation(this.setupAnims, this.modelId)];
+		this.teardownAnim = (KeyframeAnimation) this.teardownAnims.keySet().toArray()[getRandomAnimation(this.teardownAnims, this.modelId)];
+
+		this.setupAnimLen = this.setupAnims.get(this.setupAnim);
+		this.teardownAnimLen = this.teardownAnims.get(this.teardownAnim);
 	}
 
 	// /////////////// //
@@ -273,23 +359,17 @@ public abstract class BaseTurretModel<S extends BaseTurretRenderState> extends B
 		super.setupAnim(state);
 
 		// Play the setup animation if the state says we are setting up
-		if (state.isSettingUp && this.setupAnims != null && this.setupAnims.length > 0) {
-			getRandomAnimation(
-				this.setupAnims,
-				state.id
-			).apply(
+		if (state.isSettingUp && this.setupAnims != null && this.setupAnims.isEmpty()) {
+			this.setupAnim.apply(
 				state.setupAnimationState,
 				state.ageInTicks
 			);
 		}
 
 		// Play the teardown animation if the state says we are tearing down
-		if (state.isTearingDown && this.teardownAnims != null && this.teardownAnims.length > 0) {
+		if (state.isTearingDown && this.teardownAnims != null && !this.teardownAnims.isEmpty()) {
 			if (state.teardownAnimationState.isStarted()) {
-				getRandomAnimation(
-					this.teardownAnims,
-					state.id
-				).apply(
+				this.teardownAnim.apply(
 					state.teardownAnimationState,
 					state.ageInTicks
 				);
@@ -362,7 +442,7 @@ public abstract class BaseTurretModel<S extends BaseTurretRenderState> extends B
 			}
 
 			// If the animation reached its end, stop the animation state.
-			if (animProgress >= this.shootAnimLen) {
+			if (animProgress >= (this.shootAnimLen * 1000)) {
 				state.shootAnimationState.stop();
 			}
 		}
@@ -383,25 +463,25 @@ public abstract class BaseTurretModel<S extends BaseTurretRenderState> extends B
 		if (this.deathAnim != null) {
 			long animProgress = state.deathAnimationState.getTimeInMillis(state.ageInTicks);
 
-			boolean shootAnimProcedureNull = this.getShootAnimProcedure(state.id) == null;
-			boolean shootAnimDurNotZero = animProgress > 0;
-			boolean shootAnimStarted = state.deathAnimationState.isStarted();
+			boolean deathAnimProcedureNull = this.getDeathAnimProcedure(state.id) == null;
+			boolean deathAnimDurNotZero = animProgress > 0;
+			boolean deathAnimStarted = state.deathAnimationState.isStarted();
 
 			// If the death anim procedure is null, the current animation progress not zero, and
 			// the animation isn't started yet, set the animation procedure to track
-			if (shootAnimProcedureNull && shootAnimDurNotZero && !shootAnimStarted) {
-				this.setShootAnimProcedure(state.id, this.getShootAnimProcedureInstance());
+			if (deathAnimProcedureNull && deathAnimDurNotZero && !deathAnimStarted) {
+				this.setDeathAnimProcedure(state.id, this.getDeathAnimProcedureInstance());
 			}
 
 			// If the death animation is started, apply states to the death animation and play
 			// the procedures in the dearg animation procedure queue.
-			if (shootAnimStarted) {
+			if (deathAnimStarted) {
 				this.deathAnim.apply(state.deathAnimationState, state.ageInTicks);
 				this.playDeathAnimProcedures(state.deathAnimationState, state);
 			}
 
 			// If the animation reached its end, stop the animation state.
-			if (animProgress >= this.deathAnimLen) {
+			if (animProgress >= (this.deathAnimLen * 1000)) {
 				state.deathAnimationState.stop();
 			}
 		}
@@ -596,18 +676,23 @@ public abstract class BaseTurretModel<S extends BaseTurretRenderState> extends B
 	}
 
 	/**
-	 * Gets a random animation from an array of provided one.
+	 * Selects an index based on the size of the provided animations map and the entity ID. This is
+	 * used to randomly select an animation from the provided map of animations, allowing for
+	 * variation in the animations played by different turret entities. The selection is based on
+	 * a seeded random generator using the least significant bits of the entity ID, ensuring that
+	 * the same entity will consistently select the same animation from the map, while different
+	 * entities may select different animations, adding visual diversity to the turret entities in
+	 * the game.
 	 *
-	 * @return A random keyframe animation.
+	 * @return The index of the selected animation from the provided map of animations.
 	 */
-	protected static KeyframeAnimation getRandomAnimation(KeyframeAnimation[] animations, UUID entityId) {
-		if (animations == null || animations.length == 0) {
-			return null;
+	protected static int getRandomAnimation(Map<KeyframeAnimation, Float> animations, UUID entityId) {
+		if (animations == null || animations.isEmpty()) {
+			return 0;
 		}
 
 		Random seededRandom = new Random(entityId.getLeastSignificantBits());
-		int index = seededRandom.nextInt(animations.length);
-		return animations[index];
+		return seededRandom.nextInt(animations.size());
 	}
 
 	// //////////////// //
