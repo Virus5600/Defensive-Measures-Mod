@@ -378,7 +378,7 @@ public abstract class TurretEntity extends Mob implements Itemable, RangedAttack
 		this.lookControl = new TurretLookControl(this);
 
 		if (this.projectile == null) {
-			this.projectile = EntityType.ARROW;
+			this.projectile = EntityTypes.ARROW;
 		}
 
 		if (!this.isHeldInPlace()) {

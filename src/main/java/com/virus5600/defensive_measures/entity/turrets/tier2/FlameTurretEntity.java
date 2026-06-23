@@ -46,6 +46,7 @@ import org.jetbrains.annotations.Nullable;
 import org.jspecify.annotations.NonNull;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -521,22 +522,25 @@ public class FlameTurretEntity extends TurretEntity implements LoopableShootingS
 			new Vec3(0, 0, 1.3125)
 		);
 
-		healables = Map.of(
+		healables = new HashMap<>(Map.of(
 			Items.COPPER_NUGGET, 1f,
 			Items.IRON_NUGGET, 1f,
 			Items.COPPER_INGOT, 5f,
 			Items.IRON_INGOT, 10f,
-			Items.COPPER_BLOCK, 50f,
 			Items.IRON_BLOCK, 100f
-		);
+		));
 
-		effectSource = Map.of(
+		effectSource = new HashMap<>(Map.of(
 			Items.IRON_BLOCK, List.<Object[]>of(
 				new Object[] { MobEffects.RESISTANCE, 60, 2 }
-			),
-			Items.COPPER_BLOCK, List.<Object[]>of(
-				new Object[] { MobEffects.RESISTANCE, 60, 1 }
 			)
-		);
+		));
+
+		Items.COPPER_BLOCK.forEach(item -> {
+			healables.put(item, 50f);
+			effectSource.put(item, List.<Object[]>of(
+				new Object[] { MobEffects.RESISTANCE, 60, 1 }
+			));
+		});
 	}
 }

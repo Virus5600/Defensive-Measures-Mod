@@ -1,6 +1,8 @@
 package com.virus5600.defensive_measures.advancement.criterion;
 
-import net.minecraft.advancements.CriteriaTriggers;
+import net.minecraft.advancements.triggers.CriterionTrigger;
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 
 import com.virus5600.defensive_measures.DefensiveMeasures;
 
@@ -17,9 +19,13 @@ import com.virus5600.defensive_measures.DefensiveMeasures;
  */
 public class ModCriterion {
 
-	public static final TurretItemRetrievedCriterion TURRET_ITEM_RETRIEVED_CRITERION = CriteriaTriggers.register("turret_item_retrieved", new TurretItemRetrievedCriterion());
+	public static final TurretItemRetrievedCriterion TURRET_ITEM_RETRIEVED_CRITERION = register("turret_item_retrieved", new TurretItemRetrievedCriterion());
 
 	public static void registerModCriterion() {
 		DefensiveMeasures.LOGGER.info("REGISTERING CRITERION FOR {}...", DefensiveMeasures.MOD_NAME);
+	}
+
+	private static <T extends CriterionTrigger<?>> T register(final String name, final T criterion) {
+		return (T)(Registry.register(BuiltInRegistries.TRIGGER_TYPES, name, criterion));
 	}
 }
