@@ -1,7 +1,5 @@
 package com.virus5600.defensive_measures.entity.projectiles;
 
-import com.virus5600.defensive_measures._helper.RegistryHelper;
-import com.virus5600.defensive_measures.registry.tag.ModEntityTypeTags;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.core.BlockPos;
@@ -37,6 +35,7 @@ import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.*;
 
+import com.virus5600.defensive_measures._helper.RegistryHelper;
 import com.virus5600.defensive_measures.entity.ExplosiveEntity;
 import com.virus5600.defensive_measures.entity.turrets.TurretEntity;
 
@@ -296,7 +295,7 @@ public abstract class TurretProjectileEntity extends Projectile {
 		}
 
 		// Handles the behavior of setting its target on fire if hit
-		boolean isEnderman = hitEntity.getType().equals(EntityType.ENDERMAN);
+		boolean isEnderman = hitEntity.getType().equals(EntityTypes.ENDERMAN);
 		int fireTime = hitEntity.getRemainingFireTicks();
 		if (this.isOnFire() && !isEnderman) {
 			hitEntity.igniteForSeconds(5F);
