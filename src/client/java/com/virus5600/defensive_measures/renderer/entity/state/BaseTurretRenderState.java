@@ -7,6 +7,8 @@ import net.minecraft.world.phys.Vec3;
 import java.util.UUID;
 
 public class BaseTurretRenderState extends LivingEntityRenderState {
+	public final AnimationState setupAnimationState = new AnimationState();
+	public final AnimationState teardownAnimationState = new AnimationState();
 	public final AnimationState idleAnimationState = new AnimationState();
 	public final AnimationState shootAnimationState = new AnimationState();
 	public final AnimationState deathAnimationState = new AnimationState();
@@ -19,4 +21,6 @@ public class BaseTurretRenderState extends LivingEntityRenderState {
 	public boolean isLockedButNotAttacking;
 	public boolean shooting;
 	public boolean dead;
+	public boolean isSettingUp;
+	public boolean isTearingDown;
 }

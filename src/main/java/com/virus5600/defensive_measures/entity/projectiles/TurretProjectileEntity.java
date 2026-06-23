@@ -76,7 +76,7 @@ public abstract class TurretProjectileEntity extends Projectile {
 
 	/** Holds the blockstate information of the block in this projectile's position. */
 	@Nullable
-	protected BlockState inBlockState;
+	protected BlockState lastState;
 	/** Holds the information about the list of entities this projectile have pierced through. */
 	@Nullable
 	protected IntOpenHashSet piercedEntities;
@@ -390,7 +390,7 @@ public abstract class TurretProjectileEntity extends Projectile {
 	@Override
 	protected void onHitBlock(BlockHitResult blockHitResult) {
 		Level world = this.level();
-		this.inBlockState = world.getBlockState(blockHitResult.getBlockPos());
+		this.lastState = world.getBlockState(blockHitResult.getBlockPos());
 		super.onHitBlock(blockHitResult);
 
 		Vec3 velocity = this.getDeltaMovement();
@@ -418,7 +418,7 @@ public abstract class TurretProjectileEntity extends Projectile {
 	@Override
 	public void playerTouch(@NonNull Player player) {
 		Level world = this.level();
-		if (world.isClientSide() && (this.isInGround() || this.isNoClip()) && this.shake <= 0) {
+		if (world.isClientSide() && (this.isInGround() || this.isNoPhysics()) && this.shake <= 0) {
 			if (this.tryPickup(player)) {
 				player.take(this, 1);
 				this.discard();
@@ -490,7 +490,7 @@ public abstract class TurretProjectileEntity extends Projectile {
 		}
 	}
 
-	protected void fall() {
+	protected void startFalling() {
 		Vec3 velocity = this.getDeltaMovement();
 
 		this.life = 0;
@@ -504,7 +504,7 @@ public abstract class TurretProjectileEntity extends Projectile {
 		);
 	}
 
-	protected void age() {
+	protected void tickDespawn() {
 		this.life++;
 
 		if (this.life >= 1200) {
@@ -565,8 +565,8 @@ public abstract class TurretProjectileEntity extends Projectile {
 			view.store("item", ItemStack.CODEC, this.stack);
 		}
 
-		if (this.inBlockState != null) {
-			view.storeNullable("inBlockState", BlockState.CODEC, this.inBlockState);
+		if (this.lastState != null) {
+			view.storeNullable("inBlockState", BlockState.CODEC, this.lastState);
 		}
 	}
 
@@ -582,7 +582,7 @@ public abstract class TurretProjectileEntity extends Projectile {
 		this.setCritical(view.getBooleanOr("crit", false));
 		this.setPierceLevel(view.getByteOr("PierceLevel", (byte) 0));
 
-		this.inBlockState = view.read("inBlockState", BlockState.CODEC)
+		this.lastState = view.read("inBlockState", BlockState.CODEC)
 			.orElse(null);
 
 		this.setStack(
@@ -832,7 +832,7 @@ public abstract class TurretProjectileEntity extends Projectile {
 		this.setProjectileFlag(NO_CLIP_FLAG, noClip);
 	}
 
-	public boolean isNoClip() {
+	public boolean isNoPhysics() {
 		return !this.level().isClientSide() ? this.noPhysics : (this.entityData.get(PROJECTILE_FLAGS) & 2) != 0;
 	}
 

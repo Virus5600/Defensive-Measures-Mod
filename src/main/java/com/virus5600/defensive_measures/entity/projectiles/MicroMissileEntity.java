@@ -29,6 +29,7 @@ import com.virus5600.defensive_measures.entity.turrets.tier2.MissileTurretEntity
 import com.virus5600.defensive_measures.particle.ModParticles;
 import com.virus5600.defensive_measures.sound.ModSoundEvents;
 
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jspecify.annotations.NonNull;
 
@@ -150,6 +151,11 @@ public class MicroMissileEntity extends ExplosiveProjectileEntity implements Loo
 		}
 
 		return this.turnRate == 0 ? defaultVal : this.turnRate;
+	}
+
+	@Override @NotNull
+	protected Vec3 trailOffset() {
+		return new Vec3(0, 0, -0.5);
 	}
 
 	/**

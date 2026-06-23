@@ -1,6 +1,7 @@
 package com.virus5600.defensive_measures.model.entity;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.animation.AnimationDefinition;
 import net.minecraft.client.model.*;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
@@ -40,7 +41,10 @@ public class AATurretModel extends BaseTurretModel<BaseTurretRenderState> {
 			root.getChild("base").getChild("horizontal_traverse").getChild("gun"),
 
 			AATurretAnimation.ANIM_AA_TURRET_SHOOT,
-			AATurretAnimation.ANIM_AA_TURRET_DEATH
+			AATurretAnimation.ANIM_AA_TURRET_DEATH,
+			new AnimationDefinition[] {AATurretAnimation.ANIM_AA_TURRET_SETUP},
+			new AnimationDefinition[] {AATurretAnimation.ANIM_AA_TURRET_TEARDOWN},
+			2f
 		);
 	}
 
@@ -48,17 +52,21 @@ public class AATurretModel extends BaseTurretModel<BaseTurretRenderState> {
 		MeshDefinition modelData = new MeshDefinition();
 		PartDefinition modelPartData = modelData.getRoot();
 
-		PartDefinition base = modelPartData.addOrReplaceChild("base", CubeListBuilder.create().texOffs(0, 0).addBox(-2.0F, -4.0F, -16.0F, 4.0F, 2.0F, 32.0F, new CubeDeformation(0.0F))
-			.texOffs(0, 61).addBox(-16.0F, -4.0F, -2.0F, 32.0F, 2.0F, 4.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, 24.0F, 0.0F));
+		PartDefinition base = modelPartData.addOrReplaceChild("base", CubeListBuilder.create(), PartPose.offset(0.0F, 24.0F, 0.0F));
 
-		base.addOrReplaceChild("base_stand", CubeListBuilder.create().texOffs(20, 91).addBox(14.0F, -2.0F, -0.5F, 1.0F, 4.0F, 1.0F, new CubeDeformation(0.0F))
-			.texOffs(16, 101).addBox(-0.5F, -2.0F, -15.0F, 1.0F, 4.0F, 1.0F, new CubeDeformation(0.0F))
-			.texOffs(86, 105).addBox(-0.5F, -2.0F, 14.0F, 1.0F, 4.0F, 1.0F, new CubeDeformation(0.0F))
-			.texOffs(86, 100).addBox(-15.0F, -2.0F, -0.5F, 1.0F, 4.0F, 1.0F, new CubeDeformation(0.0F))
-			.texOffs(108, 0).addBox(13.0F, 2.0F, -1.5F, 3.0F, 1.0F, 3.0F, new CubeDeformation(0.0F))
-			.texOffs(108, 4).addBox(-16.0F, 2.0F, -1.5F, 3.0F, 1.0F, 3.0F, new CubeDeformation(0.0F))
-			.texOffs(108, 34).addBox(-1.5F, 2.0F, 13.0F, 3.0F, 1.0F, 3.0F, new CubeDeformation(0.0F))
-			.texOffs(108, 38).addBox(-1.5F, 2.0F, -16.0F, 3.0F, 1.0F, 3.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, -3.0F, 0.0F));
+		base.addOrReplaceChild("ew_base_support", CubeListBuilder.create().texOffs(0, 61).addBox(-16.0F, -4.0F, -2.0F, 32.0F, 2.0F, 4.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, 0.0F, 0.0F));
+		base.addOrReplaceChild("ns_base_support", CubeListBuilder.create().texOffs(0, 0).addBox(-2.0F, -4.0F, -16.0F, 4.0F, 2.0F, 32.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, 0.0F, 0.0F));
+
+		PartDefinition base_stand = base.addOrReplaceChild("base_stand", CubeListBuilder.create(), PartPose.offset(0.0F, -3.0F, 0.0F));
+
+		base_stand.addOrReplaceChild("north_stand", CubeListBuilder.create().texOffs(16, 101).addBox(-0.5F, -2.0F, -0.5F, 1.0F, 4.0F, 1.0F, new CubeDeformation(0.0F))
+			.texOffs(108, 38).addBox(-1.5F, 2.0F, -1.5F, 3.0F, 1.0F, 3.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, 0.0F, -14.5F));
+		base_stand.addOrReplaceChild("east_stand", CubeListBuilder.create().texOffs(86, 100).addBox(-0.5F, -2.0F, -0.5F, 1.0F, 4.0F, 1.0F, new CubeDeformation(0.0F))
+			.texOffs(108, 4).addBox(-1.5F, 2.0F, -1.5F, 3.0F, 1.0F, 3.0F, new CubeDeformation(0.0F)), PartPose.offset(-14.5F, 0.0F, 0.0F));
+		base_stand.addOrReplaceChild("west_stand", CubeListBuilder.create().texOffs(20, 91).addBox(-0.5F, -2.0F, -0.5F, 1.0F, 4.0F, 1.0F, new CubeDeformation(0.0F))
+			.texOffs(108, 0).addBox(-1.5F, 2.0F, -1.5F, 3.0F, 1.0F, 3.0F, new CubeDeformation(0.0F)), PartPose.offset(14.5F, 0.0F, 0.0F));
+		base_stand.addOrReplaceChild("south_stand", CubeListBuilder.create().texOffs(86, 105).addBox(-0.5F, -2.0F, -0.5F, 1.0F, 4.0F, 1.0F, new CubeDeformation(0.0F))
+			.texOffs(108, 34).addBox(-1.5F, 2.0F, -1.5F, 3.0F, 1.0F, 3.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, 0.0F, 14.5F));
 
 		PartDefinition stand = base.addOrReplaceChild("stand", CubeListBuilder.create().texOffs(0, 67).addBox(-5.0F, -0.25F, -5.0F, 10.0F, 2.0F, 10.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, -4.0F, 0.0F));
 
@@ -81,6 +89,7 @@ public class AATurretModel extends BaseTurretModel<BaseTurretRenderState> {
 			.texOffs(24, 84).addBox(-3.0F, -4.0F, -9.0F, 1.0F, 1.0F, 11.0F, new CubeDeformation(0.25F))
 			.texOffs(70, 84).addBox(2.0F, -3.0F, -5.0F, 1.0F, 2.0F, 1.0F, new CubeDeformation(0.0F))
 			.texOffs(104, 20).addBox(-3.0F, -3.0F, -5.0F, 1.0F, 2.0F, 1.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, 0.0F, 0.0F));
+
 		balancer.addOrReplaceChild("springs", CubeListBuilder.create().texOffs(70, 100).addBox(2.0F, -0.5F, 0.0F, 1.0F, 1.0F, 7.0F, new CubeDeformation(0.0F))
 			.texOffs(100, 70).addBox(-3.0F, -0.5F, 0.0F, 1.0F, 1.0F, 7.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, -3.5F, 2.0F));
 
