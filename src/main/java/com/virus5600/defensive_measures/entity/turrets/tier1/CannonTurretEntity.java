@@ -152,8 +152,10 @@ public class CannonTurretEntity extends TurretEntity {
 	public void tick() {
 		super.tick();
 
+		boolean isSettingOrTearing = this.isSettingUp() || this.isTearingDown();
+
 		// Client Side
-		if (this.level().isClientSide()) {
+		if (this.level().isClientSide() && !isSettingOrTearing) {
 			this.updateAnimations();
 		}
 	}
@@ -295,6 +297,16 @@ public class CannonTurretEntity extends TurretEntity {
 					velocityModifier.x(), velocityModifier.y(), velocityModifier.z()
 				);
 		}
+	}
+
+	@Override
+	protected int getSetupAnimDuration() {
+		return (int) (2.0F * 20);
+	}
+
+	@Override
+	protected int getTeardownAnimDuration() {
+		return (int) (1.75F * 20);
 	}
 
 	// /////////////////// //

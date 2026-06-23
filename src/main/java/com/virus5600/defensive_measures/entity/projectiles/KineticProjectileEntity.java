@@ -14,6 +14,8 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
+import com.virus5600.defensive_measures._util.MathUtil;
+
 /**
  * {@code KineticProjectileEntity} is an abstract class that extends {@link TurretProjectileEntity}.
  * This class is used to represent a projectile entity that uses kinetic energy to deal damage
@@ -62,13 +64,13 @@ public abstract class KineticProjectileEntity extends TurretProjectileEntity {
 
 	@Override
 	protected void move() {
-		boolean isClipping = !this.isNoClip();
+		boolean physicsEnabled = !this.isNoPhysics();
 		Vec3 velocity = this.getDeltaMovement();
 		BlockPos blockPos = this.blockPosition();
 		BlockState blockState = this.level().getBlockState(blockPos);
 
-		// If this projectile is clipping and colliding with a block...
-		if (!blockState.isAir() && isClipping) {
+		// If this projectile has phjysics and colliding with a block...
+		if (!blockState.isAir() && physicsEnabled) {
 			VoxelShape voxelShape = blockState.getCollisionShape(this.level(), blockPos);
 
 			// ... and if the block has a collision shape (i.e. it's not a block like tall grass or
@@ -89,19 +91,19 @@ public abstract class KineticProjectileEntity extends TurretProjectileEntity {
 			}
 		}
 
-		// If this projectile is in ground and clipping it...
-		if (this.isInGround() && isClipping) {
+		// If this projectile is in ground and has it physics...
+		if (this.isInGround() && physicsEnabled) {
 			// ... and the the world isn't client...
 			if (!this.level().isClientSide()) {
 				// ... and if the block state that the projectile is in is different from the block
 				// state that it was in when it first collided with the block, and if the
 				// projectile should fall, then the projectile falls.
-				if (this.inBlockState != blockState && this.shouldFall()) {
-					this.fall();
+				if (this.lastState != blockState && this.shouldFall()) {
+					this.startFalling();
 				}
 				// ... else, this just ages.
 				else {
-					this.age();
+					this.tickDespawn();
 				}
 
 				// ... finally, set this on fire if fire ticks is more than 0.
@@ -144,29 +146,17 @@ public abstract class KineticProjectileEntity extends TurretProjectileEntity {
 				}
 			}
 
-			// ... and if this is not clipping, set the yaw to the angle of the velocity vector,
-			// and the pitch to the angle between the velocity vector and the horizontal plane.
-			float yawDeg;
-			if (!isClipping) {
-				yawDeg = (float) (Mth.atan2(-velocity.x, -velocity.z) * 180.0F / (float) Math.PI);
-			}
-			// ... otherwise, set the yaw to the angle of the velocity vector, but without negating
-			// the x and z components, since the projectile is clipping and thus, the yaw should be
-			// based on the direction of the velocity vector rather than the opposite direction.
-			else {
-				yawDeg = (float) (Mth.atan2(velocity.x, velocity.z) * 180.0F / (float) Math.PI);
-			}
+			float pitchDeg = MathUtil.radToDeg((float) (Mth.atan2(velocity.y, velocity.horizontalDistance())));
+			float yawDeg = MathUtil.radToDeg((float) (Mth.atan2(velocity.x, velocity.z)));
 
-			float pitchDeg = (float)(Mth.atan2(velocity.y, velocity.horizontalDistance()) * 180.0F / (float)Math.PI);
-
-			this.setXRot(lerpRotation(this.getXRot(), pitchDeg));
-			this.setYRot(lerpRotation(this.getYRot(), yawDeg));
+			this.setXRot(lerpRotation(this.getXRot(), -pitchDeg));
+			this.setYRot(lerpRotation(this.getYRot(), -yawDeg));
 			this.checkLeftOwner();
 
-			// ... and if it is clipping, perform a raycast to check for collisions with blocks
+			// ... and if it has physics, perform a raycast to check for collisions with blocks
 			// along the projectile's path, and if there is a collision, apply the collision logic
 			// to the hit result.
-			if (isClipping) {
+			if (physicsEnabled) {
 				BlockHitResult hitResult = this.level()
 					.clipIncludingBorder(
 						new ClipContext(
@@ -190,7 +180,7 @@ public abstract class KineticProjectileEntity extends TurretProjectileEntity {
 			// ground, apply gravity to the velocity as well, causing the projectile to slow down
 			// and fall over time.
 			this.applyDrag();
-			if (isClipping && !this.isInGround()) {
+			if (physicsEnabled && !this.isInGround()) {
 				this.applyGravity();
 			}
 		}

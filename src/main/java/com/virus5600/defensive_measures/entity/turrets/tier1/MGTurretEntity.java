@@ -231,6 +231,16 @@ public class MGTurretEntity extends TurretEntity {
 		}
 	}
 
+	@Override
+	protected int getSetupAnimDuration() {
+		return (int) (3.75F * 20);
+	}
+
+	@Override
+	protected int getTeardownAnimDuration() {
+		return (int) (3.75F * 20);
+	}
+
 	// /////////////////// //
 	// LOCAL CLASSES/ENUMS //
 	// /////////////////// //

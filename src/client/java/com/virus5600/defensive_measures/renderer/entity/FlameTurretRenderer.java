@@ -5,11 +5,12 @@ import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import com.virus5600.defensive_measures.entity.turrets.tier2.FlameTurretEntity;
 import com.virus5600.defensive_measures.model.ModEntityModels;
 import com.virus5600.defensive_measures.model.entity.FlameTurretModel;
-import com.virus5600.defensive_measures.renderer.entity.state.BaseTurretRenderState;
+import com.virus5600.defensive_measures.renderer.entity.state.FlameTurretRenderState;
+import org.jspecify.annotations.NonNull;
 
 public class FlameTurretRenderer extends BaseTurretRenderer<
 	FlameTurretEntity,
-	BaseTurretRenderState,
+	FlameTurretRenderState,
 	FlameTurretModel
 	> {
 
@@ -17,7 +18,14 @@ public class FlameTurretRenderer extends BaseTurretRenderer<
 		super(
 			ctx,
 			new FlameTurretModel(ctx.bakeLayer(ModEntityModels.FLAME_TURRET)),
-			BaseTurretRenderState::new
+			FlameTurretRenderState::new
 		);
+	}
+
+	@Override
+	public void extractRenderState(@NonNull FlameTurretEntity turret, @NonNull FlameTurretRenderState state, float tickProgress) {
+		super.extractRenderState(turret, state, tickProgress);
+
+		state.lighterPitch = turret.lighterPitch;
 	}
 }

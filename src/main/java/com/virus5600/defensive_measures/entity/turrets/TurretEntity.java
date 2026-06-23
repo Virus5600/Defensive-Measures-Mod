@@ -15,7 +15,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Mth;
-import net.minecraft.util.RandomSource;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.InteractionHand;
@@ -29,11 +28,13 @@ import net.minecraft.world.entity.EntityEvent;
 import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
+import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.control.BodyRotationControl;
 import net.minecraft.world.entity.ai.goal.LookAtPlayerGoal;
 import net.minecraft.world.entity.ai.goal.RandomLookAroundGoal;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.entity.monster.RangedAttackMob;
 import net.minecraft.world.entity.player.Player;
@@ -153,6 +154,8 @@ public abstract class TurretEntity extends Mob implements Itemable, RangedAttack
 	protected static final EntityDataAccessor<Boolean> SHOOTING;
 	protected static final EntityDataAccessor<Boolean> IS_LOCKED_BUT_NOT_ATTACKING;
 	protected static final EntityDataAccessor<Boolean> HAS_TARGET;
+	protected static final EntityDataAccessor<Boolean> SETTING_UP;
+	protected static final EntityDataAccessor<Boolean> TEARING_DOWN;
 	/**
 	 * The maximum health of this turret entity. Change this value using the {@link #setTurretMaxHealth(float)}
 	 * method before calling the {@link TurretEntity#setAttributes()} method to set the max health
@@ -178,6 +181,15 @@ public abstract class TurretEntity extends Mob implements Itemable, RangedAttack
 	// ////////////////// //
 	// INSTANCE VARIABLES //
 	// ////////////////// //
+	private int setupTicks = 0;
+	private int teardownTicks = 0;
+	/**
+	 * Identifies what item to drop on teardown. When {@code null}, the entity won't drop anything
+	 * on retrieval.
+	 *
+	 * @implNote Use {@link Itemable#tryItem(TurretEntity, Item, Level)} to populate this field's value.
+	 */
+	private @Nullable ItemEntity itemToDrop = null;
 	/**
 	 * Acts as a storage for the turret's world position, allowing the turret to snap in place.
 	 */
@@ -204,6 +216,12 @@ public abstract class TurretEntity extends Mob implements Itemable, RangedAttack
 	 */
 	private int burstDelayTimer = 0;
 	private TurretProjectileVelocity velocityData = null;
+	/**
+	 * A simple tracker for when a turret is spawned intentionally without AI. This allows the
+	 * setup animation to play without the turret trying to attack and look at targets by
+	 * having the turret without AI at first before enabling it if this field's value is {@code false}.
+	 */
+	private boolean hasAiOnSpawn = false;
 
 	/**
 	 * The sound the turret makes when it is being healed.
@@ -254,11 +272,9 @@ public abstract class TurretEntity extends Mob implements Itemable, RangedAttack
 	 * Plays the shoot sound when shooting. {@code true} by default.
 	 */
 	protected boolean playShootSound = true;
-	/**
-	 * A randomizer for this turret's instance.
-	 */
-	protected final RandomSource random;
 
+	protected final AnimationState setupAnimationState = new AnimationState();
+	protected final AnimationState teardownAnimationState = new AnimationState();
 	protected final AnimationState idleAnimationState = new AnimationState();
 	protected final AnimationState shootAnimationState = new AnimationState();
 	protected final AnimationState deathAnimationState = new AnimationState();
@@ -353,7 +369,6 @@ public abstract class TurretEntity extends Mob implements Itemable, RangedAttack
 
 		this.material = material;
 		this.itemable = itemable;
-		this.random = RandomSource.create();
 		this.lookControl = new TurretLookControl(this);
 
 		if (this.projectile == null) {
@@ -485,6 +500,11 @@ public abstract class TurretEntity extends Mob implements Itemable, RangedAttack
 			.define(SHOOTING, false)
 			.define(IS_LOCKED_BUT_NOT_ATTACKING, false)
 			.define(HAS_TARGET, false)
+
+		// Setup and Teardown related tracking
+			.define(SETTING_UP, false)
+			.define(TEARING_DOWN, false)
+
 		;
 	}
 
@@ -546,7 +566,7 @@ public abstract class TurretEntity extends Mob implements Itemable, RangedAttack
 	 * @see Attributes
 	 * @see net.minecraft.world.entity.ai.attributes.AttributeSupplier.Builder
 	 */
-	public static net.minecraft.world.entity.ai.attributes.AttributeSupplier.Builder setAttributes() {
+	public static AttributeSupplier.Builder setAttributes() {
 		return TurretEntity.createMobAttributes()
 			.add(Attributes.MAX_HEALTH, TurretEntity.getTurretMaxHealth())
 			.add(Attributes.FOLLOW_RANGE, TurretEntity.getTurretMaxRange())
@@ -566,11 +586,13 @@ public abstract class TurretEntity extends Mob implements Itemable, RangedAttack
 		this.yBodyRotO = 0.0f;
 		this.setOldPosAndRot();
 
+		this.setInvulnerable(true);
+		this.startSetupAnim();
+
 		if (spawnReason == EntitySpawnReason.SPAWN_ITEM_USE) {
 			this.setFromItem((byte) 1);
-			this.setPersistenceRequired();
 
-			return entityData;
+			return super.finalizeSpawn(world, difficulty, spawnReason, entityData);
 		}
 
 		this.setFromItem((byte) 0);
@@ -580,6 +602,39 @@ public abstract class TurretEntity extends Mob implements Itemable, RangedAttack
 	// /////////////// //
 	// PROCESS METHODS //
 	// /////////////// //
+
+	private void startSetupAnim() {
+		if (this.isSettingUp()) return;
+
+		this.hasAiOnSpawn = !this.isNoAi();
+
+		this.setNoAi(true);
+		this.setYHeadRot(180F);
+		this.setSettingUpStatus(true);
+		this.setupAnimationState.start(this.tickCount);
+	}
+
+	private void endSetupAnim() {
+		this.setNoAi(!this.hasAiOnSpawn);
+	}
+
+	private void startTeardownAnim() {
+		this.hasAiOnSpawn = !this.isNoAi();
+
+		this.setNoAi(true);
+		this.lerpHeadTo(180F, 5);
+		this.setTearingDownStatus(true);
+	}
+
+	private void endTeardownAnim() {
+		if (this.itemToDrop != null) {
+			this.level().addFreshEntity(this.itemToDrop);
+			this.itemToDrop = null;
+		}
+
+		this.setNoAi(!this.hasAiOnSpawn);
+		this.discard();
+	}
 
 	/**
 	 * An optional overridable method that is called when a projectile is created by this turret.
@@ -713,13 +768,24 @@ public abstract class TurretEntity extends Mob implements Itemable, RangedAttack
 		boolean isSuccess = false;
 
 		// Turret Remover Interaction
-		if (item.getItem().equals(ModItems.TURRET_REMOVER)
+		if (!this.level().isClientSide() && item.getItem().equals(ModItems.TURRET_REMOVER)
 			&& !this.level().isClientSide()) {
-			if (isSurvival) {
-				item.hurtWithoutBreaking(1, player);
+			if (this.isTearingDown()) {
+				return InteractionResult.PASS;
 			}
 
-			return Itemable.tryItem(player, hand, this, item.getItem(), this.itemable)
+			if (isSurvival) {
+				item.hurtAndBreak(1, player, hand.asEquipmentSlot());
+			}
+
+			this.startTeardownAnim();
+
+			// Only drop when the player is in survival, or if in creative, if sneaking.
+			if (isSurvival || (player.isCreative() && player.isShiftKeyDown())) {
+				this.itemToDrop = Itemable.tryItem(this, this.itemable, this.level());
+			}
+
+			return Itemable.tryItem(player, hand, this, item.getItem(), this.itemable, false, false)
 				.orElse(super.mobInteract(player, hand));
 		}
 
@@ -872,6 +938,21 @@ public abstract class TurretEntity extends Mob implements Itemable, RangedAttack
 		}
 		// SERVER SIDE
 		else {
+			if (this.isSettingUp()) {
+				this.setupTicks++;
+				if (this.setupTicks >= this.getSetupAnimDuration()) {
+					this.setSettingUpStatus(false);
+				}
+			}
+
+			boolean in180Deg = Math.abs(Mth.wrapDegrees(this.getYHeadRot())) < 181F && Math.abs(Mth.wrapDegrees(this.getYHeadRot())) > 179F;
+			if (this.isTearingDown() && in180Deg) {
+				this.teardownTicks++;
+				if (this.teardownTicks >= this.getTeardownAnimDuration()) {
+					this.setTearingDownStatus(false);
+				}
+			}
+
 			// Handles the "locked but not attacking" data.
 			this.updateTrackedLockedButNotAttacking();
 
@@ -894,6 +975,7 @@ public abstract class TurretEntity extends Mob implements Itemable, RangedAttack
 				this.tryAttachOrFall();
 				this.setPos(newPos);
 				this.level().gameEvent(this, GameEvent.TELEPORT, newPos);
+				this.setInvulnerable(false);
 
 				if (this.getDeltaMovement() == Vec3.ZERO && this.level().isClientSide() && !this.isPassenger()) {
 					this.xOld = this.getX();
@@ -946,19 +1028,32 @@ public abstract class TurretEntity extends Mob implements Itemable, RangedAttack
 				}
 			}
 
+			boolean isSettingOrTearing = this.isSettingUp() || this.isTearingDown();
+
 			// Using the idle pitch
-			if (this.getIdlePitch().isPresent()) {
+			if (!isSettingOrTearing) {
 				this.setTrackedLockedButNotAttacking(this.getTarget() != null);
 
-				float idlePitch = this.getIdlePitch().get();
-
 				if (this.getTarget() == null) {
+					float idlePitch = this.getIdlePitch().orElse(this.getXRot());
+
 					this.setXRot(idlePitch);
 					this.setTrackedPitch(idlePitch);
+
+					if (this.velocityData != null) {
+						this.velocityData = null;
+					}
+				}
+				else {
+					float shootingPitch = this.getShootingPitch().orElse(this.getXRot());
+
+					this.setXRot(shootingPitch);
+					this.setTrackedPitch(shootingPitch);
 				}
 			}
-
-			this.setTrackedPitch(this.getXRot());
+			else {
+				this.setTrackedPitch(this.getXRot());
+			}
 		}
 	}
 
@@ -1036,6 +1131,10 @@ public abstract class TurretEntity extends Mob implements Itemable, RangedAttack
 			return true;
 
 		return !(bState.is(Blocks.MOVING_PISTON) && pos.equals(this.blockPosition()));
+	}
+
+	public boolean removeWhenFarAway(final double distSqr) {
+		return false;
 	}
 
 	/**
@@ -1170,6 +1269,30 @@ public abstract class TurretEntity extends Mob implements Itemable, RangedAttack
 	// //////////// //
 	// TRACKED DATA //
 	// //////////// //
+
+	public boolean isSettingUp() {
+		return this.entityData.get(SETTING_UP);
+	}
+
+	public final void setSettingUpStatus(boolean status) {
+		this.entityData.set(SETTING_UP, status);
+
+		if (!status) {
+			this.endSetupAnim();
+		}
+	}
+
+	public boolean isTearingDown() {
+		return this.entityData.get(TEARING_DOWN);
+	}
+
+	public final void setTearingDownStatus(boolean status) {
+		this.entityData.set(TEARING_DOWN, status);
+
+		if (!status) {
+			this.endTeardownAnim();
+		}
+	}
 
 	public int getTrackedLevel() {
 		return Math.clamp(this.entityData.get(LEVEL), 1, this.getMaxLevel());
@@ -1729,29 +1852,22 @@ public abstract class TurretEntity extends Mob implements Itemable, RangedAttack
 		this.shoot(velocityData);
 	}
 
-	/**
-	 * Retrieves the idle animation state of this turret.
-	 *
-	 * @return {@code AnimationState} The idle animation state of this turret.
-	 */
+	public AnimationState getSetupAnimationState() {
+		return this.setupAnimationState;
+	}
+
+	public AnimationState getTeardownAnimationState() {
+		return this.teardownAnimationState;
+	}
+
 	public AnimationState getIdleAnimationState() {
 		return this.idleAnimationState;
 	}
 
-	/**
-	 * Retrieves the shoot animation state of this turret.
-	 *
-	 * @return {@code AnimationState} The shoot animation state of this turret.
-	 */
 	public AnimationState getShootAnimationState() {
 		return this.shootAnimationState;
 	}
 
-	/**
-	 * Retrieves the death animation state of this turret.
-	 *
-	 * @return {@code AnimationState} The death animation state of this turret.
-	 */
 	public AnimationState getDeathAnimationState() {
 		return this.deathAnimationState;
 	}
@@ -1832,6 +1948,32 @@ public abstract class TurretEntity extends Mob implements Itemable, RangedAttack
 
 	// OVERRIDABLES //
 
+	/**
+	 * Defines how long the turret's setup animation is. This is defined by simply multiplying
+	 * the setup animation duration in seconds by twenty ({@code animDur * 20}).
+	 *
+	 * @return {@code int} The duration of the turret's setup animation in ticks.
+	 *
+	 * @apiNote Must be manually updated whenever the setup animation duration on the client side is updated
+	 * @implNote The default duration is 2.5 seconds (50 ticks) as it is also the duration of the fallback animation when none is defined for this turret. If multiple animations with different duration are present, use the longest duration as this method's return value.
+	 */
+	protected int getSetupAnimDuration() {
+		return (int) (2.5F * 20);
+	}
+
+	/**
+	 * Defines how long the turret's teardown animation is. This is defined by simply multiplying
+	 * the teardown animation duration in seconds by twenty ({@code animDur * 20}).
+	 *
+	 * @return {@code int} The duration of the turret's teardown animation in ticks.
+	 *
+	 * @apiNote Must be manually updated whenever the teardown animation duration on the client side is updated
+	 * @implNote The default duration is 2.5 seconds (50 ticks) as it is also the duration of the fallback animation when none is defined for this turret. If multiple animations with different duration are present, use the longest duration as this method's return value.
+	 */
+	protected int getTeardownAnimDuration() {
+		return (int) (2.5F * 20);
+	}
+
 	protected double getTargetHeightScale() {
 		return 1.0 / 3.0;
 	}
@@ -1907,23 +2049,36 @@ public abstract class TurretEntity extends Mob implements Itemable, RangedAttack
 	protected void updateAnimations() {
 		this.idleAnimationState.startIfStopped(this.tickCount);
 
-		if (this.isDeadOrDying()) {
-			this.deathAnimationState.startIfStopped(this.tickCount);
+		boolean in180Deg = Math.abs(this.getYHeadRot()) < 181F && Math.abs(this.getYHeadRot()) > 179F;
+
+		this.setupAnimationState.animateWhen(this.isSettingUp(), this.tickCount);
+		this.teardownAnimationState.animateWhen(this.isTearingDown() && in180Deg, this.tickCount);
+
+		if (this.isTearingDown()) {
+			return;
 		}
 
-		float elapsedTime = this.shootAnimationState.getTimeInMillis(this.tickCount);
-		float reload = (this.getTotalAttCooldown() / 50f) * 1000;
+		boolean isSettingOrTearing = this.isSettingUp() || this.isTearingDown();
 
-		boolean isAnimPlaying = this.shootAnimationState.isStarted();
-		boolean isAttacking = elapsedTime >= reload;
-		boolean isShooting = this.getTrackedShooting();
+		if (!isSettingOrTearing) {
+			if (this.isDeadOrDying()) {
+				this.deathAnimationState.startIfStopped(this.tickCount);
+			}
 
-		if (isShooting) {
-			this.shootAnimationState.startIfStopped(this.tickCount);
-		}
+			float elapsedTime = this.shootAnimationState.getTimeInMillis(this.tickCount);
+			float reload = (this.getTotalAttCooldown() / 50f) * 1000;
 
-		if (!isShooting && isAnimPlaying && isAttacking && elapsedTime > 1000) {
-			this.shootAnimationState.stop();
+			boolean isAnimPlaying = this.shootAnimationState.isStarted();
+			boolean isAttacking = elapsedTime >= reload;
+			boolean isShooting = this.getTrackedShooting();
+
+			if (isShooting) {
+				this.shootAnimationState.startIfStopped(this.tickCount);
+			}
+
+			if (!isShooting && isAnimPlaying && isAttacking && elapsedTime > 1000) {
+				this.shootAnimationState.stop();
+			}
 		}
 	}
 
@@ -2033,16 +2188,20 @@ public abstract class TurretEntity extends Mob implements Itemable, RangedAttack
 			this.setProjectileVelocity(projectile, velocityData);
 
 			// Set projectile direction
+			this.velocityData = velocityData;
 			Vec3 dir = velocityData.getDeltaMovement().normalize();
-			float pitch = MathUtil.radToDeg((float) Mth.atan2(dir.y(), Math.sqrt(dir.x() * dir.x() + dir.z() * dir.z())));
-			float yaw = MathUtil.radToDeg((float) Mth.atan2(dir.x(), dir.z()));
+			float yaw = -MathUtil.radToDeg((float) Mth.atan2(dir.x(), dir.z()));
+			float pitch = this.getShootingPitch()
+				.orElse(MathUtil.radToDeg(
+					(float) Mth.atan2(
+						dir.y(),
+						dir.horizontalDistance()
+					)
+				)
+			);
 
-			pitch *= projectile instanceof ExplosiveProjectileEntity ? -1 : 1;
-			yaw *= projectile instanceof ExplosiveProjectileEntity ? -1 : 1;
-			yaw += projectile instanceof ExplosiveProjectileEntity ? 180 : 0;
-
-			projectile.setYRot(yaw);
 			projectile.setXRot(pitch);
+			projectile.setYRot(yaw);
 			projectile.setYHeadRot(yaw);
 			projectile.setYBodyRot(yaw);
 
@@ -2123,6 +2282,28 @@ public abstract class TurretEntity extends Mob implements Itemable, RangedAttack
 	 */
 	public Optional<Float> getIdlePitch() {
 		return Optional.empty();
+	}
+
+	public Optional<Float> getShootingPitch() {
+		if (this.velocityData == null) {
+			return Optional.empty();
+		}
+
+		Vec3 dir = this.velocityData.getDeltaMovement().normalize();
+		float shootingPitch = MathUtil.radToDeg(
+			(float) Mth.atan2(
+				dir.y(),
+				dir.horizontalDistance()
+			)
+		);
+
+		shootingPitch = Math.clamp(
+			shootingPitch,
+			this.getMinHeadXRot(),
+			this.getMaxHeadXRot()
+		);
+
+		return Optional.of(-shootingPitch);
 	}
 
 	// ///////////// //
@@ -2671,5 +2852,8 @@ public abstract class TurretEntity extends Mob implements Itemable, RangedAttack
 		BURST_PROJECTILE_FIRED = SynchedEntityData.defineId(TurretEntity.class, EntityDataSerializers.INT);
 		BURST_DELAY = SynchedEntityData.defineId(TurretEntity.class, EntityDataSerializers.INT);
 		SHOOTING = SynchedEntityData.defineId(TurretEntity.class, EntityDataSerializers.BOOLEAN);
+
+		SETTING_UP = SynchedEntityData.defineId(TurretEntity.class, EntityDataSerializers.BOOLEAN);
+		TEARING_DOWN = SynchedEntityData.defineId(TurretEntity.class, EntityDataSerializers.BOOLEAN);
 	}
 }

@@ -230,6 +230,20 @@ public class BallistaTurretEntity extends TurretEntity {
 		return TOTAL_ATT_COOLDOWN;
 	}
 
+	// //////////// //
+	// OVERRIDABLES //
+	// //////////// //
+
+	@Override
+	protected int getSetupAnimDuration() {
+		return (int) (2.0F * 20);
+	}
+
+	@Override
+	protected int getTeardownAnimDuration() {
+		return (int) (2.0F * 20);
+	}
+
 	// /////////////////// //
 	// LOCAL CLASSES/ENUMS //
 	// /////////////////// //
