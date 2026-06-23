@@ -67,7 +67,6 @@ public abstract class BaseRecipeBookScreen<T extends RecipeBookMenu> extends Abs
 
 		graphics.nextStratum();
 		this.extractCarriedItem(graphics, mouseX, mouseY);
-		this.extractSnapbackItem(graphics);
 		this.extractTooltip(graphics, mouseX, mouseY);
 		this.getRecipeBook().extractTooltip(graphics, mouseX, mouseY, this.hoveredSlot);
 	}

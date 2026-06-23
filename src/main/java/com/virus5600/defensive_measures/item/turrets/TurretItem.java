@@ -5,6 +5,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -47,6 +48,7 @@ import org.jspecify.annotations.NonNull;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Consumer;
 
 /**
@@ -182,9 +184,18 @@ public abstract class TurretItem extends Item {
 
 			if (nbtCompound != null && nbtCompound.contains("id")) {
 				String id = nbtCompound.getString("id")
-					.orElse(null);
+					.orElse("");
 
-				return id != null ? EntityType.byString(id).orElse(this.type) : this.type;
+				Optional<EntityType<?>> entityType = (
+					id.isEmpty() ?
+						Optional.of(this.type)
+						: Optional.of(
+							BuiltInRegistries.ENTITY_TYPE
+							.getValue(Identifier.parse(id))
+					)
+				);
+
+				return entityType.orElse(this.type);
 			}
 		}
 

@@ -176,7 +176,7 @@ public class BaseRecipeBookPage {
 	}
 
 	public void extractTooltip(GuiGraphicsExtractor context, int x, int y) {
-		if (this.client.screen != null &&
+		if (this.client.gui.screen() != null &&
 			this.hoveredButton != null &&
 			!this.altWidget.isVisible()) {
 			ItemStack itemStack = this.hoveredButton.getDisplayStack();
