@@ -1,5 +1,6 @@
 package com.virus5600.defensive_measures.model.entity;
 
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.animation.AnimationDefinition;
 import net.minecraft.client.animation.KeyframeAnimation;
 import net.minecraft.client.model.geom.ModelPart;
@@ -10,9 +11,11 @@ import net.minecraft.world.entity.AnimationState;
 import com.virus5600.defensive_measures._util.MathUtil;
 import com.virus5600.defensive_measures.animations.Keyframe;
 import com.virus5600.defensive_measures.animations.entity.CommonTurretAnimation;
+import com.virus5600.defensive_measures.animations.entity.CommonTurretAnimation.ANIMATIONS;
 import com.virus5600.defensive_measures.entity.turrets.TurretEntity;
 import com.virus5600.defensive_measures.model.BaseModel;
 import com.virus5600.defensive_measures.model.entity.tier1.CannonTurretModel;
+import com.virus5600.defensive_measures.network.serverbound.entity.StopAnimationPacket;
 import com.virus5600.defensive_measures.renderer.entity.state.BaseTurretRenderState;
 
 import org.jetbrains.annotations.NotNull;
@@ -48,6 +51,11 @@ import java.util.stream.Stream;
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
  */
 public abstract class BaseTurretModel<S extends BaseTurretRenderState> extends BaseModel<S> {
+	/**
+	 * The delegated value wherein an animation is considered not playing.
+	 */
+	protected static final long ANIM_STOP_TIME = Integer.MIN_VALUE;
+
 	private final Map<UUID, Queue<? extends Keyframe>> shootAnimProcedure = new HashMap<>();
 	private final Map<UUID, Queue<? extends Keyframe>> deathAnimProcedure = new HashMap<>();
 
@@ -358,23 +366,9 @@ public abstract class BaseTurretModel<S extends BaseTurretRenderState> extends B
 	public void setupAnim(@NonNull S state) {
 		super.setupAnim(state);
 
-		// Play the setup animation if the state says we are setting up
-		if (state.isSettingUp && this.setupAnims != null && this.setupAnims.isEmpty()) {
-			this.setupAnim.apply(
-				state.setupAnimationState,
-				state.ageInTicks
-			);
-		}
-
-		// Play the teardown animation if the state says we are tearing down
-		if (state.isTearingDown && this.teardownAnims != null && !this.teardownAnims.isEmpty()) {
-			if (state.teardownAnimationState.isStarted()) {
-				this.teardownAnim.apply(
-					state.teardownAnimationState,
-					state.ageInTicks
-				);
-			}
-		}
+		// Play thesetup & teardown animations
+		this.handleSetupAnimation(state);
+		this.handleTeardownAnimation(state);
 
 		// HEAD ANGLE HANDLING
 		float headYaw = state.yRot + state.bodyRot + 180;
@@ -415,6 +409,58 @@ public abstract class BaseTurretModel<S extends BaseTurretRenderState> extends B
 	}
 
 	/**
+	 * Handles the setup animation of the turret.
+	 *
+	 * @param state The current state of the turret.
+	 */
+	protected final void handleSetupAnimation(@NonNull S state) {
+		if (state.isSettingUp && this.setupAnims != null && !this.setupAnims.isEmpty()) {
+			long animProgress = state.setupAnimationState.getTimeInMillis(state.ageInTicks);
+			long notPlayingTime = getAnimInactiveTime(state.ageInTicks);
+
+			boolean setupAnimStarted = state.setupAnimationState.isStarted() && animProgress != notPlayingTime;
+
+			if (setupAnimStarted) {
+				this.setupAnim.apply(
+					state.setupAnimationState,
+					state.ageInTicks
+				);
+			}
+
+			if (animProgress >= (this.setupAnimLen * 1000) && setupAnimStarted) {
+				state.setupAnimationState.stop();
+				this.stopServerSideAnimation(state.id, ANIMATIONS.SETUP);
+			}
+		}
+	}
+
+	/**
+	 * Handles the teardown animation of the turret.
+	 *
+	 * @param state The current state of the turret.
+	 */
+	protected final void handleTeardownAnimation(@NonNull S state) {
+		if (state.isTearingDown && this.teardownAnims != null && !this.teardownAnims.isEmpty()) {
+			long animProgress = state.teardownAnimationState.getTimeInMillis(state.ageInTicks);
+			long notPlayingTime = getAnimInactiveTime(state.ageInTicks);
+
+			boolean teardownAnimStarted = state.teardownAnimationState.isStarted() && animProgress != notPlayingTime;
+
+			if (teardownAnimStarted) {
+				this.teardownAnim.apply(
+					state.teardownAnimationState,
+					state.ageInTicks
+				);
+			}
+
+			if (animProgress >= (this.teardownAnimLen * 1000) && teardownAnimStarted) {
+				state.teardownAnimationState.stop();
+				this.stopServerSideAnimation(state.id, ANIMATIONS.TEARDOWN);
+			}
+		}
+	}
+
+	/**
 	 * Handles the shooting animation for the turret.
 	 *
 	 * @param state The current state of the turret.
@@ -423,10 +469,11 @@ public abstract class BaseTurretModel<S extends BaseTurretRenderState> extends B
 		// If there's a shoot animation...
 		if (this.shootAnim != null) {
 			long animProgress = state.shootAnimationState.getTimeInMillis(state.ageInTicks);
+			long notPlayingTime = getAnimInactiveTime(state.ageInTicks);
 
 			boolean shootAnimProcedureNull = this.getShootAnimProcedure(state.id) == null;
 			boolean shootAnimDurNotZero = animProgress > 0;
-			boolean shootAnimStarted = state.shootAnimationState.isStarted();
+			boolean shootAnimStarted = state.shootAnimationState.isStarted() && animProgress != notPlayingTime;
 
 			// If the shooting anim procedure is null, the current animation progress not zero, and
 			// the animation isn't started yet, set the animation procedure to track
@@ -442,11 +489,12 @@ public abstract class BaseTurretModel<S extends BaseTurretRenderState> extends B
 			}
 
 			// If the animation reached its end, stop the animation state.
-			if (animProgress >= (this.shootAnimLen * 1000)) {
+			if (animProgress >= (this.shootAnimLen * 1000) && shootAnimStarted) {
 				state.shootAnimationState.stop();
+				this.stopServerSideAnimation(state.id, ANIMATIONS.SHOOT);
 			}
 		}
-		// Though, if there're none, we can't play the procedure as well so forcefully set this
+		// Though, if there are none, we can't play the procedure as well so forcefully set this
 		// entity's procedure to none
 		else {
 			this.setShootAnimProcedure(state.id, null);
@@ -462,10 +510,11 @@ public abstract class BaseTurretModel<S extends BaseTurretRenderState> extends B
 		// If there's a death animation...
 		if (this.deathAnim != null) {
 			long animProgress = state.deathAnimationState.getTimeInMillis(state.ageInTicks);
+			long notPlayingTime = getAnimInactiveTime(state.ageInTicks);
 
 			boolean deathAnimProcedureNull = this.getDeathAnimProcedure(state.id) == null;
 			boolean deathAnimDurNotZero = animProgress > 0;
-			boolean deathAnimStarted = state.deathAnimationState.isStarted();
+			boolean deathAnimStarted = state.deathAnimationState.isStarted() && animProgress != notPlayingTime;
 
 			// If the death anim procedure is null, the current animation progress not zero, and
 			// the animation isn't started yet, set the animation procedure to track
@@ -474,22 +523,32 @@ public abstract class BaseTurretModel<S extends BaseTurretRenderState> extends B
 			}
 
 			// If the death animation is started, apply states to the death animation and play
-			// the procedures in the dearg animation procedure queue.
+			// the procedures in the death animation procedure queue.
 			if (deathAnimStarted) {
 				this.deathAnim.apply(state.deathAnimationState, state.ageInTicks);
 				this.playDeathAnimProcedures(state.deathAnimationState, state);
 			}
 
 			// If the animation reached its end, stop the animation state.
-			if (animProgress >= (this.deathAnimLen * 1000)) {
+			if (animProgress >= (this.deathAnimLen * 1000) && deathAnimStarted) {
 				state.deathAnimationState.stop();
+				this.stopServerSideAnimation(state.id, ANIMATIONS.DEATH);
 			}
 		}
-		// Though, if there're none, we can't play the procedure as well so forcefully set this
+		// Though, if there are none, we can't play the procedure as well so forcefully set this
 		// entity's procedure to none
 		else {
 			this.setDeathAnimProcedure(state.id, null);
 		}
+	}
+
+	protected final void stopServerSideAnimation(UUID id, CommonTurretAnimation.ANIMATIONS animation) {
+		ClientPlayNetworking.send(
+			new StopAnimationPacket(
+				id,
+				animation.name()
+			)
+		);
 	}
 
 	// ///////////////// //
@@ -693,6 +752,11 @@ public abstract class BaseTurretModel<S extends BaseTurretRenderState> extends B
 
 		Random seededRandom = new Random(entityId.getLeastSignificantBits());
 		return seededRandom.nextInt(animations.size());
+	}
+
+	protected static long getAnimInactiveTime(final float ageInTicks) {
+		float timeInTicks = ageInTicks - (float) ANIM_STOP_TIME;
+		return (long)(timeInTicks * 50.0F);
 	}
 
 	// //////////////// //

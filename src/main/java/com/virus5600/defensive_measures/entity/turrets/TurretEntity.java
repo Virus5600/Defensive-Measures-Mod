@@ -646,17 +646,20 @@ public abstract class TurretEntity extends Mob implements Itemable, RangedAttack
 	}
 
 	private void endTeardownAnim() {
-		this.endTeardownAnim(true);
+		this.endTeardownAnim(true, true);
 	}
 
-	private void endTeardownAnim(boolean dropItem) {
+	private void endTeardownAnim(boolean dropItem, boolean discard) {
 		if (this.itemToDrop != null && dropItem) {
 			this.level().addFreshEntity(this.itemToDrop);
 			this.itemToDrop = null;
 		}
 
 		this.setNoAi(!this.hasAiOnSpawn);
-		this.discard();
+
+		if (discard) {
+			this.discard();
+		}
 	}
 
 	/**
@@ -1145,10 +1148,13 @@ public abstract class TurretEntity extends Mob implements Itemable, RangedAttack
 					this.idleAnimationState.stop();
 				}
 				case "setup" -> {
-					this.endSetupAnim();
+					this.setupAnimationState.stop();
+					this.setSettingUpStatus(false);
 				}
 				case "teardown" -> {
-					this.endTeardownAnim(false);
+					this.teardownAnimationState.stop();
+					this.setTearingDownStatus(false, true);
+					this.endTeardownAnim(false, false);
 				}
 			}
 		}
@@ -1168,6 +1174,7 @@ public abstract class TurretEntity extends Mob implements Itemable, RangedAttack
 				}
 				case "teardown" -> {
 					this.startTeardownAnim(false);
+					this.teardownAnimationState.start(this.tickCount);
 				}
 			}
 		}
@@ -1369,9 +1376,19 @@ public abstract class TurretEntity extends Mob implements Itemable, RangedAttack
 	}
 
 	public final void setTearingDownStatus(boolean status) {
+		this.setTearingDownStatus(status, false);
+	}
+
+	/**
+	 * Sets the "TEARING_DOWN" flag of the turret.
+	 *
+	 * @param status     The status to set for the "TEARING_DOWN" flag.
+	 * @param manualCall Indicates whether this method will manually call the end method of the teardown animation.
+	 */
+	public final void setTearingDownStatus(boolean status, boolean manualCall) {
 		this.entityData.set(TEARING_DOWN, status);
 
-		if (!status) {
+		if (!status && !manualCall) {
 			this.endTeardownAnim();
 		}
 	}

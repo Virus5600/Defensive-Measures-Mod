@@ -69,4 +69,28 @@ public class CommonTurretAnimation {
 			))
 			.build();
 	}
+
+	public enum ANIMATIONS {
+		SETUP("setup"),
+		TEARDOWN("teardown"),
+
+		IDLE("idle"),
+		SHOOT("shoot"),
+		DEATH("death")
+		;
+
+		private final String name;
+
+		ANIMATIONS(String name) {
+			this.name = name;
+		}
+
+		public String getName() {
+			return this.name;
+		}
+
+		public String toString() {
+			return "Animations[name=\"" + this.name + "\"]";
+		}
+	}
 }
