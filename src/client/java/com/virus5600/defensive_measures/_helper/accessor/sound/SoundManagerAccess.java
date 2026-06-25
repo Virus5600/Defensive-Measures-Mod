@@ -4,7 +4,7 @@ import com.mojang.blaze3d.audio.Channel;
 import net.minecraft.client.sounds.SoundManager;
 import net.minecraft.client.sounds.SoundEngine;
 
-import com.virus5600.defensive_measures.mixin.sound.SoundManagerMixin;
+import com.virus5600.defensive_measures.mixins.sound.SoundManagerMixin;
 
 /**
  * Exposes the sound system from the {@link SoundManager} class, allowing access to the

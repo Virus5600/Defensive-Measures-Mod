@@ -19,6 +19,7 @@
 
 	"environment": "*",
 	"mixins": [
+		"dm.mixins.json",
 		{
 			"config": "dm.client.mixins.json",
 			"environment": "client"
@@ -39,6 +40,7 @@
 		"fabric-api": ">=0.153.0+26.2"
 	},
 	"custom": {
+		"loom:classtweaker": "dm.classtweaker",
 		"modmenu": {
 			"links": {
 				"curseforge": "https://www.curseforge.com/minecraft/mc-mods/defensive-measures",

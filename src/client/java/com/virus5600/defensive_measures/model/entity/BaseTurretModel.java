@@ -11,7 +11,7 @@ import net.minecraft.world.entity.AnimationState;
 import com.virus5600.defensive_measures._util.MathUtil;
 import com.virus5600.defensive_measures.animations.Keyframe;
 import com.virus5600.defensive_measures.animations.entity.CommonTurretAnimation;
-import com.virus5600.defensive_measures.animations.entity.CommonTurretAnimation.ANIMATIONS;
+import com.virus5600.defensive_measures.entity.CommonTurretAnimations;
 import com.virus5600.defensive_measures.entity.turrets.TurretEntity;
 import com.virus5600.defensive_measures.model.BaseModel;
 import com.virus5600.defensive_measures.model.entity.tier1.CannonTurretModel;
@@ -429,7 +429,7 @@ public abstract class BaseTurretModel<S extends BaseTurretRenderState> extends B
 
 			if (animProgress >= (this.setupAnimLen * 1000) && setupAnimStarted) {
 				state.setupAnimationState.stop();
-				this.stopServerSideAnimation(state.id, ANIMATIONS.SETUP);
+				this.stopServerSideAnimation(state.id, CommonTurretAnimations.SETUP);
 			}
 		}
 	}
@@ -455,7 +455,7 @@ public abstract class BaseTurretModel<S extends BaseTurretRenderState> extends B
 
 			if (animProgress >= (this.teardownAnimLen * 1000) && teardownAnimStarted) {
 				state.teardownAnimationState.stop();
-				this.stopServerSideAnimation(state.id, ANIMATIONS.TEARDOWN);
+				this.stopServerSideAnimation(state.id, CommonTurretAnimations.TEARDOWN);
 			}
 		}
 	}
@@ -491,7 +491,7 @@ public abstract class BaseTurretModel<S extends BaseTurretRenderState> extends B
 			// If the animation reached its end, stop the animation state.
 			if (animProgress >= (this.shootAnimLen * 1000) && shootAnimStarted) {
 				state.shootAnimationState.stop();
-				this.stopServerSideAnimation(state.id, ANIMATIONS.SHOOT);
+				this.stopServerSideAnimation(state.id, CommonTurretAnimations.SHOOT);
 			}
 		}
 		// Though, if there are none, we can't play the procedure as well so forcefully set this
@@ -532,7 +532,7 @@ public abstract class BaseTurretModel<S extends BaseTurretRenderState> extends B
 			// If the animation reached its end, stop the animation state.
 			if (animProgress >= (this.deathAnimLen * 1000) && deathAnimStarted) {
 				state.deathAnimationState.stop();
-				this.stopServerSideAnimation(state.id, ANIMATIONS.DEATH);
+				this.stopServerSideAnimation(state.id, CommonTurretAnimations.DEATH);
 			}
 		}
 		// Though, if there are none, we can't play the procedure as well so forcefully set this
@@ -542,7 +542,7 @@ public abstract class BaseTurretModel<S extends BaseTurretRenderState> extends B
 		}
 	}
 
-	protected final void stopServerSideAnimation(UUID id, CommonTurretAnimation.ANIMATIONS animation) {
+	protected final void stopServerSideAnimation(UUID id, CommonTurretAnimations animation) {
 		ClientPlayNetworking.send(
 			new StopAnimationPacket(
 				id,

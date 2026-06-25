@@ -1,4 +1,4 @@
-package com.virus5600.defensive_measures.mixin.sound;
+package com.virus5600.defensive_measures.mixins.sound;
 
 import net.minecraft.client.sounds.SoundEngine;
 import net.minecraft.client.sounds.SoundManager;

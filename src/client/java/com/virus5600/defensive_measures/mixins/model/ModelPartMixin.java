@@ -1,4 +1,4 @@
-package com.virus5600.defensive_measures.mixin.model;
+package com.virus5600.defensive_measures.mixins.model;
 
 import net.minecraft.client.model.geom.ModelPart;
 

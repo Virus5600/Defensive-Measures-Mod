@@ -10,6 +10,7 @@ import com.virus5600.defensive_measures._helper.RegistryHelper;
  * Derives from the {@link RecipeBookCategories}
  */
 public class ModRecipeBookCategories {
+	public static final RecipeBookCategory DM_TURRETS = RegistryHelper.registerRecipeBookCat("dm_turrets");
 	public static final RecipeBookCategory TAS_TURRETS = RegistryHelper.registerRecipeBookCat("tas_turrets");
 	public static final RecipeBookCategory TAS_PARTS = RegistryHelper.registerRecipeBookCat("tas_parts");
 	public static final RecipeBookCategory TAS_TRAPS = RegistryHelper.registerRecipeBookCat("tas_traps");
