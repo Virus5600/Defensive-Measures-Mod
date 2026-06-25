@@ -156,6 +156,7 @@ public abstract class TurretEntity extends Mob implements Itemable, RangedAttack
 	protected static final EntityDataAccessor<Boolean> HAS_TARGET;
 	protected static final EntityDataAccessor<Boolean> SETTING_UP;
 	protected static final EntityDataAccessor<Boolean> TEARING_DOWN;
+	protected static final EntityDataAccessor<Boolean> PLAY_ANIM_CALLED;
 	/**
 	 * The maximum health of this turret entity. Change this value using the {@link #setTurretMaxHealth(float)}
 	 * method before calling the {@link TurretEntity#setAttributes()} method to set the max health
@@ -510,7 +511,7 @@ public abstract class TurretEntity extends Mob implements Itemable, RangedAttack
 		// Setup and Teardown related tracking
 			.define(SETTING_UP, false)
 			.define(TEARING_DOWN, false)
-
+			.define(PLAY_ANIM_CALLED, false)
 		;
 	}
 
@@ -611,11 +612,11 @@ public abstract class TurretEntity extends Mob implements Itemable, RangedAttack
 	// /////////////// //
 
 	private void startSetupAnim() {
-		this.startSetupAnim(false, true);
+		this.startSetupAnim(true);
 	}
 
-	private void startSetupAnim(boolean override, boolean disableAi) {
-		if (this.isSettingUp() && !override) return;
+	private void startSetupAnim(boolean disableAi) {
+		if (this.isSettingUp()) return;
 
 		if (disableAi) {
 			this.hasAiOnSpawn = !this.isNoAi();
@@ -628,6 +629,7 @@ public abstract class TurretEntity extends Mob implements Itemable, RangedAttack
 	}
 
 	private void endSetupAnim() {
+		this.setupAnimationState.stop();
 		this.setNoAi(!this.hasAiOnSpawn);
 	}
 
@@ -636,9 +638,14 @@ public abstract class TurretEntity extends Mob implements Itemable, RangedAttack
 	}
 
 	private void startTeardownAnim(boolean disableAi) {
+		if (this.isTearingDown()) return;
+
 		if (disableAi) {
 			this.hasAiOnSpawn = !this.isNoAi();
 			this.setNoAi(true);
+
+			// Invert value if this run was overriden
+			this.hasAiOnSpawn = !this.hasAiOnSpawn && this.isTearingDown();
 		}
 
 		this.lerpHeadTo(180F, 5);
@@ -655,6 +662,7 @@ public abstract class TurretEntity extends Mob implements Itemable, RangedAttack
 			this.itemToDrop = null;
 		}
 
+		this.teardownAnimationState.stop();
 		this.setNoAi(!this.hasAiOnSpawn);
 
 		if (discard) {
@@ -1129,7 +1137,7 @@ public abstract class TurretEntity extends Mob implements Itemable, RangedAttack
 	 * @see DMAnimation DMAnimation
 	 */
 	public void playAnimation(String animation) {
-		if (animation == null || animation.isEmpty()) {
+		if ((animation == null || animation.isEmpty()) && this.isPlayAnimationCalled()) {
 			return;
 		}
 
@@ -1148,17 +1156,21 @@ public abstract class TurretEntity extends Mob implements Itemable, RangedAttack
 					this.idleAnimationState.stop();
 				}
 				case "setup" -> {
+					this.setSettingUpStatus(false, true);
 					this.setupAnimationState.stop();
-					this.setSettingUpStatus(false);
 				}
 				case "teardown" -> {
-					this.teardownAnimationState.stop();
 					this.setTearingDownStatus(false, true);
-					this.endTeardownAnim(false, false);
+					this.teardownAnimationState.stop();
 				}
 			}
+
+			this.setPlayAnimationCalled(false);
 		}
 		else {
+			this.playAnimation(animation + "-stop");
+			this.setPlayAnimationCalled(true);
+
 			switch (animation) {
 				case "shoot" -> {
 					this.shootAnimationState.start(this.tickCount);
@@ -1170,11 +1182,14 @@ public abstract class TurretEntity extends Mob implements Itemable, RangedAttack
 					this.idleAnimationState.start(this.tickCount);
 				}
 				case "setup" -> {
-					this.startSetupAnim(true, false);
+					boolean hasNoAI = this.isNoAi();
+					this.startSetupAnim(false);
+					this.hasAiOnSpawn = !hasNoAI;
 				}
 				case "teardown" -> {
+					boolean hasNoAI = this.isNoAi();
 					this.startTeardownAnim(false);
-					this.teardownAnimationState.start(this.tickCount);
+					this.hasAiOnSpawn = !hasNoAI;
 				}
 			}
 		}
@@ -1364,9 +1379,19 @@ public abstract class TurretEntity extends Mob implements Itemable, RangedAttack
 	}
 
 	public final void setSettingUpStatus(boolean status) {
+		this.setSettingUpStatus(status, false);
+	}
+
+	/**
+	 * Sets the "TEARING_DOWN" flag of the turret.
+	 *
+	 * @param status     The status to set for the "TEARING_DOWN" flag.
+	 * @param manualCall Indicates whether this method will manually call the end method of the teardown animation.
+	 */
+	public final void setSettingUpStatus(boolean status, boolean manualCall) {
 		this.entityData.set(SETTING_UP, status);
 
-		if (!status) {
+		if (!status && !manualCall) {
 			this.endSetupAnim();
 		}
 	}
@@ -1391,6 +1416,14 @@ public abstract class TurretEntity extends Mob implements Itemable, RangedAttack
 		if (!status && !manualCall) {
 			this.endTeardownAnim();
 		}
+	}
+
+	public boolean isPlayAnimationCalled() {
+		return this.entityData.get(PLAY_ANIM_CALLED);
+	}
+
+	public final void setPlayAnimationCalled(boolean status) {
+		this.entityData.set(PLAY_ANIM_CALLED, status);
 	}
 
 	public int getTrackedLevel() {
@@ -2148,8 +2181,8 @@ public abstract class TurretEntity extends Mob implements Itemable, RangedAttack
 	protected void updateAnimations() {
 		boolean in180Deg = Math.abs(this.getYHeadRot()) < 181F && Math.abs(this.getYHeadRot()) > 179F;
 
-		this.setupAnimationState.animateWhen(this.isSettingUp(), this.tickCount);
-		this.teardownAnimationState.animateWhen(this.isTearingDown() && in180Deg, this.tickCount);
+		this.setupAnimationState.animateWhen((this.isSettingUp() || this.isPlayAnimationCalled()), this.tickCount);
+		this.teardownAnimationState.animateWhen(((this.isTearingDown() && in180Deg) || this.isPlayAnimationCalled()), this.tickCount);
 
 		if (this.isTearingDown()) {
 			return;
@@ -2949,5 +2982,6 @@ public abstract class TurretEntity extends Mob implements Itemable, RangedAttack
 
 		SETTING_UP = SynchedEntityData.defineId(TurretEntity.class, EntityDataSerializers.BOOLEAN);
 		TEARING_DOWN = SynchedEntityData.defineId(TurretEntity.class, EntityDataSerializers.BOOLEAN);
+		PLAY_ANIM_CALLED = SynchedEntityData.defineId(TurretEntity.class, EntityDataSerializers.BOOLEAN);
 	}
 }
