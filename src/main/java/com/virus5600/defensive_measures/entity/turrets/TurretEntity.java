@@ -1120,13 +1120,18 @@ public abstract class TurretEntity extends Mob implements Itemable, RangedAttack
 	 * @see DMAnimation DMAnimation
 	 */
 	public void playAnimation(String animation) {
-		if ((animation == null || animation.isEmpty()) || this.isPlayAnimationCalled()) {
+		if (animation == null || animation.isEmpty()) {
 			return;
 		}
 
 		animation = animation.toLowerCase();
+		boolean isStop = animation.endsWith("-stop");
 
-		if (animation.endsWith("-stop")) {
+		if (this.isPlayAnimationCalled() && !isStop) {
+			return;
+		}
+
+		if (isStop) {
 			animation = animation.substring(0, animation.indexOf("-stop"));
 			switch (animation) {
 				case "shoot" -> this.shootAnimationState.stop();

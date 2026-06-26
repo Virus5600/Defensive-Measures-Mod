@@ -1,13 +1,13 @@
 package com.virus5600.defensive_measures.network;
 
-import com.virus5600.defensive_measures.network.clientbound.entity.PlayAnimationPacket;
-import com.virus5600.defensive_measures.network.receiver.entity.StopAnimationPacketReceiver;
-import com.virus5600.defensive_measures.network.serverbound.entity.StopAnimationPacket;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 
 import com.virus5600.defensive_measures.DefensiveMeasures;
+import com.virus5600.defensive_measures.network.clientbound.entity.PlayAnimationPacket;
 import com.virus5600.defensive_measures.network.clientbound.sounds.TurretLoopSoundPacket;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import com.virus5600.defensive_measures.network.receiver.entity.StopAnimationPacketReceiver;
+import com.virus5600.defensive_measures.network.serverbound.entity.StopAnimationPacket;
 
 /**
  * Class containing all the packet identifiers used by the mod. This is usually used to create the
