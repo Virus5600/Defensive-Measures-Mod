@@ -22,9 +22,9 @@
 				"items": [
 					{
 						"items": [
-							"dm:cannon_head",
-							"dm:cannon_stand",
-							"dm:cannon_base"
+							"minecraft:gold_ingot",
+							"minecraft:iron_nugget",
+							"minecraft:redstone_block"
 						]
 					}
 				]
@@ -32,12 +32,16 @@
 		}
 	},
 	"requirements": [
-		["tas_interacted"],
-		["has_ingredients"]
+		[
+			"tas_interacted"
+		],
+		[
+			"has_ingredients"
+		]
 	],
 	"rewards": {
 		"recipes": [
-			"dm:_turret_assembly_station/cannon_turret/cannon_turret"
+			"dm:_turret_assembly_station/turret_remover"
 		]
 	}
 }

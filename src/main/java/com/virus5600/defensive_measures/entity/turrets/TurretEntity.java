@@ -127,19 +127,6 @@ public abstract class TurretEntity extends Mob implements Itemable, RangedAttack
 	 */
 	protected static final EntityDataAccessor<Direction> ATTACHED_FACE;
 	/**
-	 * Tracks the X position of this turret.
-	 */
-	protected static final EntityDataAccessor<Float> X;
-	/**
-	 * Tracks the Y position of this turret.
-	 */
-	protected static final EntityDataAccessor<Float> Y;
-	/**
-	 * Tracks the Z position of this turret.
-	 */
-	protected static final EntityDataAccessor<Float> Z;
-
-	/**
 	 * Tracks the amount of projectile to shoot in a burst.
 	 */
 	protected static final EntityDataAccessor<Integer> BURST_COUNT;
@@ -495,9 +482,6 @@ public abstract class TurretEntity extends Mob implements Itemable, RangedAttack
 
 		// Position related tracking
 			.define(ATTACHED_FACE, Direction.DOWN)
-			.define(X, 0f)
-			.define(Y, 0f)
-			.define(Z, 0f)
 
 		// Shooting related tracking
 			.define(USE_BURST, false)
@@ -681,7 +665,6 @@ public abstract class TurretEntity extends Mob implements Itemable, RangedAttack
 	 * @param projectile The projectile that is created by this turret.
 	 * @param <P>        The type of the projectile, which must be a subclass of {@link Projectile}.
 	 */
-	@SuppressWarnings("JavadocDeclaration")
 	protected <P extends Projectile> void onProjectileCreateCallback(P projectile) {
 	}
 
@@ -1137,7 +1120,7 @@ public abstract class TurretEntity extends Mob implements Itemable, RangedAttack
 	 * @see DMAnimation DMAnimation
 	 */
 	public void playAnimation(String animation) {
-		if ((animation == null || animation.isEmpty()) && this.isPlayAnimationCalled()) {
+		if ((animation == null || animation.isEmpty()) || this.isPlayAnimationCalled()) {
 			return;
 		}
 
@@ -1146,15 +1129,9 @@ public abstract class TurretEntity extends Mob implements Itemable, RangedAttack
 		if (animation.endsWith("-stop")) {
 			animation = animation.substring(0, animation.indexOf("-stop"));
 			switch (animation) {
-				case "shoot" -> {
-					this.shootAnimationState.stop();
-				}
-				case "death" -> {
-					this.deathAnimationState.stop();
-				}
-				case "idle" -> {
-					this.idleAnimationState.stop();
-				}
+				case "shoot" -> this.shootAnimationState.stop();
+				case "death" -> this.deathAnimationState.stop();
+				case "idle" -> this.idleAnimationState.stop();
 				case "setup" -> {
 					this.setSettingUpStatus(false, true);
 					this.setupAnimationState.stop();
@@ -1172,15 +1149,9 @@ public abstract class TurretEntity extends Mob implements Itemable, RangedAttack
 			this.setPlayAnimationCalled(true);
 
 			switch (animation) {
-				case "shoot" -> {
-					this.shootAnimationState.start(this.tickCount);
-				}
-				case "death" -> {
-					this.deathAnimationState.start(this.tickCount);
-				}
-				case "idle" -> {
-					this.idleAnimationState.start(this.tickCount);
-				}
+				case "shoot" -> this.shootAnimationState.start(this.tickCount);
+				case "death" -> this.deathAnimationState.start(this.tickCount);
+				case "idle" -> this.idleAnimationState.start(this.tickCount);
 				case "setup" -> {
 					boolean hasNoAI = this.isNoAi();
 					this.startSetupAnim(false);
@@ -2971,9 +2942,6 @@ public abstract class TurretEntity extends Mob implements Itemable, RangedAttack
 		HAS_TARGET = SynchedEntityData.defineId(TurretEntity.class, EntityDataSerializers.BOOLEAN);
 
 		ATTACHED_FACE = SynchedEntityData.defineId(TurretEntity.class, EntityDataSerializers.DIRECTION);
-		X = SynchedEntityData.defineId(TurretEntity.class, EntityDataSerializers.FLOAT);
-		Y = SynchedEntityData.defineId(TurretEntity.class, EntityDataSerializers.FLOAT);
-		Z = SynchedEntityData.defineId(TurretEntity.class, EntityDataSerializers.FLOAT);
 
 		BURST_COUNT = SynchedEntityData.defineId(TurretEntity.class, EntityDataSerializers.INT);
 		BURST_PROJECTILE_FIRED = SynchedEntityData.defineId(TurretEntity.class, EntityDataSerializers.INT);
