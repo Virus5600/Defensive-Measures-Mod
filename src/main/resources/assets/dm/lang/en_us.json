@@ -182,5 +182,10 @@
 
 	"container.dm.turret_assembly_station": "Assembling",
 
-	"stat.dm.interact_with_turret_assembly_station": "Interactions with Turret Assembly Station"
+	"stat.dm.interact_with_turret_assembly_station": "Interactions with Turret Assembly Station",
+
+	"commands.playanimation.success.single": "Played %2$s animation for %1$s.",
+	"commands.playanimation.success.multiple": "Played %1$s animation to %2$d %3$s (skipped %4$d %5$s).",
+	"commands.playanimation.empty_animation": "No animation called '%1$s' exists in all turrets.",
+	"commands.playanimation.no_target": "No target specified."
 }

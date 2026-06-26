@@ -1,6 +1,6 @@
 {
 	"type": "minecraft:crafting_shaped",
-	"category": "turret",
+	"category": "turrets",
 	"group": "dm:cannon_turret",
 	"pattern": [
 		"shs",

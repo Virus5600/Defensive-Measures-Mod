@@ -1,10 +1,10 @@
-package com.virus5600.defensive_measures._helper.accessor;
+package com.virus5600.defensive_measures._helper.accessor.sound;
 
 import com.mojang.blaze3d.audio.Channel;
 import net.minecraft.client.sounds.SoundManager;
 import net.minecraft.client.sounds.SoundEngine;
 
-import com.virus5600.defensive_measures.mixin.SoundManagerMixin;
+import com.virus5600.defensive_measures.mixins.sound.SoundManagerMixin;
 
 /**
  * Exposes the sound system from the {@link SoundManager} class, allowing access to the
@@ -21,4 +21,3 @@ public interface SoundManagerAccess {
 	 */
 	SoundEngine dm$getSoundSystem();
 }
-

@@ -1,4 +1,4 @@
-package com.virus5600.defensive_measures._helper.accessor;
+package com.virus5600.defensive_measures._helper.accessor.sound;
 
 import com.mojang.blaze3d.audio.Channel;
 import net.minecraft.client.resources.sounds.SoundInstance;
@@ -26,4 +26,3 @@ public interface SoundSystemAccess {
 	 */
 	boolean dm$isStopped(SoundInstance soundInstance);
 }
-

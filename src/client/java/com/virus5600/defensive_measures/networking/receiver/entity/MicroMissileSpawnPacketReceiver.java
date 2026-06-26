@@ -1,4 +1,4 @@
-package com.virus5600.defensive_measures.networking.receiver;
+package com.virus5600.defensive_measures.networking.receiver.entity;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.sounds.SoundSource;

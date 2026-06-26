@@ -143,13 +143,8 @@ public class AATurretModel extends BaseTurretModel<BaseTurretRenderState> {
 	}
 
 	@Override
-	protected void additionalDeathAnimProcedures(AnimationState animState, BaseTurretRenderState state) {
-		super.additionalDeathAnimProcedures(animState, state);
-	}
-
-	@Override
-	protected float getDefaultHeadPitch() {
-		return 30f;
+	protected void playDeathAnimProcedures(AnimationState animState, BaseTurretRenderState state) {
+		super.playDeathAnimProcedures(animState, state);
 	}
 
 	// //////////////// //

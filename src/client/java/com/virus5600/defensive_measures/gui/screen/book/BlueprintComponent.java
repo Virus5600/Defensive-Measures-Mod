@@ -103,8 +103,8 @@ public class BlueprintComponent extends RecipeBookComponent<AbstractCraftingMenu
 			new TabInfo(ModRecipeBookCategory.TURRET_ASSEMBLY_STATION),
 			new TabInfo(ModItems.CANNON_TURRET, ModRecipeBookCategories.TAS_TURRETS),
 			new TabInfo(ModItems.BALLISTA_BOLT, ModItems.MG_HEAD, ModRecipeBookCategories.TAS_PARTS),
-			new TabInfo(ModItems.ELECTRIC_FENCE, ModRecipeBookCategories.TAS_TRAPS),
-			new TabInfo(Items.OAK_FENCE, ModRecipeBookCategories.TAS_DEFENSE),
+			new TabInfo(ModItems.BOLT_HEAD, ModRecipeBookCategories.TAS_TRAPS),
+			new TabInfo(ModItems.ELECTRIC_FENCE, ModRecipeBookCategories.TAS_DEFENSE),
 			new TabInfo(ModItems.TURRET_REMOVER, ModRecipeBookCategories.TAS_EQUIPMENTS),
 			new TabInfo(Items.COPPER_INGOT, ModRecipeBookCategories.TAS_MISC)
 		);

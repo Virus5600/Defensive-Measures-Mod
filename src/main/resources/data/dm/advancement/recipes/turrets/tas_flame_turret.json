@@ -2,19 +2,18 @@
 	"parent": "minecraft:recipes/root",
 	"criteria": {
 		"tas_interacted": {
-			"trigger": "minecraft:tick",
+			"trigger": "minecraft:default_block_use",
 			"conditions": {
-				"player": {
-					"stats": [
-						{
-							"type": "minecraft:custom",
-							"stat": "dm:interact_with_turret_assembly_station",
-							"value": {
-								"min": 1
+				"location": [
+					{
+						"condition": "minecraft:location_check",
+						"predicate": {
+							"block": {
+								"blocks": "dm:turret_assembly_station"
 							}
 						}
-					]
-				}
+					}
+				]
 			}
 		},
 		"has_ingredients": {
