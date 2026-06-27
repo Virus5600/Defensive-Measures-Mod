@@ -2,18 +2,18 @@ package com.virus5600.defensive_measures.renderer.entity;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
-import com.virus5600.defensive_measures.DefensiveMeasures;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.resources.Identifier;
 
+import com.virus5600.defensive_measures.DefensiveMeasures;
 import com.virus5600.defensive_measures.entity.turrets.TurretEntity;
 import com.virus5600.defensive_measures.model.entity.BaseTurretModel;
 import com.virus5600.defensive_measures.renderer.entity.state.BaseTurretRenderState;
 
-import java.util.function.Supplier;
-
 import org.jspecify.annotations.NonNull;
+
+import java.util.function.Supplier;
 
 public abstract class BaseTurretRenderer<
 	T extends TurretEntity,
@@ -78,9 +78,11 @@ public abstract class BaseTurretRenderer<
 		turretRenderState.isSettingUp = turretEntity.isSettingUp();
 		turretRenderState.isTearingDown = turretEntity.isTearingDown();
 
+		// Setup & Teardown Animations
 		turretRenderState.setupAnimationState.copyFrom(turretEntity.getSetupAnimationState());
 		turretRenderState.teardownAnimationState.copyFrom(turretEntity.getTeardownAnimationState());
 
+		// Common Turret Animations
 		turretRenderState.idleAnimationState.copyFrom(turretEntity.getIdleAnimationState());
 		turretRenderState.shootAnimationState.copyFrom(turretEntity.getShootAnimationState());
 		turretRenderState.deathAnimationState.copyFrom(turretEntity.getDeathAnimationState());

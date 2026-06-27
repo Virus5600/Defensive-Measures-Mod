@@ -2,13 +2,14 @@ package com.virus5600.defensive_measures.entity.turrets.tier1;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.network.syncher.SynchedEntityData.Builder;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
-import net.minecraft.world.entity.ai.attributes.AttributeSupplier.Builder;
+import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -24,6 +25,7 @@ import com.virus5600.defensive_measures.item.ModItems;
 import com.virus5600.defensive_measures.particle.ModParticles;
 import com.virus5600.defensive_measures.sound.ModSoundEvents;
 
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jspecify.annotations.NonNull;
 
@@ -106,12 +108,13 @@ public class MGTurretEntity extends TurretEntity {
 	}
 
 	@Override
-	protected void defineSynchedData(net.minecraft.network.syncher.SynchedEntityData.@NonNull Builder builder) {
+	protected void defineSynchedData(@NonNull Builder builder) {
 		// Initialize standard data trackers
 		super.defineSynchedData(builder);
 	}
 
-	public static Builder setAttributes() {
+	@NotNull
+	public static AttributeSupplier.Builder setAttributes() {
 		TurretEntity.setTurretMaxHealth(25);
 		TurretEntity.setTurretMaxRange(20 + ModEntities.MG_TURRET.getDimensions().eyeHeight());
 

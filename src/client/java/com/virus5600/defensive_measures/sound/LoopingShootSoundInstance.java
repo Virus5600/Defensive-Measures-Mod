@@ -13,8 +13,8 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
 
-import com.virus5600.defensive_measures._helper.accessor.SoundManagerAccess;
-import com.virus5600.defensive_measures._helper.accessor.SoundSystemAccess;
+import com.virus5600.defensive_measures._helper.accessor.sound.SoundManagerAccess;
+import com.virus5600.defensive_measures._helper.accessor.sound.SoundSystemAccess;
 import com.virus5600.defensive_measures.entity.turrets.TurretEntity;
 
 import org.jetbrains.annotations.Nullable;

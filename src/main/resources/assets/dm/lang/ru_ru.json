@@ -39,7 +39,9 @@
 	"item.dm.flame_turret": "Place Flame Turret",
 	"item.dm.missile_turret": "Place Missile Turret",
 
-	"itemTooltip.dm.generic.health" : "Health: %s / %s",
+	"item.dm.pellet_turret": "Place Pellet Turret",
+
+	"itemTooltip.dm.generic.health" : "Health: %.1f / %.1f (%.2f%%)",
 
 	"itemTooltip.dm.cannon_turret.line1" : "Range: 3-24 blocks",
 	"itemTooltip.dm.cannon_turret.line2" : "Firing Arc: X: ±360° | Y: -20° to 22.5°",
@@ -65,6 +67,10 @@
 	"itemTooltip.dm.missile_turret.line2" : "Firing Arc: X: ±360° | Y: ±12°",
 	"itemTooltip.dm.missile_turret.line3" : "Reload Time: 0.34 seconds (burst) | 5 seconds (cooldown)",
 
+	"itemTooltip.dm.pellet_turret.line1" : "Range: 10 blocks",
+	"itemTooltip.dm.pellet_turret.line2" : "Firing Arc: X: ±360° | Y: ±30°",
+	"itemTooltip.dm.pellet_turret.line3" : "Reload Time: 2 seconds",
+
 	"entity.dm.cannon_turret" : "Турельная башня",
 	"entity.dm.cannonball" : "Пушечное ядро",
 
@@ -83,6 +89,9 @@
 	"entity.dm.missile_turret": "Missile Turret",
 	"entity.dm.micro_missile": "Micro Missile",
 
+	"entity.dm.pellet_turret": "Pellet Turret",
+	"entity.dm.flint_pellet": "Flint Pellet",
+
 	"death.attack.bolt_head" : "%1$s раздавлен Наконечником стрелы",
 	"death.attack.bolt_head.player" : "%1$s раздавлен случайным Наконечником стрелы во время борьбы с %2$s",
 
@@ -95,12 +104,16 @@
 	"death.attack.thrown_flame": "%1$s got cooked by %2$s.",
 	"death.attack.thrown_flame.player": "%1$s got turned to ashes thanks %2$s.",
 
+	"death.attack.flint_pellet": "%2$s got annoyed because of %1$s.",
+	"death.attack.flint_pellet.player": "A lucky pellet shot by %2$s hit and killed %1$s.",
+
 	"subtitles.turret.remove.metal" : "Металлическая турель убрана",
 	"subtitles.turret.remove.wood" : "Деревянная турель убрана",
 
-	"subtitles.turret.iron.repair" : "Repaired Iron Turret",
-	"subtitles.turret.bow.repair" : "Repaired Bow Turret",
-	"subtitles.turret.wood.repair" : "Repaired Wooden Turret",
+	"subtitles.turret.iron.repair" : "Repaired an iron turret",
+	"subtitles.turret.bow.repair" : "Repaired a bow turret",
+	"subtitles.turret.leather.repair" : "Stitched leather patching",
+	"subtitles.turret.wood.repair" : "Repaired a wooden turret",
 
 	"subtitles.generic.impact.bullet.default" : "Bullet impacted",
 	"subtitles.generic.impact.bullet.flesh" : "Bullet hit an entity",
@@ -109,6 +122,7 @@
 	"subtitles.generic.impact.bullet.metal" : "Bullet impacted on metal",
 	"subtitles.generic.impact.bullet.stone" : "Bullet impacted on stone",
 	"subtitles.generic.impact.bullet.wood" : "Bullet impacted on wood",
+	"subtitles.generic.impact.flint_pellet.default" : "Flint Pellet impacted",
 
 	"subtitles.generic.rocket.engine.loop": "Rocket Engine firing",
 	"subtitles.generic.rocket.explode": "Rocket explodes",
@@ -139,6 +153,11 @@
 	"subtitles.turret.missile_turret.destroyed" : "Missile Turret destroyed",
 	"subtitles.turret.missile_turret.shoot" : "Missile Turret shoots",
 
+	"subtitles.turret.pellet_turret.hurt" : "Pellet Turret damaged",
+	"subtitles.turret.pellet_turret.destroyed" : "Pellet Turret destroyed",
+	"subtitles.turret.pellet_turret.shoot" : "Pellet Turret shoots",
+
+	"tag.item.dm.tier_0_turrets" : "Tier 0 Turrets",
 	"tag.item.dm.tier_1_turrets" : "Tier 1 Turrets",
 	"tag.item.dm.tier_2_turrets" : "Tier 2 Turrets",
 	"tag.item.dm.turrets" : "Turrets",
@@ -147,6 +166,7 @@
 
 	"tag.entity.dm.flying_hostiles" : "Flying Hostiles",
 	"tag.entity.dm.projectiles" : "Defensive Measures Projectiles",
+	"tag.entity.dm.tier_0_turrets" : "Tier 0 Turrets",
 	"tag.entity.dm.tier_1_turrets" : "Tier 1 Turrets",
 	"tag.entity.dm.tier_2_turrets" : "Tier 2 Turrets",
 	"tag.entity.dm.turrets" : "Turrets",
@@ -163,5 +183,10 @@
 
 	"container.dm.turret_assembly_station": "Assembling",
 
-	"stat.dm.interact_with_turret_assembly_station": "Interactions with Turret Assembly Station"
+	"stat.dm.interact_with_turret_assembly_station": "Interactions with Turret Assembly Station",
+
+	"commands.playanimation.success.single": "Played %2$s animation for %1$s.",
+	"commands.playanimation.success.multiple": "Played %1$s animation to %2$d %3$s (skipped %4$d %5$s).",
+	"commands.playanimation.empty_animation": "No animation called '%1$s' exists in all turrets.",
+	"commands.playanimation.no_target": "No target specified."
 }

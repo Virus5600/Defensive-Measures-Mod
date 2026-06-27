@@ -1,6 +1,6 @@
 {
 	"type": "dm:tas_shaped",
-	"category": "traps",
+	"category": "defense",
 	"pattern": [
 		" ccc ",
 		"icqci",

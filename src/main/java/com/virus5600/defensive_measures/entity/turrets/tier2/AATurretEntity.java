@@ -138,7 +138,8 @@ public class AATurretEntity extends TurretEntity {
 		super.defineSynchedData(builder);
 	}
 
-	public static @NotNull AttributeSupplier.Builder setAttributes() {
+	@NotNull
+	public static AttributeSupplier.Builder setAttributes() {
 		TurretEntity.setTurretMaxHealth(100);
 		TurretEntity.setTurretMaxRange(96 + ModEntities.AA_TURRET.getDimensions().eyeHeight());
 

@@ -16,15 +16,15 @@ public class MGBulletModel extends BaseProjectileModel<BaseProjectileRenderState
 		super(root, "mg_turret", TEXTURES);
 	}
 
-	public static LayerDefinition getTexturedModelData() {
-		MeshDefinition modelData = new MeshDefinition();
-		PartDefinition modelPartData = modelData.getRoot();
+	public static LayerDefinition createBodyLayer() {
+		MeshDefinition meshdefinition = new MeshDefinition();
+		PartDefinition partDefinition = meshdefinition.getRoot();
 
-		PartDefinition body = modelPartData.addOrReplaceChild("body", CubeListBuilder.create(), PartPose.offset(0.0F, 0.0F, 0.0F).scaled(0.2f));
+		PartDefinition body = partDefinition.addOrReplaceChild("body", CubeListBuilder.create(), PartPose.offset(0.0F, 0.0F, 0.0F).scaled(0.2f));
 
 		body.addOrReplaceChild("body_r1", CubeListBuilder.create().texOffs(0, -11).addBox(0.0F, -2.5F, -3.0F, 0.0F, 5.0F, 11.0F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(0.0F, 0.0F, 0.0F, 0.0F, 0.0F, -0.7854F));
 		body.addOrReplaceChild("body_r2", CubeListBuilder.create().texOffs(0, -6).addBox(0.0F, -2.5F, -3.0F, 0.0F, 5.0F, 11.0F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.7854F));
 
-		return LayerDefinition.create(modelData, 32, 32);
+		return LayerDefinition.create(meshdefinition, 32, 32);
 	}
 }

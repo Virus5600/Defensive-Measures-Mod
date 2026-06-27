@@ -2,13 +2,14 @@ package com.virus5600.defensive_measures.entity.turrets.tier2;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.network.syncher.SynchedEntityData.Builder;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.item.Item;
@@ -27,6 +28,7 @@ import com.virus5600.defensive_measures.entity.turrets.interfaces.UsesMissile;
 import com.virus5600.defensive_measures.item.ModItems;
 import com.virus5600.defensive_measures.sound.ModSoundEvents;
 
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jspecify.annotations.NonNull;
 
@@ -121,12 +123,13 @@ public class MissileTurretEntity extends TurretEntity implements UsesMissile {
 	}
 
 	@Override
-	protected void defineSynchedData(SynchedEntityData.@NonNull Builder builder) {
+	protected void defineSynchedData(@NonNull Builder builder) {
 		// Initialize standard data trackers
 		super.defineSynchedData(builder);
 	}
 
-	public static net.minecraft.world.entity.ai.attributes.AttributeSupplier.Builder setAttributes() {
+	@NotNull
+	public static AttributeSupplier.Builder setAttributes() {
 		TurretEntity.setTurretMaxHealth(75);
 		TurretEntity.setTurretMaxRange(64 + ModEntities.MISSILE_TURRET.getDimensions().eyeHeight());
 
