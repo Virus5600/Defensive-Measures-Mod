@@ -1,6 +1,5 @@
 package com.virus5600.defensive_measures.entity.projectiles;
 
-import com.virus5600.defensive_measures._helper.BlockHelper;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.Level;
@@ -9,6 +8,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
 
+import com.virus5600.defensive_measures._helper.BlockHelper;
 import com.virus5600.defensive_measures.entity.turrets.tier0.PelletTurretEntity;
 import com.virus5600.defensive_measures.sound.ModSoundEvents;
 
@@ -30,6 +30,8 @@ import com.virus5600.defensive_measures.sound.ModSoundEvents;
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
  */
 public class FlintPelletEntity extends KineticProjectileEntity {
+	protected int idleAge = 0;
+
 	// //////////// //
 	// CONSTRUCTORS //
 	// //////////// //
@@ -52,7 +54,6 @@ public class FlintPelletEntity extends KineticProjectileEntity {
 		BlockState state = this.level().getBlockState(hitResult.getBlockPos());
 		BlockHelper.BlockCategory blockCat = BlockHelper.getBlockCategory(state);
 		Vec3 velocity = this.getDeltaMovement();
-		double retainedVelocity = 1.0;
 
 		velocity = switch (hitResult.getDirection().getAxis()) {
 			case X -> new Vec3(velocity.x() * -1, velocity.y(), velocity.z());
@@ -60,7 +61,7 @@ public class FlintPelletEntity extends KineticProjectileEntity {
 			case Z -> new Vec3(velocity.x(), velocity.y(), velocity.z() * -1);
 		};
 
-		retainedVelocity = switch (blockCat) {
+		double retainedVelocity = switch (blockCat) {
 			case BlockHelper.BlockCategory.GLASS -> 0.40;
 			case BlockHelper.BlockCategory.GRAINY -> 0.10;
 			case BlockHelper.BlockCategory.METAL -> 0.85;
@@ -70,10 +71,6 @@ public class FlintPelletEntity extends KineticProjectileEntity {
 		};
 
 		this.setDeltaMovement(velocity.scale(retainedVelocity));
-
-//		if (this.isAlive() || this.isRemoved() || this.isInGround() || this.onGround()) {
-//			this.discard();
-//		}
 	}
 
 	@Override
@@ -89,5 +86,13 @@ public class FlintPelletEntity extends KineticProjectileEntity {
 	@Override
 	public void tick() {
 		super.tick();
+
+		if (this.getDeltaMovement().length() < 0.01 && this.idleAge == 0) {
+			this.idleAge = this.tickCount;
+		}
+
+		if (this.idleAge + 100 <= this.tickCount) {
+			this.discard();
+		}
 	}
 }
