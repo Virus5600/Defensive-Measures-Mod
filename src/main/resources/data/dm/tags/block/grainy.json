@@ -2,7 +2,7 @@
 	"replace": false,
 	"values": [
 		"#minecraft:sand",
-		"#minecraft:concrete_powder",
+		"#minecraft:concrete_powders",
 		"minecraft:gravel",
 		"minecraft:soul_sand",
 		"minecraft:soul_soil",

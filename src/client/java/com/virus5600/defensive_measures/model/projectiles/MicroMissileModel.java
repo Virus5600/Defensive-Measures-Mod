@@ -16,11 +16,11 @@ public class MicroMissileModel extends BaseProjectileModel<BaseProjectileRenderS
 		super(root, "missile_turret", TEXTURES);
 	}
 
-	public static LayerDefinition getTexturedModelData() {
-		MeshDefinition modelData = new MeshDefinition();
-		PartDefinition modelPartData = modelData.getRoot();
+	public static LayerDefinition createBodyLayer() {
+		MeshDefinition meshdefinition = new MeshDefinition();
+		PartDefinition partDefinition = meshdefinition.getRoot();
 
-		PartDefinition projectile = modelPartData.addOrReplaceChild("projectile", CubeListBuilder.create()
+		PartDefinition projectile = partDefinition.addOrReplaceChild("projectile", CubeListBuilder.create()
 			.texOffs(24, 14).addBox(-0.5F, -0.5F, -1.0F, 1.0F, 1.0F, 19.0F, new CubeDeformation(0.0F))
 			.texOffs(42, 32).addBox(-0.5F, -0.5F, -1.5F, 1.0F, 1.0F, 1.0F, new CubeDeformation(-0.125F)), PartPose.offset(0.0F, 1.0F, -8.0F));
 		projectile.addOrReplaceChild("fins", CubeListBuilder.create()
@@ -29,6 +29,6 @@ public class MicroMissileModel extends BaseProjectileModel<BaseProjectileRenderS
 			.texOffs(43, 31).addBox(-1.0F, 0.0F, 7.5F, 1.0F, 0.0F, 2.0F, new CubeDeformation(0.0F))
 			.texOffs(39, 31).addBox(0.0F, 0.0F, 7.5F, 1.0F, 0.0F, 2.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, 0.0F, 8.5F));
 
-		return LayerDefinition.create(modelData, 64, 64);
+		return LayerDefinition.create(meshdefinition, 64, 64);
 	}
 }

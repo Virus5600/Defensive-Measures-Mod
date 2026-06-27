@@ -68,8 +68,8 @@ public class ProjectileAttackGoal extends net.minecraft.world.entity.ai.goal.Ran
 	private int updateCountdownTicks = -1;
 	private final double mobSpeed;
 	private int seenTargetTicks;
-	private final int minIntervalTicks;
-	private final int maxIntervalTicks;
+	private int minIntervalTicks;
+	private int maxIntervalTicks;
 	private final float maxShootRange;
 	private final float minShootRange;
 	private final float squaredMaxShootRange;
@@ -312,5 +312,29 @@ public class ProjectileAttackGoal extends net.minecraft.world.entity.ai.goal.Ran
 		boolean withinYaw = targetYaw <= maxYaw && targetYaw >= minYaw;
 
 		return withinPitch && withinYaw;
+	}
+
+	public void setMaxIntervalTicks(int ticks) {
+		this.maxIntervalTicks = ticks;
+
+		if (ticks < minIntervalTicks) {
+			this.setMinIntervalTicks(maxIntervalTicks);
+		}
+	}
+
+	public int getMaxIntervalTicks() {
+		return this.maxIntervalTicks;
+	}
+
+	public void setMinIntervalTicks(int ticks) {
+		this.minIntervalTicks = ticks;
+
+		if (ticks > maxIntervalTicks) {
+			this.setMaxIntervalTicks(maxIntervalTicks);
+		}
+	}
+
+	public int getMinIntervalTicks() {
+		return this.minIntervalTicks;
 	}
 }

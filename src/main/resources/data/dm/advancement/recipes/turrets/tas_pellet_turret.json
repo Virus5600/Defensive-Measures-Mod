@@ -1,0 +1,43 @@
+﻿{
+	"parent": "minecraft:recipes/root",
+	"criteria": {
+		"tas_interacted": {
+			"trigger": "minecraft:default_block_use",
+			"conditions": {
+				"location": [
+					{
+						"condition": "minecraft:location_check",
+						"predicate": {
+							"block": {
+								"blocks": "dm:turret_assembly_station"
+							}
+						}
+					}
+				]
+			}
+		},
+		"has_ingredients": {
+			"trigger": "minecraft:inventory_changed",
+			"conditions": {
+				"items": [
+					{
+						"items": [
+							"minecraft:flint",
+							"minecraft:leather",
+							"minecraft:stick"
+						]
+					}
+				]
+			}
+		}
+	},
+	"requirements": [
+		["tas_interacted"],
+		["has_ingredients"]
+	],
+	"rewards": {
+		"recipes": [
+			"dm:_turret_assembly_station/pellet_turret/pellet_turret"
+		]
+	}
+}

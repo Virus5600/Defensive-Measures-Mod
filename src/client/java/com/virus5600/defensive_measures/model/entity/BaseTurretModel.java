@@ -1,5 +1,6 @@
 package com.virus5600.defensive_measures.model.entity;
 
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.animation.AnimationDefinition;
 import net.minecraft.client.animation.KeyframeAnimation;
 import net.minecraft.client.model.geom.ModelPart;
@@ -10,8 +11,11 @@ import net.minecraft.world.entity.AnimationState;
 import com.virus5600.defensive_measures._util.MathUtil;
 import com.virus5600.defensive_measures.animations.Keyframe;
 import com.virus5600.defensive_measures.animations.entity.CommonTurretAnimation;
+import com.virus5600.defensive_measures.entity.CommonTurretAnimations;
 import com.virus5600.defensive_measures.entity.turrets.TurretEntity;
 import com.virus5600.defensive_measures.model.BaseModel;
+import com.virus5600.defensive_measures.model.entity.tier1.CannonTurretModel;
+import com.virus5600.defensive_measures.network.serverbound.entity.StopAnimationPacket;
 import com.virus5600.defensive_measures.renderer.entity.state.BaseTurretRenderState;
 
 import org.jetbrains.annotations.NotNull;
@@ -19,6 +23,7 @@ import org.jetbrains.annotations.Nullable;
 import org.jspecify.annotations.NonNull;
 
 import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -46,6 +51,11 @@ import java.util.stream.Stream;
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
  */
 public abstract class BaseTurretModel<S extends BaseTurretRenderState> extends BaseModel<S> {
+	/**
+	 * The delegated value wherein an animation is considered not playing.
+	 */
+	protected static final long ANIM_STOP_TIME = Integer.MIN_VALUE;
+
 	private final Map<UUID, Queue<? extends Keyframe>> shootAnimProcedure = new HashMap<>();
 	private final Map<UUID, Queue<? extends Keyframe>> deathAnimProcedure = new HashMap<>();
 
@@ -61,6 +71,11 @@ public abstract class BaseTurretModel<S extends BaseTurretRenderState> extends B
 	protected final ModelPart head;
 
 	/**
+	 * The idle animation that gets randomly played by the turret.
+	 */
+	protected final KeyframeAnimation idleAnim;
+
+	/**
 	 * The shooting animation of the turret. This is used to render the shooting animation of the
 	 * turret when it shoots.
 	 */
@@ -71,18 +86,41 @@ public abstract class BaseTurretModel<S extends BaseTurretRenderState> extends B
 	 * when it dies.
 	 */
 	protected final KeyframeAnimation deathAnim;
+
+	/**
+	 * A selected setup animation from one of the map entries from {@link #setupAnims}. This is
+	 * used to render the setup animation of the turret when it is being placed or spawned.
+	 */
+	protected final KeyframeAnimation setupAnim;
+
+	/**
+	 * A selected teardown animation from one of the map entries from {@link #teardownAnims}. This
+	 * is used to render the teardown animation of the turret when it is being taken (using the
+	 * {@link com.virus5600.defensive_measures.item.equipments.TurretRemoverItem Turret Remover}).
+	 */
+	protected final KeyframeAnimation teardownAnim;
+
 	/**
 	 * The setup animations that this turret can play when placed or spawned.
 	 */
-	protected final KeyframeAnimation[] setupAnims;
+	protected final Map<KeyframeAnimation, Float> setupAnims;
 	/**
 	 * The teardown animations that this turret can play when taken (using the
 	 * {@link com.virus5600.defensive_measures.item.equipments.TurretRemoverItem Turret Remover}).
 	 */
-	protected final KeyframeAnimation[] teardownAnims;
+	protected final Map<KeyframeAnimation, Float> teardownAnims;
 
-	protected final float shootAnimLen;
-	protected final float deathAnimLen;
+	public final float idleAnimLen;
+	public final float shootAnimLen;
+	public final float deathAnimLen;
+	public final float setupAnimLen;
+	public final float teardownAnimLen;
+
+	/**
+	 * An ID assigned to a (this) model to allow a stable randomization, allowing reusability of
+	 * randomized values every instance.
+	 */
+	public final UUID modelId = UUID.randomUUID();
 
 	protected final static Queue<? extends Keyframe> DEFAULT_EMPTY_KEYFRAME = new PriorityQueue<>() {
 		{
@@ -187,6 +225,41 @@ public abstract class BaseTurretModel<S extends BaseTurretRenderState> extends B
 			@Nullable AnimationDefinition[] setupAnims, @Nullable AnimationDefinition[] teardownAnims,
 			float height
 	) {
+		this(
+			root, texturePath, textures, neck, head,
+			shootAnim, deathAnim,
+			setupAnims, teardownAnims, null,
+			height
+		);
+	}
+
+	/**
+	 * Constructs a new {@link BaseTurretModel} with the specified model part,
+	 * texture path, and bone names. These will be used by this model to
+	 * render the turret entity and apply default configurations.
+	 *
+	 * @param root The root model part of this model.
+	 * @param texturePath The path of the texture this model will use.
+	 * @param textures The file name(s) that this model will use.
+	 * @param neck The model part that serves as the neck of the turret. This part will rotate along the yaw axis.
+	 * @param head The model part that servesas the head of the turret. This part will rotate along the pitch axis.
+	 * @param shootAnim The shoot animation. {@code null} if none.
+	 * @param deathAnim The death animation. {@code null} if none.
+	 * @param setupAnims The setup animations. {@code null} if none.
+	 * @param idleAnim The idle animation. {@code null} if none.
+	 * @param teardownAnims The teardown animations. {@code null} if none.
+	 *
+	 * @see #texturePath
+	 * @see #baseTexture
+	 */
+	public BaseTurretModel(
+		@NotNull ModelPart root, @NotNull String texturePath, @NotNull String[] textures,
+		@NotNull ModelPart neck, @NotNull ModelPart head,
+		@Nullable AnimationDefinition shootAnim, @Nullable AnimationDefinition deathAnim,
+		@Nullable AnimationDefinition[] setupAnims, @Nullable AnimationDefinition[] teardownAnims,
+		@Nullable AnimationDefinition idleAnim,
+		float height
+	) {
 		super(root, texturePath, textures);
 
 		// Adds 25% more height for safety measures.
@@ -211,10 +284,14 @@ public abstract class BaseTurretModel<S extends BaseTurretRenderState> extends B
 		int deathProcLenMS = lastKF == null ? 0 : lastKF.getTimeMS();
 
 		// Stores the animation lengths first...
+		this.idleAnimLen = idleAnim == null ? 0 : idleAnim.lengthInSeconds();
 		this.shootAnimLen = shootAnim == null ? shootProcLenMS : shootAnim.lengthInSeconds();
 		this.deathAnimLen = deathAnim == null ? deathProcLenMS : deathAnim.lengthInSeconds();
 
 		// Sets the common animation parts that may/not be used by all turret models
+		this.idleAnim = idleAnim != null ?
+			idleAnim.bake(root) : null;
+
 		this.shootAnim = shootAnim != null ?
 			shootAnim.bake(root) :
 			AnimationDefinition.Builder
@@ -229,19 +306,41 @@ public abstract class BaseTurretModel<S extends BaseTurretRenderState> extends B
 				.build()
 				.bake(root);
 
+		// Special cases - Setup & Teardown animations
 		this.setupAnims = setupAnims == null || setupAnims.length == 0 ?
-			Stream.of(CommonTurretAnimation.createDefaultSetupAnimation(root, height))
-				.toArray(KeyframeAnimation[]::new)
+			Stream.of(
+				CommonTurretAnimation.createPopUpSetupAnimation(root, height),
+				CommonTurretAnimation.createScaleUpSetupAnimation(root)
+			).collect(Collectors.toMap(
+				anim -> anim.bake(root),
+				AnimationDefinition::lengthInSeconds
+			))
 			: Stream.of(setupAnims).filter(Objects::nonNull)
-				.map(def -> def.bake(root))
-				.toArray(KeyframeAnimation[]::new);
+				.collect(Collectors.toMap(
+					anim -> anim.bake(root),
+					AnimationDefinition::lengthInSeconds
+				));
 
 		this.teardownAnims = teardownAnims == null || teardownAnims.length == 0 ?
-			Stream.of(CommonTurretAnimation.createDefaultTeardownAnimation(root, height))
-				.toArray(KeyframeAnimation[]::new)
+			Stream.of(
+				CommonTurretAnimation.createPopDownTeardownAnimation(root, height),
+				CommonTurretAnimation.createScaleDownAnimation(root)
+			).collect(Collectors.toMap(
+				anim -> anim.bake(root),
+				AnimationDefinition::lengthInSeconds
+			))
 			: Stream.of(teardownAnims).filter(Objects::nonNull)
-				.map(def -> def.bake(root))
-				.toArray(KeyframeAnimation[]::new);
+			  .collect(Collectors.toMap(
+				  anim -> anim.bake(root),
+				  AnimationDefinition::lengthInSeconds
+			  ));
+
+		// Finalize setup and teardown selection
+		this.setupAnim = (KeyframeAnimation) this.setupAnims.keySet().toArray()[getRandomAnimation(this.setupAnims, this.modelId)];
+		this.teardownAnim = (KeyframeAnimation) this.teardownAnims.keySet().toArray()[getRandomAnimation(this.teardownAnims, this.modelId)];
+
+		this.setupAnimLen = this.setupAnims.get(this.setupAnim);
+		this.teardownAnimLen = this.teardownAnims.get(this.teardownAnim);
 	}
 
 	// /////////////// //
@@ -267,73 +366,19 @@ public abstract class BaseTurretModel<S extends BaseTurretRenderState> extends B
 	public void setupAnim(@NonNull S state) {
 		super.setupAnim(state);
 
-		// Play the setup animation if the state says we are setting up
-		if (state.isSettingUp && this.setupAnims != null && this.setupAnims.length > 0) {
-			getRandomAnimation(
-				this.setupAnims,
-				state.id
-			).apply(
-				state.setupAnimationState,
-				state.ageInTicks
-			);
-		}
-
-		// Play the teardown animation if the state says we are tearing down
-		if (state.isTearingDown && this.teardownAnims != null && this.teardownAnims.length > 0) {
-			if (state.teardownAnimationState.isStarted()) {
-				getRandomAnimation(
-					this.teardownAnims,
-					state.id
-				).apply(
-					state.teardownAnimationState,
-					state.ageInTicks
-				);
-			}
-		}
+		// Play thesetup & teardown animations
+		this.handleSetupAnimation(state);
+		this.handleTeardownAnimation(state);
 
 		// HEAD ANGLE HANDLING
 		float headYaw = state.yRot + state.bodyRot + 180;
 		float headPitch = state.xRot;
 
+		// ANIMATION HANDLING (& ADDITIONAL PROCEDURES)
+		// Only though if the turret isn't being set up or torn down.
 		if (!(state.isSettingUp || state.isTearingDown)) {
-			// ANIMATION HANDLING (& ADDITIONAL PROCEDURES)
-			if (this.shootAnim != null) {
-				if ((this.getShootAnimProcedure(state.id) == null &&
-					state.shootAnimationState.getTimeInMillis(state.ageInTicks) > 0 &&
-					!state.shootAnimationState.isStarted())
-				) {
-					this.setShootAnimProcedure(state.id, this.getShootAnimProcedureInstance());
-				}
-
-				this.shootAnim.apply(state.shootAnimationState, state.ageInTicks);
-				this.additionalShootAnimProcedures(state.shootAnimationState, state);
-			}
-			else {
-				this.setShootAnimProcedure(state.id, null);
-			}
-
-			if (this.deathAnim != null) {
-				if (this.getDeathAnimProcedure(state.id) == null &&
-					state.deathAnimationState.getTimeInMillis(state.ageInTicks) > 0 &&
-					!state.deathAnimationState.isStarted()
-				) {
-					Queue<? extends Keyframe> procedure = this.getDeathAnimProcedureInstance();
-					this.setDeathAnimProcedure(state.id, procedure);
-				}
-
-				this.deathAnim.apply(state.deathAnimationState, state.ageInTicks);
-				this.additionalDeathAnimProcedures(state.deathAnimationState, state);
-			}
-			else {
-				this.setDeathAnimProcedure(state.id, null);
-			}
-
-			// Garbage Collector
-			Queue<? extends Keyframe> deathProcedure = this.getDeathAnimProcedure(state.id);
-			if (state.dead && (deathProcedure == null || deathProcedure.isEmpty())) {
-				this.setShootAnimProcedure(state.id, null);
-				this.setDeathAnimProcedure(state.id, null);
-			}
+			this.handleShootAnimation(state);
+			this.handleDeathAnimation(state);
 		}
 
 		// Only set head angles while the animation isn't started yet or if the head angle isn't at 0° yet when the animations are to be played.
@@ -363,10 +408,168 @@ public abstract class BaseTurretModel<S extends BaseTurretRenderState> extends B
 		this.head.xRot = MathUtil.degToRad(headPitch);
 	}
 
+	/**
+	 * Handles the setup animation of the turret.
+	 *
+	 * @param state The current state of the turret.
+	 */
+	protected final void handleSetupAnimation(@NonNull S state) {
+		if (state.isSettingUp && this.setupAnims != null && !this.setupAnims.isEmpty()) {
+			long animProgress = state.setupAnimationState.getTimeInMillis(state.ageInTicks);
+			long notPlayingTime = getAnimInactiveTime(state.ageInTicks);
+
+			boolean setupAnimStarted = state.setupAnimationState.isStarted() && animProgress != notPlayingTime;
+
+			if (setupAnimStarted) {
+				this.setupAnim.apply(
+					state.setupAnimationState,
+					state.ageInTicks
+				);
+			}
+
+			if (animProgress >= (this.setupAnimLen * 1000) && setupAnimStarted) {
+				state.setupAnimationState.stop();
+				this.stopServerSideAnimation(state.id, CommonTurretAnimations.SETUP);
+			}
+		}
+	}
+
+	/**
+	 * Handles the teardown animation of the turret.
+	 *
+	 * @param state The current state of the turret.
+	 */
+	protected final void handleTeardownAnimation(@NonNull S state) {
+		if (state.isTearingDown && this.teardownAnims != null && !this.teardownAnims.isEmpty()) {
+			long animProgress = state.teardownAnimationState.getTimeInMillis(state.ageInTicks);
+			long notPlayingTime = getAnimInactiveTime(state.ageInTicks);
+
+			boolean teardownAnimStarted = state.teardownAnimationState.isStarted() && animProgress != notPlayingTime;
+
+			if (teardownAnimStarted) {
+				this.teardownAnim.apply(
+					state.teardownAnimationState,
+					state.ageInTicks
+				);
+			}
+
+			if (animProgress >= (this.teardownAnimLen * 1000) && teardownAnimStarted) {
+				state.teardownAnimationState.stop();
+				this.stopServerSideAnimation(state.id, CommonTurretAnimations.TEARDOWN);
+			}
+		}
+	}
+
+	/**
+	 * Handles the shooting animation for the turret.
+	 *
+	 * @param state The current state of the turret.
+	 */
+	protected final void handleShootAnimation(@NonNull S state) {
+		// If there's a shoot animation...
+		if (this.shootAnim != null) {
+			long animProgress = state.shootAnimationState.getTimeInMillis(state.ageInTicks);
+			long notPlayingTime = getAnimInactiveTime(state.ageInTicks);
+
+			boolean shootAnimProcedureNull = this.getShootAnimProcedure(state.id) == null;
+			boolean shootAnimDurNotZero = animProgress > 0;
+			boolean shootAnimStarted = state.shootAnimationState.isStarted() && animProgress != notPlayingTime;
+
+			// If the shooting anim procedure is null, the current animation progress not zero, and
+			// the animation isn't started yet, set the animation procedure to track
+			if (shootAnimProcedureNull && shootAnimDurNotZero && !shootAnimStarted) {
+				this.setShootAnimProcedure(state.id, this.getShootAnimProcedureInstance());
+			}
+
+			// If the shooting animation is started, apply states to the shoot animation and play
+			// the procedures in the shoot animation procedure queue.
+			if (shootAnimStarted) {
+				this.shootAnim.apply(state.shootAnimationState, state.ageInTicks);
+				this.playShootAnimProcedures(state.shootAnimationState, state);
+			}
+
+			// If the animation reached its end, stop the animation state.
+			if (animProgress >= (this.shootAnimLen * 1000) && shootAnimStarted) {
+				state.shootAnimationState.stop();
+				this.stopServerSideAnimation(state.id, CommonTurretAnimations.SHOOT);
+			}
+		}
+		// Though, if there are none, we can't play the procedure as well so forcefully set this
+		// entity's procedure to none
+		else {
+			this.setShootAnimProcedure(state.id, null);
+		}
+	}
+
+	/**
+	 * Handles the death animation for the turret.
+	 *
+	 * @param state The current state of the turret.
+	 */
+	protected final void handleDeathAnimation(@NonNull S state) {
+		// If there's a death animation...
+		if (this.deathAnim != null) {
+			long animProgress = state.deathAnimationState.getTimeInMillis(state.ageInTicks);
+			long notPlayingTime = getAnimInactiveTime(state.ageInTicks);
+
+			boolean deathAnimProcedureNull = this.getDeathAnimProcedure(state.id) == null;
+			boolean deathAnimDurNotZero = animProgress > 0;
+			boolean deathAnimStarted = state.deathAnimationState.isStarted() && animProgress != notPlayingTime;
+
+			// If the death anim procedure is null, the current animation progress not zero, and
+			// the animation isn't started yet, set the animation procedure to track
+			if (deathAnimProcedureNull && deathAnimDurNotZero && !deathAnimStarted) {
+				this.setDeathAnimProcedure(state.id, this.getDeathAnimProcedureInstance());
+			}
+
+			// If the death animation is started, apply states to the death animation and play
+			// the procedures in the death animation procedure queue.
+			if (deathAnimStarted) {
+				this.deathAnim.apply(state.deathAnimationState, state.ageInTicks);
+				this.playDeathAnimProcedures(state.deathAnimationState, state);
+			}
+
+			// If the animation reached its end, stop the animation state.
+			if (animProgress >= (this.deathAnimLen * 1000) && deathAnimStarted) {
+				state.deathAnimationState.stop();
+				this.stopServerSideAnimation(state.id, CommonTurretAnimations.DEATH);
+			}
+		}
+		// Though, if there are none, we can't play the procedure as well so forcefully set this
+		// entity's procedure to none
+		else {
+			this.setDeathAnimProcedure(state.id, null);
+		}
+	}
+
+	protected final void stopServerSideAnimation(UUID id, CommonTurretAnimations animation) {
+		ClientPlayNetworking.send(
+			new StopAnimationPacket(
+				id,
+				animation.name()
+			)
+		);
+	}
+
 	// ///////////////// //
 	// GETTERS & SETTERS //
 	// ///////////////// //
 
+	/**
+	 * Sets the shoot animation procedure for an entity via its entity ID. This is used to set the
+	 * procedure that will get played when the shooting animation is played, allowing tracking of
+	 * the procedure's progress.
+	 * <br><br>
+	 * Setting the {@code queue} parameter to a non-null value will set the procedure for the
+	 * entity with the specified ID, while setting it to {@code null} will remove the currently
+	 * assigned procedure to the entity. Do note that providing a non-null value to an entity that
+	 * already has a procedure will overwrite said procedure, thus reseting its progress.
+	 *
+	 * @param id    The entity ID of the turret entity to set the shoot animation procedure for.
+	 * @param queue The shoot animation procedure to set for the turret entity. Setting this to {@code null} will remove the currently assigned procedure.
+	 *
+	 * @see #getShootAnimProcedure(UUID)
+	 */
 	protected void setShootAnimProcedure(UUID id, @Nullable Queue<? extends Keyframe> queue) {
 		if (queue == null) {
 			this.shootAnimProcedure.remove(id);
@@ -376,11 +579,37 @@ public abstract class BaseTurretModel<S extends BaseTurretRenderState> extends B
 		}
 	}
 
+	/**
+	 * Gets the shoot animation procedure (if one was ever set) for an entity via its entity ID.
+	 * This is used to get the procedure that will get played when the shooting animation is played,
+	 * allowing tracking of the procedure's progress.
+	 *
+	 * @param id  The entity ID of the turret entity to get the shoot animation procedure for.
+	 *
+	 * @return The shoot animation procedure assigned to the turret entity with the specified ID, or {@code null} if no procedure is assigned.
+	 *
+	 * @see #setShootAnimProcedure(UUID, Queue)
+	 */
 	@Nullable
 	protected final Queue<? extends Keyframe> getShootAnimProcedure(UUID id) {
 		return this.shootAnimProcedure.get(id);
 	}
 
+	/**
+	 * Sets the death animation procedure for an entity via its entity ID. This is used to set the
+	 * procedure that will get played when the death animation is played, allowing tracking of
+	 * the procedure's progress.
+	 * <br><br>
+	 * Setting the {@code queue} parameter to a non-null value will set the procedure for the
+	 * entity with the specified ID, while setting it to {@code null} will remove the currently
+	 * assigned procedure to the entity. Do note that providing a non-null value to an entity that
+	 * already has a procedure will overwrite said procedure, thus reseting its progress.
+	 *
+	 * @param id    The entity ID of the turret entity to set the shoot animation procedure for.
+	 * @param queue The death animation procedure to set for the turret entity. Setting this to {@code null} will remove the currently assigned procedure.
+	 *
+	 * @see #getDeathAnimProcedure(UUID)
+	 */
 	protected void setDeathAnimProcedure(UUID id, @Nullable Queue<? extends Keyframe> queue) {
 		if (queue == null) {
 			this.deathAnimProcedure.remove(id);
@@ -390,6 +619,17 @@ public abstract class BaseTurretModel<S extends BaseTurretRenderState> extends B
 		}
 	}
 
+	/**
+	 * Gets the death animation procedure (if one was ever set) for an entity via its entity ID.
+	 * This is used to get the procedure that will get played when the death animation is played,
+	 * allowing tracking of the procedure's progress.
+	 *
+	 * @param id  The entity ID of the turret entity to get the death animation procedure for.
+	 *
+	 * @return The death animation procedure assigned to the turret entity with the specified ID, or {@code null} if no procedure is assigned.
+	 *
+	 * @see #setDeathAnimProcedure(UUID, Queue)
+	 */
 	@Nullable
 	protected final Queue<? extends Keyframe> getDeathAnimProcedure(UUID id) {
 		return this.deathAnimProcedure.get(id);
@@ -421,20 +661,25 @@ public abstract class BaseTurretModel<S extends BaseTurretRenderState> extends B
 	}
 
 	/**
-	 * Defines additional procedures to be executed during the shooting animation. This method is called
-	 * after the shooting animation is applied to the model parts, allowing for any additional
-	 * transformations or effects to be applied to the model during the shooting animation. This can be
-	 * used to add extra visual flair or effects to the turret's shooting animation, such as adding
-	 * particle effects, changing the model's color, or applying additional transformations to the
-	 * model parts to enhance the visual impact of the turret's shooting.<br>
-	 * <br>
-	 * By default, this method does nothing, but it can be overridden in subclasses to implement
-	 * custom behavior during the shooting animation.
+	 * Defines additional procedures to be executed during the shooting animation.
+	 * <br><br>
+	 * This method is called after the shooting animation is applied to the model parts, allowing
+	 * for any additional transformations or effects to be applied to the model during the shooting
+	 * animation. This can be used to add extra visual flair or effects to the turret's shooting
+	 * animation, such as adding particle effects, changing the model's color, or applying
+	 * additional transformations to the model parts to enhance the visual impact of the turret's
+	 * shooting.
+	 * <br><br>
+	 * Once called, this method plays the procedures in the shoot animation procedure queue one by
+	 * one based on their timing, allowing for precise timing of the procedures during the shooting
+	 * animation. The procedures will be removed from the queue once they are played, and the queue
+	 * will be set to {@code null} once all procedures are played to prevent unnecessary processing
+	 * in subsequent frames.
 	 *
 	 * @param animState The shooting animation state that is running.
 	 * @param state	 The current state of the turret.
 	 */
-	protected void additionalShootAnimProcedures(AnimationState animState, S state) {
+	protected void playShootAnimProcedures(AnimationState animState, S state) {
 		long ms = animState.getTimeInMillis(state.ageInTicks);
 		UUID id = state.id;
 		Queue<? extends Keyframe> procedure = this.getShootAnimProcedure(id);
@@ -453,20 +698,25 @@ public abstract class BaseTurretModel<S extends BaseTurretRenderState> extends B
 	}
 
 	/**
-	 * Defines additional procedures to be executed during the death animation. This method is called
-	 * after the death animation is applied to the model parts, allowing for any additional
-	 * transformations or effects to be applied to the model during the death animation. This can be
-	 * used to add extra visual flair or effects to the turret's death animation, such as adding
-	 * particle effects, changing the model's color, or applying additional transformations to the
-	 * model parts to enhance the visual impact of the turret's death.<br>
-	 * <br>
-	 * By default, this method does nothing, but it can be overridden in subclasses to implement
-	 * custom behavior during the death animation.
+	 * Defines additional procedures to be executed during the death animation.
+	 * <br><br>
+	 * This method is called after the death animation is applied to the model parts, allowing
+	 * for any additional transformations or effects to be applied to the model during the death
+	 * animation. This can be used to add extra visual flair or effects to the turret's death
+	 * animation, such as adding particle effects, changing the model's color, or applying
+	 * additional transformations to the model parts to enhance the visual impact of the turret's
+	 * death.
+	 * <br><br>
+	 * Once called, this method plays the procedures in the death animation procedure queue one by
+	 * one based on their timing, allowing for precise timing of the procedures during the death
+	 * animation. The procedures will be removed from the queue once they are played, and the queue
+	 * will be set to {@code null} once all procedures are played to prevent unnecessary processing
+	 * in subsequent frames.
 	 *
 	 * @param animState The death animation state that is running.
 	 * @param state	 The current state of the turret.
 	 */
-	protected void additionalDeathAnimProcedures(AnimationState animState, S state) {
+	protected void playDeathAnimProcedures(AnimationState animState, S state) {
 		long ms = animState.getTimeInMillis(state.ageInTicks);
 		UUID id = state.id;
 		Queue<? extends Keyframe> procedure = this.getDeathAnimProcedure(id);
@@ -485,33 +735,28 @@ public abstract class BaseTurretModel<S extends BaseTurretRenderState> extends B
 	}
 
 	/**
-	 * Defines the default head pitch the turret uses. This is to render the model
-	 * with their guns in their resting pose. A good example is the {@link AATurretModel} which
-	 * has a 30 degree tilt upward when in rest, allowing the turret to portray the constant state
-	 * of monitoring the air for targets.
+	 * Selects an index based on the size of the provided animations map and the entity ID. This is
+	 * used to randomly select an animation from the provided map of animations, allowing for
+	 * variation in the animations played by different turret entities. The selection is based on
+	 * a seeded random generator using the least significant bits of the entity ID, ensuring that
+	 * the same entity will consistently select the same animation from the map, while different
+	 * entities may select different animations, adding visual diversity to the turret entities in
+	 * the game.
 	 *
-	 * @return The default head pitch in degrees. By default, this is 0, meaning the turret will be
-	 * rendered with its gun parallel to the ground when in rest.
-	 *
-	 * @see AATurretModel#getDefaultHeadPitch()
+	 * @return The index of the selected animation from the provided map of animations.
 	 */
-	protected float getDefaultHeadPitch() {
-		return 0;
-	}
-
-	/**
-	 * Gets a random animation from an array of provided one.
-	 *
-	 * @return A random keyframe animation.
-	 */
-	protected static KeyframeAnimation getRandomAnimation(KeyframeAnimation[] animations, UUID entityId) {
-		if (animations == null || animations.length == 0) {
-			return null;
+	protected static int getRandomAnimation(Map<KeyframeAnimation, Float> animations, UUID entityId) {
+		if (animations == null || animations.isEmpty()) {
+			return 0;
 		}
 
 		Random seededRandom = new Random(entityId.getLeastSignificantBits());
-		int index = seededRandom.nextInt(animations.length);
-		return animations[index];
+		return seededRandom.nextInt(animations.size());
+	}
+
+	protected static long getAnimInactiveTime(final float ageInTicks) {
+		float timeInTicks = ageInTicks - (float) ANIM_STOP_TIME;
+		return (long)(timeInTicks * 50.0F);
 	}
 
 	// //////////////// //

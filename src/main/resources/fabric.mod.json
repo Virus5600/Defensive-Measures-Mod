@@ -8,6 +8,20 @@
 	"authors": [
 		"Virus5600"
 	],
+	"contributors": [
+		{
+			"name": "avirtual777",
+			"contact": {
+				"homepage": "https://github.com/avirtual777"
+			}
+		},
+		{
+			"name": "Heimdallr-1",
+			"contact": {
+				"homepage": "https://github.com/Heimdallr-1"
+			}
+		}
+	],
 	"contact": {
 		"issues": "https://github.com/Virus5600/Defensive-Measures-Mod/issues",
 		"sources": "https://github.com/Virus5600/Defensive-Measures-Mod"
@@ -19,6 +33,7 @@
 
 	"environment": "*",
 	"mixins": [
+		"dm.mixins.json",
 		{
 			"config": "dm.client.mixins.json",
 			"environment": "client"
@@ -39,13 +54,14 @@
 		"fabric-api": ">=0.153.0+26.2"
 	},
 	"custom": {
+		"loom:classtweaker": "dm.classtweaker",
 		"modmenu": {
 			"links": {
-				"curseforge": "https://www.curseforge.com/minecraft/mc-mods/defensive-measures",
-				"modrinth": "https://modrinth.com/mod/defensive-measures",
-				"planetminecraft": "https://www.planetminecraft.com/mod/defensive-measures-mod/",
-				"github": "https://github.com/Virus5600/Defensive-Measures-Mod/releases",
-				"discord": "https://discord.gg/PCUKucADFr"
+				"Curseforge": "https://www.curseforge.com/minecraft/mc-mods/defensive-measures",
+				"Modrinth": "https://modrinth.com/mod/defensive-measures",
+				"Planet Minecraft": "https://www.planetminecraft.com/mod/defensive-measures-mod/",
+				"GitHub": "https://github.com/Virus5600/Defensive-Measures-Mod/releases",
+				"Discord": "https://discord.gg/PCUKucADFr"
 			},
 			"update_checker": true
 		}
