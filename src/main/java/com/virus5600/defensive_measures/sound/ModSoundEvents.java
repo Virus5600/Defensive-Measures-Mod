@@ -78,6 +78,7 @@ public class ModSoundEvents {
 
 	// v1.2.0-beta
 	public final static SoundEvent TURRET_REPAIR_LEATHER = ModSoundEvents.registerSoundEvent("turret.repair.leather");
+	public final static SoundEvent FLINT_PELLET_DEFAULT = ModSoundEvents.registerSoundEvent("generic.impact.flint_pellet.default");
 
 	// PELLET TURRET
 	public static final SoundEvent TURRET_PELLET_HURT = ModSoundEvents.registerSoundEvent("turret.pellet_turret.hurt");

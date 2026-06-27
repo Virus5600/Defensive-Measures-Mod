@@ -57,5 +57,8 @@ public class ModEntityRenderers {
 		EntityRenderers.register(ModEntities.FLAK_PROJECTILE, FlakProjectileRenderer::new);
 		EntityRenderers.register(ModEntities.FLAMMABLE_AEROSOL, FlammableAerosolRenderer::new);
 		EntityRenderers.register(ModEntities.MICRO_MISSILE, MicroMissileRenderer::new);
+
+		// v1.2.0
+		EntityRenderers.register(ModEntities.FLINT_PELLET, FlintPelletRenderer::new);
 	}
 }

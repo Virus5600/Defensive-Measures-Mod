@@ -54,6 +54,15 @@
 		],
 		"subtitle": "subtitles.generic.impact.bullet.wood"
 	},
+	"generic.impact.flint_pellet.default": {
+		"sounds": [
+			"enchant/thorns/hit1",
+			"enchant/thorns/hit2",
+			"enchant/thorns/hit3",
+			"enchant/thorns/hit4"
+		],
+		"subtitle": "subtitles.generic.impact.flint_pellet.default"
+	},
 
 	"turret.remove.metal": {
 		"sounds": [

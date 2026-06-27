@@ -55,6 +55,11 @@ import java.util.Map;
  *     <li><b>Armor:</b> 0</li>
  *     <li><b>Armor Toughness:</b> 0</li>
  * </ul>
+ * <hr/>
+ * Additionally, the turret can have various abilities based on its evolution path that can be
+ * rescinded or changed when see fit:
+ * <a href="https://github.com/Virus5600/Defensive-Measures-Mod/issues/31">Pellet Turret's GitHub
+ * issue</a>.
  *
  * @see TurretEntity
  *
@@ -87,7 +92,7 @@ public class PelletTurretEntity extends TurretEntity {
 	// CONSTRUCTORS //
 	// //////////// //
 	public PelletTurretEntity(EntityType<? extends Mob> entityType, Level world) {
-		super(entityType, world, TurretMaterial.WOOD, ModEntities.MG_BULLET, ModItems.PELLET_TURRET);
+		super(entityType, world, TurretMaterial.WOOD, ModEntities.FLINT_PELLET, ModItems.PELLET_TURRET);
 
 		this.setShootSound(ModSoundEvents.TURRET_PELLET_SHOOT);
 

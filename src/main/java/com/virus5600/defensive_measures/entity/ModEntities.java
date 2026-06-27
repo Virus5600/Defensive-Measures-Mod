@@ -153,6 +153,18 @@ public class ModEntities {
 			.eyeHeight(0.0625f)
 	);
 
+	// v1.2.0-beta
+	public static final EntityType<FlintPelletEntity> FLINT_PELLET = RegistryHelper.registerEntity(
+		"flint_pellet",
+		Builder
+			.<FlintPelletEntity>of(FlintPelletEntity::new, MobCategory.MISC)
+			.noLootTable()
+			.sized(0.0625f, 0.0625f)
+			.clientTrackingRange(4)
+			.updateInterval(10)
+			.eyeHeight(0.03125f)
+	);
+
 	// REGISTRY //
 	@SuppressWarnings("ConstantConditions")
 	public static void registerModEntityAttributes() {

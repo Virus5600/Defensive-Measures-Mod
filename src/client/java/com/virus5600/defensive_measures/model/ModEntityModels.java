@@ -54,6 +54,7 @@ public class ModEntityModels {
 	public static final ModelLayerLocation MICRO_MISSILE = registerMain("micro_missile");
 
 	// v1.2.0-beta
+	public static final ModelLayerLocation FLINT_PELLET = registerMain("flint_pellet");
 
 	public static void registerEntityModels() {
 		DefensiveMeasures.LOGGER.info("REGISTERING ENTITY MODELS FOR {}...", DefensiveMeasures.MOD_NAME);
@@ -88,6 +89,9 @@ public class ModEntityModels {
 		ModelLayerRegistry.registerModelLayer(FLAK_PROJECTILE, FlakProjectileModel::createBodyLayer);
 		ModelLayerRegistry.registerModelLayer(FLAMMABLE_AEROSOL, FlammableAerosolModel::createBodyLayer);
 		ModelLayerRegistry.registerModelLayer(MICRO_MISSILE, MicroMissileModel::createBodyLayer);
+
+		// v1.2.0-beta
+		ModelLayerRegistry.registerModelLayer(FLINT_PELLET, FlintPelletProjectileModel::createBodyLayer);
 	}
 
 	private static ModelLayerLocation registerMain(String id) {

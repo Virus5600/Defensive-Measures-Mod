@@ -122,6 +122,7 @@
 	"subtitles.generic.impact.bullet.metal" : "Bullet impacted on metal",
 	"subtitles.generic.impact.bullet.stone" : "Bullet impacted on stone",
 	"subtitles.generic.impact.bullet.wood" : "Bullet impacted on wood",
+	"subtitles.generic.impact.flint_pellet.default" : "Flint Pellet impacted",
 
 	"subtitles.generic.rocket.engine.loop": "Rocket Engine firing",
 	"subtitles.generic.rocket.explode": "Rocket explodes",
