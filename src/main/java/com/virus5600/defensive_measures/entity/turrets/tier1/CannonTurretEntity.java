@@ -11,6 +11,7 @@ import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -112,7 +113,8 @@ public class CannonTurretEntity extends TurretEntity {
 		super.defineSynchedData(builder);
 	}
 
-	public static @NotNull net.minecraft.world.entity.ai.attributes.AttributeSupplier.Builder setAttributes() {
+	@NotNull
+	public static AttributeSupplier.Builder setAttributes() {
 		TurretEntity.setTurretMaxHealth(50);
 		TurretEntity.setTurretMaxRange(24 + ModEntities.CANNON_TURRET.getDimensions().eyeHeight());
 

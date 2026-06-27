@@ -54,6 +54,16 @@
 		],
 		"subtitle": "subtitles.generic.impact.bullet.wood"
 	},
+	"generic.impact.flint_pellet.default": {
+		"sounds": [
+			"enchant/thorns/hit1",
+			"enchant/thorns/hit2",
+			"enchant/thorns/hit3",
+			"enchant/thorns/hit4"
+		],
+		"subtitle": "subtitles.generic.impact.flint_pellet.default"
+	},
+
 	"turret.remove.metal": {
 		"sounds": [
 			{
@@ -91,6 +101,7 @@
 		],
 		"subtitle": "subtitles.turret.remove.wood"
 	},
+
 	"turret.repair.metal": {
 		"sounds": [
 			{
@@ -113,6 +124,12 @@
 		],
 		"subtitle": "subtitles.turret.bow.repair"
 	},
+	"turret.repair.leather": {
+		"sounds": [
+			"dm:turrets/repair/leather_repair1"
+		],
+		"subtitle": "subtitles.turret.leather.repair"
+	},
 	"turret.repair.wood": {
 		"sounds": [
 			"dm:turrets/repair/wood_repair1",
@@ -120,6 +137,7 @@
 		],
 		"subtitle": "subtitles.turret.wood.repair"
 	},
+
 	"turret.hurt.metal": {
 		"sounds": [
 			"mob/zombie/metal1",
@@ -320,6 +338,35 @@
 		"subtitle": "subtitles.turret.flame_turret.shoot.end"
 	},
 
+	"turret.pellet_turret.hurt": {
+		"sounds": [
+			"mob/zombie/wood1",
+			"mob/zombie/wood2",
+			"mob/zombie/wood3",
+			"mob/zombie/wood4"
+		],
+		"subtitle": "subtitles.turret.pellet_turret.hurt"
+	},
+	"turret.pellet_turret.destroyed": {
+		"sounds": [
+			"mob/zombie/woodbreak"
+		],
+		"subtitle": "subtitles.turret.pellet_turret.destroyed"
+	},
+	"turret.pellet_turret.shoot": {
+		"sounds": [
+			"dm:pellet_turret/shoot1",
+			"dm:pellet_turret/shoot2",
+			"dm:pellet_turret/shoot3",
+			"dm:pellet_turret/shoot4",
+			"dm:pellet_turret/shoot5",
+			"dm:pellet_turret/shoot6",
+			"dm:pellet_turret/shoot7",
+			"dm:pellet_turret/shoot8"
+		],
+		"subtitle": "subtitles.turret.pellet_turret.shoot"
+	},
+
 	"turret.missile_turret.hurt": {
 		"sounds": [
 			"dm:turrets/hurt/metal_hurt1",
@@ -340,6 +387,7 @@
 		],
 		"subtitle": "subtitles.turret.missile_turret.shoot"
 	},
+
 	"generic.rocket.engine.loop": {
 		"sounds": [
 			"dm:turrets/rocket/engine_loop1"

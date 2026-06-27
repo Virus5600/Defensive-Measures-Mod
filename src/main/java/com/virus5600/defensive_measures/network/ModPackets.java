@@ -1,9 +1,13 @@
 package com.virus5600.defensive_measures.network;
 
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 
 import com.virus5600.defensive_measures.DefensiveMeasures;
+import com.virus5600.defensive_measures.network.clientbound.entity.PlayAnimationPacket;
 import com.virus5600.defensive_measures.network.clientbound.sounds.TurretLoopSoundPacket;
+import com.virus5600.defensive_measures.network.receiver.entity.StopAnimationPacketReceiver;
+import com.virus5600.defensive_measures.network.serverbound.entity.StopAnimationPacket;
 
 /**
  * Class containing all the packet identifiers used by the mod. This is usually used to create the
@@ -21,11 +25,27 @@ public final class ModPackets {
 		DefensiveMeasures.LOGGER.info("REGISTERING PACKETS FOR {}...", DefensiveMeasures.MOD_NAME);
 
 		// ////////////// //
-		// S2C - OUTBOUND //
+		// OUTBOUND - C2S //
 		// ////////////// //
 
+		// v1.2.0-beta
+		PayloadTypeRegistry.clientboundPlay().register(PlayAnimationPacket.PAYLOAD_ID, PlayAnimationPacket.CODEC_STREAM);
+
+		// ////////////// //
+		// OUTBOUND - S2C //
+		// ////////////// //
 		// v1.1.0-beta
 		PayloadTypeRegistry.clientboundPlay().register(TurretLoopSoundPacket.PAYLOAD_ID, TurretLoopSoundPacket.CODEC_STREAM);
+
+		// v1.2.0-beta
+		PayloadTypeRegistry.serverboundPlay().register(StopAnimationPacket.PAYLOAD_ID, StopAnimationPacket.CODEC_STREAM);
+
+		// /////// //
+		// INBOUND //
+		// /////// //
+
+		// v1.2.0-beta
+		ServerPlayNetworking.registerGlobalReceiver(StopAnimationPacket.PAYLOAD_ID, StopAnimationPacketReceiver::handle);
 	}
 
 	// ///////////////// //
