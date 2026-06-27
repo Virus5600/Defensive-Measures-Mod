@@ -46,7 +46,7 @@ import java.util.Map;
  *     <li><b>Base Damage:</b> 5.0</li>
  *     <li><b>Base Pierce Level:</b> 5</li>
  *     <li><b>Attack Cooldown:</b> 0.15 seconds per bullets / 3.75 seconds per burst</li>
- *     <li><b>Attack Range:</b> 20 blocks</li>
+ *     <li><b>Attack Range:</b> 25 blocks</li>
  *     <li><b>X Firing Arc:</b> ±360°</li>
  *     <li><b>Y Firing Arc:</b> -27.5 to 90°</li>
  *     <li><b>Armor:</b> 2</li>
@@ -116,7 +116,7 @@ public class MGTurretEntity extends TurretEntity {
 	@NotNull
 	public static AttributeSupplier.Builder setAttributes() {
 		TurretEntity.setTurretMaxHealth(25);
-		TurretEntity.setTurretMaxRange(20 + ModEntities.MG_TURRET.getDimensions().eyeHeight());
+		TurretEntity.setTurretMaxRange(25 + ModEntities.MG_TURRET.getDimensions().eyeHeight());
 
 		return TurretEntity.setAttributes()
 			.add(Attributes.ARMOR, 2)
