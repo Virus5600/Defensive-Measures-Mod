@@ -47,23 +47,6 @@ public class BallistaBoltEntity extends KineticProjectileEntity {
 		this.setDamage(4);
 	}
 
-	public BallistaBoltEntity(Level world, LivingEntity owner) {
-		this(ModEntities.BALLISTA_BOLT, world);
-
-		this.setOwner(owner);
-	}
-
-	public BallistaBoltEntity(
-            LivingEntity owner,
-            double directionX,
-            double directionY,
-            double directionZ,
-            Level world
-	) {
-		this(world, owner);
-		this.setDeltaMovement(directionX, directionY, directionZ);
-	}
-
 	// ///////// //
 	//  METHODS  //
 	// ///////// //

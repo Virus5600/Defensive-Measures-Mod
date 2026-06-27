@@ -57,25 +57,9 @@ public class MGBulletEntity extends KineticProjectileEntity {
             Level world
 	) {
 		super(entityType, world);
-	}
-
-	public MGBulletEntity(Level world, LivingEntity owner) {
-		this(ModEntities.MG_BULLET, world);
-		this.setOwner(owner);
 
 		this.setPierceLevel((byte) 5);
 		this.setDamage(5);
-	}
-
-	public MGBulletEntity(
-            LivingEntity owner,
-            double velocityX,
-            double velocityY,
-            double velocityZ,
-            Level world
-	) {
-		this(world, owner);
-		this.setDeltaMovement(velocityX, velocityY, velocityZ);
 	}
 
 	// ///////// //
@@ -187,11 +171,6 @@ public class MGBulletEntity extends KineticProjectileEntity {
 		if (this.isAlive() || this.isRemoved() || this.isInGround() || this.onGround()) {
 			this.discard();
 		}
-	}
-
-	@Override
-	protected final void setPierceLevel(byte pierceLevel) {
-		this.entityData.set(PIERCE_LEVEL, pierceLevel);
 	}
 
 	// PUBLIC
