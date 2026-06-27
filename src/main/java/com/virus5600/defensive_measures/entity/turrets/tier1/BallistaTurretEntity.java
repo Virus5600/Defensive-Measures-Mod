@@ -46,7 +46,7 @@ import java.util.Map;
  *     <li><b>Base Damage:</b> 4.0</li>
  *     <li><b>Base Pierce Level:</b> 5</li>
  *     <li><b>Attack Cooldown:</b> 2.5 seconds</li>
- *     <li><b>Attack Range:</b> 16 blocks</li>
+ *     <li><b>Attack Range:</b> 20 blocks</li>
  *     <li><b>X Firing Arc:</b> ±360°</li>
  *     <li><b>Y Firing Arc:</b> ±20°</li>
  *     <li><b>Armor:</b> 0</li>
@@ -112,7 +112,7 @@ public class BallistaTurretEntity extends TurretEntity {
 	@NotNull
 	public static AttributeSupplier.Builder setAttributes() {
 		TurretEntity.setTurretMaxHealth(25);
-		TurretEntity.setTurretMaxRange(16 + ModEntities.BALLISTA_TURRET.getDimensions().eyeHeight());
+		TurretEntity.setTurretMaxRange(20 + ModEntities.BALLISTA_TURRET.getDimensions().eyeHeight());
 
 		return TurretEntity.setAttributes();
 	}

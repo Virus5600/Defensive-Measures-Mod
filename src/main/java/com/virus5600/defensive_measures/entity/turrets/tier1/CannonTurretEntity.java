@@ -50,7 +50,7 @@ import java.util.Optional;
  *     <li><b>Base Damage:</b> 10.0</li>
  *     <li><b>Base Pierce Level:</b> 0</li>
  *     <li><b>Attack Cooldown:</b> 5 seconds</li>
- *     <li><b>Attack Range:</b> 3-24 blocks</li>
+ *     <li><b>Attack Range:</b> 3-30 blocks</li>
  *     <li><b>X Firing Arc:</b> ±360°</li>
  *     <li><b>Y Firing Arc:</b> -20 to 22.5°</li>
  *     <li><b>Armor:</b> 3</li>
@@ -116,7 +116,7 @@ public class CannonTurretEntity extends TurretEntity {
 	@NotNull
 	public static AttributeSupplier.Builder setAttributes() {
 		TurretEntity.setTurretMaxHealth(50);
-		TurretEntity.setTurretMaxRange(24 + ModEntities.CANNON_TURRET.getDimensions().eyeHeight());
+		TurretEntity.setTurretMaxRange(30 + ModEntities.CANNON_TURRET.getDimensions().eyeHeight());
 
 		return TurretEntity.setAttributes()
 			.add(Attributes.ARMOR, 3)
