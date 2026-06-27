@@ -309,10 +309,6 @@ public abstract class TurretProjectileEntity extends Projectile {
 				if (isEnderman) return;
 
 				if (hitEntity instanceof LivingEntity livingEntity) {
-					if (!world.isClientSide() && this.getPierceLevel() <= 0) {
-						livingEntity.setArrowCount(livingEntity.getArrowCount() + 1);
-					}
-
 					this.onHit(livingEntity);
 				}
 
