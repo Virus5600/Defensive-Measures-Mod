@@ -1,6 +1,6 @@
 {
 	"model": {
 		"type": "minecraft:model",
-		"model": "dm:item/mg_ammo_case"
+		"model": "dm:item/tier1/mg_turret/mg_ammo_case"
 	}
 }

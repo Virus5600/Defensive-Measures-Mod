@@ -36,7 +36,13 @@
 	"item.dm.mg_turret" : "设置机枪塔",
 
 	"item.dm.aa_turret": "Place Anti-Air (AA) Turret",
+	"item.dm.aa_turret_base": "AA Cross Stand",
+	"item.dm.aa_turret_traverse_platform": "AA Horizontal Traverse Platform",
+	"item.dm.aa_turret_gun_barrel": "AA Gun Barrel",
+
 	"item.dm.flame_turret": "Place Flame Turret",
+	"item.dm.flame_turret_base": "Flame Turret Platform",
+
 	"item.dm.missile_turret": "Place Missile Turret",
 
 	"item.dm.pellet_turret": "Place Pellet Turret",

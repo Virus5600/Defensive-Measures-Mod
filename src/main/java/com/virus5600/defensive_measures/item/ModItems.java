@@ -16,13 +16,13 @@ import com.virus5600.defensive_measures.entity.ModEntities;
 import com.virus5600.defensive_measures.item.equipments.TurretRemoverItem;
 import com.virus5600.defensive_measures.item.interfaces.FuelItem;
 import com.virus5600.defensive_measures.item.turrets.TurretItem;
-import com.virus5600.defensive_measures.item.turrets.aa_turret.*;
-import com.virus5600.defensive_measures.item.turrets.ballista.*;
-import com.virus5600.defensive_measures.item.turrets.cannon.*;
-import com.virus5600.defensive_measures.item.turrets.flame_turret.*;
-import com.virus5600.defensive_measures.item.turrets.mg_turret.*;
-import com.virus5600.defensive_measures.item.turrets.missile_turret.*;
-import com.virus5600.defensive_measures.item.turrets.pellet_turret.*;
+import com.virus5600.defensive_measures.item.turrets.tier_0.pellet_turret.*;
+import com.virus5600.defensive_measures.item.turrets.tier_1.ballista.*;
+import com.virus5600.defensive_measures.item.turrets.tier_1.cannon.*;
+import com.virus5600.defensive_measures.item.turrets.tier_1.mg_turret.*;
+import com.virus5600.defensive_measures.item.turrets.tier_2.aa_turret.*;
+import com.virus5600.defensive_measures.item.turrets.tier_2.flame_turret.*;
+import com.virus5600.defensive_measures.item.turrets.tier_2.missile_turret.*;
 
 import java.util.Arrays;
 import java.util.function.Function;
@@ -77,9 +77,13 @@ public class ModItems {
 
 	// AA TURRET
 	public final static Item AA_TURRET = registerItem("aa_turret", ModEntities.AA_TURRET, AATurretItem::new);
+	public final static Item AA_TURRET_BASE = registerItem("aa_turret_base", AABaseItem::new);
+	public final static Item AA_TURRET_TRAVERSE_PLATFORM = registerItem("aa_turret_traverse_platform", AATraversePlatformItem::new);
+	public final static Item AA_TURRET_GUN_BARREL = registerItem("aa_turret_gun_barrel", AAGunBarrelItem::new);
 
 	// FLAME TURRET
 	public final static Item FLAME_TURRET = registerItem("flame_turret", ModEntities.FLAME_TURRET, FlameTurretItem::new);
+	public final static Item FLAME_TURRET_BASE = registerItem("flame_turret_base", FlameBaseItem::new);
 
 	// MISSILE TURRET
 	public final static Item MISSILE_TURRET = registerItem("missile_turret", ModEntities.MISSILE_TURRET, MissileTurretItem::new);
@@ -234,7 +238,15 @@ public class ModItems {
 			MG_AMMO_ROUNDS,
 			MG_BASE,
 			MG_HEAD,
-			MG_STAND
+			MG_STAND,
+
+			// AA TURRET
+			AA_TURRET_BASE,
+			AA_TURRET_TRAVERSE_PLATFORM,
+			AA_TURRET_GUN_BARREL,
+
+			// FLAME TURRET
+			FLAME_TURRET_BASE,
 		};
 
 		DM_EQUIPMENTS = new Item[] {
@@ -262,11 +274,15 @@ public class ModItems {
 		};
 
 		FUEL_ITEMS = new Item[] {
-			// CANNON
+			// PELLET TURRET
+			PELLET_TURRET,
+
+			// CANNON TURRET
 			CANNON_STAND,
 			CANNON_BASE,
 
 			// BALLISTA
+			BALLISTA_TURRET,
 			BALLISTA_BOLT,
 			BALLISTA_BASE,
 			BALLISTA_BASE_WITH_STAND,

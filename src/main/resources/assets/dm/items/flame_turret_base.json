@@ -1,0 +1,31 @@
+{
+	"model": {
+		"type": "composite",
+		"models": [
+			{
+				"type": "model",
+				"model": "dm:item/tier2/flame_turret/flame_turret_base/0"
+			},
+			{
+				"type": "model",
+				"model": "dm:item/tier2/flame_turret/flame_turret_base/1"
+			},
+			{
+				"type": "model",
+				"model": "dm:item/tier2/flame_turret/flame_turret_base/2"
+			},
+			{
+				"type": "model",
+				"model": "dm:item/tier2/flame_turret/flame_turret_base/3"
+			},
+			{
+				"type": "model",
+				"model": "dm:item/tier2/flame_turret/flame_turret_base/4"
+			},
+			{
+				"type": "model",
+				"model": "dm:item/tier2/flame_turret/flame_turret_base/5"
+			}
+		]
+	}
+}

@@ -1,6 +1,6 @@
 {
 	"model": {
 		"type": "minecraft:model",
-		"model": "dm:item/aa_turret"
+		"model": "dm:item/tier2/aa_turret/aa_turret"
 	}
 }
