@@ -316,6 +316,16 @@ public abstract class TurretProjectileEntity extends Projectile {
 				if (this.getPierceLevel() <= 0) {
 					this.discard();
 				}
+
+				if (this.getDeltaMovement().lengthSqr() < 1.0E-7) {
+					ItemStack asStack = this.asItemStack();
+
+					if (this.pickupType == PickupPermission.ALLOWED && asStack != null) {
+						this.spawnAtLocation(serverWorld, asStack, 0.1f);
+					}
+
+					this.discard();
+				}
 			}
 			else {
 				hitEntity.hurtClient(dmgSrc);
@@ -323,14 +333,6 @@ public abstract class TurretProjectileEntity extends Projectile {
 				hitEntity.setRemainingFireTicks(fireTime);
 				this.deflect(ProjectileDeflection.REVERSE, hitEntity, EntityReference.of(hitEntity), false);
 				this.setDeltaMovement(this.getDeltaMovement().scale(0.2));
-
-				if (world instanceof ServerLevel serverWorld && this.getDeltaMovement().lengthSqr() < 1.0E-7) {
-					if (this.pickupType == PickupPermission.ALLOWED && this.stack != null) {
-						this.spawnAtLocation(serverWorld, this.asItemStack(), 0.1f);
-					}
-
-					this.discard();
-				}
 			}
 		}
 
