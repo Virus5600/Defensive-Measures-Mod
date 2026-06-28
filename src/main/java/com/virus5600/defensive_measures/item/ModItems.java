@@ -108,7 +108,7 @@ public class ModItems {
 
 	/**
 	 * Registers a turret item which spawns a turret entity.
-	 * @param name The name of the item. (e.g. "cannon_turret")
+	 * @param name The name of the item. (e.g. {@code "cannon_turret"})
 	 * @param entityType The entity type of the turret. (e.g. {@code ModEntities.CANNON_TURRET})
 	 * @param factory The factory method to create the turret item. Usually a lambda expression like {@code CannonTurretItem::new}.
 	 * @return The registered item.
@@ -138,7 +138,7 @@ public class ModItems {
 
 	/**
 	 * Registers a normal item such as ingredients, etc.
-	 * @param name The name of the item. (e.g. "cannon_base")
+	 * @param name The name of the item. (e.g. {@code "cannon_base"})
 	 * @param factory The factory method to create the item. Usually a lambda expression like {@code CannonBaseItem::new}.
 	 * @return The registered item.
 	 */
@@ -194,10 +194,12 @@ public class ModItems {
 
 		Arrays.stream(FUEL_ITEMS).iterator().forEachRemaining((item) -> FuelValueEvents.BUILD.register((builder, _) -> {
 			// Verifies whether the item is a valid fuel item. Ignores the item if it is not.
-			if (item instanceof FuelItem)
+			if (item instanceof FuelItem) {
 				builder.add(item, ((FuelItem) item).getFuelTime());
-			else
+			}
+			else {
 				DefensiveMeasures.LOGGER.warn("Item {} is not a valid fuel item.", item.getName(item.getDefaultInstance()).getString());
+			}
 		}));
 	}
 

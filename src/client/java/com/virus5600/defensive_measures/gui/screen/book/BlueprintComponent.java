@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Objects;
 
 public class BlueprintComponent extends RecipeBookComponent<AbstractCraftingMenu> {
-	private static final WidgetSprites FILTER_BUTTON_SPRITES = new WidgetSprites(Identifier.withDefaultNamespace("recipe_book/filter_enabled"), Identifier.withDefaultNamespace("recipe_book/filter_disabled"), Identifier.withDefaultNamespace("recipe_book/filter_enabled_highlighted"), Identifier.withDefaultNamespace("recipe_book/filter_disabled_highlighted"));
+	private static final WidgetSprites FILTER_BUTTON_SPRITES;
 	private static final Component ONLY_CRAFTABLES_TOOLTIP = Component.translatable("gui.recipebook.toggleRecipes.craftable");
 	private static final List<TabInfo> TABS;
 
@@ -36,7 +36,7 @@ public class BlueprintComponent extends RecipeBookComponent<AbstractCraftingMenu
 			this.menu.getInputGridSlots().contains(slot);
 	}
 
-	private boolean canDisplay(RecipeDisplay display) {
+	protected boolean canDisplay(RecipeDisplay display) {
 		int gridWidth = this.menu.getGridWidth();
 		int gridHeight = this.menu.getGridHeight();
 		boolean result;
@@ -94,19 +94,26 @@ public class BlueprintComponent extends RecipeBookComponent<AbstractCraftingMenu
 	// OVERRIDE METHODS //
 	// //////////////// //
 
-	protected int getxOffset() {
+	protected int getXOffset() {
 		return 106;
 	}
 
 	static {
+		FILTER_BUTTON_SPRITES = new WidgetSprites(
+			Identifier.withDefaultNamespace("recipe_book/filter_enabled"),
+			Identifier.withDefaultNamespace("recipe_book/filter_disabled"),
+			Identifier.withDefaultNamespace("recipe_book/filter_enabled_highlighted"),
+			Identifier.withDefaultNamespace("recipe_book/filter_disabled_highlighted")
+		);
+
 		TABS = List.of(
 			new TabInfo(ModRecipeBookCategory.TURRET_ASSEMBLY_STATION),
-			new TabInfo(ModItems.CANNON_TURRET, ModRecipeBookCategories.TAS_TURRETS),
-			new TabInfo(ModItems.BALLISTA_BOLT, ModItems.MG_HEAD, ModRecipeBookCategories.TAS_PARTS),
-			new TabInfo(ModItems.BOLT_HEAD, ModRecipeBookCategories.TAS_TRAPS),
-			new TabInfo(ModItems.ELECTRIC_FENCE, ModRecipeBookCategories.TAS_DEFENSE),
-			new TabInfo(ModItems.TURRET_REMOVER, ModRecipeBookCategories.TAS_EQUIPMENTS),
-			new TabInfo(Items.COPPER_INGOT, ModRecipeBookCategories.TAS_MISC)
+			new TabInfo("tas_turrets", ModItems.CANNON_TURRET, ModRecipeBookCategories.TAS_TURRETS),
+			new TabInfo("tas_parts", ModItems.MG_HEAD, ModItems.BALLISTA_BOW, ModRecipeBookCategories.TAS_PARTS),
+			new TabInfo("tas_traps", ModItems.BOLT_HEAD, ModRecipeBookCategories.TAS_TRAPS),
+			new TabInfo("tas_defense", ModItems.ELECTRIC_FENCE, ModRecipeBookCategories.TAS_DEFENSE),
+			new TabInfo("tas_equipment", ModItems.TURRET_REMOVER, ModRecipeBookCategories.TAS_EQUIPMENT),
+			new TabInfo("tas_misc", Items.COPPER_INGOT, ModRecipeBookCategories.TAS_MISC)
 		);
 	}
 }

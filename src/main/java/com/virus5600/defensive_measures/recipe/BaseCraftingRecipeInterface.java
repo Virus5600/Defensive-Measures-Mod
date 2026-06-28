@@ -21,7 +21,7 @@ public interface BaseCraftingRecipeInterface<T extends RecipeInput> extends Reci
 			case PARTS -> category = ModRecipeBookCategories.TAS_PARTS;
 			case TRAPS -> category = ModRecipeBookCategories.TAS_TRAPS;
 			case DEFENSE -> category = ModRecipeBookCategories.TAS_DEFENSE;
-			case EQUIPMENTS -> category = ModRecipeBookCategories.TAS_EQUIPMENTS;
+			case EQUIPMENT -> category = ModRecipeBookCategories.TAS_EQUIPMENT;
 			case MISC -> category = ModRecipeBookCategories.TAS_MISC;
 			default -> throw new MatchException(null, null);
 		}

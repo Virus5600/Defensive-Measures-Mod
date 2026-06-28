@@ -16,7 +16,7 @@ public enum ModRecipeBookCategory implements ExtendedRecipeBookCategory {
 		ModRecipeBookCategories.TAS_PARTS,
 		ModRecipeBookCategories.TAS_TRAPS,
 		ModRecipeBookCategories.TAS_DEFENSE,
-		ModRecipeBookCategories.TAS_EQUIPMENTS,
+		ModRecipeBookCategories.TAS_EQUIPMENT,
 		ModRecipeBookCategories.TAS_MISC
 	)
 	;

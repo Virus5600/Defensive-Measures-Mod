@@ -15,7 +15,7 @@ public class ModRecipeBookCategories {
 	public static final RecipeBookCategory TAS_PARTS = RegistryHelper.registerRecipeBookCat("tas_parts");
 	public static final RecipeBookCategory TAS_TRAPS = RegistryHelper.registerRecipeBookCat("tas_traps");
 	public static final RecipeBookCategory TAS_DEFENSE = RegistryHelper.registerRecipeBookCat("tas_defense");
-	public static final RecipeBookCategory TAS_EQUIPMENTS = RegistryHelper.registerRecipeBookCat("tas_equipments");
+	public static final RecipeBookCategory TAS_EQUIPMENT = RegistryHelper.registerRecipeBookCat("tas_equipments");
 	public static final RecipeBookCategory TAS_MISC = RegistryHelper.registerRecipeBookCat("tas_misc");
 
 	public static void registerBookCategories() {

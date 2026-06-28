@@ -183,6 +183,16 @@
 
 	"container.dm.turret_assembly_station": "Assembling",
 
+	"gui.recipebook.all": "All",
+	"gui.recipebook.blueprint": "Blueprint",
+	"gui.recipebook.close": "Close",
+
+	"gui.recipebook.tas_turrets": "Turrets",
+	"gui.recipebook.tas_parts": "Parts",
+	"gui.recipebook.tas_traps": "Traps",
+	"gui.recipebook.tas_defense": "Defenses",
+	"gui.recipebook.tas_equipments": "Equipment",
+
 	"stat.dm.interact_with_turret_assembly_station": "Interactions with Turret Assembly Station",
 
 	"commands.playanimation.success.single": "Played %2$s animation for %1$s.",

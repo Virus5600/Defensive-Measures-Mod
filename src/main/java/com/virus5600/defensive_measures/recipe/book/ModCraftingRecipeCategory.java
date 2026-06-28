@@ -16,8 +16,8 @@ public enum ModCraftingRecipeCategory implements StringRepresentable {
 	TURRETS("turrets", 0),
 	PARTS("parts", 1),
 	TRAPS("traps", 2),
-	DEFENSE("defense", 3),
-	EQUIPMENTS("equipments", 4),
+	DEFENSE("defenses", 3),
+	EQUIPMENT("equipment", 4),
 	MISC("misc", 5);
 
 	public static final Codec<ModCraftingRecipeCategory> CODEC = StringRepresentable.fromEnum(ModCraftingRecipeCategory::values);

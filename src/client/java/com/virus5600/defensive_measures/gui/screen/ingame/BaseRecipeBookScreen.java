@@ -3,9 +3,7 @@ package com.virus5600.defensive_measures.gui.screen.ingame;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.components.ImageButton;
-import net.minecraft.client.gui.components.WidgetSprites;
+import net.minecraft.client.gui.components.*;
 import net.minecraft.client.gui.navigation.ScreenPosition;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.recipebook.RecipeUpdateListener;
@@ -13,6 +11,7 @@ import net.minecraft.client.input.CharacterEvent;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.inventory.RecipeBookMenu;
@@ -20,12 +19,17 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.crafting.display.RecipeDisplay;
 
 import com.virus5600.defensive_measures.gui.screen.book.RecipeBookComponent;
+
 import org.jspecify.annotations.NonNull;
+
+import com.google.common.collect.Maps;
+import java.util.Map;
 
 @Environment(EnvType.CLIENT)
 public abstract class BaseRecipeBookScreen<T extends RecipeBookMenu> extends AbstractContainerScreen<T> implements RecipeUpdateListener {
 	private final RecipeBookComponent<?> recipeBook;
 	private boolean narrow;
+	protected final Map<AbstractWidget, UpdateScreenPosition> widgets;
 
 	public BaseRecipeBookScreen(
 		T handler, RecipeBookComponent<?> recipeBook, Inventory inventory, Component title,
@@ -34,6 +38,7 @@ public abstract class BaseRecipeBookScreen<T extends RecipeBookMenu> extends Abs
 		super(handler, inventory, title, imageWidth, imageHeight);
 
 		this.recipeBook = recipeBook;
+		this.widgets = Maps.newHashMap();
 	}
 
 	protected void init() {
@@ -43,16 +48,44 @@ public abstract class BaseRecipeBookScreen<T extends RecipeBookMenu> extends Abs
 		this.getRecipeBook().init(this.width, this.height, this.minecraft, this.narrow);
 		this.leftPos = this.getRecipeBook().updateScreenPosition(this.width, this.imageWidth);
 		this.initButton();
+		this.initCloseButton();
 	}
 
 	protected void initButton() {
-		ScreenPosition screenPos = this.getRecipeBookButtonPos();
+		ScreenPosition screenPos = this.getRecipeBookButtonPos(
+			this.leftPos, this.topPos,
+			this.imageWidth, this.imageHeight,
+			this.width, this.height
+		);
 
-		this.addRenderableWidget(new ImageButton(
+		ImageButton btn = new ImageButton(
 			screenPos.x(), screenPos.y(), 20, 18,
-			this.getButtonTexture(), this::getRecipeBookButtonAction
-		));
+			this.getButtonTexture(),
+			this::getRecipeBookButtonAction
+		);
+
+		btn.setTooltip(Tooltip.create(Component.translatable("gui.recipebook.blueprint")));
+
+		this.addUpdatebleWidget(btn, this::getRecipeBookButtonPos);
 		this.addWidget(this.getRecipeBook());
+	}
+
+	protected final void initCloseButton() {
+		ScreenPosition screenPos = getCloseButtonPos(
+			this.leftPos, this.topPos,
+			this.imageWidth, this.imageHeight,
+			this.width, this.height
+		);
+
+		ImageButton btn = new ImageButton(
+			screenPos.x(), screenPos.y(), 15, 15,
+			getCloseButtonTexture(),
+			_ -> this.minecraft.gui.setScreen(null)
+		);
+
+		btn.setTooltip(Tooltip.create(Component.translatable("gui.recipebook.close")));
+
+		this.addUpdatebleWidget(btn, BaseRecipeBookScreen::getCloseButtonPos);
 	}
 
 	public void extractRenderState(@NonNull GuiGraphicsExtractor graphics, int mouseX, int mouseY, float deltaTicks) {
@@ -128,12 +161,61 @@ public abstract class BaseRecipeBookScreen<T extends RecipeBookMenu> extends Abs
 		this.getRecipeBook().fillGhostRecipe(display);
 	}
 
+	public final void updateWidgetPositions() {
+		this.widgets.forEach((widget, lambda) -> {
+			ScreenPosition newPos = lambda.updateScreenPosition(
+				this.leftPos, this.topPos,
+				this.imageWidth, this.imageHeight,
+				this.width, this.height
+			);
+
+			widget.setPosition(newPos.x(), newPos.y());
+		});
+	}
+
 	// ///////////////// //
 	// GETTERS & SETTERS //
 	// ///////////////// //
 
+	/**
+	 * Adds a widget that gets its position updated when {@link #updateWidgetPositions()} gets
+	 * called.
+	 *
+	 * @param widget An instance of {@link AbstractWidget} that will be added to the screen and have its position updated.
+	 * @param lambda An instance of {@link UpdateScreenPosition} functional interface that gets called to calculate the new position of the {@code widget}.
+	 *
+	 * @return The same widget that was passed in as a parameter, allowing for method chaining or further manipulation if needed.
+	 *
+	 * @see UpdateScreenPosition
+	 *
+	 * @implNote This method is final and cannot be re-implemented. To extend this method, you will
+	 * have to create a new one and then call this method from within.
+	 *
+	 * @apiNote This method adds the widget to the {@link #widgets} field and in a private
+	 * {@code renderer} field under the {@link net.minecraft.client.gui.screens.Screen Screen} class.
+	 */
+	protected final AbstractWidget addUpdatebleWidget(final AbstractWidget widget, final UpdateScreenPosition lambda) {
+		this.widgets.put(widget, lambda);
+
+		return super.addRenderableWidget(widget);
+	}
+
 	protected RecipeBookComponent<?> getRecipeBook() {
 		return this.recipeBook;
+	}
+
+	protected static ScreenPosition getCloseButtonPos(int leftPos, int topPos, int imageWidth, int imageHeight, int screenWidth, int screenHeight) {
+		return new ScreenPosition(
+			leftPos + imageWidth - 22,
+			topPos + 7
+		);
+	}
+
+	protected static WidgetSprites getCloseButtonTexture() {
+		return new WidgetSprites(
+			Identifier.withDefaultNamespace("widget/cross_button"),
+			Identifier.withDefaultNamespace("widget/cross_button_highlighted")
+		);
 	}
 
 	// /////////////////// //
@@ -144,19 +226,54 @@ public abstract class BaseRecipeBookScreen<T extends RecipeBookMenu> extends Abs
 		this.getRecipeBook().toggleVisibility();
 		this.leftPos = this.getRecipeBook().updateScreenPosition(this.width, this.imageWidth);
 
-		ScreenPosition updatedButtonPos = this.getRecipeBookButtonPos();
-		btnWidget.setPosition(updatedButtonPos.x(), updatedButtonPos.y());
-
-		this.onRecipeBookButtonClick();
-	}
-
-	protected void onRecipeBookButtonClick() {
+		this.updateWidgetPositions();
 	}
 
 	// //////////////// //
 	// ABSTRACT METHODS //
 	// //////////////// //
-	protected abstract ScreenPosition getRecipeBookButtonPos();
+
+	/**
+	 * Calculates the position of the recipe book button based on the given parameters and returns a {@link ScreenPosition} object.
+	 *
+	 * @param leftPos      The left-most position of the parent screen.
+	 * @param topPos       The top-most position of the parent screen.
+	 * @param imageWidth   The width of the parent screen's size.
+	 * @param imageHeight  The height of the parent screen's size.
+	 * @param screenWidth  The width of the current screen.
+	 * @param screenHeight The height of the current screen.
+	 *
+	 * @return The calculated {@link ScreenPosition} object representing the position of the recipe book button.
+	 */
+	protected abstract ScreenPosition getRecipeBookButtonPos(int leftPos, int topPos, int imageWidth, int imageHeight, int screenWidth, int screenHeight);
 
 	protected abstract WidgetSprites getButtonTexture();
+
+	// //////////////////// //
+	// FUNCTIONAL INTERFACE //
+	// //////////////////// //
+
+	/**
+	 * A functional interface that guarantees an updated {@link ScreenPosition} for a widget or any
+	 * element that requires a position update based on the current screen dimensions and the parent
+	 * screen's size. And since this functional interface utilizes the screens top-left position and
+	 * its size, it can be used to calculate the new position of any widget or element that needs
+	 * to be repositioned when the screen size changes within or outside a screen/UI.
+	 */
+	@FunctionalInterface
+	protected interface UpdateScreenPosition {
+		/**
+		 * Calculates the new screen position based on the given parameters and returns a {@link ScreenPosition} object.
+		 *
+		 * @param leftPos     The left-most position of the parent screen.
+		 * @param topPos      The top-most position of the parent screen.
+		 * @param imageWidth  The width of the parent screen's size.
+		 * @param imageHeight The height of the parent screen's size.
+		 * @param screenWidth  The width of the current screen.
+		 * @param screenHeight The height of the current screen.
+		 *
+		 * @return The calculated {@link ScreenPosition} object representing the new position.
+		 */
+		ScreenPosition updateScreenPosition(int leftPos, int topPos, int imageWidth, int imageHeight, int screenWidth, int screenHeight);
+	}
 }

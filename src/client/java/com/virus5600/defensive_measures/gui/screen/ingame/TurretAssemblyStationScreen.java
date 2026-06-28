@@ -37,10 +37,10 @@ public class TurretAssemblyStationScreen extends BaseRecipeBookScreen<TurretAsse
 		super.init();
 	}
 
-	protected ScreenPosition getRecipeBookButtonPos() {
+	protected ScreenPosition getRecipeBookButtonPos(int leftPos, int topPos, int imageWidth, int imageHeight, int screenWidth, int screenHeight) {
 		return new ScreenPosition(
-			this.leftPos + 27,
-			this.height / 2 + 55
+			leftPos + 27,
+			screenHeight / 2 + 55
 		);
 	}
 

@@ -122,7 +122,7 @@ public abstract class RecipeBookComponent<T extends RecipeBookMenu> implements G
 
 	protected void initVisuals() {
 		boolean isFiltering = this.isFiltering();
-		this.xOffset = this.widthTooNarrow ? 0 : this.getxOffset();
+		this.xOffset = this.widthTooNarrow ? 0 : this.getXOffset();
 		int xOrigin = this.getXOrigin();
 		int yOrigin = this.getYOrigin();
 
@@ -168,7 +168,17 @@ public abstract class RecipeBookComponent<T extends RecipeBookMenu> implements G
 		this.tabButtons.clear();
 
 		for (TabInfo tabInfo : this.tabInfos) {
-			this.tabButtons.add(new BaseRecipeBookTabButton(0, 0, tabInfo, this::onTabButtonPress));
+			BaseRecipeBookTabButton btn = new BaseRecipeBookTabButton(0, 0, tabInfo, this::onTabButtonPress);
+
+			if (tabInfo.category() instanceof ExtendedRecipeBookCategory
+				&& !(tabInfo.category() instanceof RecipeBookCategory)
+			) {
+				btn.setTooltip(Tooltip.create(Component.translatable("gui.recipebook.all")));
+			} else {
+				btn.setTooltip(Tooltip.create(Component.translatable("gui.recipebook." + tabInfo.langGuiKey())));
+			}
+
+			this.tabButtons.add(btn);
 		}
 
 		// Try to find the same tab as before, since the recipe book doesn't track the current tab.
@@ -591,7 +601,7 @@ public abstract class RecipeBookComponent<T extends RecipeBookMenu> implements G
 	}
 
 	private boolean isOffsetNextToMainGUI() {
-		return this.xOffset == this.getxOffset();
+		return this.xOffset == this.getXOffset();
 	}
 
 	public void recipesUpdated() {
@@ -680,7 +690,7 @@ public abstract class RecipeBookComponent<T extends RecipeBookMenu> implements G
 		return this.uvSize;
 	}
 
-	protected int getxOffset() {
+	protected int getXOffset() {
 		return 86;
 	}
 
@@ -723,18 +733,22 @@ public abstract class RecipeBookComponent<T extends RecipeBookMenu> implements G
 	// CUSTOM RECORD //
 	// ///////////// //
 
-	public record TabInfo(ItemStack primaryIcon, Optional<ItemStack> secondaryIcon,
-	                      ExtendedRecipeBookCategory category) {
+	public record TabInfo(
+		String langGuiKey,
+		ItemStack primaryIcon,
+		Optional<ItemStack> secondaryIcon,
+		ExtendedRecipeBookCategory category
+	) {
 		public TabInfo(ModRecipeBookCategory type) {
-			this(new ItemStack(Items.COMPASS), Optional.empty(), type);
+			this("all", new ItemStack(Items.COMPASS), Optional.empty(), type);
 		}
 
-		public TabInfo(Item primaryIcon, RecipeBookCategory category) {
-			this(new ItemStack(primaryIcon), Optional.empty(), category);
+		public TabInfo(String langGuiKey, Item primaryIcon, RecipeBookCategory category) {
+			this(langGuiKey, new ItemStack(primaryIcon), Optional.empty(), category);
 		}
 
-		public TabInfo(Item primaryIcon, Item secondaryIcon, RecipeBookCategory category) {
-			this(new ItemStack(primaryIcon), Optional.of(new ItemStack(secondaryIcon)), category);
+		public TabInfo(String langGuiKey, Item primaryIcon, Item secondaryIcon, RecipeBookCategory category) {
+			this(langGuiKey, new ItemStack(primaryIcon), Optional.of(new ItemStack(secondaryIcon)), category);
 		}
 	}
 }
