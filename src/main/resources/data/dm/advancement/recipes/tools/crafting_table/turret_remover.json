@@ -17,13 +17,11 @@
 		}
 	},
 	"requirements": [
-		[
-			"has_ingredients"
-		]
+		["has_ingredients"]
 	],
 	"rewards": {
 		"recipes": [
-			"dm:turret_remover"
+			"dm:_crafting_table/tools/turret_remover"
 		]
 	}
 }

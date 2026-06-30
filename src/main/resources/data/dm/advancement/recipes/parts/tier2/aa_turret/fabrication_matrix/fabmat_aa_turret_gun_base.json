@@ -1,0 +1,46 @@
+﻿{
+	"parent": "minecraft:recipes/root",
+	"criteria": {
+		"fabmat_interacted": {
+			"trigger": "minecraft:tick",
+			"conditions": {
+				"player": {
+					"minecraft:type_specific/player": {
+						"stats": [
+							{
+								"type": "minecraft:custom",
+								"stat": "dm:interact_with_fabrication_matrix",
+								"value": {
+									"min": 1
+								}
+							}
+						]
+					}
+				}
+			}
+		},
+		"has_ingredients": {
+			"trigger": "minecraft:inventory_changed",
+			"conditions": {
+				"items": [
+					{
+						"items": [
+							"dm:aa_turret_gun_barrel",
+							"dm:aa_turret_traverse_platform",
+							"dm:aa_turret_base"
+						]
+					}
+				]
+			}
+		}
+	},
+	"requirements": [
+		["fabmat_interacted"],
+		["has_ingredients"]
+	],
+	"rewards": {
+		"recipes": [
+			"dm:_fabrication_matrix/parts/tier2/aa_turret/aa_turret_gun_base"
+		]
+	}
+}

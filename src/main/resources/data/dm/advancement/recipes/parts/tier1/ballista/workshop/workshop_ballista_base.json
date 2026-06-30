@@ -1,0 +1,42 @@
+﻿{
+	"parent": "minecraft:recipes/root",
+	"criteria": {
+		"tas_interacted": {
+			"trigger": "minecraft:tick",
+			"conditions": {
+				"player": {
+					"minecraft:type_specific/player": {
+						"stats": [
+							{
+								"type": "minecraft:custom",
+								"stat": "dm:interact_with_turret_assembly_station",
+								"value": {
+									"min": 1
+								}
+							}
+						]
+					}
+				}
+			}
+		},
+		"has_ingredients": {
+			"trigger": "minecraft:inventory_changed",
+			"conditions": {
+				"items": [
+					{
+						"items": "#minecraft:wooden_slabs"
+					}
+				]
+			}
+		}
+	},
+	"requirements": [
+		["tas_interacted"],
+		["has_ingredients"]
+	],
+	"rewards": {
+		"recipes": [
+			"dm:_workshop/parts/tier1/ballista/ballista_base"
+		]
+	}
+}

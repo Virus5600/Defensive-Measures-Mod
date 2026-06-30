@@ -1,0 +1,25 @@
+{
+	"type": "dm:fabmat_shaped",
+	"category": "turrets",
+	"pattern": [
+		"iiiiiii",
+		" pccct ",
+		" pccct ",
+		" pccct ",
+		"iiiiiii",
+		"  ibi  ",
+		" ssbss "
+	],
+	"key": {
+		"i": "minecraft:iron_ingot",
+		"b": "minecraft:iron_block",
+		"s": "minecraft:smooth_stone_slab",
+		"p": "minecraft:blaze_powder",
+		"c": "minecraft:copper_ingot",
+		"t": "minecraft:tnt"
+	},
+	"result": {
+		"id": "dm:missile_turret",
+		"count": 1
+	}
+}

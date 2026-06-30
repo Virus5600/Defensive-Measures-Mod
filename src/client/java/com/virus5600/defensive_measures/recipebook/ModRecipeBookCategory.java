@@ -18,6 +18,22 @@ public enum ModRecipeBookCategory implements ExtendedRecipeBookCategory {
 		ModRecipeBookCategories.TAS_DEFENSE,
 		ModRecipeBookCategories.TAS_EQUIPMENT,
 		ModRecipeBookCategories.TAS_MISC
+	),
+	WORKSHOP(
+		ModRecipeBookCategories.WORKSHOP_TURRETS,
+		ModRecipeBookCategories.WORKSHOP_PARTS,
+		ModRecipeBookCategories.WORKSHOP_TRAPS,
+		ModRecipeBookCategories.WORKSHOP_DEFENSE,
+		ModRecipeBookCategories.WORKSHOP_EQUIPMENT,
+		ModRecipeBookCategories.WORKSHOP_MISC
+	),
+	FABRICATION_MATRIX(
+		ModRecipeBookCategories.FABMAT_TURRETS,
+		ModRecipeBookCategories.FABMAT_PARTS,
+		ModRecipeBookCategories.FABMAT_TRAPS,
+		ModRecipeBookCategories.FABMAT_DEFENSE,
+		ModRecipeBookCategories.FABMAT_EQUIPMENT,
+		ModRecipeBookCategories.FABMAT_MISC
 	)
 	;
 

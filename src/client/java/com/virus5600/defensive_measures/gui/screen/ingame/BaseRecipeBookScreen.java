@@ -20,16 +20,17 @@ import net.minecraft.world.item.crafting.display.RecipeDisplay;
 
 import com.virus5600.defensive_measures.gui.screen.book.RecipeBookComponent;
 
+import com.google.common.collect.Maps;
 import org.jspecify.annotations.NonNull;
 
-import com.google.common.collect.Maps;
 import java.util.Map;
 
 @Environment(EnvType.CLIENT)
 public abstract class BaseRecipeBookScreen<T extends RecipeBookMenu> extends AbstractContainerScreen<T> implements RecipeUpdateListener {
 	private final RecipeBookComponent<?> recipeBook;
-	private boolean narrow;
 	protected final Map<AbstractWidget, UpdateScreenPosition> widgets;
+	private ImageButton recipeBookBtn;
+	private boolean narrow;
 
 	public BaseRecipeBookScreen(
 		T handler, RecipeBookComponent<?> recipeBook, Inventory inventory, Component title,
@@ -41,14 +42,30 @@ public abstract class BaseRecipeBookScreen<T extends RecipeBookMenu> extends Abs
 		this.widgets = Maps.newHashMap();
 	}
 
+	// ////////////////////// //
+	// INITIALIZATION METHODS //
+	// ////////////////////// //
+
 	protected void init() {
 		super.init();
 
-		this.narrow = this.width < 379;
-		this.getRecipeBook().init(this.width, this.height, this.minecraft, this.narrow);
-		this.leftPos = this.getRecipeBook().updateScreenPosition(this.width, this.imageWidth);
+		this.narrow = this.width < 450;
+		this.recipeBook.init(this.width, this.height, this.minecraft, this.narrow);
+		this.leftPos = this.recipeBook.updateScreenPosition(this.width, this.imageWidth);
 		this.initButton();
 		this.initCloseButton();
+
+		if (!this.hasRecipes()) {
+			if (this.minecraft.player != null) {
+				this.minecraft
+					.player
+					.sendOverlayMessage(Component.translatable("gui.recipebook.no_recipes"));
+			}
+
+			if (this.recipeBook.isVisible()) {
+				this.recipeBook.toggleVisibility();
+			}
+		}
 	}
 
 	protected void initButton() {
@@ -58,15 +75,15 @@ public abstract class BaseRecipeBookScreen<T extends RecipeBookMenu> extends Abs
 			this.width, this.height
 		);
 
-		ImageButton btn = new ImageButton(
+		this.recipeBookBtn = new ImageButton(
 			screenPos.x(), screenPos.y(), 20, 18,
 			this.getButtonTexture(),
-			this::getRecipeBookButtonAction
+			this::recipeBookButtonAction
 		);
 
-		btn.setTooltip(Tooltip.create(Component.translatable("gui.recipebook.blueprint")));
+		this.updateRecipeBookTooltip();
 
-		this.addUpdatebleWidget(btn, this::getRecipeBookButtonPos);
+		this.addUpdatebleWidget(this.recipeBookBtn, this::getRecipeBookButtonPos);
 		this.addWidget(this.getRecipeBook());
 	}
 
@@ -86,6 +103,25 @@ public abstract class BaseRecipeBookScreen<T extends RecipeBookMenu> extends Abs
 		btn.setTooltip(Tooltip.create(Component.translatable("gui.recipebook.close")));
 
 		this.addUpdatebleWidget(btn, BaseRecipeBookScreen::getCloseButtonPos);
+	}
+
+	// /////// //
+	// METHODS //
+	// /////// //
+
+	public boolean hasRecipes() {
+		int recipes = this.recipeBook.selectMatchingRecipes();
+
+		return recipes > 0;
+	}
+
+	private void updateRecipeBookTooltip() {
+		if (this.hasRecipes()) {
+			this.recipeBookBtn.setTooltip(Tooltip.create(Component.translatable("gui.recipebook.blueprint")));
+		}
+		else {
+			this.recipeBookBtn.setTooltip(Tooltip.create(Component.translatable("gui.recipebook.no_recipes")));
+		}
 	}
 
 	public void extractRenderState(@NonNull GuiGraphicsExtractor graphics, int mouseX, int mouseY, float deltaTicks) {
@@ -150,7 +186,16 @@ public abstract class BaseRecipeBookScreen<T extends RecipeBookMenu> extends Abs
 
 	public void containerTick() {
 		super.containerTick();
-		this.getRecipeBook().tick();
+
+		if ((this.recipeBook.isVisible() || this.hasRecipes()) && this.minecraft.player != null) {
+			int timesChanged = this.minecraft.player.getInventory().getTimesChanged();
+
+			if (this.recipeBook.getTimesInventoryChanged() != timesChanged) {
+				this.updateRecipeBookTooltip();
+			}
+		}
+
+		this.recipeBook.tick();
 	}
 
 	public void recipesUpdated() {
@@ -222,9 +267,18 @@ public abstract class BaseRecipeBookScreen<T extends RecipeBookMenu> extends Abs
 	// OVERRIDABLE METHODS //
 	// /////////////////// //
 
-	protected void getRecipeBookButtonAction(Button btnWidget) {
-		this.getRecipeBook().toggleVisibility();
-		this.leftPos = this.getRecipeBook().updateScreenPosition(this.width, this.imageWidth);
+	protected void recipeBookButtonAction(Button btnWidget) {
+		if (!this.hasRecipes()) {
+			if (this.minecraft.player != null) {
+				this.minecraft
+					.player
+					.sendOverlayMessage(Component.translatable("gui.recipebook.no_recipes"));
+			}
+			return;
+		}
+
+		this.recipeBook.toggleVisibility();
+		this.leftPos = this.recipeBook.updateScreenPosition(this.width, this.imageWidth);
 
 		this.updateWidgetPositions();
 	}

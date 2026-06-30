@@ -84,9 +84,15 @@ public class ModItems {
 	// FLAME TURRET
 	public final static Item FLAME_TURRET = registerItem("flame_turret", ModEntities.FLAME_TURRET, FlameTurretItem::new);
 	public final static Item FLAME_TURRET_BASE = registerItem("flame_turret_base", FlameBaseItem::new);
+	public final static Item FLAME_TURRET_HEAD = registerItem("flame_turret_head", FlameHeadItem::new);
+	public final static Item FLAME_TURRET_NOZZLE = registerItem("flame_turret_nozzle", FlameNozzleItem::new);
 
 	// MISSILE TURRET
 	public final static Item MISSILE_TURRET = registerItem("missile_turret", ModEntities.MISSILE_TURRET, MissileTurretItem::new);
+	public final static Item MISSILE_TURRET_BASE = registerItem("missile_turret_base", MissileBaseItem::new);
+	public final static Item MISSILE_TURRET_COLUMN = registerItem("missile_turret_column", MissileColumnItem::new);
+	public final static Item MISSILE_TURRET_BATTERY = registerItem("missile_turret_battery", MissileBatteryItem::new);
+	public final static Item MISSILE_TURRET_RADAR = registerItem("missile_turret_radar", MissileRadarItem::new);
 
 	// PELLET TURRET
 	public final static Item PELLET_TURRET = registerItem("pellet_turret", ModEntities.PELLET_TURRET, PelletTurretItem::new);
@@ -247,6 +253,14 @@ public class ModItems {
 
 			// FLAME TURRET
 			FLAME_TURRET_BASE,
+			FLAME_TURRET_HEAD,
+			FLAME_TURRET_NOZZLE,
+
+			// MISSILE TURRET
+			MISSILE_TURRET_BASE,
+			MISSILE_TURRET_COLUMN,
+			MISSILE_TURRET_BATTERY,
+			MISSILE_TURRET_RADAR,
 		};
 
 		DM_EQUIPMENTS = new Item[] {

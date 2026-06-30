@@ -2,18 +2,21 @@
 	"parent": "minecraft:recipes/root",
 	"criteria": {
 		"tas_interacted": {
-			"trigger": "minecraft:default_block_use",
+			"trigger": "minecraft:tick",
 			"conditions": {
-				"location": [
-					{
-						"condition": "minecraft:location_check",
-						"predicate": {
-							"block": {
-								"blocks": "dm:turret_assembly_station"
+				"player": {
+					"minecraft:type_specific/player": {
+						"stats": [
+							{
+								"type": "minecraft:custom",
+								"stat": "dm:interact_with_turret_assembly_station",
+								"value": {
+									"min": 1
+								}
 							}
-						}
+						]
 					}
-				]
+				}
 			}
 		},
 		"has_ingredients": {
@@ -32,16 +35,12 @@
 		}
 	},
 	"requirements": [
-		[
-			"tas_interacted"
-		],
-		[
-			"has_ingredients"
-		]
+		["tas_interacted"],
+		["has_ingredients"]
 	],
 	"rewards": {
 		"recipes": [
-			"dm:_turret_assembly_station/turret_remover"
+			"dm:_turret_assembly_station/tools/tier1/turret_remover"
 		]
 	}
 }

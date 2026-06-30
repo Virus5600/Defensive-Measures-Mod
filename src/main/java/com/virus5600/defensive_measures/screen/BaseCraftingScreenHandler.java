@@ -373,7 +373,7 @@ public abstract class BaseCraftingScreenHandler<T extends BaseCraftingRecipe<Cra
 
 				@Override
 				public boolean recipeMatches(@NonNull RecipeHolder entry) {
-					BaseCraftingRecipe<?> recipe = (BaseCraftingRecipe<?>) entry.value();
+					BaseCraftingRecipe<CraftingInput> recipe = (BaseCraftingRecipe<CraftingInput>) entry.value();
 
 					return recipe.matches(
 						BaseCraftingScreenHandler.this.craftSlots.asCraftInput(),

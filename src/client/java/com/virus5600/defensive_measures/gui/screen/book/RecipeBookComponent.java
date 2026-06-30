@@ -1,5 +1,6 @@
 package com.virus5600.defensive_measures.gui.screen.book;
 
+import com.virus5600.defensive_measures.DefensiveMeasures;
 import net.minecraft.client.ClientRecipeBook;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.*;
@@ -64,12 +65,12 @@ import org.jspecify.annotations.Nullable;
  * @since 1.1.0-beta
  */
 public abstract class RecipeBookComponent<T extends RecipeBookMenu> implements GuiEventListener, Renderable, NarratableEntry {
-	private static final Identifier TEXTURE = Identifier.withDefaultNamespace("textures/gui/recipe_book.png");
+	private static final Identifier TEXTURE = Identifier.fromNamespaceAndPath(DefensiveMeasures.MOD_ID, "textures/gui/container/recipe_book.png");
 	private static final Component SEARCH_HINT_TEXT = Component.translatable("gui.recipebook.search_hint").withStyle(EditBox.SEARCH_HINT_STYLE);
 	private static final Component TOGGLE_ALL_RECIPES_TEXT = Component.translatable("gui.recipebook.toggleRecipes.all");
 
 	private final Dimension dimension = new Dimension(256, 256);
-	private final Dimension uvSize = new Dimension(147, 166);
+	private final Dimension uvSize = new Dimension(147, 195);
 	private final GhostSlots ghostRecipe;
 	private final List<BaseRecipeBookTabButton> tabButtons = Lists.newArrayList();
 	private final List<TabInfo> tabInfos;
@@ -202,17 +203,17 @@ public abstract class RecipeBookComponent<T extends RecipeBookMenu> implements G
 	}
 
 	private int getYOrigin() {
-		return (this.parentHeight - this.getUVSize().height) / 2;
+		return (this.parentHeight - this.uvSize.height) / 2;
 	}
 
 	private int getXOrigin() {
-		return (this.parentWidth - this.getUVSize().width) / 2 - this.xOffset;
+		return (this.parentWidth - this.uvSize.width) / 2 - this.xOffset;
 	}
 
 	public int updateScreenPosition(int width, int imageWidth) {
 		int leftPos;
 		if (this.isVisible() && !this.widthTooNarrow) {
-			leftPos = 177 + (width - imageWidth - 200) / 2;
+			leftPos = 170 + (width - imageWidth - this.uvSize.width) / 2;
 		} else {
 			leftPos = (width - imageWidth) / 2;
 		}
@@ -256,7 +257,9 @@ public abstract class RecipeBookComponent<T extends RecipeBookMenu> implements G
 		}
 	}
 
-	private void selectMatchingRecipes() {
+	public int selectMatchingRecipes() {
+		int matchedRecipes = 0;
+
 		for (TabInfo tab : this.tabInfos) {
 			ExtendedRecipeBookCategory category = tab.category();
 
@@ -264,14 +267,18 @@ public abstract class RecipeBookComponent<T extends RecipeBookMenu> implements G
 				for (RecipeBookCategory recipeCategory : modRecipeBookType.includedCategories()) {
 					for (RecipeCollection recipeResultCollection : this.book.getCollection(recipeCategory)) {
 						this.selectMatchingRecipes(recipeResultCollection, this.stackedContents);
+						matchedRecipes++;
 					}
 				}
 			} else {
 				for (RecipeCollection recipeResultCollection : this.book.getCollection(category)) {
 					this.selectMatchingRecipes(recipeResultCollection, this.stackedContents);
+					matchedRecipes++;
 				}
 			}
 		}
+
+		return matchedRecipes;
 	}
 
 	private void updateCollections(boolean resetPage, boolean isFiltering) {
@@ -312,8 +319,8 @@ public abstract class RecipeBookComponent<T extends RecipeBookMenu> implements G
 	}
 
 	private void updateTabs(boolean filteringCraftable) {
-		int xPosTab = (this.parentWidth - this.getUVSize().width) / 2 - this.xOffset - 30;
-		int yPosTab = (this.parentHeight - this.getUVSize().height) / 2 + 3;
+		int xPosTab = (this.parentWidth - this.uvSize.width) / 2 - this.xOffset - 30;
+		int yPosTab = (this.parentHeight - this.uvSize.height) / 2 + 3;
 		int yOffset = 27;
 		int index = 0;
 
@@ -329,6 +336,10 @@ public abstract class RecipeBookComponent<T extends RecipeBookMenu> implements G
 				tabBtn.startAnimation(this.book, filteringCraftable);
 			}
 		}
+	}
+
+	public int getTimesInventoryChanged() {
+		return this.timesInventoryChanged;
 	}
 
 	public void tick() {
@@ -368,7 +379,7 @@ public abstract class RecipeBookComponent<T extends RecipeBookMenu> implements G
 			int xOrigin = this.getXOrigin();
 			int yOrigin = this.getYOrigin();
 
-			Dimension uvDimension = this.getUVSize();
+			Dimension uvDimension = this.uvSize;
 			Dimension textureDimension = this.getTextureSize();
 
 			graphics.blit(
@@ -404,7 +415,7 @@ public abstract class RecipeBookComponent<T extends RecipeBookMenu> implements G
 
 	public boolean mouseClicked(@NonNull MouseButtonEvent event, boolean doubleClick) {
 		if (this.isVisible() && !this.minecraft.player.isSpectator()) {
-			Dimension uvDimension = this.getUVSize();
+			Dimension uvDimension = this.uvSize;
 			boolean recipesAreaClicked = this.recipeBookPage
 				.mouseClicked(event,
 					this.getXOrigin(), this.getYOrigin(),
@@ -503,7 +514,7 @@ public abstract class RecipeBookComponent<T extends RecipeBookMenu> implements G
 				mouseX >= (double) (x + imageWidth) ||
 				mouseY >= (double) (y + imageHeight);
 
-			boolean clickedOnRecipeBook = (double) (x - this.getUVSize().width) < mouseX &&
+			boolean clickedOnRecipeBook = (double) (x - this.uvSize.width) < mouseX &&
 				mouseX < (double) x &&
 				(double) y < mouseY &&
 				mouseY < (double) (y + imageHeight);
@@ -689,6 +700,7 @@ public abstract class RecipeBookComponent<T extends RecipeBookMenu> implements G
 	protected Dimension getUVSize() {
 		return this.uvSize;
 	}
+
 
 	protected int getXOffset() {
 		return 86;

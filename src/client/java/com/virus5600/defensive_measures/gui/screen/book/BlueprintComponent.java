@@ -12,11 +12,12 @@ import net.minecraft.world.inventory.AbstractCraftingMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.display.RecipeDisplay;
+import net.minecraft.world.item.crafting.display.ShapelessCraftingRecipeDisplay;
 import net.minecraft.world.item.crafting.display.SlotDisplay;
 
 import com.virus5600.defensive_measures.item.ModItems;
 import com.virus5600.defensive_measures.recipe.book.ModRecipeBookCategories;
-import com.virus5600.defensive_measures.recipe.display.TASCraftingRecipeDisplay;
+import com.virus5600.defensive_measures.recipe.display.FlexibleShapedCraftingRecipeDisplay;
 import com.virus5600.defensive_measures.recipebook.ModRecipeBookCategory;
 
 import java.util.List;
@@ -41,8 +42,10 @@ public class BlueprintComponent extends RecipeBookComponent<AbstractCraftingMenu
 		int gridHeight = this.menu.getGridHeight();
 		boolean result;
 
+		// Include display condition handling here when created...
 		switch (display) {
-			case TASCraftingRecipeDisplay tas -> result = gridWidth >= tas.width() && gridHeight >= tas.height();
+			case FlexibleShapedCraftingRecipeDisplay tas -> result = gridWidth >= tas.width() && gridHeight >= tas.height();
+			case ShapelessCraftingRecipeDisplay tasShapeless -> result = gridWidth * gridHeight >= tasShapeless.ingredients().size();
 			default -> result = false;
 		}
 
@@ -54,7 +57,7 @@ public class BlueprintComponent extends RecipeBookComponent<AbstractCraftingMenu
 		Objects.requireNonNull(recipe);
 
 		switch (recipe) {
-			case TASCraftingRecipeDisplay tas -> {
+			case FlexibleShapedCraftingRecipeDisplay tas -> {
 				List<Slot> inputSlots = this.menu.getInputGridSlots();
 
 				List<SlotDisplay> ingredients = tas.ingredients();

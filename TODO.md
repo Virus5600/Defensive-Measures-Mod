@@ -9,6 +9,10 @@ its first turret.
 
 Fully implement this class after implementing a UI for the turrets.
 
+## Bug
+
+- TAS Shapeless not showing ghost recipe in TAS
+
 ## Pellet Turret
 
 Implementing this will serve as the most basic and rudimentary turret that even day-1 players could make, addressing the #20 Low end turret proposal made 3 years ago. Said turret will most likely be similar in design to a [Blowgun](https://en.wikipedia.org/wiki/Blowgun) but will have some few "creative" liberties with the leather bag to serve as the "blowing" mechanism, allowing the pellet turret to shoot.

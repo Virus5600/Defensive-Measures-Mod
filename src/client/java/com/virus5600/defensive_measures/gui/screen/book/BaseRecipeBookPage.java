@@ -150,7 +150,13 @@ public class BaseRecipeBookPage {
 		if (this.totalPages > 1) {
 			Component text = Component.translatable("gui.recipebook.page", this.currentPage + 1, this.totalPages);
 			int pWidth = this.client.font.width(text);
-			graphics.text(this.client.font, text, x - pWidth / 2 + 73, y + 141, -1);
+			int yPos = this.getTraverseElementPos(y) + 5;
+
+			graphics.text(
+				this.client.font, text,
+				x - pWidth / 2 + 73, yPos,
+				-1
+			);
 		}
 
 		this.hoveredButton = null;
@@ -264,7 +270,7 @@ public class BaseRecipeBookPage {
 	// OVERRIDABLE METHODS //
 	// /////////////////// //
 	protected int getResultRowCount() {
-		return 4;
+		return 5;
 	}
 
 	protected int getResultColCount() {
@@ -279,20 +285,29 @@ public class BaseRecipeBookPage {
 		return Component.translatable("gui.recipebook.next_page");
 	}
 
+	protected final int getTraverseElementPos(int parentTop) {
+		return parentTop + this.resultGridTopMargin + 7
+			+ (this.getResultRowCount() * this.resultCellSize);
+	}
+
 	protected ImageButton getPrevPageBtn(int parentLeft, int parentTop) {
+		int top = this.getTraverseElementPos(parentTop);
+
 		return new ImageButton(
-			parentLeft + 38, parentTop + 137, 12, 17,
+			parentLeft + 38, top, 12, 17,
 			PAGE_BACKWARD_TEXTURES,
-			(buttonWidget) -> this.updateArrowButtons(),
+			_ -> this.updateArrowButtons(),
 			this.getPrevPageTooltip()
 		);
 	}
 
 	protected ImageButton getNextPageBtn(int parentLeft, int parentTop) {
+		int top = this.getTraverseElementPos(parentTop);
+
 		return new ImageButton(
-			parentLeft + 93, parentTop + 137, 12, 17,
+			parentLeft + 93, top, 12, 17,
 			PAGE_FORWARD_TEXTURES,
-			(buttonWidget) -> this.updateArrowButtons(),
+			_ -> this.updateArrowButtons(),
 			this.getNextPageTooltip()
 		);
 	}

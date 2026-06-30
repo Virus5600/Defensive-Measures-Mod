@@ -1,0 +1,47 @@
+﻿{
+	"parent": "minecraft:recipes/root",
+	"criteria": {
+		"workshop_interacted": {
+			"trigger": "minecraft:tick",
+			"conditions": {
+				"player": {
+					"minecraft:type_specific/player": {
+						"stats": [
+							{
+								"type": "minecraft:custom",
+								"stat": "dm:interact_with_workshop",
+								"value": {
+									"min": 1
+								}
+							}
+						]
+					}
+				}
+			}
+		},
+		"has_ingredients": {
+			"trigger": "minecraft:inventory_changed",
+			"conditions": {
+				"items": [
+					{
+						"items": [
+							"minecraft:copper_ingot",
+							"minecraft:flint",
+							"minecraft:gunpowder",
+							"minecraft:iron_ingot"
+						]
+					}
+				]
+			}
+		}
+	},
+	"requirements": [
+		["workshop_interacted"],
+		["has_ingredients"]
+	],
+	"rewards": {
+		"recipes": [
+			"dm:_workshop/turrets/tier1/mg_turret/mg_ammo_rounds"
+		]
+	}
+}
