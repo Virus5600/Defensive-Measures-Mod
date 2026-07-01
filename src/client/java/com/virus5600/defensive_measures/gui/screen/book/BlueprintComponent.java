@@ -4,7 +4,6 @@ import net.minecraft.client.gui.components.WidgetSprites;
 import net.minecraft.client.gui.screens.recipebook.GhostSlots;
 import net.minecraft.client.gui.screens.recipebook.RecipeCollection;
 import net.minecraft.network.chat.Component;
-import net.minecraft.recipebook.PlaceRecipeHelper;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.context.ContextMap;
 import net.minecraft.world.entity.player.StackedItemContents;
@@ -16,6 +15,7 @@ import net.minecraft.world.item.crafting.display.ShapelessCraftingRecipeDisplay;
 import net.minecraft.world.item.crafting.display.SlotDisplay;
 
 import com.virus5600.defensive_measures.item.ModItems;
+import com.virus5600.defensive_measures.recipe.book.ModPlaceRecipeHelper;
 import com.virus5600.defensive_measures.recipe.book.ModRecipeBookCategories;
 import com.virus5600.defensive_measures.recipe.display.FlexibleShapedCraftingRecipeDisplay;
 import com.virus5600.defensive_measures.recipebook.ModRecipeBookCategory;
@@ -42,7 +42,7 @@ public class BlueprintComponent extends RecipeBookComponent<AbstractCraftingMenu
 		int gridHeight = this.menu.getGridHeight();
 		boolean result;
 
-		// Include display condition handling here when created...
+		// NOTE: Include display condition handling here when created...
 		switch (display) {
 			case FlexibleShapedCraftingRecipeDisplay tas -> result = gridWidth >= tas.width() && gridHeight >= tas.height();
 			case ShapelessCraftingRecipeDisplay tasShapeless -> result = gridWidth * gridHeight >= tasShapeless.ingredients().size();
@@ -66,7 +66,7 @@ public class BlueprintComponent extends RecipeBookComponent<AbstractCraftingMenu
 				int gridWidth = this.menu.getGridWidth();
 				int gridHeight = this.menu.getGridHeight();
 
-				PlaceRecipeHelper.placeRecipe(
+				ModPlaceRecipeHelper.placeRecipeCentered(
 					gridWidth, gridHeight,
 					recipeWidth, recipeHeight, ingredients,
 					(ingredient, gridIndex, gridXPos, gridYPos) -> {
@@ -74,6 +74,15 @@ public class BlueprintComponent extends RecipeBookComponent<AbstractCraftingMenu
 						ghostSlots.setInput(slot, context, ingredient);
 					}
 				);
+			}
+
+			case ShapelessCraftingRecipeDisplay tasShapeless -> {
+				List<Slot> inputSlots = this.menu.getInputGridSlots();
+				int slotCount = Math.min(tasShapeless.ingredients().size(), inputSlots.size());
+
+				for (int i = 0; i < slotCount; i++) {
+					ghostSlots.setInput(inputSlots.get(i), context, tasShapeless.ingredients().get(i));
+				}
 			}
 
 			default -> {

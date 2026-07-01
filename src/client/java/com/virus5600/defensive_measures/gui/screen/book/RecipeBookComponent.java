@@ -1,6 +1,5 @@
 package com.virus5600.defensive_measures.gui.screen.book;
 
-import com.virus5600.defensive_measures.DefensiveMeasures;
 import net.minecraft.client.ClientRecipeBook;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.*;
@@ -41,6 +40,7 @@ import net.minecraft.world.item.crafting.display.RecipeDisplay;
 import net.minecraft.world.item.crafting.display.RecipeDisplayId;
 import net.minecraft.world.item.crafting.display.SlotDisplayContext;
 
+import com.virus5600.defensive_measures.DefensiveMeasures;
 import com.virus5600.defensive_measures.recipebook.ModRecipeBookCategory;
 
 import com.google.common.collect.Lists;
@@ -637,7 +637,29 @@ public abstract class RecipeBookComponent<T extends RecipeBookMenu> implements G
 		this.fillGhostRecipe(this.ghostRecipe, recipe, context);
 	}
 
-	protected abstract void fillGhostRecipe(GhostSlots ghostRecipe, RecipeDisplay display, ContextMap context);
+	/**
+	 * Determines if a recipe display can be shown in the recipe book.
+	 *
+	 * @param display The recipe display to check.
+	 *
+	 * @return {@code true} if the display can be shown, {@code false} otherwise.
+	 *
+	 * @implNote Update this method if a {@link #fillGhostRecipe(GhostSlots, RecipeDisplay, ContextMap)}
+	 * handles a new {@link RecipeDisplay}.
+	 */
+	protected abstract boolean canDisplay(RecipeDisplay display);
+
+	/**
+	 * Fills the crafting grid input slots with ghost items to show the recipe.
+	 *
+	 * @param ghostSlots The {@link GhostSlots} instance to fill with ghost items.
+	 * @param display    The {@link RecipeDisplay} to display in the crafting grid.
+	 * @param context    The {@link ContextMap} to use for the ghost slots.
+	 *
+	 * @implNote Update this method when the {@link #canDisplay(RecipeDisplay)} to also display the
+	 * accepted display from said method.
+	 */
+	protected abstract void fillGhostRecipe(GhostSlots ghostSlots, RecipeDisplay display, ContextMap context);
 
 	protected void sendUpdateSettings() {
 		if (this.minecraft.getConnection() != null) {

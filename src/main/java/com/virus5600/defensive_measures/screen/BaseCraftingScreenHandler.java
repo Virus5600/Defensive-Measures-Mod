@@ -332,32 +332,53 @@ public abstract class BaseCraftingScreenHandler<T extends BaseCraftingRecipe<Cra
 	public PostPlaceAction handlePlacement(boolean useMaxItems, boolean allowDroppingItemsToClear, @NonNull RecipeHolder<?> recipe, @NonNull ServerLevel level, @NonNull Inventory inventory) {
 		RecipeHolder<BaseCraftingRecipe<?>> typedRecipe = (RecipeHolder) recipe;
 		BaseCraftingRecipe<?> baseRecipe = typedRecipe.value();
-		int recipeWidth = baseRecipe.getWidth();
-		int recipeHeight = baseRecipe.getHeight();
+
+		int recipeWidth;
+		int recipeHeight;
+
 		int gridWidth = this.getGridWidth();
 		int gridHeight = this.getGridHeight();
-		int startX = (gridWidth - recipeWidth) / 2;
-		int startY = (gridHeight - recipeHeight) / 2;
 		List<Slot> inputSlots = this.getInputGridSlots();
-		List<Slot> centeredInputSlots = new ArrayList<>(recipeWidth * recipeHeight);
+		List<Slot> centeredInputSlots;
 
-		for (int row = 0; row < recipeHeight; ++row) {
-			for (int col = 0; col < recipeWidth; ++col) {
-				int slotIndex = (startY + row) * gridWidth + startX + col;
+		if (baseRecipe.isShaped()) {
+			recipeWidth = baseRecipe.getWidth();
+			recipeHeight = baseRecipe.getHeight();
 
-				if (slotIndex >= 0 && slotIndex < inputSlots.size()) {
-					centeredInputSlots.add(inputSlots.get(slotIndex));
+			int startX = (gridWidth - recipeWidth) / 2;
+			int startY = ((gridHeight - recipeHeight) / 2);
+
+			centeredInputSlots = new ArrayList<>(recipeWidth * recipeHeight);
+			boolean outOfBounds = false;
+
+			for (int row = 0; row < recipeHeight; ++row) {
+				for (int col = 0; col < recipeWidth; ++col) {
+					int slotIndex = (startY + row) * gridWidth + startX + col;
+
+					if (slotIndex >= 0 && slotIndex < inputSlots.size()) {
+						Slot slot = inputSlots.get(slotIndex);
+						centeredInputSlots.add(slot);
+					}
+					else {
+						outOfBounds = true;
+					}
 				}
 			}
-		}
 
-		if (centeredInputSlots.size() != recipeWidth * recipeHeight) {
+			if (centeredInputSlots.size() != recipeWidth * recipeHeight || outOfBounds) {
+				centeredInputSlots = inputSlots;
+			}
+		}
+		else {
+			recipeWidth = gridWidth;
+			recipeHeight = gridHeight;
+
 			centeredInputSlots = inputSlots;
 		}
 
 		this.beginPlacingRecipe();
-
 		RecipeBookMenu.PostPlaceAction result;
+
 		try {
 			result = ServerPlaceRecipe.placeRecipe(new ServerPlaceRecipe.CraftingMenuAccess<T>() {
 				@Override

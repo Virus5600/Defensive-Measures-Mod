@@ -127,6 +127,18 @@ public abstract class BaseCraftingRecipe<T extends CraftingInput> implements Bas
 		return this.pattern.height();
 	}
 
+	public int getIngredientCount() {
+		if (this.isShaped) {
+			throw new IllegalStateException("Cannot access a shapeless recipe method on a shaped recipe");
+		}
+
+		return this.ingredients.size();
+	}
+
+	public boolean isShaped() {
+		return this.isShaped;
+	}
+
 	// //////////////// //
 	// ABSTRACT METHODS //
 	// //////////////// //
