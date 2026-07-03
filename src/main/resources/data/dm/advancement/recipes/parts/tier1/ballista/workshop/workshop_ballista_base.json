@@ -1,7 +1,7 @@
 ﻿{
 	"parent": "minecraft:recipes/root",
 	"criteria": {
-		"tas_interacted": {
+		"workshop_interacted": {
 			"trigger": "minecraft:tick",
 			"conditions": {
 				"player": {
@@ -9,7 +9,7 @@
 						"stats": [
 							{
 								"type": "minecraft:custom",
-								"stat": "dm:interact_with_turret_assembly_station",
+								"stat": "dm:interact_with_workshop",
 								"value": {
 									"min": 1
 								}
@@ -31,12 +31,12 @@
 		}
 	},
 	"requirements": [
-		["tas_interacted"],
+		["workshop_interacted"],
 		["has_ingredients"]
 	],
 	"rewards": {
 		"recipes": [
-			"dm:_workshop/parts/tier1/ballista/ballista_base"
+			"dm:_workshop/parts/tier1/ballista/workshop_ballista_base"
 		]
 	}
 }

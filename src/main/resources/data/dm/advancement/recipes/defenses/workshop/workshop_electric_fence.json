@@ -40,7 +40,7 @@
 	],
 	"rewards": {
 		"recipes": [
-			"dm:_workshop/defenses/tier2/electric_fence/workshop_electric_fence"
+			"dm:_workshop/defenses/tier2/workshop_electric_fence"
 		]
 	}
 }

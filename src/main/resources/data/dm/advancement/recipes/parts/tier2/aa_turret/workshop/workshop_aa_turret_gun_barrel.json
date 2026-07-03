@@ -1,7 +1,7 @@
 ﻿{
 	"parent": "minecraft:recipes/root",
 	"criteria": {
-		"tas_interacted": {
+		"workshop_interacted": {
 			"trigger": "minecraft:tick",
 			"conditions": {
 				"player": {
@@ -9,7 +9,7 @@
 						"stats": [
 							{
 								"type": "minecraft:custom",
-								"stat": "dm:interact_with_turret_assembly_station",
+								"stat": "dm:interact_with_workshop",
 								"value": {
 									"min": 1
 								}
@@ -25,9 +25,10 @@
 				"items": [
 					{
 						"items": [
-							"dm:aa_turret_gun_barrel",
-							"dm:aa_turret_traverse_platform",
-							"dm:aa_turret_base"
+							"minecraft:iron_block",
+							"minecraft:iron_ingot",
+							"minecraft:tnt",
+							"minecraft:gray_dye"
 						]
 					}
 				]
@@ -35,12 +36,12 @@
 		}
 	},
 	"requirements": [
-		["tas_interacted"],
+		["workshop_interacted"],
 		["has_ingredients"]
 	],
 	"rewards": {
 		"recipes": [
-			"dm:_turret_assembly_station/parts/tier2/aa_turret/aa_turret_gun_base"
+			"dm:_workshop/parts/tier2/aa_turret/workshop_aa_turret_gun_barrel"
 		]
 	}
 }

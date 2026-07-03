@@ -40,7 +40,7 @@
 	],
 	"rewards": {
 		"recipes": [
-			"dm:_fabrication_matrix/defenses/tier2/electric_fence/fabmat_electric_fence"
+			"dm:_fabrication_matrix/defenses/tier2/fabmat_electric_fence"
 		]
 	}
 }

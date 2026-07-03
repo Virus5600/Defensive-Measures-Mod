@@ -42,7 +42,7 @@
 	],
 	"rewards": {
 		"recipes": [
-			"dm:_turret_assembly_station/parts/tier2/aa_turret/aa_turret_traverse_platform"
+			"dm:_turret_assembly_station/parts/tier2/aa_turret/tas_aa_turret_traverse_platform"
 		]
 	}
 }

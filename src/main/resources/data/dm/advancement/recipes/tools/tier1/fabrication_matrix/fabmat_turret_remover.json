@@ -25,9 +25,9 @@
 				"items": [
 					{
 						"items": [
-							"dm:aa_turret_gun_barrel",
-							"dm:aa_turret_traverse_platform",
-							"dm:aa_turret_base"
+							"minecraft:gold_ingot",
+							"minecraft:iron_nugget",
+							"minecraft:redstone_block"
 						]
 					}
 				]
@@ -40,7 +40,7 @@
 	],
 	"rewards": {
 		"recipes": [
-			"dm:_fabrication_matrix/parts/tier2/aa_turret/aa_turret_gun_base"
+			"dm:_fabrication_matrix/tools/tier1/fabmat_turret_remover"
 		]
 	}
 }

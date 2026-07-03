@@ -36,7 +36,7 @@
 	],
 	"rewards": {
 		"recipes": [
-			"dm:_workshop/turrets/tier1/cannon_turret/cannon_stand"
+			"dm:_workshop/turrets/tier1/cannon_turret/workshop_cannon_stand"
 		]
 	}
 }

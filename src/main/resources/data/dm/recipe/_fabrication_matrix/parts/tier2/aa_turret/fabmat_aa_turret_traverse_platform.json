@@ -1,14 +1,10 @@
 {
-	"type": "dm:workshop_shaped",
-	"category": "turrets",
+	"type": "dm:fabmat_shaped",
+	"category": "parts",
 	"pattern": [
-		"      i",
-		"   d i ",
-		"  iii  ",
-		" dbtid ",
-		" cibic ",
-		"   i   ",
-		"  iii  "
+		"dc cd",
+		"ictci",
+		"iibii"
 	],
 	"key": {
 		"b": "minecraft:iron_block",
@@ -18,7 +14,7 @@
 		"d": "minecraft:gray_dye"
 	},
 	"result": {
-		"id": "dm:aa_turret",
+		"id": "dm:aa_turret_traverse_platform",
 		"count": 1
 	}
 }

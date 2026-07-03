@@ -1,6 +1,6 @@
 {
 	"type": "dm:workshop_shapeless",
-	"category": "misc",
+	"category": "parts",
 	"ingredients": [
 		"dm:unfinished_cannon_head",
 		"minecraft:string"

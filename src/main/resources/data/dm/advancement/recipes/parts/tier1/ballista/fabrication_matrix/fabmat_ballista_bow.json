@@ -9,7 +9,7 @@
 						"stats": [
 							{
 								"type": "minecraft:custom",
-								"stat": "dm:interact_with_turret_assembly_station",
+								"stat": "dm:interact_with_fabrication_matrix",
 								"value": {
 									"min": 1
 								}
@@ -54,7 +54,7 @@
 		}
 	},
 	"requirements": [
-		["tas_interacted"],
+		["fabmat_interacted"],
 		[
 			"has_ingredients",
 			"has_wooden_buttons",
@@ -63,7 +63,7 @@
 	],
 	"rewards": {
 		"recipes": [
-			"dm:_fabrication_matrix/parts/tier1/ballista/ballista_bow"
+			"dm:_fabrication_matrix/parts/tier1/ballista/fabmat_ballista_bow"
 		]
 	}
 }

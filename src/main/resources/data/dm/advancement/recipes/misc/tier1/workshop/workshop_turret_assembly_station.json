@@ -40,7 +40,7 @@
 	],
 	"rewards": {
 		"recipes": [
-			"dm:_workshop/misc/workshop_turret_assembly_station"
+			"dm:_workshop/misc/tier1/workshop_turret_assembly_station"
 		]
 	}
 }

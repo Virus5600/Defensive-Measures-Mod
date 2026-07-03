@@ -40,7 +40,7 @@
 	],
 	"rewards": {
 		"recipes": [
-			"dm:_turret_assembly_station/misc/tas_turret_assembly_station"
+			"dm:_turret_assembly_station/misc/tier1/tas_turret_assembly_station"
 		]
 	}
 }

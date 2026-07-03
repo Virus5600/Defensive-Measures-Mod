@@ -1,7 +1,7 @@
 ﻿{
 	"parent": "minecraft:recipes/root",
 	"criteria": {
-		"tas_interacted": {
+		"fabmat_interacted": {
 			"trigger": "minecraft:tick",
 			"conditions": {
 				"player": {
@@ -9,7 +9,7 @@
 						"stats": [
 							{
 								"type": "minecraft:custom",
-								"stat": "dm:interact_with_turret_assembly_station",
+								"stat": "dm:interact_with_fabrication_matrix",
 								"value": {
 									"min": 1
 								}
@@ -43,7 +43,7 @@
 		}
 	},
 	"requirements": [
-		["tas_interacted"],
+		["fabmat_interacted"],
 		[
 			"has_wooden_fences",
 			"has_ingredients"
@@ -51,7 +51,7 @@
 	],
 	"rewards": {
 		"recipes": [
-			"dm:_fabrication_matrix/parts/tier1/ballista/ballista_base_with_stand"
+			"dm:_fabrication_matrix/parts/tier1/ballista/fabmat_ballista_base_with_stand"
 		]
 	}
 }

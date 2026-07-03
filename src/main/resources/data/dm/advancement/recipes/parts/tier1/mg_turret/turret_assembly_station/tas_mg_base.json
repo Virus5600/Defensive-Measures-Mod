@@ -39,7 +39,7 @@
 	],
 	"rewards": {
 		"recipes": [
-			"dm:_turret_assembly_station/turrets/tier1/mg_turret/mg_base"
+			"dm:_turret_assembly_station/turrets/tier1/mg_turret/tas_mg_base"
 		]
 	}
 }

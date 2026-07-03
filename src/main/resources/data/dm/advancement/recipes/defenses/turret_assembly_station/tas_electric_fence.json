@@ -40,7 +40,7 @@
 	],
 	"rewards": {
 		"recipes": [
-			"dm:_turret_assembly_station/defenses/tier2/electric_fence/tas_electric_fence"
+			"dm:_turret_assembly_station/defenses/tier2/tas_electric_fence"
 		]
 	}
 }

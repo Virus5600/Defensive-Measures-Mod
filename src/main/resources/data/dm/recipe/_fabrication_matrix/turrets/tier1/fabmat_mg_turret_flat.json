@@ -1,0 +1,26 @@
+{
+	"type": "dm:fabmat_shaped",
+	"category": "turrets",
+	"pattern": [
+		"fbiig",
+		"ic ii",
+		"digii",
+		" igi ",
+		" npn ",
+		" nnn "
+	],
+	"key": {
+		"n": "minecraft:nether_brick",
+		"p": "minecraft:heavy_weighted_pressure_plate",
+		"i": "minecraft:iron_ingot",
+		"g": "minecraft:green_dye",
+		"b": "minecraft:iron_block",
+		"c": "minecraft:copper_ingot",
+		"f": "minecraft:flint",
+		"d": "minecraft:gunpowder"
+	},
+	"result": {
+		"id": "dm:mg_turret",
+		"count": 1
+	}
+}

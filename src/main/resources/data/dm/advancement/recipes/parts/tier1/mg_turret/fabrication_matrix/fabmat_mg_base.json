@@ -39,7 +39,7 @@
 	],
 	"rewards": {
 		"recipes": [
-			"dm:_fabrication_matrix/turrets/tier1/mg_turret/mg_base"
+			"dm:_fabrication_matrix/turrets/tier1/mg_turret/fabmat_mg_base"
 		]
 	}
 }

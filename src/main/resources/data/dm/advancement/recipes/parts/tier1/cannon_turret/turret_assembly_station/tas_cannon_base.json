@@ -51,7 +51,7 @@
 	],
 	"rewards": {
 		"recipes": [
-			"dm:_turret_assembly_station/turrets/tier1/cannon_turret/cannon_base"
+			"dm:_turret_assembly_station/turrets/tier1/cannon_turret/tas_cannon_base"
 		]
 	}
 }

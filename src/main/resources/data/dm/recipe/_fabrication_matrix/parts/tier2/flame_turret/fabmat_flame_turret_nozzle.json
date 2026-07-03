@@ -1,0 +1,17 @@
+{
+	"type": "dm:fabmat_shaped",
+	"category": "parts",
+	"pattern": [
+		"iiiii",
+		"cccc ",
+		"iiiii"
+	],
+	"key": {
+		"c": "minecraft:copper_ingot",
+		"i": "minecraft:iron_ingot"
+	},
+	"result": {
+		"id": "dm:flame_turret_nozzle",
+		"count": 1
+	}
+}

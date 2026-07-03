@@ -25,9 +25,8 @@
 				"items": [
 					{
 						"items": [
-							"dm:aa_turret_gun_barrel",
-							"dm:aa_turret_traverse_platform",
-							"dm:aa_turret_base"
+							"minecraft:iron_ingot",
+							"minecraft:iron_block"
 						]
 					}
 				]

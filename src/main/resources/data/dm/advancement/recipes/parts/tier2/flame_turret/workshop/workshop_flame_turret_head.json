@@ -1,7 +1,7 @@
 ﻿{
 	"parent": "minecraft:recipes/root",
 	"criteria": {
-		"tas_interacted": {
+		"workshop_interacted": {
 			"trigger": "minecraft:tick",
 			"conditions": {
 				"player": {
@@ -9,7 +9,7 @@
 						"stats": [
 							{
 								"type": "minecraft:custom",
-								"stat": "dm:interact_with_turret_assembly_station",
+								"stat": "dm:interact_with_workshop",
 								"value": {
 									"min": 1
 								}
@@ -25,9 +25,11 @@
 				"items": [
 					{
 						"items": [
-							"minecraft:gold_ingot",
-							"minecraft:iron_nugget",
-							"minecraft:redstone_block"
+							"minecraft:red_dye",
+							"minecraft:blaze_powder",
+							"minecraft:copper_ingot",
+							"minecraft:iron_block",
+							"minecraft:iron_ingot"
 						]
 					}
 				]
@@ -35,12 +37,12 @@
 		}
 	},
 	"requirements": [
-		["tas_interacted"],
+		["workshop_interacted"],
 		["has_ingredients"]
 	],
 	"rewards": {
 		"recipes": [
-			"dm:_turret_assembly_station/tools/tier1/turret_remover"
+			"dm:_workshop/parts/tier2/flame_turret/workshop_flame_turret_head"
 		]
 	}
 }

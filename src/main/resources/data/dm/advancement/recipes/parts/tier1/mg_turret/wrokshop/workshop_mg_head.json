@@ -42,7 +42,7 @@
 	],
 	"rewards": {
 		"recipes": [
-			"dm:_workshop/turrets/tier1/mg_turret/mg_head"
+			"dm:_workshop/turrets/tier1/mg_turret/workshop_mg_head"
 		]
 	}
 }

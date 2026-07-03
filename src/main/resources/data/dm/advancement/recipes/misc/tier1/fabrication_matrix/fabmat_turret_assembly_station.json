@@ -40,7 +40,7 @@
 	],
 	"rewards": {
 		"recipes": [
-			"dm:_fabrication_matrix/misc/fabmat_turret_assembly_station"
+			"dm:_fabrication_matrix/misc/tier1/fabmat_turret_assembly_station"
 		]
 	}
 }

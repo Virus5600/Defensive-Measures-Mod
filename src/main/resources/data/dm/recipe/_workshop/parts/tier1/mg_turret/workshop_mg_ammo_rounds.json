@@ -1,6 +1,6 @@
 {
 	"type": "dm:workshop_shapeless",
-	"category": "misc",
+	"category": "parts",
 	"ingredients": [
 		"minecraft:iron_ingot",
 		"minecraft:flint",
