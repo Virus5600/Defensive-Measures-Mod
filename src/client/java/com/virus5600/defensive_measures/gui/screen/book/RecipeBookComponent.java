@@ -241,7 +241,6 @@ public abstract class RecipeBookComponent<T extends RecipeBookMenu> implements G
 	}
 
 	private void closeBook(Button btn) {
-		System.out.println("TEST");
 		this.setVisible(false);
 	}
 
