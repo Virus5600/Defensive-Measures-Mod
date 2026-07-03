@@ -1,5 +1,8 @@
 package com.virus5600.defensive_measures.gui.screen.ingame;
 
+import com.virus5600.defensive_measures.DefensiveMeasures;
+import com.virus5600.defensive_measures.gui.screen.book.BlueprintComponent;
+import com.virus5600.defensive_measures.screen.TurretAssemblyStationScreenHandler;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -10,20 +13,15 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
 
-import com.virus5600.defensive_measures.DefensiveMeasures;
-import com.virus5600.defensive_measures.gui.screen.book.BlueprintComponent;
-import com.virus5600.defensive_measures.screen.TurretAssemblyStationScreenHandler;
-
 @Environment(EnvType.CLIENT)
-public class TurretAssemblyStationScreen extends BaseRecipeBookScreen<TurretAssemblyStationScreenHandler> {
+public class WorkshopScreen extends BaseRecipeBookScreen<TurretAssemblyStationScreenHandler> {
 	private static final Identifier TEXTURE = Identifier.fromNamespaceAndPath(DefensiveMeasures.MOD_ID, "textures/gui/container/turret_assembly_station.png");
 
-	public TurretAssemblyStationScreen(
+	public WorkshopScreen(
 		TurretAssemblyStationScreenHandler screenHandler, Inventory inventory, Component title
 	) {
 		super(
-			screenHandler, new BlueprintComponent(screenHandler),
-			inventory, title,
+			screenHandler, new BlueprintComponent(screenHandler), inventory, title,
 			256, 242
 		);
 	}
