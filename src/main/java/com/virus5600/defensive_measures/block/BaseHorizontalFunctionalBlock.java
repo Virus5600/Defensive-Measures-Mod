@@ -70,14 +70,6 @@ public abstract class BaseHorizontalFunctionalBlock extends BaseFunctionalBlock 
 				block.getMainPartDirection(state)
 			);
 
-			System.out.println("[updateShape] pos=" + pos
-				+ " part=" + state.getValue(block.getPartProperty())
-				+ " isThisMainPart=" + isThisMainPart
-				+ " companionPos=" + companionPos
-				+ " neighborPos=" + neighborPos
-				+ " neighborState.is(this)=" + neighborState.is(this)
-				+ " neighborPart=" + (neighborState.is(this) ? neighborState.getValue(block.getPartProperty()) : "N/A"));
-
 			if (
 				!neighborPos.equals(companionPos)
 				|| neighborState.is(this)

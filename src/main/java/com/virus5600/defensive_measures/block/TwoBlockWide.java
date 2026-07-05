@@ -151,19 +151,21 @@ public interface TwoBlockWide<T extends Enum<T> & StringRepresentable> {
 			T part = state.getValue(block.getPartProperty());
 			T companionPart = part == block.getDefaultPart() ? block.getOtherPart() : block.getDefaultPart();
 
-			Direction dir = getNeighborDirection(
-				block.getDefaultPart(), part,
-				block.getOtherPartDirection(state)
-			);
-			BlockPos companionPos = pos.relative(dir);
-			BlockState companionState = level.getBlockState(companionPos);
+			if (part == block.getOtherPart()) {
+				Direction dir = getNeighborDirection(
+					block.getDefaultPart(), part,
+					block.getOtherPartDirection(state)
+				);
+				BlockPos companionPos = pos.relative(dir);
+				BlockState companionState = level.getBlockState(companionPos);
 
-			if (
-				companionState.is(state.getBlock())
-				&& companionState.getValue(block.getPartProperty()) == companionPart
-			) {
-				level.setBlock(companionPos, Blocks.AIR.defaultBlockState(), 35);
-				level.levelEvent(player, 2001, companionPos, Block.getId(companionState));
+				if (
+					companionState.is(state.getBlock())
+					&& companionState.getValue(block.getPartProperty()) == companionPart
+				) {
+					level.setBlock(companionPos, Blocks.AIR.defaultBlockState(), 35);
+					level.levelEvent(player, 2001, companionPos, Block.getId(companionState));
+				}
 			}
 		}
 
