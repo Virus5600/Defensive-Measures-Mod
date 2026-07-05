@@ -2,7 +2,7 @@ package com.virus5600.defensive_measures.state.properties;
 
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 
-import com.virus5600.defensive_measures.block.BoltHeadBlock;
+import com.virus5600.defensive_measures.block.traps.tier1.BoltHeadBlock;
 
 /**
  * Contains all block and fluid state properties for Defensive Measures mod.

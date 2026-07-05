@@ -9,7 +9,7 @@ public class ModScreenHandlers {
 	public static final MenuType<TurretAssemblyStationScreenHandler> TURRET_ASSEMBLY_STATION = RegistryHelper.registerScreenHandlerType("turret_assembly_station", TurretAssemblyStationScreenHandler::new);
 	public static final MenuType<WorkshopScreenHandler> WORKSHOP = RegistryHelper.registerScreenHandlerType("workshop", WorkshopScreenHandler::new);
 
-	public static void registerScreenHandlers() {
+	public static void init() {
 		DefensiveMeasures.LOGGER.info("REGISTERING SCREEN HANDLERS FOR {}...", DefensiveMeasures.MOD_NAME);
 	}
 }

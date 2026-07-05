@@ -112,6 +112,9 @@ public class ModItems {
 	public final static Item TURRET_ASSEMBLY_STATION = registerItem(ModBlocks.TURRET_ASSEMBLY_STATION);
 	public final static Item ELECTRIC_FENCE = registerItem(ModBlocks.ELECTRIC_FENCE);
 
+	// WORKSHOP
+	public final static Item WORKSHOP = registerItem(ModBlocks.WORKSHOP);
+
 	// //////////////////////// //
 	// REGISTRY RELATED METHODS //
 	// //////////////////////// //
@@ -169,7 +172,7 @@ public class ModItems {
 		return RegistryHelper.registerItem(block);
 	}
 
-	public static void registerModItems() {
+	public static void init() {
 		DefensiveMeasures.LOGGER.info("REGISTERING ITEMS TO ITEM GROUPS...");
 
 		Arrays.stream(FUNCTIONAL_ITEMS).iterator().forEachRemaining(
@@ -223,7 +226,8 @@ public class ModItems {
 
 	static {
 		FUNCTIONAL_ITEMS = new Item[] {
-			TURRET_ASSEMBLY_STATION
+			TURRET_ASSEMBLY_STATION,
+			WORKSHOP
 		};
 
 		DM_ITEMS = new Item[] {

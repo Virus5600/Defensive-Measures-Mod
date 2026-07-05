@@ -1,9 +1,11 @@
 package com.virus5600.defensive_measures;
 
+import com.virus5600.defensive_measures.behvaior.block.ModDispenserItemBehavior;
 import net.fabricmc.api.ModInitializer;
 
 import com.virus5600.defensive_measures.advancement.criterion.ModCriterion;
 import com.virus5600.defensive_measures.block.ModBlocks;
+import com.virus5600.defensive_measures.block.state.properties.ModBlockStateProperties;
 import com.virus5600.defensive_measures.command.ModCommands;
 import com.virus5600.defensive_measures.entity.ModEntities;
 import com.virus5600.defensive_measures.entity.damage.ModDamageTypes;
@@ -55,22 +57,24 @@ public class DefensiveMeasures implements ModInitializer {
 		// Use https://github.com/Khazoda/basic-weapons/blob/latest-stable/src/main/java/com/seacroak/basicweapons/util/Reggie.java as a reference
 
 		// Modded Stuff's Registration
-		ModDamageTypes.registerDamageTypes();
-		ModItemGroups.registerModItemGroups();
-		ModItems.registerModItems();
-		ModSoundEvents.registerSoundEvents();
-		ModBlocks.registerModBlocks();
-		ModCriterion.registerModCriterion();
-		ModEntities.registerModEntityAttributes();
-		ModParticles.registerParticles();
-		ModStats.registerStats();
-		ModScreenHandlers.registerScreenHandlers();
-		ModRecipeDisplays.registerModRecipeDisplays();
-		ModRecipeSerializers.registerModRecipeSerializers();
-		ModRecipeTypes.registerModRecipesTypes();
-		ModRecipeBookCategories.registerBookCategories();
-		ModCommands.registerCommands();
-		ModPackets.registerModPackets();
+		ModDamageTypes.init();
+		ModItemGroups.init();
+		ModItems.init();
+		ModSoundEvents.init();
+		ModBlockStateProperties.init();
+		ModBlocks.init();
+		ModCriterion.init();
+		ModEntities.init();
+		ModParticles.init();
+		ModStats.init();
+		ModScreenHandlers.init();
+		ModRecipeDisplays.init();
+		ModRecipeSerializers.init();
+		ModRecipeTypes.init();
+		ModRecipeBookCategories.init();
+		ModCommands.init();
+		ModPackets.init();
+		ModDispenserItemBehavior.init();
 
 		LOGGER.info("{} MAIN ENTRY POINT INITIALIZED.", MOD_NAME);
 	}

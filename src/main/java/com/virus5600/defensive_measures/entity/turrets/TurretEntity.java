@@ -68,6 +68,7 @@ import com.virus5600.defensive_measures.item.ModItems;
 import com.virus5600.defensive_measures.item.turrets.TurretItem;
 import com.virus5600.defensive_measures.sound.ModSoundEvents;
 
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jspecify.annotations.NonNull;
 
@@ -617,11 +618,16 @@ public abstract class TurretEntity extends Mob implements Itemable, RangedAttack
 		this.setNoAi(!this.hasAiOnSpawn);
 	}
 
-	private void startTeardownAnim() {
+	public final void startTeardownAnim() {
 		this.startTeardownAnim(true);
 	}
 
-	private void startTeardownAnim(boolean disableAi) {
+	public final void startTeardownAnim(boolean disableAi, @NotNull  ItemEntity itemEntity) {
+		this.itemToDrop = itemEntity;
+		this.startTeardownAnim(disableAi);
+	}
+
+	public final void startTeardownAnim(boolean disableAi) {
 		if (this.isTearingDown()) return;
 
 		if (disableAi) {

@@ -1,4 +1,4 @@
-package com.virus5600.defensive_measures.block;
+package com.virus5600.defensive_measures.block.traps.tier1;
 
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
@@ -73,11 +73,12 @@ public class BoltHeadBlock extends Block implements SimpleWaterloggedBlock {
 	protected int damageDealt = 2;
 
 	public BoltHeadBlock(Properties settings) {
-		super(settings);
+		super(
+			settings.destroyTime(1.5f)
+				.explosionResistance(1.0f)
+				.noOcclusion()
+		);
 
-		settings.destroyTime(1.5f)
-			.explosionResistance(1.0f)
-			.noOcclusion();
 
 		this.registerDefaultState(
 			this.stateDefinition

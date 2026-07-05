@@ -20,5 +20,6 @@ public class ModHandledScreens {
 		DefensiveMeasures.LOGGER.info("REGISTERING CLIENT SCREENS FOR {}...", DefensiveMeasures.MOD_NAME);
 
 		MenuScreens.register(ModScreenHandlers.TURRET_ASSEMBLY_STATION, TurretAssemblyStationScreen::new);
+		MenuScreens.register(ModScreenHandlers.WORKSHOP, WorkshopScreen::new);
 	}
 }

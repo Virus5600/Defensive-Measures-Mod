@@ -9,26 +9,28 @@ import net.minecraft.util.context.ContextMap;
 import net.minecraft.world.entity.player.StackedItemContents;
 import net.minecraft.world.inventory.AbstractCraftingMenu;
 import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.display.RecipeDisplay;
 import net.minecraft.world.item.crafting.display.ShapelessCraftingRecipeDisplay;
-import net.minecraft.world.item.crafting.display.SlotDisplay;
 
+import com.virus5600.defensive_measures.DefensiveMeasures;
 import com.virus5600.defensive_measures.item.ModItems;
 import com.virus5600.defensive_measures.recipe.book.ModPlaceRecipeHelper;
 import com.virus5600.defensive_measures.recipe.book.ModRecipeBookCategories;
 import com.virus5600.defensive_measures.recipe.display.FlexibleShapedCraftingRecipeDisplay;
 import com.virus5600.defensive_measures.recipebook.ModRecipeBookCategory;
+import net.minecraft.world.item.crafting.display.SlotDisplay;
 
 import java.util.List;
 import java.util.Objects;
 
-public class BlueprintComponent extends RecipeBookComponent<AbstractCraftingMenu> {
+public abstract class BaseBlueprintComponent extends RecipeBookComponent<AbstractCraftingMenu> {
 	private static final WidgetSprites FILTER_BUTTON_SPRITES;
 	private static final Component ONLY_CRAFTABLES_TOOLTIP = Component.translatable("gui.recipebook.toggleRecipes.craftable");
 	private static final List<TabInfo> TABS;
 
-	public BlueprintComponent(AbstractCraftingMenu screenHandler) {
+	public BaseBlueprintComponent(AbstractCraftingMenu screenHandler) {
 		super(screenHandler, TABS);
 	}
 
@@ -44,48 +46,46 @@ public class BlueprintComponent extends RecipeBookComponent<AbstractCraftingMenu
 
 		// NOTE: Include display condition handling here when created...
 		switch (display) {
-			case FlexibleShapedCraftingRecipeDisplay tas -> result = gridWidth >= tas.width() && gridHeight >= tas.height();
-			case ShapelessCraftingRecipeDisplay tasShapeless -> result = gridWidth * gridHeight >= tasShapeless.ingredients().size();
+			case FlexibleShapedCraftingRecipeDisplay shaped -> result =
+				gridWidth >= shaped.width()
+				&& gridHeight >= shaped.height()
+				&& this.getItemForSlotDisplay()
+					.getDefaultInstance()
+					.is(((SlotDisplay.ItemSlotDisplay) shaped.craftingStation())
+						.item())
+			;
+
+			case ShapelessCraftingRecipeDisplay shapeless -> result =
+				gridWidth * gridHeight >= shapeless.ingredients().size()
+				&& this.getItemForSlotDisplay()
+					.getDefaultInstance()
+					.is(((SlotDisplay.ItemSlotDisplay) shapeless.craftingStation())
+						.item())
+			;
+
 			default -> result = false;
 		}
 
 		return result;
 	}
 
-	protected void fillGhostRecipe(GhostSlots ghostSlots, RecipeDisplay recipe, ContextMap context) {
-		ghostSlots.setResult(this.menu.getResultSlot(), context, recipe.result());
+	protected void fillGhostRecipe(GhostSlots ghostSlots, RecipeDisplay recipe, ContextMap ctx) {
+		ghostSlots.setResult(this.menu.getResultSlot(), ctx, recipe.result());
 		Objects.requireNonNull(recipe);
 
 		switch (recipe) {
-			case FlexibleShapedCraftingRecipeDisplay tas -> {
+			case FlexibleShapedCraftingRecipeDisplay flexible -> this.fillGhostShapedRecipe(flexible, ghostSlots, ctx);
+			case ShapelessCraftingRecipeDisplay shapeless -> {
 				List<Slot> inputSlots = this.menu.getInputGridSlots();
-
-				List<SlotDisplay> ingredients = tas.ingredients();
-				int recipeWidth = tas.width();
-				int recipeHeight = tas.height();
-				int gridWidth = this.menu.getGridWidth();
-				int gridHeight = this.menu.getGridHeight();
-
-				ModPlaceRecipeHelper.placeRecipeCentered(
-					gridWidth, gridHeight,
-					recipeWidth, recipeHeight, ingredients,
-					(ingredient, gridIndex, gridXPos, gridYPos) -> {
-						Slot slot = inputSlots.get(gridIndex);
-						ghostSlots.setInput(slot, context, ingredient);
-					}
-				);
-			}
-
-			case ShapelessCraftingRecipeDisplay tasShapeless -> {
-				List<Slot> inputSlots = this.menu.getInputGridSlots();
-				int slotCount = Math.min(tasShapeless.ingredients().size(), inputSlots.size());
+				int slotCount = Math.min(shapeless.ingredients().size(), inputSlots.size());
 
 				for (int i = 0; i < slotCount; i++) {
-					ghostSlots.setInput(inputSlots.get(i), context, tasShapeless.ingredients().get(i));
+					ghostSlots.setInput(inputSlots.get(i), ctx, shapeless.ingredients().get(i));
 				}
 			}
 
 			default -> {
+				DefensiveMeasures.LOGGER.warn("Recipe '{}' not supported for {}", recipe, this.getItemForSlotDisplay().toString());
 			}
 		}
 	}
@@ -102,6 +102,31 @@ public class BlueprintComponent extends RecipeBookComponent<AbstractCraftingMenu
 		collection.selectRecipes(stackedContents, this::canDisplay);
 	}
 
+	// ////////////// //
+	// STATIC METHODS //
+	// ////////////// //
+	protected static <T extends AbstractCraftingMenu> void defaultFillGhostShaped(
+		FlexibleShapedCraftingRecipeDisplay display,
+		GhostSlots ghostSlots, ContextMap ctx, T menu
+	) {
+		List<Slot> inputSlots = menu.getInputGridSlots();
+
+		List<SlotDisplay> ingredients = display.ingredients();
+		int recipeWidth = display.width();
+		int recipeHeight = display.height();
+		int gridWidth = menu.getGridWidth();
+		int gridHeight = menu.getGridHeight();
+
+		ModPlaceRecipeHelper.placeRecipeCentered(
+			gridWidth, gridHeight,
+			recipeWidth, recipeHeight, ingredients,
+			(ingredient, gridIndex, _, _) -> {
+				Slot slot = inputSlots.get(gridIndex);
+				ghostSlots.setInput(slot, ctx, ingredient);
+			}
+		);
+	}
+
 	// //////////////// //
 	// OVERRIDE METHODS //
 	// //////////////// //
@@ -109,6 +134,21 @@ public class BlueprintComponent extends RecipeBookComponent<AbstractCraftingMenu
 	protected int getXOffset() {
 		return 106;
 	}
+
+	// //////////////// //
+	// ABSTRACT METHODS //
+	// //////////////// //
+
+	protected abstract void fillGhostShapedRecipe(
+		FlexibleShapedCraftingRecipeDisplay display,
+		GhostSlots ghostSlots, ContextMap ctx
+	);
+
+	public abstract Item getItemForSlotDisplay();
+
+	// ///////////////////// //
+	// STATIC INITIALIZATION //
+	// ///////////////////// //
 
 	static {
 		FILTER_BUTTON_SPRITES = new WidgetSprites(

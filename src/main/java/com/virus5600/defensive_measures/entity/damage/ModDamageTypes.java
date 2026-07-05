@@ -25,7 +25,7 @@ public class ModDamageTypes {
 	public static final ResourceKey<DamageType> THROWN_FLAME = RegistryHelper.getDamageTypeKey("thrown_flame");
 	public static final ResourceKey<DamageType> SECONDARY_EXPLOSION = RegistryHelper.getDamageTypeKey("secondary_explosion");
 
-	public static void registerDamageTypes() {
+	public static void init() {
 		DefensiveMeasures.LOGGER.info("REGISTERING DAMAGE TYPES FOR {}...", DefensiveMeasures.MOD_NAME);
 	}
 }

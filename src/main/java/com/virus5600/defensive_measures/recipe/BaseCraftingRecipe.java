@@ -2,9 +2,11 @@ package com.virus5600.defensive_measures.recipe;
 
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import com.virus5600.defensive_measures.recipe.display.FlexibleShapedCraftingRecipeDisplay;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.util.StringRepresentable;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.crafting.*;
 
@@ -12,6 +14,9 @@ import com.virus5600.defensive_measures.recipe.annotations.Shaped;
 import com.virus5600.defensive_measures.recipe.annotations.Shapeless;
 import com.virus5600.defensive_measures.recipe.book.ModCraftingRecipeCategory;
 
+import net.minecraft.world.item.crafting.display.RecipeDisplay;
+import net.minecraft.world.item.crafting.display.ShapelessCraftingRecipeDisplay;
+import net.minecraft.world.item.crafting.display.SlotDisplay;
 import org.jetbrains.annotations.Nullable;
 import org.jspecify.annotations.NonNull;
 
@@ -139,6 +144,43 @@ public abstract class BaseCraftingRecipe<T extends CraftingInput> implements Bas
 		return this.isShaped;
 	}
 
+	public List<RecipeDisplay> display() {
+		// Handles Shaped
+		if (this.isShaped) {
+			if (this.pattern == null) {
+				throw new IllegalStateException("pattern is null");
+			}
+
+			return List.of(new FlexibleShapedCraftingRecipeDisplay(
+				this.pattern.width(),
+				this.pattern.height(),
+				this.pattern.ingredients()
+					.stream()
+					.map((ingredient) ->
+						ingredient.map(Ingredient::display)
+							.orElse(SlotDisplay.Empty.INSTANCE))
+					.toList(),
+				new SlotDisplay.ItemStackSlotDisplay(this.result),
+				new SlotDisplay.ItemSlotDisplay(this.getItemForSlotDisplay())
+			));
+		}
+		// Handles Shapeless
+		else {
+			if (this.ingredients == null) {
+				throw new IllegalStateException("ingredients is null");
+			}
+
+			return List.of(new ShapelessCraftingRecipeDisplay(
+				this.ingredients
+					.stream()
+					.map(Ingredient::display)
+					.toList(),
+				new SlotDisplay.ItemStackSlotDisplay(this.result),
+				new SlotDisplay.ItemSlotDisplay(this.getItemForSlotDisplay())
+			));
+		}
+	}
+
 	// //////////////// //
 	// ABSTRACT METHODS //
 	// //////////////// //
@@ -156,9 +198,11 @@ public abstract class BaseCraftingRecipe<T extends CraftingInput> implements Bas
 	 */
 	protected abstract CustomShapedRecipePattern pattern();
 
+	protected abstract PlacementInfo createPlacementInfo();
+
 	public abstract List<Optional<Ingredient>> getIngredients();
 
-	protected abstract PlacementInfo createPlacementInfo();
+	public abstract Item getItemForSlotDisplay();
 
 	// ////////////////////// //
 	// CODECS AND SERIALIZERS //

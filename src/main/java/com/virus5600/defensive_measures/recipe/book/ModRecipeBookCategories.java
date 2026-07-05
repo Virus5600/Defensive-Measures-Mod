@@ -37,7 +37,7 @@ public class ModRecipeBookCategories {
 	public static final RecipeBookCategory FABMAT_EQUIPMENT = RegistryHelper.registerRecipeBookCat("fabmat_equipment");
 	public static final RecipeBookCategory FABMAT_MISC = RegistryHelper.registerRecipeBookCat("fabmat_misc");
 
-	public static void registerBookCategories() {
+	public static void init() {
 		DefensiveMeasures.LOGGER.info("REGISTERING RECIPE BOOK CATEGORIES (BLUEPRINT CATEGORIES) FOR {}...", DefensiveMeasures.MOD_NAME);
 	}
 }

@@ -1,4 +1,4 @@
-package com.virus5600.defensive_measures.block;
+package com.virus5600.defensive_measures.block.misc.tier1;
 
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
@@ -8,26 +8,24 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.inventory.ContainerLevelAccess;
-import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.StateDefinition;
-import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.level.block.state.properties.NoteBlockInstrument;
-import net.minecraft.world.level.pathfinder.PathComputationType;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
+import com.virus5600.defensive_measures.block.BaseHorizontalFunctionalBlock;
 import com.virus5600.defensive_measures.screen.TurretAssemblyStationScreenHandler;
 import com.virus5600.defensive_measures.stat.ModStats;
 
 import org.jspecify.annotations.NonNull;
 
 /**
- * Turret Assembly Station (or TAS) is a functional block that allows players to craft higher tiered turrets.
+ * Turret Assembly Station (or TAS) is a functional block that allows players to craft higher
+ * tiered turrets. Specifically, Tier 2 turrets that usually occupies a 2x2 area.
  * <br><br>
  * Similar to how crafting tables work, players can interact with the turret assembly station to
  * open a crafting GUI that allows them to craft higher tiered turrets using the materials they
@@ -44,56 +42,36 @@ import org.jspecify.annotations.NonNull;
  * @since 1.1.0
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
  */
-public class TurretAssemblyStationBlock extends BaseFunctionalBlock {
-	public static final MapCodec<TurretAssemblyStationBlock> CODEC = simpleCodec(TurretAssemblyStationBlock::new);
-
-	public static final EnumProperty<Direction> FACING;
-
+public class TurretAssemblyStationBlock extends BaseHorizontalFunctionalBlock {
 	private static final VoxelShape SHAPE;
+	public static final MapCodec<TurretAssemblyStationBlock> CODEC;
 
 	public TurretAssemblyStationBlock(Properties settings) {
-		super(settings);
+		super(
+			settings
+				.instrument(NoteBlockInstrument.IRON_XYLOPHONE)
+				.requiresCorrectToolForDrops()
+				.strength(2.5F, 4.75F)
+				.sound(SoundType.IRON)
+				.noOcclusion()
+		);
 
-		settings.instrument(NoteBlockInstrument.IRON_XYLOPHONE)
-			.requiresCorrectToolForDrops()
-			.strength(5.0F, 6.0F)
-			.sound(SoundType.IRON)
-			.noOcclusion();
 
-		this.registerDefaultState(this.stateDefinition.any().setValue(FACING, Direction.NORTH));
-	}
-
-	public BlockState getStateForPlacement(BlockPlaceContext ctx) {
-		return this.defaultBlockState().setValue(FACING, ctx.getHorizontalDirection().getOpposite());
+		this.registerDefaultState(
+			this.stateDefinition
+				.any()
+				.setValue(FACING, Direction.NORTH)
+		);
 	}
 
 	@Override
-	protected @NonNull VoxelShape getShape(@NonNull BlockState state, @NonNull BlockGetter world, @NonNull BlockPos pos, @NonNull CollisionContext context) {
+	protected VoxelShape getShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
 		return SHAPE;
 	}
 
 	@Override
-	protected @NonNull BlockState rotate(BlockState state, Rotation rotation) {
-		return state.setValue(FACING, rotation.rotate(state.getValue(FACING)));
-	}
-
-	@Override
-	protected @NonNull BlockState mirror(BlockState state, Mirror mirror) {
-		return state.rotate(mirror.getRotation(state.getValue(FACING)));
-	}
-
-	protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-		builder.add(FACING);
-	}
-
-	@Override
-	public @NonNull MapCodec<TurretAssemblyStationBlock> codec() {
+	public MapCodec<TurretAssemblyStationBlock> codec() {
 		return CODEC;
-	}
-
-	@Override
-	protected boolean isPathfindable(@NonNull BlockState state, @NonNull PathComputationType type) {
-		return false;
 	}
 
 	// /////////////////// //
@@ -128,8 +106,6 @@ public class TurretAssemblyStationBlock extends BaseFunctionalBlock {
 	}
 
 	static {
-		FACING = HorizontalDirectionalBlock.FACING;
-
 		SHAPE = Shapes.or(
 			// Table Top
 			Block.box(0, 14, 0, 16, 16, 16),
@@ -139,5 +115,7 @@ public class TurretAssemblyStationBlock extends BaseFunctionalBlock {
 			Block.box(13, 0, 13, 15, 14, 15),
 			Block.box(13, 0, 1, 15, 14, 3)
 		);
+
+		CODEC = simpleCodec(TurretAssemblyStationBlock::new);
 	}
 }

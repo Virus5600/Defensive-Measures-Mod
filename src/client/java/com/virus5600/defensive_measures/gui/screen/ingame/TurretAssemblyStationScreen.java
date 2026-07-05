@@ -11,7 +11,7 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
 
 import com.virus5600.defensive_measures.DefensiveMeasures;
-import com.virus5600.defensive_measures.gui.screen.book.BlueprintComponent;
+import com.virus5600.defensive_measures.gui.screen.book.TASBlueprintComponent;
 import com.virus5600.defensive_measures.screen.TurretAssemblyStationScreenHandler;
 
 @Environment(EnvType.CLIENT)
@@ -22,7 +22,7 @@ public class TurretAssemblyStationScreen extends BaseRecipeBookScreen<TurretAsse
 		TurretAssemblyStationScreenHandler screenHandler, Inventory inventory, Component title
 	) {
 		super(
-			screenHandler, new BlueprintComponent(screenHandler),
+			screenHandler, new TASBlueprintComponent(screenHandler),
 			inventory, title,
 			256, 242
 		);

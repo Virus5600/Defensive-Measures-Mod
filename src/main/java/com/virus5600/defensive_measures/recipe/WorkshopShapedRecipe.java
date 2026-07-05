@@ -1,9 +1,9 @@
 package com.virus5600.defensive_measures.recipe;
 
 import com.mojang.serialization.MapCodec;
-import com.virus5600.defensive_measures.recipe.display.FlexibleShapedCraftingRecipeDisplay;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.crafting.*;
@@ -11,8 +11,10 @@ import net.minecraft.world.item.crafting.display.RecipeDisplay;
 import net.minecraft.world.item.crafting.display.SlotDisplay;
 import net.minecraft.world.level.Level;
 
+import com.virus5600.defensive_measures.block.misc.tier2.WorkshopBlock;
 import com.virus5600.defensive_measures.item.ModItems;
 import com.virus5600.defensive_measures.recipe.annotations.Shaped;
+import com.virus5600.defensive_measures.recipe.display.FlexibleShapedCraftingRecipeDisplay;
 
 import java.util.List;
 import java.util.Optional;
@@ -43,34 +45,15 @@ public class WorkshopShapedRecipe extends BaseCraftingRecipe<CraftingInput> {
 	}
 
 	// //////////////// //
-	// OVERRIDE METHODS //
-	// //////////////// //
-
-	public List<RecipeDisplay> display() {
-		if (this.pattern == null) {
-			throw new IllegalStateException("pattern is null");
-		}
-
-		return List.of(new FlexibleShapedCraftingRecipeDisplay(
-			this.pattern.width(),
-			this.pattern.height(),
-			this.pattern.ingredients()
-				.stream()
-				.map((ingredient) ->
-					ingredient.map(Ingredient::display)
-						.orElse(SlotDisplay.Empty.INSTANCE))
-				.toList(),
-			new SlotDisplay.ItemStackSlotDisplay(this.result),
-			new SlotDisplay.ItemSlotDisplay(ModItems.TURRET_ASSEMBLY_STATION)
-		));
-	}
-
-	// //////////////// //
 	// ABSTRACT METHODS //
 	// //////////////// //
 
 	protected CustomShapedRecipePattern pattern() {
 		return this.pattern;
+	}
+
+	protected PlacementInfo createPlacementInfo() {
+		return PlacementInfo.createFromOptionals(this.getIngredients());
 	}
 
 	public List<Optional<Ingredient>> getIngredients() {
@@ -81,8 +64,8 @@ public class WorkshopShapedRecipe extends BaseCraftingRecipe<CraftingInput> {
 		return this.pattern.ingredients();
 	}
 
-	protected PlacementInfo createPlacementInfo() {
-		return PlacementInfo.createFromOptionals(this.getIngredients());
+	public Item getItemForSlotDisplay() {
+		return ModItems.WORKSHOP;
 	}
 
 	// ///////////////// //

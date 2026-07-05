@@ -14,7 +14,7 @@ public class ModRecipeSerializers {
 	public static final RecipeSerializer<WorkshopShapedRecipe> WORKSHOP_SERIALIZER;
 	public static final RecipeSerializer<WorkshopShapelessRecipe> WORKSHOP_SHAPELESS_SERIALIZER;
 
-	public static void registerModRecipeSerializers() {
+	public static void init() {
 		DefensiveMeasures.LOGGER.info("REGISTERING RECIPE SERIALIZERS FOR {}...", DefensiveMeasures.MOD_NAME);
 	}
 

@@ -1,4 +1,4 @@
-package com.virus5600.defensive_measures.block;
+package com.virus5600.defensive_measures.block.defenses.tier2;
 
 import com.mojang.serialization.MapCodec;
 import net.minecraft.world.entity.Entity;

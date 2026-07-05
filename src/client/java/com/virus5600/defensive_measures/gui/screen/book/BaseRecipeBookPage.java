@@ -24,6 +24,7 @@ import net.minecraft.world.item.crafting.display.SlotDisplayContext;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import com.google.common.collect.Lists;
 
@@ -100,9 +101,11 @@ public class BaseRecipeBookPage {
 	}
 
 	public void updateCollections(List<RecipeCollection> resultCollections, boolean resetPage, boolean isFiltering) {
-		this.resultCollections = resultCollections;
 		this.isFiltering = isFiltering;
-		this.totalPages = (int) Math.ceil((double) resultCollections.size() / (double) this.getSlotCount());
+		this.resultCollections = resultCollections.stream()
+			.filter(recipeCollection -> recipeCollection.hasCraftable() || recipeCollection.hasAnySelected())
+			.collect(Collectors.toList());
+		this.totalPages = (int) Math.ceil((double) this.resultCollections.size() / (double) this.getSlotCount());
 
 		if (this.totalPages <= this.currentPage || resetPage) {
 			this.currentPage = 0;
@@ -112,6 +115,8 @@ public class BaseRecipeBookPage {
 	}
 
 	protected void updateButtonsForPage() {
+		Objects.requireNonNull(this.client.level);
+
 		int startOffset = this.getSlotCount() * this.currentPage;
 		ContextMap ctx = SlotDisplayContext.fromLevel(this.client.level);
 

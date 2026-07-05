@@ -5,16 +5,16 @@ import com.virus5600.defensive_measures.item.ModItems;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ItemStackTemplate;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.item.crafting.display.RecipeDisplay;
 import net.minecraft.world.item.crafting.display.ShapelessCraftingRecipeDisplay;
 import net.minecraft.world.item.crafting.display.SlotDisplay;
 import net.minecraft.world.level.Level;
 
-import com.virus5600.defensive_measures.block.TurretAssemblyStationBlock;
+import com.virus5600.defensive_measures.block.misc.tier1.TurretAssemblyStationBlock;
 import com.virus5600.defensive_measures.recipe.annotations.Shapeless;
 
 import org.jspecify.annotations.NonNull;
@@ -49,31 +49,18 @@ public class TASShapelessRecipe extends BaseCraftingRecipe<CraftingInput> {
 	}
 
 	// //////////////// //
-	// OVERRIDE METHODS //
-	// //////////////// //
-
-	@NonNull
-	public List<RecipeDisplay> display() {
-		if (this.ingredients == null) {
-			throw new IllegalStateException("ingredients is null");
-		}
-
-		return List.of(new ShapelessCraftingRecipeDisplay(
-			this.ingredients
-				.stream()
-				.map(Ingredient::display)
-				.toList(),
-			new SlotDisplay.ItemStackSlotDisplay(this.result),
-			new SlotDisplay.ItemSlotDisplay(ModItems.TURRET_ASSEMBLY_STATION)
-		));
-	}
-
-	// //////////////// //
 	// ABSTRACT METHODS //
 	// //////////////// //
 
 	protected CustomShapedRecipePattern pattern() {
 		return this.pattern;
+	}
+
+	protected PlacementInfo createPlacementInfo() {
+		String errorMsg = "Ingredients list cannot be null for recipe" + this.commonInfo;
+		Objects.requireNonNull(this.ingredients, errorMsg);
+
+		return PlacementInfo.create(this.ingredients);
 	}
 
 	public List<Optional<Ingredient>> getIngredients() {
@@ -87,11 +74,8 @@ public class TASShapelessRecipe extends BaseCraftingRecipe<CraftingInput> {
 			.toList();
 	}
 
-	protected PlacementInfo createPlacementInfo() {
-		String errorMsg = "Ingredients list cannot be null for recipe" + this.commonInfo;
-		Objects.requireNonNull(this.ingredients, errorMsg);
-
-		return PlacementInfo.create(this.ingredients);
+	public Item getItemForSlotDisplay() {
+		return ModItems.TURRET_ASSEMBLY_STATION;
 	}
 
 	// ///////////////// //
