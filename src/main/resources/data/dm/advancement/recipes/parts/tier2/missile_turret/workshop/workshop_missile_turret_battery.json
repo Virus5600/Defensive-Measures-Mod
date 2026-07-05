@@ -1,0 +1,48 @@
+﻿{
+	"parent": "minecraft:recipes/root",
+	"criteria": {
+		"workshop_interacted": {
+			"trigger": "minecraft:tick",
+			"conditions": {
+				"player": {
+					"minecraft:type_specific/player": {
+						"stats": [
+							{
+								"type": "minecraft:custom",
+								"stat": "dm:interact_with_workshop",
+								"value": {
+									"min": 1
+								}
+							}
+						]
+					}
+				}
+			}
+		},
+		"has_ingredients": {
+			"trigger": "minecraft:inventory_changed",
+			"conditions": {
+				"items": [
+					{
+						"items": [
+							"minecraft:iron_ingot",
+							"minecraft:blaze_powder",
+							"minecraft:copper_ingot",
+							"minecraft:tnt",
+							"minecraft:redstone"
+						]
+					}
+				]
+			}
+		}
+	},
+	"requirements": [
+		["workshop_interacted"],
+		["has_ingredients"]
+	],
+	"rewards": {
+		"recipes": [
+			"dm:_workshop/parts/tier2/missile_turret/workshop_missile_turret_battery"
+		]
+	}
+}

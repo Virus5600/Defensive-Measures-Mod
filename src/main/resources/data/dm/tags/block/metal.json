@@ -1,5 +1,4 @@
 {
-	"replace": false,
 	"values": [
 		"#c:chains",
 		"minecraft:iron_block",
@@ -29,7 +28,9 @@
 		"minecraft:powder_snow_cauldron",
 		"minecraft:lightning_rod",
 		"minecraft:lantern",
-		"minecraft:soul_lantern"
+		"minecraft:soul_lantern",
+		"dm:turret_assembly_station",
+		"dm:workshop"
 	]
 }
 

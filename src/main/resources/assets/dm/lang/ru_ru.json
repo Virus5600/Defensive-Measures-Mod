@@ -8,11 +8,13 @@
 	"block.dm.electric_fence" : "Electric Fence",
 
 	"block.dm.turret_assembly_station": "Turret Assembly Station",
+	"block.dm.workshop": "Workshop",
 
 	"item.dm.bolt_head": "Bolt Head",
 	"item.dm.electric_fence": "Electric Fence",
 
 	"item.dm.turret_assembly_station": "Turret Assembly Station",
+	"item.dm.workshop": "Workshop",
 
 	"item.dm.turret_remover": "Съёмник турели",
 
@@ -194,6 +196,7 @@
 	"tag.block.dm.electric_fence" : "Electric Fence",
 
 	"container.dm.turret_assembly_station": "Assembling",
+	"container.dm.workshop": "Creating",
 
 	"gui.recipebook.all": "All",
 	"gui.recipebook.blueprint": "Blueprint",

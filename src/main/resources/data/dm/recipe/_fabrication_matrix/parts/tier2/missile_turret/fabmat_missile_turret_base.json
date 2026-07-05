@@ -1,0 +1,20 @@
+{
+	"type": "dm:fabmat_shaped",
+	"category": "parts",
+	"pattern": [
+		"  s  ",
+		" sis ",
+		"sibis",
+		" sis ",
+		"  s  "
+	],
+	"key": {
+		"s": "minecraft:smooth_stone_slab",
+		"b": "minecraft:iron_block",
+		"i": "minecraft:iron_ingot"
+	},
+	"result": {
+		"id": "dm:missile_turret_base",
+		"count": 1
+	}
+}

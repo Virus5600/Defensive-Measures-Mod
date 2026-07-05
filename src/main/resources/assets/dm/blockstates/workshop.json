@@ -1,0 +1,19 @@
+{
+	"variants": {
+		"facing=east": {
+			"model": "dm:block/turret_assembly_station",
+			"y": 270
+		},
+		"facing=north": {
+			"model": "dm:block/turret_assembly_station",
+			"y": 180
+		},
+		"facing=south": {
+			"model": "dm:block/turret_assembly_station"
+		},
+		"facing=west": {
+			"model": "dm:block/turret_assembly_station",
+			"y": 90
+		}
+	}
+}
