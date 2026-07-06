@@ -1,19 +1,34 @@
 {
 	"variants": {
-		"facing=east": {
-			"model": "dm:block/turret_assembly_station",
-			"y": 270
+		"facing=east,workshop_part=left": {
+			"model": "dm:block/workshop_left",
+			"y": 90
 		},
-		"facing=north": {
-			"model": "dm:block/turret_assembly_station",
+		"facing=north,workshop_part=left": {
+			"model": "dm:block/workshop_left"
+		},
+		"facing=south,workshop_part=left": {
+			"model": "dm:block/workshop_left",
 			"y": 180
 		},
-		"facing=south": {
-			"model": "dm:block/turret_assembly_station"
+		"facing=west,workshop_part=left": {
+			"model": "dm:block/workshop_left",
+			"y": 270
 		},
-		"facing=west": {
-			"model": "dm:block/turret_assembly_station",
+		"facing=east,workshop_part=right": {
+			"model": "dm:block/workshop_right",
 			"y": 90
+		},
+		"facing=north,workshop_part=right": {
+			"model": "dm:block/workshop_right"
+		},
+		"facing=south,workshop_part=right": {
+			"model": "dm:block/workshop_right",
+			"y": 180
+		},
+		"facing=west,workshop_part=right": {
+			"model": "dm:block/workshop_right",
+			"y": 270
 		}
 	}
 }

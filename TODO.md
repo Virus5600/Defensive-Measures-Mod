@@ -1,5 +1,12 @@
 # TODO
 
+## CURRENT TASK
+
+- Implement 9-slice texture for the GUI.
+- Refactor GUI to use the new 9-slice texture.
+
+-------------
+
 ## `TurretItemRetrievedCriterion` - Class
 
 Change implementation. Make this criterion an advancement trigger for creating
@@ -35,11 +42,11 @@ In this new workbench, tiers 0 to 2 are available for creation as well with a fl
 
 Workbench will have the following features:
 
-- [ ] 9x9 Crafting Grid
-- [ ] Blueprint System
+- [x] 9x9 Crafting Grid
+- [x] Blueprint System
 - [ ] Custom GUI
-- [ ] Recipe Book (Blueprint) Integration
-- [ ] Custom Crafting System
+- [x] Recipe Book (Blueprint) Integration
+- [x] Custom Crafting System
 
 ### Fabrication Matrix
 

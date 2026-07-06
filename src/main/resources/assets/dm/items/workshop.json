@@ -1,6 +1,39 @@
 {
 	"model": {
-		"type": "minecraft:model",
-		"model": "dm:block/turret_assembly_station"
+		"type": "minecraft:composite",
+		"models": [
+			{
+				"type": "minecraft:model",
+				"model": "dm:block/workshop_left"
+			},
+			{
+				"type": "minecraft:model",
+				"model": "dm:block/workshop_right",
+				"transformation": {
+					"left_rotation": [
+						0.0,
+						0.0,
+						0.0,
+						1.0
+					],
+					"right_rotation": [
+						0.0,
+						0.0,
+						0.0,
+						1.0
+					],
+					"scale": [
+						1.0,
+						1.0,
+						1.0
+					],
+					"translation": [
+						1.0,
+						0.0,
+						0.0
+					]
+				}
+			}
+		]
 	}
 }

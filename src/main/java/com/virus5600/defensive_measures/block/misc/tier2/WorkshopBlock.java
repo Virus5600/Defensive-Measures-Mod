@@ -30,6 +30,8 @@ import com.virus5600.defensive_measures.stat.ModStats;
 
 import org.jspecify.annotations.NonNull;
 
+import java.util.Map;
+
 /**
  * Workshop is a functional block that allows players to craft higher tiered turrets. Specifically,
  * Tier 3 turrets that occupies a 3x3 area.
@@ -50,7 +52,7 @@ import org.jspecify.annotations.NonNull;
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
  */
 public class WorkshopBlock extends BaseHorizontalFunctionalBlock implements TwoBlockWide<WorkshopPart> {
-	private static final VoxelShape SHAPE;
+	private static final Map<Direction, VoxelShape> SHAPES;
 	public static final EnumProperty<WorkshopPart> PART;
 	public static final MapCodec<WorkshopBlock> CODEC;
 
@@ -85,7 +87,13 @@ public class WorkshopBlock extends BaseHorizontalFunctionalBlock implements TwoB
 
 	@Override
 	protected VoxelShape getShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
-		return SHAPE;
+		Direction facing =  state.getValue(FACING);
+		WorkshopPart part = state.getValue(PART);
+
+		return switch (part) {
+			case WorkshopPart.LEFT -> SHAPES.get(facing);
+			case WorkshopPart.RIGHT -> SHAPES.get(facing.getOpposite());
+		};
 	}
 
 	@Override
@@ -192,14 +200,16 @@ public class WorkshopBlock extends BaseHorizontalFunctionalBlock implements TwoB
 		PART = ModBlockStateProperties.WORKSHOP_PART;
 		CODEC = simpleCodec(WorkshopBlock::new);
 
-		SHAPE = Shapes.or(
-			// Table Top
+		// Facing default: North
+		SHAPES = Shapes.rotateHorizontal(Shapes.or(
+			// Table Top //
 			Block.box(0, 14, 0, 16, 16, 16),
-			// Legs
+
+			// Legs //
+			// North-West
 			Block.box(1, 0, 13, 3, 14, 15),
-			Block.box(1, 0, 1, 3, 14, 3),
-			Block.box(13, 0, 13, 15, 14, 15),
-			Block.box(13, 0, 1, 15, 14, 3)
-		);
+			// South-West
+			Block.box(1, 0, 1, 3, 14, 3)
+		));
 	}
 }
