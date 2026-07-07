@@ -13,6 +13,13 @@ public class WorkshopBlueprintComponent extends BaseBlueprintComponent {
 		super(screenHandler);
 	}
 
+	// ////////////////// //
+	// OVERRIDDEN METHODS //
+	// ////////////////// //
+	protected int getXOffset() {
+		return 154;
+	}
+
 	// //////////////// //
 	// ABSTRACT METHODS //
 	// //////////////// //

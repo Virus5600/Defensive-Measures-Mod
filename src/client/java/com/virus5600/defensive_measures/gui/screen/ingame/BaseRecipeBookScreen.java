@@ -4,12 +4,14 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.*;
+import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.navigation.ScreenPosition;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.recipebook.RecipeUpdateListener;
 import net.minecraft.client.input.CharacterEvent;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
@@ -18,28 +20,53 @@ import net.minecraft.world.inventory.RecipeBookMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.crafting.display.RecipeDisplay;
 
+import com.virus5600.defensive_measures.DefensiveMeasures;
 import com.virus5600.defensive_measures.gui.screen.book.RecipeBookComponent;
+import com.virus5600.defensive_measures.screen.BaseCraftingScreenHandler;
+import com.virus5600.defensive_measures.screen.slots.SpriteResultSlot;
+import com.virus5600.defensive_measures.screen.slots.SpriteSlot;
 
 import com.google.common.collect.Maps;
 import org.jspecify.annotations.NonNull;
 
+import java.awt.*;
 import java.util.Map;
 
+/**
+ * The {@code BaseRecipeBookScreen} class is an abstract base class for creating custom recipe book
+ * screens in this Minecraft mod. It extends the {@link AbstractContainerScreen} class and
+ * implements the {@link RecipeUpdateListener} interface, allowing it to handle recipe updates
+ * and manage the display of recipes within the screen.
+ *
+ * @param <T> The type of {@link RecipeBookMenu} that this screen is associated with. This generic
+ *           type allows for flexibility in defining different types of recipe book screens that
+ *           can work with various menu implementations.
+ *
+ * @since 1.2.0-beta
+ * @author <a href="https://github.com/Virus5600">Virus5600</a>
+ */
 @Environment(EnvType.CLIENT)
 public abstract class BaseRecipeBookScreen<T extends RecipeBookMenu> extends AbstractContainerScreen<T> implements RecipeUpdateListener {
+	public static Identifier ARROW = Identifier.fromNamespaceAndPath(DefensiveMeasures.MOD_ID, "container/crafting_arrow");
+
 	private final RecipeBookComponent<?> recipeBook;
 	protected final Map<AbstractWidget, UpdateScreenPosition> widgets;
+	private final Dimension size;
+
 	private ImageButton recipeBookBtn;
 	private boolean narrow;
+	protected boolean drawArrow;
 
 	public BaseRecipeBookScreen(
 		T handler, RecipeBookComponent<?> recipeBook, Inventory inventory, Component title,
-		int imageWidth, int imageHeight
+		int uiWidth, int uiHeight
 	) {
-		super(handler, inventory, title, imageWidth, imageHeight);
+		super(handler, inventory, title, uiWidth, uiHeight);
 
 		this.recipeBook = recipeBook;
 		this.widgets = Maps.newHashMap();
+		this.size = new Dimension(uiWidth, uiHeight);
+		this.drawArrow = true;
 	}
 
 	// ////////////////////// //
@@ -49,7 +76,7 @@ public abstract class BaseRecipeBookScreen<T extends RecipeBookMenu> extends Abs
 	protected void init() {
 		super.init();
 
-		this.narrow = this.width < 450;
+		this.narrow = this.width < this.getUISize().getWidth() + 200;
 		this.recipeBook.init(this.width, this.height, this.minecraft, this.narrow);
 		this.leftPos = this.recipeBook.updateScreenPosition(this.width, this.imageWidth);
 		this.initButton();
@@ -128,7 +155,11 @@ public abstract class BaseRecipeBookScreen<T extends RecipeBookMenu> extends Abs
 		if (this.getRecipeBook().isVisible() && this.narrow) {
 			this.extractBackground(graphics, mouseX, mouseY, deltaTicks);
 		} else {
-			super.extractContents(graphics, mouseX, mouseY, deltaTicks);
+			this.extractContents(graphics, mouseX, mouseY, deltaTicks);
+		}
+
+		if (this.drawArrow) {
+			this.drawArrow(graphics);
 		}
 
 		graphics.nextStratum();
@@ -140,9 +171,64 @@ public abstract class BaseRecipeBookScreen<T extends RecipeBookMenu> extends Abs
 		this.getRecipeBook().extractTooltip(graphics, mouseX, mouseY, this.hoveredSlot);
 	}
 
-	protected void extractSlots(@NonNull GuiGraphicsExtractor context, int mouseX, int mouseY) {
-		super.extractSlots(context, mouseX, mouseY);
-		this.getRecipeBook().extractGhostRecipe(context, this.isBiggerResultSlot());
+	protected void drawArrow(@NonNull GuiGraphicsExtractor graphics) {
+		if (this.menu instanceof BaseCraftingScreenHandler<?> handler) {
+			ScreenPosition pos = new ScreenPosition(
+				(int) handler.getArrowPos().getX() + this.leftPos - 2,
+				(int) handler.getArrowPos().getY() + this.topPos - 2
+			);
+
+			graphics.blitSprite(
+				RenderPipelines.GUI_TEXTURED, this.getArrowSprite(),
+				pos.x(), pos.y(),
+				22, 15
+			);
+		}
+	}
+
+	protected void extractSlots(@NonNull GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
+		for(Slot slot : this.menu.slots) {
+			if (slot.isActive()) {
+				this.extractSlot(graphics, slot, mouseX, mouseY);
+			}
+		}
+
+		this.getRecipeBook().extractGhostRecipe(graphics, this.isBiggerResultSlot());
+	}
+
+	protected void extractSlot(
+		final GuiGraphicsExtractor graphics, final Slot slot,
+		final int mouseX, final int mouseY
+	) {
+		if (slot instanceof SpriteSlot spriteSlot) {
+			int xOrigin = spriteSlot.x - (spriteSlot.getPadding() / 2) - 1;
+			int yOrigin = spriteSlot.y - (spriteSlot.getPadding() / 2) - 1;
+			Dimension size = new Dimension(
+				18 + spriteSlot.getPadding(),
+				18 + spriteSlot.getPadding()
+			);
+
+			graphics.blitSprite(
+				RenderPipelines.GUI_TEXTURED, spriteSlot.getSprite(),
+				xOrigin, yOrigin,
+				size.width, size.height
+			);
+		} else if (slot instanceof SpriteResultSlot spriteResultSlot) {
+			int xOrigin = spriteResultSlot.x - (spriteResultSlot.getPadding() / 2) - 2;
+			int yOrigin = spriteResultSlot.y - (spriteResultSlot.getPadding() / 2) - 2;
+			Dimension size = new Dimension(
+				20 + spriteResultSlot.getPadding(),
+				20 + spriteResultSlot.getPadding()
+			);
+
+			graphics.blitSprite(
+				RenderPipelines.GUI_TEXTURED, spriteResultSlot.getSprite(),
+				xOrigin, yOrigin,
+				size.width, size.height
+			);
+		}
+
+		super.extractSlot(graphics, slot, mouseX, mouseY);
 	}
 
 	protected boolean isBiggerResultSlot() {
@@ -222,6 +308,10 @@ public abstract class BaseRecipeBookScreen<T extends RecipeBookMenu> extends Abs
 	// GETTERS & SETTERS //
 	// ///////////////// //
 
+	protected final Dimension getUISize() {
+		return this.size;
+	}
+
 	/**
 	 * Adds a widget that gets its position updated when {@link #updateWidgetPositions()} gets
 	 * called.
@@ -281,6 +371,10 @@ public abstract class BaseRecipeBookScreen<T extends RecipeBookMenu> extends Abs
 		this.leftPos = this.recipeBook.updateScreenPosition(this.width, this.imageWidth);
 
 		this.updateWidgetPositions();
+	}
+
+	protected Identifier getArrowSprite() {
+		return ARROW;
 	}
 
 	// //////////////// //

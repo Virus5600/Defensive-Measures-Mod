@@ -132,7 +132,7 @@ public abstract class BaseBlueprintComponent extends RecipeBookComponent<Abstrac
 	// //////////////// //
 
 	protected int getXOffset() {
-		return 106;
+		return 107;
 	}
 
 	// //////////////// //

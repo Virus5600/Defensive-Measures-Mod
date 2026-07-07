@@ -404,12 +404,4 @@ public class TextSpriteButton extends ImageButton {
 			return this.positionOrdinal.y();
 		}
 	}
-
-	// //////////////////// //
-	// FUNCTIONAL INTERFACE //
-	// //////////////////// //
-	@FunctionalInterface
-	private interface TriFunction<A, B, C, R> {
-		R apply(final A a, final B b, final C c);
-	}
 }

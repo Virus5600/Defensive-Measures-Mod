@@ -20,10 +20,13 @@ import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeType;
 
 import com.virus5600.defensive_measures.recipe.BaseCraftingRecipe;
+import com.virus5600.defensive_measures.screen.slots.SpriteResultSlot;
+import com.virus5600.defensive_measures.screen.slots.SpriteSlot;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -33,6 +36,7 @@ public abstract class BaseCraftingScreenHandler<T extends BaseCraftingRecipe<Cra
 	protected final ContainerLevelAccess access;
 	protected final Player player;
 	protected boolean placingRecipe;
+	protected Point arrowPos;
 
 	public BaseCraftingScreenHandler(MenuType type, int syncId, Inventory playerInventory, ContainerLevelAccess access, int width, int height, RecipeType<T> recipeType) {
 		super(type, syncId, width, height);
@@ -41,6 +45,72 @@ public abstract class BaseCraftingScreenHandler<T extends BaseCraftingRecipe<Cra
 		this.player = playerInventory.player;
 
 		this.recipeType = recipeType;
+	}
+
+	// /////// //
+	// METHODS //
+	// /////// //
+
+	public void setArrowPos(final int x, final int y) {
+		this.setArrowPos(new Point(x, y));
+	}
+
+	public void setArrowPos(final Point position) {
+		this.arrowPos = position;
+	}
+
+	public Point getArrowPos() {
+		return this.arrowPos;
+	}
+
+	protected Slot addResultSlot(final Player player, final int x, final int y) {
+		int padding = 6;
+
+		if (this.arrowPos == null) {
+			// Arrow res is 22 x 15
+			int arrowX = x - (22 + 15);
+			int arrowY = y - (padding / 2) + (((20 + padding) - 15) / 2);
+
+			this.arrowPos = new Point(arrowX, arrowY);
+		}
+
+		return this.addSlot(new SpriteResultSlot(
+			player, this.craftSlots,
+			this.resultSlots, 0,
+			x, y
+		).setPadding(padding));
+	}
+
+	protected void addCraftingGridSlots(final int left, final int top) {
+		for(int y = 0; y < this.getGridWidth(); ++y) {
+			for(int x = 0; x < this.getGridHeight(); ++x) {
+				this.addSlot(new SpriteSlot(
+					this.craftSlots, x + y * this.getGridWidth(),
+					left + x * 18,
+					top + y * 18)
+				);
+			}
+		}
+	}
+
+	protected void addInventoryHotbarSlots(final Container inventory, final int left, final int top) {
+		for(int x = 0; x < 9; ++x) {
+			this.addSlot(new SpriteSlot(
+				inventory, x,
+				left + x * 18, top
+			));
+		}
+	}
+
+	protected void addInventoryExtendedSlots(final Container inventory, final int left, final int top) {
+		for(int y = 0; y < 3; ++y) {
+			for(int x = 0; x < 9; ++x) {
+				this.addSlot(new SpriteSlot(
+					inventory, x + (y + 1) * 9,
+					left + x * 18, top + y * 18
+				));
+			}
+		}
 	}
 
 	protected static <T extends BaseCraftingRecipe<CraftingInput>> void slotChangedCraftingGrid(

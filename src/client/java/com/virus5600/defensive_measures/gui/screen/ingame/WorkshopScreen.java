@@ -14,33 +14,35 @@ import com.virus5600.defensive_measures.DefensiveMeasures;
 import com.virus5600.defensive_measures.gui.screen.book.WorkshopBlueprintComponent;
 import com.virus5600.defensive_measures.screen.WorkshopScreenHandler;
 
+import java.awt.*;
+
 @Environment(EnvType.CLIENT)
 public class WorkshopScreen extends BaseRecipeBookScreen<WorkshopScreenHandler> {
-	private static final Identifier TEXTURE = Identifier.fromNamespaceAndPath(DefensiveMeasures.MOD_ID, "textures/gui/container/turret_assembly_station.png");
+	private static final Identifier TEXTURE;
 
 	public WorkshopScreen(
 		WorkshopScreenHandler screenHandler, Inventory inventory, Component title
 	) {
 		super(
 			screenHandler, new WorkshopBlueprintComponent(screenHandler), inventory, title,
-			256, 242
+			336, 185
 		);
 	}
 
 	protected void init() {
-		this.titleLabelX = 29;
+		this.titleLabelX = 4;
 		this.titleLabelY = 6;
 
-		this.inventoryLabelX = 65;
-		this.inventoryLabelY = this.imageHeight - 96;
+		this.inventoryLabelX = 169;
+		this.inventoryLabelY = 92;
 
 		super.init();
 	}
 
-	protected ScreenPosition getRecipeBookButtonPos(int leftPos, int topPos, int imageWidth, int imageHeight, int screenWidth, int screenHeight) {
+	protected ScreenPosition getRecipeBookButtonPos(int leftPos, int topPos, int menuWidth, int menuHeight, int screenWidth, int screenHeight) {
 		return new ScreenPosition(
-			leftPos + 27,
-			screenHeight / 2 + 55
+			leftPos + (menuWidth / 2) + (int) (menuWidth * 0.0725),
+			topPos + (int) (menuHeight * 0.125)
 		);
 	}
 
@@ -55,14 +57,29 @@ public class WorkshopScreen extends BaseRecipeBookScreen<WorkshopScreenHandler> 
 	public void extractBackground(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float deltaTicks) {
 		super.extractBackground(graphics, mouseX, mouseY, deltaTicks);
 
-		int x = this.leftPos;
-		int y = (this.height - this.imageHeight) / 2;
+		int xOrigin = this.leftPos;
+		int yOrigin = (this.height - this.imageHeight) / 2;
+		Dimension size = this.getUISize();
 
-		graphics.blit(
-			RenderPipelines.GUI_TEXTURED, TEXTURE,
-			x, y, 0.0F, 0.0F,
-			this.imageWidth, this.imageHeight,
-			256, 256
+		graphics.blitSprite(
+			RenderPipelines.GUI_TEXTURED, getTexture(),
+			xOrigin, yOrigin,
+			size.width, size.height
 		);
+	}
+
+	// ////////////// //
+	// STATIC METHODS //
+	// ////////////// //
+
+	protected static Identifier getTexture() {
+		return TEXTURE;
+	}
+
+	// ///////////////////// //
+	// STATIC INITIALIZATION //
+	// ///////////////////// //
+	static {
+		TEXTURE = Identifier.fromNamespaceAndPath(DefensiveMeasures.MOD_ID, "container/crafting_container");
 	}
 }

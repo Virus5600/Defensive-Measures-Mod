@@ -67,12 +67,12 @@ import org.jspecify.annotations.Nullable;
  * @since 1.1.0-beta
  */
 public abstract class RecipeBookComponent<T extends RecipeBookMenu> implements GuiEventListener, Renderable, NarratableEntry {
-	private static final Identifier TEXTURE = Identifier.fromNamespaceAndPath(DefensiveMeasures.MOD_ID, "textures/gui/container/recipe_book.png");
+	private static final Identifier TEXTURE = Identifier.fromNamespaceAndPath(DefensiveMeasures.MOD_ID, "container/recipe_book");
 	private static final Component SEARCH_HINT_TEXT = Component.translatable("gui.recipebook.search_hint").withStyle(EditBox.SEARCH_HINT_STYLE);
 	private static final Component TOGGLE_ALL_RECIPES_TEXT = Component.translatable("gui.recipebook.toggleRecipes.all");
 
 	private final Dimension textureSize = new Dimension(256, 256);
-	private final Dimension uvSize = new Dimension(147, 195);
+	private final Dimension size;
 	private final GhostSlots ghostRecipe;
 	private final List<BaseRecipeBookTabButton> tabButtons = Lists.newArrayList();
 	private final List<TabInfo> tabInfos;
@@ -101,8 +101,13 @@ public abstract class RecipeBookComponent<T extends RecipeBookMenu> implements G
 	protected float displayTime;
 
 	public RecipeBookComponent(T screenHandler, List<TabInfo> tabInfos) {
+		this(screenHandler, tabInfos, 147, 195);
+	}
+
+	public RecipeBookComponent(T screenHandler, List<TabInfo> tabInfos, int width, int height) {
 		this.menu = screenHandler;
 		this.tabInfos = tabInfos;
+		this.size = new Dimension(width, height);
 
 		SlotSelectTime slotSelectTime = () -> Mth.floor(this.displayTime / 30.0F);
 
@@ -224,8 +229,8 @@ public abstract class RecipeBookComponent<T extends RecipeBookMenu> implements G
 	protected final void initCloseButton() {
 		int width = 147, height = 20;
 		ScreenPosition screenPos = new ScreenPosition(
-			this.getXOrigin() + this.getUVSize().width - width,
-			this.getYOrigin() + this.getUVSize().height - 1
+			this.getXOrigin() + this.getComponentSize().width - width,
+			this.getYOrigin() + this.getComponentSize().height - 1
 		);
 
 		TextSpriteButton btn = new TextSpriteButton(
@@ -244,18 +249,18 @@ public abstract class RecipeBookComponent<T extends RecipeBookMenu> implements G
 		this.setVisible(false);
 	}
 
-	private int getYOrigin() {
-		return (this.parentHeight - this.uvSize.height) / 2;
+	public int getYOrigin() {
+		return (this.parentHeight - this.size.height) / 2;
 	}
 
-	private int getXOrigin() {
-		return (this.parentWidth - this.uvSize.width) / 2 - this.xOffset;
+	public int getXOrigin() {
+		return (this.parentWidth - this.size.width) / 2 - this.xOffset;
 	}
 
 	public int updateScreenPosition(int width, int imageWidth) {
 		int leftPos;
 		if (this.isVisible() && !this.widthTooNarrow) {
-			leftPos = 170 + (width - imageWidth - this.uvSize.width) / 2;
+			leftPos = 170 + (width - imageWidth - this.size.width) / 2;
 		} else {
 			leftPos = (width - imageWidth) / 2;
 		}
@@ -365,8 +370,8 @@ public abstract class RecipeBookComponent<T extends RecipeBookMenu> implements G
 	}
 
 	private void updateTabs(boolean filteringCraftable) {
-		int xPosTab = (this.parentWidth - this.uvSize.width) / 2 - this.xOffset - 30;
-		int yPosTab = (this.parentHeight - this.uvSize.height) / 2 + 3;
+		int xPosTab = (this.parentWidth - this.size.width) / 2 - this.xOffset - 30;
+		int yPosTab = (this.parentHeight - this.size.height) / 2 + 3;
 		int yOffset = 27;
 		int index = 0;
 
@@ -426,15 +431,12 @@ public abstract class RecipeBookComponent<T extends RecipeBookMenu> implements G
 
 			int xOrigin = this.getXOrigin();
 			int yOrigin = this.getYOrigin();
+			Dimension size = this.size;
 
-			Dimension uvDimension = this.uvSize;
-			Dimension textureDimension = this.getTextureSize();
-
-			graphics.blit(
+			graphics.blitSprite(
 				RenderPipelines.GUI_TEXTURED, this.getUITexture(),
-				xOrigin, yOrigin, 1.0F, 1.0F,
-				uvDimension.width, uvDimension.height,
-				textureDimension.width, textureDimension.height
+				xOrigin, yOrigin,
+				size.width, size.height
 			);
 
 			if (this.searchBox != null) {
@@ -469,11 +471,11 @@ public abstract class RecipeBookComponent<T extends RecipeBookMenu> implements G
 
 	public boolean mouseClicked(@NonNull MouseButtonEvent event, boolean doubleClick) {
 		if (this.isVisible() && this.minecraft.player != null && !this.minecraft.player.isSpectator()) {
-			Dimension uvDimension = this.uvSize;
+			Dimension size = this.size;
 			boolean recipesAreaClicked = this.recipeBookPage
 				.mouseClicked(event,
 					this.getXOrigin(), this.getYOrigin(),
-					uvDimension.width, uvDimension.height,
+					size.width, size.height,
 					doubleClick);
 
 			if (recipesAreaClicked) {
@@ -574,7 +576,7 @@ public abstract class RecipeBookComponent<T extends RecipeBookMenu> implements G
 				mouseX >= (double) (x + imageWidth) ||
 				mouseY >= (double) (y + imageHeight);
 
-			boolean clickedOnRecipeBook = (double) (x - this.uvSize.width) < mouseX &&
+			boolean clickedOnRecipeBook = (double) (x - this.size.width) < mouseX &&
 				mouseX < (double) x &&
 				(double) y < mouseY &&
 				mouseY < (double) (y + imageHeight);
@@ -785,11 +787,11 @@ public abstract class RecipeBookComponent<T extends RecipeBookMenu> implements G
 	}
 
 	/**
-	 * Identifies the dimension of the actual texture to be used for the GUI.
+	 * Identifies the dimension of the this component.
 	 * @return Dimension
 	 */
-	protected Dimension getUVSize() {
-		return this.uvSize;
+	protected Dimension getComponentSize() {
+		return this.size;
 	}
 
 
