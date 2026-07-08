@@ -470,7 +470,7 @@ public abstract class RecipeBookComponent<T extends RecipeBookMenu> implements G
 	}
 
 	public boolean mouseClicked(@NonNull MouseButtonEvent event, boolean doubleClick) {
-		if (this.isVisible() && this.minecraft.player != null && !this.minecraft.player.isSpectator()) {
+		if (this.isVisible() && this.minecraft.player != null) {
 			Dimension size = this.size;
 			boolean recipesAreaClicked = this.recipeBookPage
 				.mouseClicked(event,
