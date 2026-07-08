@@ -1,7 +1,5 @@
 package com.virus5600.defensive_measures.gui.screen.ingame;
 
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.*;
 import net.minecraft.client.gui.components.Button;
@@ -45,7 +43,6 @@ import java.util.Map;
  * @since 1.2.0-beta
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
  */
-@Environment(EnvType.CLIENT)
 public abstract class BaseRecipeBookScreen<T extends RecipeBookMenu> extends AbstractContainerScreen<T> implements RecipeUpdateListener {
 	public static Identifier ARROW = Identifier.fromNamespaceAndPath(DefensiveMeasures.MOD_ID, "container/crafting_arrow");
 
@@ -337,6 +334,10 @@ public abstract class BaseRecipeBookScreen<T extends RecipeBookMenu> extends Abs
 
 	protected RecipeBookComponent<?> getRecipeBook() {
 		return this.recipeBook;
+	}
+
+	public boolean isNarrow() {
+		return this.narrow;
 	}
 
 	protected static ScreenPosition getCloseButtonPos(int leftPos, int topPos, int imageWidth, int imageHeight, int screenWidth, int screenHeight) {

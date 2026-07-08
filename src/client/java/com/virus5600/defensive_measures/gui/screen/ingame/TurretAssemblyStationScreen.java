@@ -12,11 +12,19 @@ import net.minecraft.world.entity.player.Inventory;
 
 import com.virus5600.defensive_measures.DefensiveMeasures;
 import com.virus5600.defensive_measures.gui.screen.book.TASBlueprintComponent;
+import com.virus5600.defensive_measures.gui.screen.book.WorkshopBlueprintComponent;
 import com.virus5600.defensive_measures.screen.TurretAssemblyStationScreenHandler;
 
 import java.awt.*;
 
-@Environment(EnvType.CLIENT)
+/**
+ * A screen (or menu in Mojmap) for the Turret Assembly Station (TAS), extending the
+ * {@link BaseRecipeBookScreen} to inherit the recipe book, which is called
+ * {@link WorkshopBlueprintComponent Blueprint} in for this bench.
+ *
+ * @since 1.2.0-beta
+ * @author <a href="https://github.com/Virus5600">Virus5600</a>
+ */
 public class TurretAssemblyStationScreen extends BaseRecipeBookScreen<TurretAssemblyStationScreenHandler> {
 	private static final Identifier TEXTURE;
 

@@ -17,7 +17,7 @@ public class WorkshopBlueprintComponent extends BaseBlueprintComponent {
 	// OVERRIDDEN METHODS //
 	// ////////////////// //
 	protected int getXOffset() {
-		return 154;
+		return 146;
 	}
 
 	// //////////////// //
