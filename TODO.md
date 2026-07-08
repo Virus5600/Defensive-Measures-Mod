@@ -2,8 +2,8 @@
 
 ## CURRENT TASK
 
-- Implement 9-slice texture for the GUI.
-- Refactor GUI to use the new 9-slice texture.
+- Implement Fabrication Matrix (FabMat)
+- Create FabMat model
 
 -------------
 
