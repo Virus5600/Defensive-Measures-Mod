@@ -1,15 +1,18 @@
 {
-	"required": true,
-	"package": "com.virus5600.defensive_measures.mixins",
-	"compatibilityLevel": "JAVA_25",
-	"client": [
-		"model.ModelPartMixin",
-		"resources.SplashManagerMixin",
-		"screens.recipebook.CraftingRecipeBookComponentMixin",
-		"sound.SoundEngineAccessorMixin",
-		"sound.SoundManagerMixin"
-	],
-	"injectors": {
-		"defaultRequire": 1
-	}
+  "required": true,
+  "package": "com.virus5600.defensive_measures.mixins",
+  "compatibilityLevel": "JAVA_25",
+  "client": [
+    "model.ModelPartMixin",
+    "resources.SplashManagerMixin",
+    "screens.recipebook.CraftingRecipeBookComponentMixin",
+    "sound.SoundEngineAccessorMixin",
+    "sound.SoundManagerMixin"
+  ],
+  "mixins": [
+    "screens.recipebook.SearchRecipeBookCategoryMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
 }

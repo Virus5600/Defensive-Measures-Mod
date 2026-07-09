@@ -1,0 +1,24 @@
+{
+	"type": "dm:fabmat_shaped",
+	"category": "parts",
+	"pattern": [
+		"riiir",
+		"iccci",
+		"icpci",
+		"icpci",
+		"icpci",
+		"iccci",
+		"ibibi"
+	],
+	"key": {
+		"r": "minecraft:red_dye",
+		"p": "minecraft:blaze_powder",
+		"c": "minecraft:copper_ingot",
+		"b": "minecraft:iron_block",
+		"i": "minecraft:iron_ingot"
+	},
+	"result": {
+		"id": "dm:flame_turret_head",
+		"count": 1
+	}
+}

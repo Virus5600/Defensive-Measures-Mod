@@ -14,6 +14,10 @@ import java.util.UUID;
 
 import com.google.common.collect.Maps;
 
+/**
+ * @since 1.1.0-beta
+ * @author <a href="https://github.com/Virus5600">Virus5600</a>
+ */
 public final class MicroMissileSpawnPacketReceiver {
 	private static final Map<UUID, RocketEngineLoopSoundInstance> ACTIVE_SOUNDS = Maps.newConcurrentMap();
 

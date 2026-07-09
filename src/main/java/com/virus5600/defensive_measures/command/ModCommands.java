@@ -5,7 +5,7 @@ import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import com.virus5600.defensive_measures.DefensiveMeasures;
 
 public class ModCommands {
-	public static void registerCommands() {
+	public static void init() {
 		DefensiveMeasures.LOGGER.info("REGISTERING COMMON COMMANDS FOR {}...", DefensiveMeasures.MOD_NAME);
 
 		// v1.2.0-beta

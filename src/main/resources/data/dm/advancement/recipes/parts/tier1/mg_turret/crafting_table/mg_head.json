@@ -1,0 +1,31 @@
+﻿{
+	"parent": "minecraft:recipes/root",
+	"criteria": {
+		"has_ingredients": {
+			"trigger": "minecraft:inventory_changed",
+			"conditions": {
+				"items": [
+					{
+						"items": [
+							"dm:mg_ammo_case",
+							"dm:mg_ammo_rounds",
+							"minecraft:green_dye",
+							"minecraft:iron_block",
+							"minecraft:iron_ingot"
+						]
+					}
+				]
+			}
+		}
+	},
+	"requirements": [
+		[
+			"has_ingredients"
+		]
+	],
+	"rewards": {
+		"recipes": [
+			"dm:_crafting_table/turrets/tier1/mg_turret/mg_head"
+		]
+	}
+}

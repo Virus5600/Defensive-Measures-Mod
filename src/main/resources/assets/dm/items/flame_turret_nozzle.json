@@ -1,0 +1,35 @@
+{
+	"model": {
+		"type": "composite",
+		"models": [
+			{
+				"type": "model",
+				"model": "dm:item/tier2/flame_turret/flame_turret_nozzle/0"
+			},
+			{
+				"type": "model",
+				"model": "dm:item/tier2/flame_turret/flame_turret_nozzle/1"
+			},
+			{
+				"type": "model",
+				"model": "dm:item/tier2/flame_turret/flame_turret_nozzle/2"
+			},
+			{
+				"type": "model",
+				"model": "dm:item/tier2/flame_turret/flame_turret_nozzle/3"
+			},
+			{
+				"type": "model",
+				"model": "dm:item/tier2/flame_turret/flame_turret_nozzle/4"
+			},
+			{
+				"type": "model",
+				"model": "dm:item/tier2/flame_turret/flame_turret_nozzle/5"
+			},
+			{
+				"type": "model",
+				"model": "dm:item/tier2/flame_turret/flame_turret_nozzle/6"
+			}
+		]
+	}
+}

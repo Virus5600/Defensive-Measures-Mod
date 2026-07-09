@@ -7,6 +7,10 @@ import com.virus5600.defensive_measures.model.ModEntityModels;
 import com.virus5600.defensive_measures.model.projectiles.FlintPelletProjectileModel;
 import com.virus5600.defensive_measures.renderer.projectiles.state.BaseProjectileRenderState;
 
+/**
+ * @since 1.2.0-beta
+ * @author <a href="https://github.com/Virus5600">Virus5600</a>
+ */
 public class FlintPelletRenderer extends BaseProjectileRenderer<
 	FlintPelletEntity,
 	BaseProjectileRenderState,

@@ -1,0 +1,16 @@
+{
+	"type": "dm:tas_shaped",
+	"category": "parts",
+	"pattern": [
+		"h",
+		"s",
+		"s"
+	],
+	"key": {
+		"h": "dm:bolt_head",
+		"s": "minecraft:stick"
+	},
+	"result": {
+		"id": "dm:ballista_bolt"
+	}
+}

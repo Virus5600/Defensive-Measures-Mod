@@ -7,6 +7,10 @@ import net.minecraft.world.entity.Entity;
 import com.virus5600.defensive_measures.entity.turrets.TurretEntity;
 import com.virus5600.defensive_measures.network.clientbound.entity.PlayAnimationPacket;
 
+/**
+ * @since 1.2.0-beta
+ * @author <a href="https://github.com/Virus5600">Virus5600</a>
+ */
 public final class PlayAnimationPacketReceiver {
 	public static void handle(PlayAnimationPacket payload, Context ctx) {
 		Minecraft client = ctx.client();

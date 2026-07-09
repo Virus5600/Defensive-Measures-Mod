@@ -1,0 +1,24 @@
+{
+	"type": "dm:fabmat_shaped",
+	"category": "turrets",
+	"pattern": [
+		" sbi ",
+		" bg  ",
+		" ibi ",
+		" w w ",
+		"wwwww",
+		" SSS "
+	],
+	"key": {
+		"b": "minecraft:iron_block",
+		"i": "minecraft:iron_ingot",
+		"g": "minecraft:gunpowder",
+		"s": "minecraft:string",
+		"w": "#minecraft:wooden_slabs",
+		"S": "minecraft:smooth_stone_slab"
+	},
+	"result": {
+		"id": "dm:cannon_turret",
+		"count": 1
+	}
+}

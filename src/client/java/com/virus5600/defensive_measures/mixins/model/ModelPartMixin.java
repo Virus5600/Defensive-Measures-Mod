@@ -11,6 +11,10 @@ import org.spongepowered.asm.mixin.Shadow;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * @since 1.2.0-beta
+ * @author <a href="https://github.com/Virus5600">Virus5600</a>
+ */
 @Mixin(ModelPart.class)
 public abstract class ModelPartMixin implements ModelPartExtensions {
 	@Shadow @Final private Map<String, ModelPart> children;

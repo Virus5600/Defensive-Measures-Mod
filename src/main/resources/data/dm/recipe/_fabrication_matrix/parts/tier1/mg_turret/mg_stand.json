@@ -1,0 +1,17 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"category": "misc",
+	"pattern": [
+		"igi",
+		"igi",
+		"iii"
+	],
+	"key": {
+		"g": "minecraft:green_dye",
+		"i": "minecraft:iron_ingot"
+	},
+	"result": {
+		"id": "dm:mg_stand",
+		"count": 1
+	}
+}

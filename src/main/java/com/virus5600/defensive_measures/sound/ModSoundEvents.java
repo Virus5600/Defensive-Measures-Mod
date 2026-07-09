@@ -98,7 +98,7 @@ public class ModSoundEvents {
 		return BuiltInRegistries.SOUND_EVENT.wrapAsHolder(sound);
 	}
 
-	public static void registerSoundEvents() {
+	public static void init() {
 		DefensiveMeasures.LOGGER.info("REGISTERING SOUND EVENTS FOR {}...", DefensiveMeasures.MOD_NAME);
 	}
 }

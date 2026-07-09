@@ -11,6 +11,12 @@ import com.virus5600.defensive_measures.renderer.entity.state.BaseTurretRenderSt
 
 import org.jspecify.annotations.NonNull;
 
+/**
+ * @since 1.2.0-beta
+ * @author <a href="https://github.com/Virus5600">Virus5600</a>
+ *
+ * @version 1.0
+ */
 public class PelletTurretModel extends BaseTurretModel<BaseTurretRenderState> {
 	private final ModelPart SUPPORT_STICKS;
 

@@ -21,7 +21,7 @@ import com.virus5600.defensive_measures.network.serverbound.entity.StopAnimation
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
  */
 public final class ModPackets {
-	public static void registerModPackets() {
+	public static void init() {
 		DefensiveMeasures.LOGGER.info("REGISTERING PACKETS FOR {}...", DefensiveMeasures.MOD_NAME);
 
 		// ////////////// //

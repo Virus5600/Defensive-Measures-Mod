@@ -23,7 +23,7 @@ import org.jspecify.annotations.NonNull;
  *
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
  * @see CustomEmitter
- * @since 1.0.0-beta
+ * @since 1.1.0-beta
  */
 @Environment(EnvType.CLIENT)
 public class FlakExplosionEmitter extends CustomEmitter {

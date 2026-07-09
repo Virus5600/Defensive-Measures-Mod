@@ -1,0 +1,19 @@
+{
+	"type": "dm:tas_shaped",
+	"category": "parts",
+	"pattern": [
+		"  i  ",
+		"  i  ",
+		"iibii",
+		"  i  ",
+		"  i  "
+	],
+	"key": {
+		"b": "minecraft:iron_block",
+		"i": "minecraft:iron_ingot"
+	},
+	"result": {
+		"id": "dm:aa_turret_base",
+		"count": 1
+	}
+}

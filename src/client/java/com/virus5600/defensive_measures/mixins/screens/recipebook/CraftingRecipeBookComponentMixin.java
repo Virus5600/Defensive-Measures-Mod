@@ -16,27 +16,23 @@ import com.virus5600.defensive_measures.item.ModItems;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * A mixin that allows the addition of new category tabs for the Crafting Table.
+ *
+ * @since 1.2.0-beta
+ * @author <a href="https://github.com/Virus5600">Virus5600</a>
+ */
 @Mixin(CraftingRecipeBookComponent.class)
 public class CraftingRecipeBookComponentMixin {
-
-	// @Mutable removes the 'final' modifier at runtime, allowing us to reassign it.
-	@Shadow
-	@Final
-	@Mutable
+	@Shadow @Final @Mutable
 	private static List<RecipeBookComponent.TabInfo> TABS;
 
 	// Injecting at TAIL of <clinit> means this runs right after Mojang's List.of(...) finishes.
 	@Inject(method = "<clinit>", at = @At("TAIL"))
 	private static void injectTurretsTab(CallbackInfo ci) {
-		// 1. Copy the immutable list into a mutable ArrayList
 		List<RecipeBookComponent.TabInfo> modifiedTabs = new ArrayList<>(TABS);
-
-		// 2. Add your custom Turrets tab to the end.
-		// Swap 'ModItems.TURRET_ITEM' with whatever item you want as the tab icon,
-		// and 'RecipeCategoryMixin.TURRETS' with your extended enum value.
 		modifiedTabs.add(new RecipeBookComponent.TabInfo(ModItems.CANNON_TURRET, ModRecipeBookCategories.DM_TURRETS));
 
-		// 3. Reassign the field, converting it back to an unmodifiable list to prevent side effects
 		TABS = List.copyOf(modifiedTabs);
 	}
 }

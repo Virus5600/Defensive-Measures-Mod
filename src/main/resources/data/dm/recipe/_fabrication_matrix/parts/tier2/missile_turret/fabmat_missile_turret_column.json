@@ -1,0 +1,22 @@
+{
+	"type": "dm:fabmat_shaped",
+	"category": "parts",
+	"pattern": [
+		"       ",
+		" i   i ",
+		" i   i ",
+		"  iii  ",
+		"  iri  ",
+		"  ibi  ",
+		"       "
+	],
+	"key": {
+		"r": "minecraft:redstone_block",
+		"b": "minecraft:iron_block",
+		"i": "minecraft:iron_ingot"
+	},
+	"result": {
+		"id": "dm:missile_turret_column",
+		"count": 1
+	}
+}

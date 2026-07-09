@@ -1,0 +1,18 @@
+{
+	"type": "dm:fabmat_shaped",
+	"category": "misc",
+	"pattern": [
+		"iii",
+		"btb",
+		"b b"
+	],
+	"key": {
+		"i": "minecraft:iron_ingot",
+		"b": "minecraft:iron_bars",
+		"t": "minecraft:crafting_table"
+	},
+	"result": {
+		"id": "dm:turret_assembly_station",
+		"count": 1
+	}
+}

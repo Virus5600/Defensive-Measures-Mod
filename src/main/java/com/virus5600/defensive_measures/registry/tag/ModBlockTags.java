@@ -5,7 +5,12 @@ import net.minecraft.world.level.block.Block;
 
 import com.virus5600.defensive_measures._helper.RegistryHelper;
 
-
+/**
+ * A class containing all the block tags used in the Defensive Measures mod.
+ *
+ * @since 1.0.0-beta
+ * @author <a href="https://github.com/Virus5600">Virus5600</a>
+ */
 public class ModBlockTags {
 	// Categories
 	public static final TagKey<Block> DIRT = RegistryHelper.createBlockTagKey("dirt");

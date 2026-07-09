@@ -2,25 +2,27 @@ package com.virus5600.defensive_measures.recipe;
 
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.core.HolderLookup.Provider;
+import com.virus5600.defensive_measures.recipe.display.FlexibleShapedCraftingRecipeDisplay;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.util.StringRepresentable;
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStackTemplate;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.*;
-import net.minecraft.world.item.crafting.display.RecipeDisplay;
-import net.minecraft.world.item.crafting.display.ShapedCraftingRecipeDisplay;
-import net.minecraft.world.item.crafting.display.SlotDisplay;
-import net.minecraft.world.level.Level;
 
+import com.virus5600.defensive_measures.recipe.annotations.Shaped;
+import com.virus5600.defensive_measures.recipe.annotations.Shapeless;
 import com.virus5600.defensive_measures.recipe.book.ModCraftingRecipeCategory;
 
+import net.minecraft.world.item.crafting.display.RecipeDisplay;
+import net.minecraft.world.item.crafting.display.ShapelessCraftingRecipeDisplay;
+import net.minecraft.world.item.crafting.display.SlotDisplay;
 import org.jetbrains.annotations.Nullable;
 import org.jspecify.annotations.NonNull;
 
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 /**
  * BaseCraftingRecipe is an abstract class that serves as the base for all crafting recipes in the
@@ -39,26 +41,56 @@ import java.util.List;
  *
  * @see Recipe
  * @see ShapedRecipe
+ * @see ShapelessRecipe
  */
 public abstract class BaseCraftingRecipe<T extends CraftingInput> implements BaseCraftingRecipeInterface<T> {
 	protected final CommonInfo commonInfo;
 	protected final ModCraftingBookInfo bookInfo;
+	protected final CustomShapedRecipePattern pattern;
+	protected final List<Ingredient> ingredients;
+	protected final ItemStackTemplate result;
 	private @Nullable PlacementInfo placementInfo;
-
-	final CustomShapedRecipePattern recipe;
-	final ItemStackTemplate result;
-	private @Nullable PlacementInfo ingredientPlacement;
+	private final boolean isShaped;
 
 	public BaseCraftingRecipe(
 		CommonInfo commonInfo, ModCraftingBookInfo bookInfo,
-		CustomShapedRecipePattern recipe, ItemStackTemplate result
+		CustomShapedRecipePattern pattern, ItemStackTemplate result
 	) {
 		this.commonInfo = commonInfo;
 		this.bookInfo = bookInfo;
 
-		this.recipe = recipe;
+		this.pattern = pattern;
+		this.ingredients = null;
 		this.result = result;
+
+		this.isShaped = true;
+
+		if (this.getClass().isAnnotationPresent(Shapeless.class)) {
+			throw new IllegalArgumentException("An annotated @Shapeless recipe must use a list of ingredients, not a CustomShapedRecipePattern.");
+		}
 	}
+
+	public BaseCraftingRecipe(
+		CommonInfo commonInfo, ModCraftingBookInfo bookInfo,
+		List<Ingredient> ingredients, ItemStackTemplate result
+	) {
+		this.commonInfo = commonInfo;
+		this.bookInfo = bookInfo;
+
+		this.pattern = null;
+		this.ingredients = ingredients;
+		this.result = result;
+
+		this.isShaped = false;
+
+		if (this.getClass().isAnnotationPresent(Shaped.class)) {
+			throw new IllegalArgumentException("An annotated @Shaped recipe must use a CustomShapedRecipePattern, not a list of ingredients.");
+		}
+	}
+
+	// /////// //
+	// METHODS //
+	// /////// //
 
 	@NonNull
 	public String group() {
@@ -75,44 +107,78 @@ public abstract class BaseCraftingRecipe<T extends CraftingInput> implements Bas
 
 	@NonNull
 	public PlacementInfo placementInfo() {
-		if (this.ingredientPlacement == null) {
-			this.ingredientPlacement = PlacementInfo.createFromOptionals(this.recipe.ingredients());
+		if (this.placementInfo == null) {
+			this.placementInfo = this.createPlacementInfo();
 		}
 
-		return this.ingredientPlacement;
-	}
-
-	public boolean matches(@NonNull CraftingInput craftingRecipeInput, @NonNull Level world) {
-		return this.recipe.matches(craftingRecipeInput);
-	}
-
-	@NonNull
-	public ItemStack assemble(@NonNull CraftingInput craftingRecipeInput, @NonNull Provider wrapperLookup) {
-		return this.result.create();
+		return this.placementInfo;
 	}
 
 	public int getWidth() {
-		return this.recipe.width();
+		if (!this.isShaped) {
+			throw new IllegalStateException("Cannot access a shaped recipe method on a shapeless recipe");
+		}
+		Objects.requireNonNull(this.pattern, "Pattern cannot be null");
+
+		return this.pattern.width();
 	}
 
 	public int getHeight() {
-		return this.recipe.height();
+		if (!this.isShaped) {
+			throw new IllegalStateException("Cannot access a shaped recipe method on a shapeless recipe");
+		}
+		Objects.requireNonNull(this.pattern, "Pattern cannot be null");
+
+		return this.pattern.height();
 	}
 
-	@NonNull
+	public int getIngredientCount() {
+		if (this.isShaped) {
+			throw new IllegalStateException("Cannot access a shapeless recipe method on a shaped recipe");
+		}
+
+		return this.ingredients.size();
+	}
+
+	public boolean isShaped() {
+		return this.isShaped;
+	}
+
 	public List<RecipeDisplay> display() {
-		return List.of(new ShapedCraftingRecipeDisplay(
-			this.recipe.width(),
-			this.recipe.height(),
-			this.recipe.ingredients()
-				.stream()
-				.map((ingredient) ->
-					ingredient.map(Ingredient::display)
-						.orElse(SlotDisplay.Empty.INSTANCE))
-				.toList(),
-			new SlotDisplay.ItemStackSlotDisplay(this.result),
-			new SlotDisplay.ItemSlotDisplay(Items.CRAFTING_TABLE)
-		));
+		// Handles Shaped
+		if (this.isShaped) {
+			if (this.pattern == null) {
+				throw new IllegalStateException("pattern is null");
+			}
+
+			return List.of(new FlexibleShapedCraftingRecipeDisplay(
+				this.pattern.width(),
+				this.pattern.height(),
+				this.pattern.ingredients()
+					.stream()
+					.map((ingredient) ->
+						ingredient.map(Ingredient::display)
+							.orElse(SlotDisplay.Empty.INSTANCE))
+					.toList(),
+				new SlotDisplay.ItemStackSlotDisplay(this.result),
+				new SlotDisplay.ItemSlotDisplay(this.getItemForSlotDisplay())
+			));
+		}
+		// Handles Shapeless
+		else {
+			if (this.ingredients == null) {
+				throw new IllegalStateException("ingredients is null");
+			}
+
+			return List.of(new ShapelessCraftingRecipeDisplay(
+				this.ingredients
+					.stream()
+					.map(Ingredient::display)
+					.toList(),
+				new SlotDisplay.ItemStackSlotDisplay(this.result),
+				new SlotDisplay.ItemSlotDisplay(this.getItemForSlotDisplay())
+			));
+		}
 	}
 
 	// //////////////// //
@@ -132,6 +198,12 @@ public abstract class BaseCraftingRecipe<T extends CraftingInput> implements Bas
 	 */
 	protected abstract CustomShapedRecipePattern pattern();
 
+	protected abstract PlacementInfo createPlacementInfo();
+
+	public abstract List<Optional<Ingredient>> getIngredients();
+
+	public abstract Item getItemForSlotDisplay();
+
 	// ////////////////////// //
 	// CODECS AND SERIALIZERS //
 	// ////////////////////// //
@@ -147,18 +219,40 @@ public abstract class BaseCraftingRecipe<T extends CraftingInput> implements Bas
 		T extends BaseCraftingRecipe<?>,
 		C extends StringRepresentable,
 		D extends BookInfo<C>
-	> MapCodec<T> createMapCodec(
+	> MapCodec<T> createShapedMapCodec(
 		int rows, int cols,
 		MapCodec<D> bookInfoCodec,
-		RecipeFactory<T, C, D> factory
+		ShapedRecipeFactory<T, C, D> factory
 	) {
 		return RecordCodecBuilder.mapCodec(
 			instance -> instance.group(
-				CommonInfo.MAP_CODEC.forGetter(o -> o.commonInfo),
-				bookInfoCodec.forGetter(o -> (D) o.bookInfo),
-				CustomShapedRecipePattern.createCodec(rows, cols).forGetter(o -> o.pattern()),
-				ItemStackTemplate.CODEC.fieldOf("result").forGetter((o) -> o.result)
+				CommonInfo.MAP_CODEC.forGetter(recipe -> recipe.commonInfo),
+				bookInfoCodec.forGetter(recipe -> (D) recipe.bookInfo),
+				CustomShapedRecipePattern.createCodec(rows, cols).forGetter(recipe -> recipe.pattern()),
+				ItemStackTemplate.CODEC.fieldOf("result").forGetter((recipe) -> recipe.result)
 			).apply(instance, factory::create)
 		);
+	}
+
+	public static <
+		T extends BaseCraftingRecipe<?>,
+		C extends StringRepresentable,
+		D extends BookInfo<C>
+	> MapCodec<T> createShapelessMapCodec(
+		int rows, int cols,
+		MapCodec<D> bookInfoCodec,
+		ShapelessRecipeFactory<T, C, D> factory
+	) {
+		return RecordCodecBuilder.mapCodec(shapeless -> shapeless.group(
+			CommonInfo.MAP_CODEC.forGetter(recipe -> recipe.commonInfo),
+			bookInfoCodec.forGetter(recipe -> (D) recipe.bookInfo),
+			Ingredient.CODEC
+				.listOf(1, rows * cols)
+				.fieldOf("ingredients")
+				.forGetter(recipe -> recipe.ingredients),
+			ItemStackTemplate.CODEC
+				.fieldOf("result")
+				.forGetter(recipe -> recipe.result)
+		).apply(shapeless, factory::create));
 	}
 }

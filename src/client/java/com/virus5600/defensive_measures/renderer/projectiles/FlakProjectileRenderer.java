@@ -9,6 +9,10 @@ import com.virus5600.defensive_measures.renderer.projectiles.state.BaseProjectil
 
 import org.jspecify.annotations.NonNull;
 
+/**
+ * @since 1.1.0-beta
+ * @author <a href="https://github.com/Virus5600">Virus5600</a>
+ */
 public class FlakProjectileRenderer extends BaseProjectileRenderer<
 	FlakProjectileEntity,
 	BaseProjectileRenderState,

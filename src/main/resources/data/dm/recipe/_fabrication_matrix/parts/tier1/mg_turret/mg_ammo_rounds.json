@@ -1,0 +1,14 @@
+{
+	"type": "minecraft:crafting_shapeless",
+	"category": "misc",
+	"ingredients": [
+		"minecraft:iron_ingot",
+		"minecraft:flint",
+		"minecraft:gunpowder",
+		"minecraft:copper_ingot"
+	],
+	"result": {
+		"id": "dm:mg_ammo_rounds",
+		"count": 1
+	}
+}

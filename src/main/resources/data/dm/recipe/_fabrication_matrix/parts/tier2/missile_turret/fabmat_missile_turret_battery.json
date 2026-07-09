@@ -1,0 +1,22 @@
+{
+	"type": "dm:fabmat_shaped",
+	"category": "parts",
+	"pattern": [
+		"iiiiiii",
+		" pccct ",
+		" pccct ",
+		" pccct ",
+		"iiiriii"
+	],
+	"key": {
+		"i": "minecraft:iron_ingot",
+		"p": "minecraft:blaze_powder",
+		"c": "minecraft:copper_ingot",
+		"t": "minecraft:tnt",
+		"r": "minecraft:redstone"
+	},
+	"result": {
+		"id": "dm:missile_turret_battery",
+		"count": 1
+	}
+}

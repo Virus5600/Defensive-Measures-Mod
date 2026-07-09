@@ -20,6 +20,13 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * A mixin that allows the injection of custom splash texts into the game without overwriting the
+ * original splash texts.
+ *
+ * @since 1.2.0-beta
+ * @author <a href="https://github.com/Virus5600">Virus5600</a>
+ */
 @Mixin(SplashManager.class)
 public class SplashManagerMixin {
 	@Unique

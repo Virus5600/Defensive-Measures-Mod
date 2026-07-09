@@ -23,6 +23,12 @@ import com.virus5600.defensive_measures.entity.turrets.TurretEntity;
 import java.util.Arrays;
 import java.util.Collection;
 
+/**
+ * A command that plays an animation on a turret entity.
+ *
+ * @since 1.2.0-beta
+ * @author <a href="https://github.com/Virus5600">Virus5600</a>
+ */
 public class PlayAnimationCommand {
 	private static String turretName = "";
 	private static int turretCount = 0;

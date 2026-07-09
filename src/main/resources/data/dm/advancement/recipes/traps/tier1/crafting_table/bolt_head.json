@@ -1,0 +1,25 @@
+﻿{
+	"parent": "minecraft:recipes/root",
+	"criteria": {
+		"has_ingredients": {
+			"trigger": "minecraft:inventory_changed",
+			"conditions": {
+				"items": [
+					{
+						"items": [
+							"minecraft:flint"
+						]
+					}
+				]
+			}
+		}
+	},
+	"requirements": [
+		["has_ingredients"]
+	],
+	"rewards": {
+		"recipes": [
+			"dm:_crafting_table/traps/ballista/ballista_bolt_head"
+		]
+	}
+}
