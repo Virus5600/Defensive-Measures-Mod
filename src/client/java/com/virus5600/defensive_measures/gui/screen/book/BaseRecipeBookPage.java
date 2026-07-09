@@ -1,7 +1,5 @@
 package com.virus5600.defensive_measures.gui.screen.book;
 
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.minecraft.client.ClientRecipeBook;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -24,12 +22,21 @@ import net.minecraft.world.item.crafting.display.SlotDisplayContext;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import com.google.common.collect.Lists;
 
 import org.jetbrains.annotations.Nullable;
 
-@Environment(EnvType.CLIENT)
+/**
+ * The base class for a recipe book's page.
+ * <br><br>
+ * This class serves as the central logic hub for creating the recipe book's page,
+ * drawing the available recipes for the workshop and such.
+ *
+ * @since 1.1.0-beta
+ * @author <a href="https://github.com/Virus5600">Virus5600</a>
+ */
 public class BaseRecipeBookPage {
 	protected static final WidgetSprites PAGE_BACKWARD_TEXTURES = new WidgetSprites(Identifier.withDefaultNamespace("recipe_book/page_backward"), Identifier.withDefaultNamespace("recipe_book/page_backward_highlighted"));
 	protected static final WidgetSprites PAGE_FORWARD_TEXTURES = new WidgetSprites(Identifier.withDefaultNamespace("recipe_book/page_forward"), Identifier.withDefaultNamespace("recipe_book/page_forward_highlighted"));
@@ -100,9 +107,11 @@ public class BaseRecipeBookPage {
 	}
 
 	public void updateCollections(List<RecipeCollection> resultCollections, boolean resetPage, boolean isFiltering) {
-		this.resultCollections = resultCollections;
 		this.isFiltering = isFiltering;
-		this.totalPages = (int) Math.ceil((double) resultCollections.size() / (double) this.getSlotCount());
+		this.resultCollections = resultCollections.stream()
+			.filter(recipeCollection -> recipeCollection.hasCraftable() || recipeCollection.hasAnySelected())
+			.collect(Collectors.toList());
+		this.totalPages = (int) Math.ceil((double) this.resultCollections.size() / (double) this.getSlotCount());
 
 		if (this.totalPages <= this.currentPage || resetPage) {
 			this.currentPage = 0;
@@ -112,6 +121,8 @@ public class BaseRecipeBookPage {
 	}
 
 	protected void updateButtonsForPage() {
+		Objects.requireNonNull(this.client.level);
+
 		int startOffset = this.getSlotCount() * this.currentPage;
 		ContextMap ctx = SlotDisplayContext.fromLevel(this.client.level);
 
@@ -150,7 +161,13 @@ public class BaseRecipeBookPage {
 		if (this.totalPages > 1) {
 			Component text = Component.translatable("gui.recipebook.page", this.currentPage + 1, this.totalPages);
 			int pWidth = this.client.font.width(text);
-			graphics.text(this.client.font, text, x - pWidth / 2 + 73, y + 141, -1);
+			int yPos = this.getTraverseElementPos(y) + 5;
+
+			graphics.text(
+				this.client.font, text,
+				x - pWidth / 2 + 73, yPos,
+				-1
+			);
 		}
 
 		this.hoveredButton = null;
@@ -264,7 +281,7 @@ public class BaseRecipeBookPage {
 	// OVERRIDABLE METHODS //
 	// /////////////////// //
 	protected int getResultRowCount() {
-		return 4;
+		return 5;
 	}
 
 	protected int getResultColCount() {
@@ -279,20 +296,29 @@ public class BaseRecipeBookPage {
 		return Component.translatable("gui.recipebook.next_page");
 	}
 
+	protected final int getTraverseElementPos(int parentTop) {
+		return parentTop + this.resultGridTopMargin + 7
+			+ (this.getResultRowCount() * this.resultCellSize);
+	}
+
 	protected ImageButton getPrevPageBtn(int parentLeft, int parentTop) {
+		int top = this.getTraverseElementPos(parentTop);
+
 		return new ImageButton(
-			parentLeft + 38, parentTop + 137, 12, 17,
+			parentLeft + 38, top, 12, 17,
 			PAGE_BACKWARD_TEXTURES,
-			(buttonWidget) -> this.updateArrowButtons(),
+			_ -> this.updateArrowButtons(),
 			this.getPrevPageTooltip()
 		);
 	}
 
 	protected ImageButton getNextPageBtn(int parentLeft, int parentTop) {
+		int top = this.getTraverseElementPos(parentTop);
+
 		return new ImageButton(
-			parentLeft + 93, parentTop + 137, 12, 17,
+			parentLeft + 93, top, 12, 17,
 			PAGE_FORWARD_TEXTURES,
-			(buttonWidget) -> this.updateArrowButtons(),
+			_ -> this.updateArrowButtons(),
 			this.getNextPageTooltip()
 		);
 	}

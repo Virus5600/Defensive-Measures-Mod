@@ -1,6 +1,6 @@
 {
 	"model": {
 		"type": "minecraft:model",
-		"model": "dm:item/unfinished_cannon_head"
+		"model": "dm:item/tier1/cannon_turret/unfinished_cannon_head"
 	}
 }

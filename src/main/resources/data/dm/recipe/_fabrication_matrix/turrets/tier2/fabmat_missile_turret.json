@@ -1,0 +1,19 @@
+{
+	"type": "dm:fabmat_shaped",
+	"category": "turrets",
+	"pattern": [
+		"b r",
+		" c ",
+		" p "
+	],
+	"key": {
+		"r": "dm:missile_turret_radar",
+		"b": "dm:missile_turret_battery",
+		"c": "dm:missile_turret_column",
+		"p": "dm:missile_turret_base"
+	},
+	"result": {
+		"id": "dm:missile_turret",
+		"count": 1
+	}
+}

@@ -1,0 +1,26 @@
+﻿{
+	"parent": "minecraft:recipes/root",
+	"criteria": {
+		"has_ingredients": {
+			"trigger": "minecraft:inventory_changed",
+			"conditions": {
+				"items": [
+					{
+						"items": [
+							"dm:bolt_head",
+							"minecraft:stick"
+						]
+					}
+				]
+			}
+		}
+	},
+	"requirements": [
+		["has_ingredients"]
+	],
+	"rewards": {
+		"recipes": [
+			"dm:_crafting_table/parts/ballista/ballista_bolt"
+		]
+	}
+}

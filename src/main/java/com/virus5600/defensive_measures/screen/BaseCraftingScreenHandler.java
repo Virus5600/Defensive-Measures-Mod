@@ -20,19 +20,33 @@ import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeType;
 
 import com.virus5600.defensive_measures.recipe.BaseCraftingRecipe;
+import com.virus5600.defensive_measures.screen.slots.SpriteResultSlot;
+import com.virus5600.defensive_measures.screen.slots.SpriteSlot;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * This abstract class serves as the base for all crafting menu that will be used by this mod. This
+ * class is only able to handle grid-system crafting menus and thus, other kind of menu requires a
+ * different abstract class.
+ *
+ * @param <T> The type of recipe this crafting screen handler is for.
+ *
+ * @since 1.1.0-beta
+ * @author <a href="https://github.com/Virus5600">Virus5600</a>
+ */
 public abstract class BaseCraftingScreenHandler<T extends BaseCraftingRecipe<CraftingInput>> extends AbstractCraftingMenu {
 	protected final RecipeType<T> recipeType;
 	protected final ContainerLevelAccess access;
 	protected final Player player;
 	protected boolean placingRecipe;
+	protected Point arrowPos;
 
 	public BaseCraftingScreenHandler(MenuType type, int syncId, Inventory playerInventory, ContainerLevelAccess access, int width, int height, RecipeType<T> recipeType) {
 		super(type, syncId, width, height);
@@ -41,6 +55,72 @@ public abstract class BaseCraftingScreenHandler<T extends BaseCraftingRecipe<Cra
 		this.player = playerInventory.player;
 
 		this.recipeType = recipeType;
+	}
+
+	// /////// //
+	// METHODS //
+	// /////// //
+
+	public void setArrowPos(final int x, final int y) {
+		this.setArrowPos(new Point(x, y));
+	}
+
+	public void setArrowPos(final Point position) {
+		this.arrowPos = position;
+	}
+
+	public Point getArrowPos() {
+		return this.arrowPos;
+	}
+
+	protected Slot addResultSlot(final Player player, final int x, final int y) {
+		int padding = 6;
+
+		if (this.arrowPos == null) {
+			// Arrow res is 22 x 15
+			int arrowX = x - (22 + 15);
+			int arrowY = y - (padding / 2) + (((20 + padding) - 15) / 2);
+
+			this.arrowPos = new Point(arrowX, arrowY);
+		}
+
+		return this.addSlot(new SpriteResultSlot(
+			player, this.craftSlots,
+			this.resultSlots, 0,
+			x, y
+		).setPadding(padding));
+	}
+
+	protected void addCraftingGridSlots(final int left, final int top) {
+		for(int y = 0; y < this.getGridWidth(); ++y) {
+			for(int x = 0; x < this.getGridHeight(); ++x) {
+				this.addSlot(new SpriteSlot(
+					this.craftSlots, x + y * this.getGridWidth(),
+					left + x * 18,
+					top + y * 18)
+				);
+			}
+		}
+	}
+
+	protected void addInventoryHotbarSlots(final Container inventory, final int left, final int top) {
+		for(int x = 0; x < 9; ++x) {
+			this.addSlot(new SpriteSlot(
+				inventory, x,
+				left + x * 18, top
+			));
+		}
+	}
+
+	protected void addInventoryExtendedSlots(final Container inventory, final int left, final int top) {
+		for(int y = 0; y < 3; ++y) {
+			for(int x = 0; x < 9; ++x) {
+				this.addSlot(new SpriteSlot(
+					inventory, x + (y + 1) * 9,
+					left + x * 18, top + y * 18
+				));
+			}
+		}
 	}
 
 	protected static <T extends BaseCraftingRecipe<CraftingInput>> void slotChangedCraftingGrid(
@@ -332,32 +412,53 @@ public abstract class BaseCraftingScreenHandler<T extends BaseCraftingRecipe<Cra
 	public PostPlaceAction handlePlacement(boolean useMaxItems, boolean allowDroppingItemsToClear, @NonNull RecipeHolder<?> recipe, @NonNull ServerLevel level, @NonNull Inventory inventory) {
 		RecipeHolder<BaseCraftingRecipe<?>> typedRecipe = (RecipeHolder) recipe;
 		BaseCraftingRecipe<?> baseRecipe = typedRecipe.value();
-		int recipeWidth = baseRecipe.getWidth();
-		int recipeHeight = baseRecipe.getHeight();
+
+		int recipeWidth;
+		int recipeHeight;
+
 		int gridWidth = this.getGridWidth();
 		int gridHeight = this.getGridHeight();
-		int startX = (gridWidth - recipeWidth) / 2;
-		int startY = (gridHeight - recipeHeight) / 2;
 		List<Slot> inputSlots = this.getInputGridSlots();
-		List<Slot> centeredInputSlots = new ArrayList<>(recipeWidth * recipeHeight);
+		List<Slot> centeredInputSlots;
 
-		for (int row = 0; row < recipeHeight; ++row) {
-			for (int col = 0; col < recipeWidth; ++col) {
-				int slotIndex = (startY + row) * gridWidth + startX + col;
+		if (baseRecipe.isShaped()) {
+			recipeWidth = baseRecipe.getWidth();
+			recipeHeight = baseRecipe.getHeight();
 
-				if (slotIndex >= 0 && slotIndex < inputSlots.size()) {
-					centeredInputSlots.add(inputSlots.get(slotIndex));
+			int startX = (gridWidth - recipeWidth) / 2;
+			int startY = ((gridHeight - recipeHeight) / 2);
+
+			centeredInputSlots = new ArrayList<>(recipeWidth * recipeHeight);
+			boolean outOfBounds = false;
+
+			for (int row = 0; row < recipeHeight; ++row) {
+				for (int col = 0; col < recipeWidth; ++col) {
+					int slotIndex = (startY + row) * gridWidth + startX + col;
+
+					if (slotIndex >= 0 && slotIndex < inputSlots.size()) {
+						Slot slot = inputSlots.get(slotIndex);
+						centeredInputSlots.add(slot);
+					}
+					else {
+						outOfBounds = true;
+					}
 				}
 			}
-		}
 
-		if (centeredInputSlots.size() != recipeWidth * recipeHeight) {
+			if (centeredInputSlots.size() != recipeWidth * recipeHeight || outOfBounds) {
+				centeredInputSlots = inputSlots;
+			}
+		}
+		else {
+			recipeWidth = gridWidth;
+			recipeHeight = gridHeight;
+
 			centeredInputSlots = inputSlots;
 		}
 
 		this.beginPlacingRecipe();
-
 		RecipeBookMenu.PostPlaceAction result;
+
 		try {
 			result = ServerPlaceRecipe.placeRecipe(new ServerPlaceRecipe.CraftingMenuAccess<T>() {
 				@Override
@@ -373,7 +474,7 @@ public abstract class BaseCraftingScreenHandler<T extends BaseCraftingRecipe<Cra
 
 				@Override
 				public boolean recipeMatches(@NonNull RecipeHolder entry) {
-					BaseCraftingRecipe<?> recipe = (BaseCraftingRecipe<?>) entry.value();
+					BaseCraftingRecipe<CraftingInput> recipe = (BaseCraftingRecipe<CraftingInput>) entry.value();
 
 					return recipe.matches(
 						BaseCraftingScreenHandler.this.craftSlots.asCraftInput(),

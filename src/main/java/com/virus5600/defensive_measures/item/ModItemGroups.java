@@ -50,7 +50,7 @@ public class ModItemGroups {
 	// REGISTER ITEMS //
 	// ////////////// //
 
-	public static void registerModItemGroups() {
+	public static void init() {
 		DefensiveMeasures.LOGGER.info("REGISTERING ITEM GROUPS FOR {}...", DefensiveMeasures.MOD_NAME);
 
 		Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB, DMI_KEY, DEFENSIVE_MEASURES_ITEMS);

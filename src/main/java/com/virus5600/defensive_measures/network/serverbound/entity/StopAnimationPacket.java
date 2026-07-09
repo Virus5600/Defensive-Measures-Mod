@@ -13,6 +13,15 @@ import org.jspecify.annotations.NonNull;
 
 import java.util.UUID;
 
+/**
+ * Packet sent from the client to the server to stop an animation on an entity.
+ *
+ * @param id            The UUID of the entity to stop the animation on.
+ * @param animationName The name of the animation to stop.
+ *
+ * @since 1.2.0-beta
+ * @author <a href="https://github.com/Virus5600">Virus5600</a>
+ */
 public record StopAnimationPacket(
 	UUID id, String animationName
 ) implements CustomPacketPayload {

@@ -5,6 +5,13 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.control.LookControl;
 
+/**
+ * A custom look control class for the turret entity, allowing for more precise control over the
+ * yaw and pitch rotation speeds.
+ *
+ * @since 1.0.0-beta
+ * @author <a href="https://github.com/Virus5600">Virus5600</a>
+ */
 public class TurretLookControl extends LookControl {
 	protected float minYawChange;
 	protected float minPitchChange;

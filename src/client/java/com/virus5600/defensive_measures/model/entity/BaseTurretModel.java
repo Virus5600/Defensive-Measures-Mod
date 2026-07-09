@@ -1,12 +1,14 @@
 package com.virus5600.defensive_measures.model.entity;
 
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.animation.AnimationDefinition;
 import net.minecraft.client.animation.KeyframeAnimation;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.AnimationState;
+import net.minecraft.world.entity.vehicle.VehicleEntity;
 
 import com.virus5600.defensive_measures._util.MathUtil;
 import com.virus5600.defensive_measures.animations.Keyframe;
@@ -163,7 +165,8 @@ public abstract class BaseTurretModel<S extends BaseTurretRenderState> extends B
 			float height
 	) {
 		this(
-			root, texturePath, textures, neck, head,
+			root, texturePath, textures,
+			neck, head,
 			null, null,
 			null, null,
 			height
@@ -193,7 +196,8 @@ public abstract class BaseTurretModel<S extends BaseTurretRenderState> extends B
 		float height
 	) {
 		this(
-			root, texturePath, textures, neck, head,
+			root, texturePath, textures,
+			neck, head,
 			shootAnim, deathAnim,
 			null, null,
 			height
@@ -226,7 +230,8 @@ public abstract class BaseTurretModel<S extends BaseTurretRenderState> extends B
 			float height
 	) {
 		this(
-			root, texturePath, textures, neck, head,
+			root, texturePath, textures,
+			neck, head,
 			shootAnim, deathAnim,
 			setupAnims, teardownAnims, null,
 			height
@@ -385,7 +390,23 @@ public abstract class BaseTurretModel<S extends BaseTurretRenderState> extends B
 		boolean isFacingNorth = Math.abs(Mth.wrapDegrees(headYaw)) == 0F;
 		boolean setupOrTeardownPlaying = state.setupAnimationState.isStarted() || state.teardownAnimationState.isStarted();
 		if (!setupOrTeardownPlaying || !isFacingNorth) {
-			this.setHeadAngles(headYaw, headPitch);
+			if (state.vehicleId == null) {
+				this.setHeadAngles(headYaw, headPitch);
+			}
+			else {
+				if (Minecraft.getInstance().level != null) {
+					VehicleEntity vehicle = (VehicleEntity) Minecraft.getInstance().level.getEntity(state.vehicleId);
+
+					if (vehicle != null) {
+						float bodyRot = vehicle.getYRot();
+
+						headYaw -= state.bodyRot;
+
+						this.setHeadAngles(headYaw, headPitch);
+						this.root.yRot = MathUtil.degToRad(bodyRot);
+					}
+				}
+			}
 		}
 	}
 

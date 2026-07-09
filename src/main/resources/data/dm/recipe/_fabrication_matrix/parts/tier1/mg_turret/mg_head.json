@@ -1,0 +1,20 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"category": "misc",
+	"pattern": [
+		"ggr",
+		"bii",
+		"ggc"
+	],
+	"key": {
+		"g": "minecraft:green_dye",
+		"b": "minecraft:iron_block",
+		"i": "minecraft:iron_ingot",
+		"r": "dm:mg_ammo_rounds",
+		"c": "dm:mg_ammo_case"
+	},
+	"result": {
+		"id": "dm:mg_head",
+		"count": 1
+	}
+}

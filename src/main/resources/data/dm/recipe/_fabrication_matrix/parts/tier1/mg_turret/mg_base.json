@@ -1,0 +1,17 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"category": "misc",
+	"pattern": [
+		"bbb",
+		"bpb",
+		"bbb"
+	],
+	"key": {
+		"b": "minecraft:nether_brick",
+		"p": "minecraft:heavy_weighted_pressure_plate"
+	},
+	"result": {
+		"id": "dm:mg_base",
+		"count": 1
+	}
+}

@@ -8,11 +8,13 @@
 	"block.dm.electric_fence" : "Electric Fence",
 
 	"block.dm.turret_assembly_station": "Turret Assembly Station",
+	"block.dm.workshop": "Workshop",
 
 	"item.dm.bolt_head": "Bolt Head",
 	"item.dm.electric_fence": "Electric Fence",
 
 	"item.dm.turret_assembly_station": "Turret Assembly Station",
+	"item.dm.workshop": "Workshop",
 
 	"item.dm.turret_remover": "拆卸工具",
 
@@ -36,8 +38,20 @@
 	"item.dm.mg_turret" : "设置机枪塔",
 
 	"item.dm.aa_turret": "Place Anti-Air (AA) Turret",
+	"item.dm.aa_turret_base": "AA Cross Stand",
+	"item.dm.aa_turret_traverse_platform": "AA Horizontal Traverse Platform",
+	"item.dm.aa_turret_gun_barrel": "AA Gun Barrel",
+
 	"item.dm.flame_turret": "Place Flame Turret",
+	"item.dm.flame_turret_base": "Flame Turret Platform",
+	"item.dm.flame_turret_head": "Flame Turret Cupola",
+	"item.dm.flame_turret_nozzle": "Flame Turret Nozzle",
+
 	"item.dm.missile_turret": "Place Missile Turret",
+	"item.dm.missile_turret_base": "Missile Turret Platform",
+	"item.dm.missile_turret_column": "Missile Turret Column",
+	"item.dm.missile_turret_battery": "Missile Turret Battery",
+	"item.dm.missile_turret_radar": "Missile Turret Radar",
 
 	"item.dm.pellet_turret": "Place Pellet Turret",
 
@@ -182,6 +196,19 @@
 	"tag.block.dm.electric_fence" : "Electric Fence",
 
 	"container.dm.turret_assembly_station": "Assembling",
+	"container.dm.workshop": "Creating",
+
+	"gui.recipebook.all": "All",
+	"gui.recipebook.blueprint": "Blueprint",
+	"gui.recipebook.close": "Close",
+	"gui.recipebook.no_recipes": "No recipes available",
+
+	"gui.recipebook.tas_turrets": "Turrets",
+	"gui.recipebook.tas_parts": "Parts",
+	"gui.recipebook.tas_traps": "Traps",
+	"gui.recipebook.tas_defense": "Defenses",
+	"gui.recipebook.tas_equipment": "Equipment",
+	"gui.recipebook.tas_misc": "Miscellaneous",
 
 	"stat.dm.interact_with_turret_assembly_station": "Interactions with Turret Assembly Station",
 

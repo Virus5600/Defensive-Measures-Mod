@@ -9,6 +9,14 @@ import org.spongepowered.asm.mixin.Shadow;
 
 import com.virus5600.defensive_measures._helper.accessor.sound.SoundManagerAccess;
 
+/**
+ * Mixin class that provides access to the private fields and methods of the SoundManager class.
+ *
+ * @since 1.1.0-beta
+ * @author <a href="https://github.com/Virus5600">Virus5600</a>
+ *
+ * @see SoundEngineAccessorMixin
+ */
 @Mixin(SoundManager.class)
 public abstract class SoundManagerMixin implements SoundManagerAccess {
 	@Shadow @Final private SoundEngine soundEngine;

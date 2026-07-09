@@ -1,0 +1,47 @@
+﻿{
+	"parent": "minecraft:recipes/root",
+	"criteria": {
+		"workshop_interacted": {
+			"trigger": "minecraft:tick",
+			"conditions": {
+				"player": {
+					"minecraft:type_specific/player": {
+						"stats": [
+							{
+								"type": "minecraft:custom",
+								"stat": "dm:interact_with_workshop",
+								"value": {
+									"min": 1
+								}
+							}
+						]
+					}
+				}
+			}
+		},
+		"has_ingredients": {
+			"trigger": "minecraft:inventory_changed",
+			"conditions": {
+				"items": [
+					{
+						"items": [
+							"minecraft:iron_block",
+							"minecraft:iron_ingot",
+							"minecraft:tnt",
+							"minecraft:gray_dye"
+						]
+					}
+				]
+			}
+		}
+	},
+	"requirements": [
+		["workshop_interacted"],
+		["has_ingredients"]
+	],
+	"rewards": {
+		"recipes": [
+			"dm:_workshop/parts/tier2/aa_turret/workshop_aa_turret_gun_barrel"
+		]
+	}
+}

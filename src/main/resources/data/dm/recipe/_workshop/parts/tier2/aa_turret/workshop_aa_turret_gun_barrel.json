@@ -1,0 +1,19 @@
+{
+	"type": "dm:workshop_shaped",
+	"category": "parts",
+	"pattern": [
+		"iiid   ",
+		"btiiiii",
+		"iiii   "
+	],
+	"key": {
+		"b": "minecraft:iron_block",
+		"i": "minecraft:iron_ingot",
+		"t": "minecraft:tnt",
+		"d": "minecraft:gray_dye"
+	},
+	"result": {
+		"id": "dm:aa_turret_gun_barrel",
+		"count": 1
+	}
+}

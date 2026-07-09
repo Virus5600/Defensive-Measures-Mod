@@ -1,0 +1,27 @@
+﻿{
+	"parent": "minecraft:recipes/root",
+	"criteria": {
+		"has_ingredients": {
+			"trigger": "minecraft:inventory_changed",
+			"conditions": {
+				"items": [
+					{
+						"items": [
+							"dm:cannon_base",
+							"dm:cannon_head",
+							"dm:cannon_stand"
+						]
+					}
+				]
+			}
+		}
+	},
+	"requirements": [
+		["has_ingredients"]
+	],
+	"rewards": {
+		"recipes": [
+			"dm:_crafting_table/turrets/tier1/cannon_turret"
+		]
+	}
+}

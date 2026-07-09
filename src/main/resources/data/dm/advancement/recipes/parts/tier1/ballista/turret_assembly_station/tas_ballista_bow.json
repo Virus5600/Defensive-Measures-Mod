@@ -1,0 +1,69 @@
+﻿{
+	"parent": "minecraft:recipes/root",
+	"criteria": {
+		"tas_interacted": {
+			"trigger": "minecraft:tick",
+			"conditions": {
+				"player": {
+					"minecraft:type_specific/player": {
+						"stats": [
+							{
+								"type": "minecraft:custom",
+								"stat": "dm:interact_with_turret_assembly_station",
+								"value": {
+									"min": 1
+								}
+							}
+						]
+					}
+				}
+			}
+		},
+		"has_ingredients": {
+			"trigger": "minecraft:inventory_changed",
+			"conditions": {
+				"items": [
+					{
+						"items": [
+							"minecraft:stick",
+							"minecraft:string"
+						]
+					}
+				]
+			}
+		},
+		"has_wooden_buttons": {
+			"trigger": "minecraft:inventory_changed",
+			"conditions": {
+				"items": [
+					{
+						"items": "#minecraft:wooden_buttons"
+					}
+				]
+			}
+		},
+		"has_wooden_slabs": {
+			"trigger": "minecraft:inventory_changed",
+			"conditions": {
+				"items": [
+					{
+						"items": "#minecraft:wooden_slabs"
+					}
+				]
+			}
+		}
+	},
+	"requirements": [
+		["tas_interacted"],
+		[
+			"has_ingredients",
+			"has_wooden_buttons",
+			"has_wooden_slabs"
+		]
+	],
+	"rewards": {
+		"recipes": [
+			"dm:_turret_assembly_station/parts/tier1/ballista/tas_ballista_bow"
+		]
+	}
+}

@@ -19,9 +19,7 @@ import com.virus5600.defensive_measures.DefensiveMeasures;
  */
 public class ModCriterion {
 
-	public static final TurretItemRetrievedCriterion TURRET_ITEM_RETRIEVED_CRITERION = register("turret_item_retrieved", new TurretItemRetrievedCriterion());
-
-	public static void registerModCriterion() {
+	public static void init() {
 		DefensiveMeasures.LOGGER.info("REGISTERING CRITERION FOR {}...", DefensiveMeasures.MOD_NAME);
 	}
 

@@ -11,18 +11,29 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
 
 import com.virus5600.defensive_measures.DefensiveMeasures;
-import com.virus5600.defensive_measures.gui.screen.book.BlueprintComponent;
+import com.virus5600.defensive_measures.gui.screen.book.TASBlueprintComponent;
+import com.virus5600.defensive_measures.gui.screen.book.WorkshopBlueprintComponent;
 import com.virus5600.defensive_measures.screen.TurretAssemblyStationScreenHandler;
 
-@Environment(EnvType.CLIENT)
+import java.awt.*;
+
+/**
+ * A screen (or menu in Mojmap) for the Turret Assembly Station (TAS), extending the
+ * {@link BaseRecipeBookScreen} to inherit the recipe book, which is called
+ * {@link WorkshopBlueprintComponent Blueprint} in for this bench.
+ *
+ * @since 1.2.0-beta
+ * @author <a href="https://github.com/Virus5600">Virus5600</a>
+ */
 public class TurretAssemblyStationScreen extends BaseRecipeBookScreen<TurretAssemblyStationScreenHandler> {
-	private static final Identifier TEXTURE = Identifier.fromNamespaceAndPath(DefensiveMeasures.MOD_ID, "textures/gui/container/turret_assembly_station.png");
+	private static final Identifier TEXTURE;
 
 	public TurretAssemblyStationScreen(
 		TurretAssemblyStationScreenHandler screenHandler, Inventory inventory, Component title
 	) {
 		super(
-			screenHandler, new BlueprintComponent(screenHandler), inventory, title,
+			screenHandler, new TASBlueprintComponent(screenHandler),
+			inventory, title,
 			256, 242
 		);
 	}
@@ -37,10 +48,10 @@ public class TurretAssemblyStationScreen extends BaseRecipeBookScreen<TurretAsse
 		super.init();
 	}
 
-	protected ScreenPosition getRecipeBookButtonPos() {
+	protected ScreenPosition getRecipeBookButtonPos(int leftPos, int topPos, int imageWidth, int imageHeight, int screenWidth, int screenHeight) {
 		return new ScreenPosition(
-			this.leftPos + 27,
-			this.height / 2 + 55
+			leftPos + 29,
+			screenHeight / 2 + 55
 		);
 	}
 
@@ -55,14 +66,29 @@ public class TurretAssemblyStationScreen extends BaseRecipeBookScreen<TurretAsse
 	public void extractBackground(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float deltaTicks) {
 		super.extractBackground(graphics, mouseX, mouseY, deltaTicks);
 
-		int x = this.leftPos;
-		int y = (this.height - this.imageHeight) / 2;
+		int xOrigin = this.leftPos;
+		int yOrigin = (this.height - this.imageHeight) / 2;
+		Dimension size = this.getUISize();
 
-		graphics.blit(
-			RenderPipelines.GUI_TEXTURED, TEXTURE,
-			x, y, 0.0F, 0.0F,
-			this.imageWidth, this.imageHeight,
-			256, 256
+		graphics.blitSprite(
+			RenderPipelines.GUI_TEXTURED, getTexture(),
+			xOrigin, yOrigin,
+			size.width, size.height
 		);
+	}
+
+	// ////////////// //
+	// STATIC METHODS //
+	// ////////////// //
+
+	protected static Identifier getTexture() {
+		return TEXTURE;
+	}
+
+	// ///////////////////// //
+	// STATIC INITIALIZATION //
+	// ///////////////////// //
+	static {
+		TEXTURE = Identifier.fromNamespaceAndPath(DefensiveMeasures.MOD_ID, "container/crafting_container");
 	}
 }

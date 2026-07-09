@@ -1,0 +1,18 @@
+{
+	"type": "dm:workshop_shaped",
+	"category": "turrets",
+	"pattern": [
+		"b",
+		"t",
+		"c"
+	],
+	"key": {
+		"b": "dm:aa_turret_gun_barrel",
+		"t": "dm:aa_turret_traverse_platform",
+		"c": "dm:aa_turret_base"
+	},
+	"result": {
+		"id": "dm:aa_turret",
+		"count": 1
+	}
+}

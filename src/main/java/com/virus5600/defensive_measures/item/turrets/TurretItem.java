@@ -76,7 +76,10 @@ public abstract class TurretItem extends Item {
 
 
 	public TurretItem(EntityType<? extends Mob> type, Properties settings) {
-		super(settings);
+		super(
+			settings
+				.spawnEgg(type)
+		);
 
 		this.type = type;
 		TURRETS.put(type, this);
