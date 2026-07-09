@@ -1,0 +1,80 @@
+{
+	"textures": {
+		"particle": "dm:item/missile_turret/missile_turret"
+	},
+	"elements": [
+		{
+			"from": [7.5, 7.5, 6.5],
+			"to": [8.5, 8.5, 9.5],
+			"light_emission": 0,
+			"faces": {
+				"north": {
+					"uv": [0.9375, 0.1875, 1, 0.25],
+					"texture": "#particle"
+				},
+				"east": {
+					"uv": [0.75, 0.1875, 0.9375, 0.25],
+					"texture": "#particle"
+				},
+				"south": {
+					"uv": [1.1875, 0.1875, 1.25, 0.25],
+					"texture": "#particle"
+				},
+				"west": {
+					"uv": [1, 0.1875, 1.1875, 0.25],
+					"texture": "#particle"
+				},
+				"up": {
+					"uv": [1, 0.1875, 0.9375, 0],
+					"texture": "#particle"
+				},
+				"down": {
+					"uv": [1.0625, 0, 1, 0.1875],
+					"texture": "#particle"
+				}
+			}
+		}
+	],
+	"display": {
+		"thirdperson_righthand": {
+			"rotation": [35, 0, 0],
+			"translation": [0, 3.31257, 1.08767],
+			"scale": [0.99, 0.99, 0.99]
+		},
+		"thirdperson_lefthand": {
+			"rotation": [35, 0, 0],
+			"translation": [0, 3.31257, 1.08767],
+			"scale": [0.99, 0.99, 0.99]
+		},
+		"firstperson_righthand": {
+			"rotation": [90, 55, -90],
+			"translation": [-1.38232, 6.40541, 0],
+			"scale": [1.5, 1.5, 1.5]
+		},
+		"firstperson_lefthand": {
+			"rotation": [90, 55, -90],
+			"translation": [-1.38232, 6.40541, 0],
+			"scale": [1.5, 1.5, 1.5]
+		},
+		"ground": {
+			"rotation": [35, 0, 0],
+			"translation": [0, 0.04055, -1.84309],
+			"scale": [2, 2, 2]
+		},
+		"gui": {
+			"rotation": [157.78089, 35.39626, -150.16243],
+			"translation": [-1.05326, 2.18575, -2.03323],
+			"scale": [2, 2, 2]
+		},
+		"head": {
+			"rotation": [35, 0, 0],
+			"translation": [0, 14.56082, -2.76464],
+			"scale": [3, 3, 3]
+		},
+		"fixed": {
+			"rotation": [-55, 0, 0],
+			"translation": [0, -2.76464, -11.31082],
+			"scale": [3, 3, 3]
+		}
+	}
+}

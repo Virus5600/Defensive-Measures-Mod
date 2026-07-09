@@ -9,6 +9,12 @@ import com.virus5600.defensive_measures.animations.entity.tier1.CannonTurretAnim
 import com.virus5600.defensive_measures.model.entity.BaseTurretModel;
 import com.virus5600.defensive_measures.renderer.entity.state.BaseTurretRenderState;
 
+/**
+ * @since 1.0.0-beta
+ * @author <a href="https://github.com/Virus5600">Virus5600</a>
+ *
+ * @version 2.0
+ */
 public class CannonTurretModel extends BaseTurretModel<BaseTurretRenderState> {
 	protected final static String[] TEXTURES = new String[] {
 		"cannon_turret.png"

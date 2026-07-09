@@ -25,6 +25,19 @@ import org.jspecify.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * An extension of the {@link ServerExplosion} class, allowing the mod to apply its own custom
+ * explosion damage formula as mentioned in {@link #explode(boolean)}. While it allows the usage of
+ * the new damage formula, it still allows the use of the vanilla one, keeping the class vanilla
+ * friendly. The new damage formula is only applied, and it is still optional, if the entity uses
+ * the {@link ExplosiveEntity} interface.
+ *
+ * @see ExplosiveProjectileEntity
+ * @see ExplosiveEntity
+ *
+ * @since 1.1.2-beta
+ * @author <a href="https://github.com/Virus5600">Virus5600</a>
+ */
 public class ModExplosionImpl extends ServerExplosion {
 	public ModExplosionImpl(ServerLevel world, @Nullable Entity entity, @Nullable DamageSource damageSource, @Nullable ExplosionDamageCalculator behavior, Vec3 pos, float power, boolean createFire, BlockInteraction destructionType) {
 		super(world, entity, damageSource, behavior, pos, power, createFire, destructionType);

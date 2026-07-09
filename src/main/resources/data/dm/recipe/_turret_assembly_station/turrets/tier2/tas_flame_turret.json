@@ -1,0 +1,17 @@
+{
+	"type": "dm:tas_shaped",
+	"category": "turrets",
+	"pattern": [
+		"nh",
+		" b"
+	],
+	"key": {
+		"n": "dm:flame_turret_nozzle",
+		"h": "dm:flame_turret_head",
+		"b": "dm:flame_turret_base"
+	},
+	"result": {
+		"id": "dm:flame_turret",
+		"count": 1
+	}
+}

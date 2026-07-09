@@ -1,6 +1,6 @@
 {
 	"model": {
 		"type": "minecraft:model",
-		"model": "dm:item/pellet_turret"
+		"model": "dm:item/tier0/pellet_turret"
 	}
 }

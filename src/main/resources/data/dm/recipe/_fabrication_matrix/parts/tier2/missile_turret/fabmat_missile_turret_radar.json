@@ -1,0 +1,18 @@
+{
+	"type": "dm:fabmat_shaped",
+	"category": "parts",
+	"pattern": [
+		" ir",
+		" i ",
+		"rsr"
+	],
+	"key": {
+		"r": "minecraft:redstone",
+		"s": "minecraft:smooth_stone_slab",
+		"i": "minecraft:iron_ingot"
+	},
+	"result": {
+		"id": "dm:missile_turret_radar",
+		"count": 2
+	}
+}

@@ -1,0 +1,26 @@
+{
+	"type": "dm:workshop_shaped",
+	"category": "turrets",
+	"pattern": [
+		"iiiiiii",
+		" pccct ",
+		" pccct ",
+		" pccct ",
+		"iiiriii",
+		"  ibi  ",
+		" ssbss "
+	],
+	"key": {
+		"i": "minecraft:iron_ingot",
+		"b": "minecraft:iron_block",
+		"s": "minecraft:smooth_stone_slab",
+		"r": "minecraft:redstone",
+		"p": "minecraft:blaze_powder",
+		"c": "minecraft:copper_ingot",
+		"t": "minecraft:tnt"
+	},
+	"result": {
+		"id": "dm:missile_turret",
+		"count": 1
+	}
+}

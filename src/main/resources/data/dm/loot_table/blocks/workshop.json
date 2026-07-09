@@ -1,0 +1,28 @@
+{
+	"type": "minecraft:block",
+	"pools": [
+		{
+			"rolls": 1,
+			"entries": [
+				{
+					"type": "minecraft:item",
+					"name": "dm:workshop",
+					"conditions": [
+						{
+							"block": "dm:workshop",
+							"condition": "minecraft:block_state_property",
+							"properties": {
+								"workshop_part": "left"
+							}
+						}
+					]
+				}
+			],
+			"conditions": [
+				{
+					"condition": "minecraft:survives_explosion"
+				}
+			]
+		}
+	]
+}

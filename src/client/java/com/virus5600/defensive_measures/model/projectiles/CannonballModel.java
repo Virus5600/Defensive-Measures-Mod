@@ -7,6 +7,12 @@ import net.minecraft.client.model.geom.builders.*;
 
 import com.virus5600.defensive_measures.renderer.projectiles.state.BaseProjectileRenderState;
 
+/**
+ * @since 1.2.0-beta
+ * @author <a href="https://github.com/Virus5600">Virus5600</a>
+ *
+ * @version 1.0
+ */
 public class CannonballModel extends BaseProjectileModel<BaseProjectileRenderState> {
 	protected final static String[] TEXTURES = new String[] {
 		"cannonball.png"

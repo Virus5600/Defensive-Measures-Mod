@@ -1,0 +1,20 @@
+{
+	"type": "dm:workshop_shaped",
+	"category": "parts",
+	"pattern": [
+		"dc cd",
+		"ictci",
+		"iibii"
+	],
+	"key": {
+		"b": "minecraft:iron_block",
+		"i": "minecraft:iron_ingot",
+		"c": "minecraft:iron_chain",
+		"t": "minecraft:tnt",
+		"d": "minecraft:gray_dye"
+	},
+	"result": {
+		"id": "dm:aa_turret_traverse_platform",
+		"count": 1
+	}
+}

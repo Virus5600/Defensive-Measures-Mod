@@ -16,13 +16,13 @@ import com.virus5600.defensive_measures.entity.ModEntities;
 import com.virus5600.defensive_measures.item.equipments.TurretRemoverItem;
 import com.virus5600.defensive_measures.item.interfaces.FuelItem;
 import com.virus5600.defensive_measures.item.turrets.TurretItem;
-import com.virus5600.defensive_measures.item.turrets.aa_turret.*;
-import com.virus5600.defensive_measures.item.turrets.ballista.*;
-import com.virus5600.defensive_measures.item.turrets.cannon.*;
-import com.virus5600.defensive_measures.item.turrets.flame_turret.*;
-import com.virus5600.defensive_measures.item.turrets.mg_turret.*;
-import com.virus5600.defensive_measures.item.turrets.missile_turret.*;
-import com.virus5600.defensive_measures.item.turrets.pellet_turret.*;
+import com.virus5600.defensive_measures.item.turrets.tier_0.pellet_turret.*;
+import com.virus5600.defensive_measures.item.turrets.tier_1.ballista.*;
+import com.virus5600.defensive_measures.item.turrets.tier_1.cannon.*;
+import com.virus5600.defensive_measures.item.turrets.tier_1.mg_turret.*;
+import com.virus5600.defensive_measures.item.turrets.tier_2.aa_turret.*;
+import com.virus5600.defensive_measures.item.turrets.tier_2.flame_turret.*;
+import com.virus5600.defensive_measures.item.turrets.tier_2.missile_turret.*;
 
 import java.util.Arrays;
 import java.util.function.Function;
@@ -77,12 +77,22 @@ public class ModItems {
 
 	// AA TURRET
 	public final static Item AA_TURRET = registerItem("aa_turret", ModEntities.AA_TURRET, AATurretItem::new);
+	public final static Item AA_TURRET_BASE = registerItem("aa_turret_base", AABaseItem::new);
+	public final static Item AA_TURRET_TRAVERSE_PLATFORM = registerItem("aa_turret_traverse_platform", AATraversePlatformItem::new);
+	public final static Item AA_TURRET_GUN_BARREL = registerItem("aa_turret_gun_barrel", AAGunBarrelItem::new);
 
 	// FLAME TURRET
 	public final static Item FLAME_TURRET = registerItem("flame_turret", ModEntities.FLAME_TURRET, FlameTurretItem::new);
+	public final static Item FLAME_TURRET_BASE = registerItem("flame_turret_base", FlameBaseItem::new);
+	public final static Item FLAME_TURRET_HEAD = registerItem("flame_turret_head", FlameHeadItem::new);
+	public final static Item FLAME_TURRET_NOZZLE = registerItem("flame_turret_nozzle", FlameNozzleItem::new);
 
 	// MISSILE TURRET
 	public final static Item MISSILE_TURRET = registerItem("missile_turret", ModEntities.MISSILE_TURRET, MissileTurretItem::new);
+	public final static Item MISSILE_TURRET_BASE = registerItem("missile_turret_base", MissileBaseItem::new);
+	public final static Item MISSILE_TURRET_COLUMN = registerItem("missile_turret_column", MissileColumnItem::new);
+	public final static Item MISSILE_TURRET_BATTERY = registerItem("missile_turret_battery", MissileBatteryItem::new);
+	public final static Item MISSILE_TURRET_RADAR = registerItem("missile_turret_radar", MissileRadarItem::new);
 
 	// PELLET TURRET
 	public final static Item PELLET_TURRET = registerItem("pellet_turret", ModEntities.PELLET_TURRET, PelletTurretItem::new);
@@ -102,13 +112,16 @@ public class ModItems {
 	public final static Item TURRET_ASSEMBLY_STATION = registerItem(ModBlocks.TURRET_ASSEMBLY_STATION);
 	public final static Item ELECTRIC_FENCE = registerItem(ModBlocks.ELECTRIC_FENCE);
 
+	// WORKSHOP
+	public final static Item WORKSHOP = registerItem(ModBlocks.WORKSHOP);
+
 	// //////////////////////// //
 	// REGISTRY RELATED METHODS //
 	// //////////////////////// //
 
 	/**
 	 * Registers a turret item which spawns a turret entity.
-	 * @param name The name of the item. (e.g. "cannon_turret")
+	 * @param name The name of the item. (e.g. {@code "cannon_turret"})
 	 * @param entityType The entity type of the turret. (e.g. {@code ModEntities.CANNON_TURRET})
 	 * @param factory The factory method to create the turret item. Usually a lambda expression like {@code CannonTurretItem::new}.
 	 * @return The registered item.
@@ -138,7 +151,7 @@ public class ModItems {
 
 	/**
 	 * Registers a normal item such as ingredients, etc.
-	 * @param name The name of the item. (e.g. "cannon_base")
+	 * @param name The name of the item. (e.g. {@code "cannon_base"})
 	 * @param factory The factory method to create the item. Usually a lambda expression like {@code CannonBaseItem::new}.
 	 * @return The registered item.
 	 */
@@ -159,7 +172,7 @@ public class ModItems {
 		return RegistryHelper.registerItem(block);
 	}
 
-	public static void registerModItems() {
+	public static void init() {
 		DefensiveMeasures.LOGGER.info("REGISTERING ITEMS TO ITEM GROUPS...");
 
 		Arrays.stream(FUNCTIONAL_ITEMS).iterator().forEachRemaining(
@@ -194,10 +207,12 @@ public class ModItems {
 
 		Arrays.stream(FUEL_ITEMS).iterator().forEachRemaining((item) -> FuelValueEvents.BUILD.register((builder, _) -> {
 			// Verifies whether the item is a valid fuel item. Ignores the item if it is not.
-			if (item instanceof FuelItem)
+			if (item instanceof FuelItem) {
 				builder.add(item, ((FuelItem) item).getFuelTime());
-			else
+			}
+			else {
 				DefensiveMeasures.LOGGER.warn("Item {} is not a valid fuel item.", item.getName(item.getDefaultInstance()).getString());
+			}
 		}));
 	}
 
@@ -211,7 +226,8 @@ public class ModItems {
 
 	static {
 		FUNCTIONAL_ITEMS = new Item[] {
-			TURRET_ASSEMBLY_STATION
+			TURRET_ASSEMBLY_STATION,
+			WORKSHOP
 		};
 
 		DM_ITEMS = new Item[] {
@@ -232,7 +248,23 @@ public class ModItems {
 			MG_AMMO_ROUNDS,
 			MG_BASE,
 			MG_HEAD,
-			MG_STAND
+			MG_STAND,
+
+			// AA TURRET
+			AA_TURRET_BASE,
+			AA_TURRET_TRAVERSE_PLATFORM,
+			AA_TURRET_GUN_BARREL,
+
+			// FLAME TURRET
+			FLAME_TURRET_BASE,
+			FLAME_TURRET_HEAD,
+			FLAME_TURRET_NOZZLE,
+
+			// MISSILE TURRET
+			MISSILE_TURRET_BASE,
+			MISSILE_TURRET_COLUMN,
+			MISSILE_TURRET_BATTERY,
+			MISSILE_TURRET_RADAR,
 		};
 
 		DM_EQUIPMENTS = new Item[] {
@@ -260,11 +292,15 @@ public class ModItems {
 		};
 
 		FUEL_ITEMS = new Item[] {
-			// CANNON
+			// PELLET TURRET
+			PELLET_TURRET,
+
+			// CANNON TURRET
 			CANNON_STAND,
 			CANNON_BASE,
 
 			// BALLISTA
+			BALLISTA_TURRET,
 			BALLISTA_BOLT,
 			BALLISTA_BASE,
 			BALLISTA_BASE_WITH_STAND,

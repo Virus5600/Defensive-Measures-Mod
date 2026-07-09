@@ -48,6 +48,10 @@ import java.util.function.Function;
  */
 public final class RegistryHelper {
 	// Holder
+	public static Holder<Item> getHolder(Item item) {
+		return BuiltInRegistries.ITEM.wrapAsHolder(item);
+	}
+
 	public static Holder<Block> getHolder(Block block) {
 		return BuiltInRegistries.BLOCK.wrapAsHolder(block);
 	}

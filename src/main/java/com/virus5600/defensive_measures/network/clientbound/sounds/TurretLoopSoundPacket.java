@@ -27,6 +27,9 @@ import io.netty.buffer.ByteBuf;
  * @param loopSound The loopSound event to play or stop. This is used by the client to identify which loopSound to play or stop, allowing for different turrets to have different shooting sounds if desired.
  * @param endSound The loopSound event to play when stopping the loopSound. This is used by the client to play a one-shot loopSound at the end of the shooting action, such as a firing stop loopSound or a cool-down loopSound.
  * @param soundCategory The loopSound category to play the loopSound under. This is used by the client to determine the volume and other properties of the loopSound when it is played.
+ *
+ * @since 1.2.0-beta
+ * @author <a href="https://github.com/Virus5600">Virus5600</a>
  */
 public record TurretLoopSoundPacket(
         int entityId, boolean start,

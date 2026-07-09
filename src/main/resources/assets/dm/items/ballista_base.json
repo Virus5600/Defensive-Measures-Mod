@@ -1,6 +1,6 @@
 {
 	"model": {
 		"type": "minecraft:model",
-		"model": "dm:item/ballista_base"
+		"model": "dm:item/tier1/ballista/ballista_base"
 	}
 }

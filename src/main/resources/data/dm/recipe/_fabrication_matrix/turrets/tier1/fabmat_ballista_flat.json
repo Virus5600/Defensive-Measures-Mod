@@ -1,0 +1,25 @@
+{
+	"type": "dm:fabmat_shaped",
+	"category": "turrets",
+	"pattern": [
+		" f  tst",
+		"fftttbs",
+		" f  tsw",
+		"     p ",
+		"     w ",
+		"    www",
+		"     w "
+	],
+	"key": {
+		"f": "minecraft:flint",
+		"t": "minecraft:stick",
+		"s": "minecraft:string",
+		"b": "#minecraft:wooden_buttons",
+		"w": "#minecraft:wooden_slabs",
+		"p": "#minecraft:wooden_fences"
+	},
+	"result": {
+		"id": "dm:ballista",
+		"count": 1
+	}
+}

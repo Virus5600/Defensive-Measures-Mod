@@ -7,9 +7,21 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.Identifier;
 
 import com.virus5600.defensive_measures.DefensiveMeasures;
+import com.virus5600.defensive_measures.entity.CommonTurretAnimations;
 
 import org.jspecify.annotations.NonNull;
 
+/**
+ * A packet that is sent from the server to the client to play an animation on an entity.
+ *
+ * @param entityId      The ID of the entity for which to play the animation.
+ * @param animationName The name of the animation to play.
+ *
+ * @see CommonTurretAnimations
+ *
+ * @since 1.2.0-beta
+ * @author <a href="https://github.com/Virus5600">Virus5600</a>
+ */
 public record PlayAnimationPacket(
 	int entityId, String animationName
 ) implements CustomPacketPayload {

@@ -9,6 +9,13 @@ import net.minecraft.commands.CommandSourceStack;
 
 import java.util.concurrent.CompletableFuture;
 
+/**
+ * A final class that provides command suggestions, listing the common animation names used by the
+ * turret.
+ *
+ * @since 1.2.0-beta
+ * @author <a href="https://github.com/Virus5600">Virus5600</a>
+ */
 public final class AnimationSuggestionProvider implements SuggestionProvider<CommandSourceStack> {
 	@Override
 	public CompletableFuture<Suggestions> getSuggestions(

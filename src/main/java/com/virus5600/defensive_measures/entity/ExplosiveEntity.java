@@ -22,6 +22,14 @@ import org.jspecify.annotations.Nullable;
 
 import java.util.Optional;
 
+/**
+ * An interface for entities that explodes. Implementing this interface allows the entity to define
+ * its explosion properties, such as effective radius, maximum damage radius, damage reduction, and
+ * base damage. It also provides methods to create explosions with specific parameters.
+ *
+ * @since 1.1.1-beta
+ * @author <a href="https://github.com/Virus5600">Virus5600</a>
+ */
 public interface ExplosiveEntity {
 	/**
 	 * Defines the maximum effective radius of the explosion. Within this

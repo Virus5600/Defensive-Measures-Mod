@@ -20,6 +20,12 @@ import java.util.Queue;
 
 import org.jspecify.annotations.NonNull;
 
+/**
+ * @since 1.2.0-beta
+ * @author <a href="https://github.com/Virus5600">Virus5600</a>
+ *
+ * @version 1.0
+ */
 public class MissileTurretModel extends BaseTurretModel<MissileTurretRenderState> {
 	private final static Queue<? extends Keyframe> SHOOT_KEYFRAMES;
 	private final ModelPart RADAR_DISH;

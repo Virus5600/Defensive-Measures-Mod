@@ -4,83 +4,83 @@
 		"models": [
 			{
 				"type": "minecraft:model",
-				"model": "dm:item/flame_turret/0"
+				"model": "dm:item/tier2/flame_turret/flame_turret/0"
 			},
 			{
 				"type": "minecraft:model",
-				"model": "dm:item/flame_turret/1"
+				"model": "dm:item/tier2/flame_turret/flame_turret/1"
 			},
 			{
 				"type": "minecraft:model",
-				"model": "dm:item/flame_turret/2"
+				"model": "dm:item/tier2/flame_turret/flame_turret/2"
 			},
 			{
 				"type": "minecraft:model",
-				"model": "dm:item/flame_turret/3"
+				"model": "dm:item/tier2/flame_turret/flame_turret/3"
 			},
 			{
 				"type": "minecraft:model",
-				"model": "dm:item/flame_turret/4"
+				"model": "dm:item/tier2/flame_turret/flame_turret/4"
 			},
 			{
 				"type": "minecraft:model",
-				"model": "dm:item/flame_turret/5"
+				"model": "dm:item/tier2/flame_turret/flame_turret/5"
 			},
 			{
 				"type": "minecraft:model",
-				"model": "dm:item/flame_turret/6"
+				"model": "dm:item/tier2/flame_turret/flame_turret/6"
 			},
 			{
 				"type": "minecraft:model",
-				"model": "dm:item/flame_turret/7"
+				"model": "dm:item/tier2/flame_turret/flame_turret/7"
 			},
 			{
 				"type": "minecraft:model",
-				"model": "dm:item/flame_turret/8"
+				"model": "dm:item/tier2/flame_turret/flame_turret/8"
 			},
 			{
 				"type": "minecraft:model",
-				"model": "dm:item/flame_turret/9"
+				"model": "dm:item/tier2/flame_turret/flame_turret/9"
 			},
 			{
 				"type": "minecraft:model",
-				"model": "dm:item/flame_turret/10"
+				"model": "dm:item/tier2/flame_turret/flame_turret/10"
 			},
 			{
 				"type": "minecraft:model",
-				"model": "dm:item/flame_turret/11"
+				"model": "dm:item/tier2/flame_turret/flame_turret/11"
 			},
 			{
 				"type": "minecraft:model",
-				"model": "dm:item/flame_turret/12"
+				"model": "dm:item/tier2/flame_turret/flame_turret/12"
 			},
 			{
 				"type": "minecraft:model",
-				"model": "dm:item/flame_turret/13"
+				"model": "dm:item/tier2/flame_turret/flame_turret/13"
 			},
 			{
 				"type": "minecraft:model",
-				"model": "dm:item/flame_turret/14"
+				"model": "dm:item/tier2/flame_turret/flame_turret/14"
 			},
 			{
 				"type": "minecraft:model",
-				"model": "dm:item/flame_turret/15"
+				"model": "dm:item/tier2/flame_turret/flame_turret/15"
 			},
 			{
 				"type": "minecraft:model",
-				"model": "dm:item/flame_turret/16"
+				"model": "dm:item/tier2/flame_turret/flame_turret/16"
 			},
 			{
 				"type": "minecraft:model",
-				"model": "dm:item/flame_turret/17"
+				"model": "dm:item/tier2/flame_turret/flame_turret/17"
 			},
 			{
 				"type": "minecraft:model",
-				"model": "dm:item/flame_turret/18"
+				"model": "dm:item/tier2/flame_turret/flame_turret/18"
 			},
 			{
 				"type": "minecraft:model",
-				"model": "dm:item/flame_turret/19"
+				"model": "dm:item/tier2/flame_turret/flame_turret/19"
 			}
 		]
 	}

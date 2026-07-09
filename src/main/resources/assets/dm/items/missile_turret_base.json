@@ -1,0 +1,51 @@
+{
+	"model": {
+		"type": "composite",
+		"models": [
+			{
+				"type": "model",
+				"model": "dm:item/tier2/missile_turret/missile_turret_base/0"
+			},
+			{
+				"type": "model",
+				"model": "dm:item/tier2/missile_turret/missile_turret_base/1"
+			},
+			{
+				"type": "model",
+				"model": "dm:item/tier2/missile_turret/missile_turret_base/2"
+			},
+			{
+				"type": "model",
+				"model": "dm:item/tier2/missile_turret/missile_turret_base/3"
+			},
+			{
+				"type": "model",
+				"model": "dm:item/tier2/missile_turret/missile_turret_base/4"
+			},
+			{
+				"type": "model",
+				"model": "dm:item/tier2/missile_turret/missile_turret_base/5"
+			},
+			{
+				"type": "model",
+				"model": "dm:item/tier2/missile_turret/missile_turret_base/6"
+			},
+			{
+				"type": "model",
+				"model": "dm:item/tier2/missile_turret/missile_turret_base/7"
+			},
+			{
+				"type": "model",
+				"model": "dm:item/tier2/missile_turret/missile_turret_base/8"
+			},
+			{
+				"type": "model",
+				"model": "dm:item/tier2/missile_turret/missile_turret_base/9"
+			},
+			{
+				"type": "model",
+				"model": "dm:item/tier2/missile_turret/missile_turret_base/10"
+			}
+		]
+	}
+}

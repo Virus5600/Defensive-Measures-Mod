@@ -1,0 +1,17 @@
+{
+	"type": "dm:workshop_shaped",
+	"category": "parts",
+	"pattern": [
+		"iccci",
+		"sssss"
+	],
+	"key": {
+		"s": "minecraft:smooth_stone_slab",
+		"c": "minecraft:copper_ingot",
+		"i": "minecraft:iron_ingot"
+	},
+	"result": {
+		"id": "dm:flame_turret_base",
+		"count": 1
+	}
+}

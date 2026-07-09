@@ -1,0 +1,43 @@
+{
+	"model": {
+		"type": "composite",
+		"models": [
+			{
+				"type": "model",
+				"model": "dm:item/tier2/missile_turret/missile_turret_battery/0"
+			},
+			{
+				"type": "model",
+				"model": "dm:item/tier2/missile_turret/missile_turret_battery/1"
+			},
+			{
+				"type": "model",
+				"model": "dm:item/tier2/missile_turret/missile_turret_battery/2"
+			},
+			{
+				"type": "model",
+				"model": "dm:item/tier2/missile_turret/missile_turret_battery/3"
+			},
+			{
+				"type": "model",
+				"model": "dm:item/tier2/missile_turret/missile_turret_battery/4"
+			},
+			{
+				"type": "model",
+				"model": "dm:item/tier2/missile_turret/missile_turret_battery/5"
+			},
+			{
+				"type": "model",
+				"model": "dm:item/tier2/missile_turret/missile_turret_battery/6"
+			},
+			{
+				"type": "model",
+				"model": "dm:item/tier2/missile_turret/missile_turret_battery/7"
+			},
+			{
+				"type": "model",
+				"model": "dm:item/tier2/missile_turret/missile_turret_battery/8"
+			}
+		]
+	}
+}

@@ -38,7 +38,7 @@ public class ModParticles {
 		);
 	}
 
-	public static void registerParticles() {
+	public static void init() {
 		DefensiveMeasures.LOGGER.info("REGISTERING PARTICLES FOR {}...", DefensiveMeasures.MOD_NAME);
 	}
 }

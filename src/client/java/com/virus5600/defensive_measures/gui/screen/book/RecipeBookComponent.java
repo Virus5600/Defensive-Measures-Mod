@@ -9,6 +9,7 @@ import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.navigation.ScreenAxis;
+import net.minecraft.client.gui.navigation.ScreenPosition;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.recipebook.GhostSlots;
@@ -40,6 +41,8 @@ import net.minecraft.world.item.crafting.display.RecipeDisplay;
 import net.minecraft.world.item.crafting.display.RecipeDisplayId;
 import net.minecraft.world.item.crafting.display.SlotDisplayContext;
 
+import com.virus5600.defensive_measures.DefensiveMeasures;
+import com.virus5600.defensive_measures.gui.screen.TextSpriteButton;
 import com.virus5600.defensive_measures.recipebook.ModRecipeBookCategory;
 
 import com.google.common.collect.Lists;
@@ -64,12 +67,12 @@ import org.jspecify.annotations.Nullable;
  * @since 1.1.0-beta
  */
 public abstract class RecipeBookComponent<T extends RecipeBookMenu> implements GuiEventListener, Renderable, NarratableEntry {
-	private static final Identifier TEXTURE = Identifier.withDefaultNamespace("textures/gui/recipe_book.png");
+	private static final Identifier TEXTURE = Identifier.fromNamespaceAndPath(DefensiveMeasures.MOD_ID, "container/recipe_book");
 	private static final Component SEARCH_HINT_TEXT = Component.translatable("gui.recipebook.search_hint").withStyle(EditBox.SEARCH_HINT_STYLE);
 	private static final Component TOGGLE_ALL_RECIPES_TEXT = Component.translatable("gui.recipebook.toggleRecipes.all");
 
-	private final Dimension dimension = new Dimension(256, 256);
-	private final Dimension uvSize = new Dimension(147, 166);
+	private final Dimension textureSize = new Dimension(256, 256);
+	private final Dimension size;
 	private final GhostSlots ghostRecipe;
 	private final List<BaseRecipeBookTabButton> tabButtons = Lists.newArrayList();
 	private final List<TabInfo> tabInfos;
@@ -77,6 +80,7 @@ public abstract class RecipeBookComponent<T extends RecipeBookMenu> implements G
 	private final StackedItemContents stackedContents = new StackedItemContents();
 	protected final T menu;
 
+	private @Nullable TextSpriteButton closeBtn;
 	private @Nullable RecipeDisplayId lastPlacedRecipe;
 	private @Nullable BaseRecipeBookTabButton selectedTab;
 	private @Nullable EditBox searchBox;
@@ -97,8 +101,13 @@ public abstract class RecipeBookComponent<T extends RecipeBookMenu> implements G
 	protected float displayTime;
 
 	public RecipeBookComponent(T screenHandler, List<TabInfo> tabInfos) {
+		this(screenHandler, tabInfos, 147, 195);
+	}
+
+	public RecipeBookComponent(T screenHandler, List<TabInfo> tabInfos, int width, int height) {
 		this.menu = screenHandler;
 		this.tabInfos = tabInfos;
+		this.size = new Dimension(width, height);
 
 		SlotSelectTime slotSelectTime = () -> Mth.floor(this.displayTime / 30.0F);
 
@@ -107,6 +116,8 @@ public abstract class RecipeBookComponent<T extends RecipeBookMenu> implements G
 	}
 
 	public void init(int parentWidth, int parentHeight, Minecraft minecraft, boolean widthTooNarrow) {
+		Objects.requireNonNull(minecraft.player, "Player cannot be null");
+
 		this.minecraft = minecraft;
 		this.parentWidth = parentWidth;
 		this.parentHeight = parentHeight;
@@ -121,8 +132,12 @@ public abstract class RecipeBookComponent<T extends RecipeBookMenu> implements G
 	}
 
 	protected void initVisuals() {
+		if (this.minecraft.player == null) {
+			return;
+		}
+
 		boolean isFiltering = this.isFiltering();
-		this.xOffset = this.widthTooNarrow ? 0 : this.getxOffset();
+		this.xOffset = this.widthTooNarrow ? 0 : this.getXOffset();
 		int xOrigin = this.getXOrigin();
 		int yOrigin = this.getYOrigin();
 
@@ -139,7 +154,12 @@ public abstract class RecipeBookComponent<T extends RecipeBookMenu> implements G
 		this.searchBox.setTextColor(-1);
 		this.searchBox.setValue(oldEdit);
 		this.searchBox.setHint(this.getSearchHintText());
-		this.magnifierIconPlacement = ScreenRectangle.of(ScreenAxis.HORIZONTAL, xOrigin + 8, this.searchBox.getY(), this.searchBox.getX() - this.getXOrigin(), this.searchBox.getHeight());
+		this.magnifierIconPlacement = ScreenRectangle.of(
+			ScreenAxis.HORIZONTAL,
+			xOrigin + 8, this.searchBox.getY(),
+			this.searchBox.getX() - this.getXOrigin(),
+			this.searchBox.getHeight()
+		);
 
 		this.recipeBookPage.init(this.minecraft, xOrigin, yOrigin);
 
@@ -168,7 +188,17 @@ public abstract class RecipeBookComponent<T extends RecipeBookMenu> implements G
 		this.tabButtons.clear();
 
 		for (TabInfo tabInfo : this.tabInfos) {
-			this.tabButtons.add(new BaseRecipeBookTabButton(0, 0, tabInfo, this::onTabButtonPress));
+			BaseRecipeBookTabButton btn = new BaseRecipeBookTabButton(0, 0, tabInfo, this::onTabButtonPress);
+
+			if (tabInfo.category() instanceof ExtendedRecipeBookCategory
+				&& !(tabInfo.category() instanceof RecipeBookCategory)
+			) {
+				btn.setTooltip(Tooltip.create(Component.translatable("gui.recipebook.all")));
+			} else {
+				btn.setTooltip(Tooltip.create(Component.translatable("gui.recipebook." + tabInfo.langGuiKey())));
+			}
+
+			this.tabButtons.add(btn);
 		}
 
 		// Try to find the same tab as before, since the recipe book doesn't track the current tab.
@@ -189,20 +219,48 @@ public abstract class RecipeBookComponent<T extends RecipeBookMenu> implements G
 		this.selectMatchingRecipes();
 		this.updateTabs(isFiltering);
 		this.updateCollections(false, isFiltering);
+
+		this.closeBtn = null;
+		if (this.widthTooNarrow) {
+			this.initCloseButton();
+		}
 	}
 
-	private int getYOrigin() {
-		return (this.parentHeight - this.getUVSize().height) / 2;
+	protected final void initCloseButton() {
+		int width = 147, height = 20;
+		ScreenPosition screenPos = new ScreenPosition(
+			this.getXOrigin() + this.getComponentSize().width - width,
+			this.getYOrigin() + this.getComponentSize().height - 1
+		);
+
+		TextSpriteButton btn = new TextSpriteButton(
+			screenPos.x(), screenPos.y(), width, height,
+			Component.translatable("gui.recipebook.close"),
+			this.minecraft.font, getCloseButtonTexture(),
+			this::closeBook
+		);
+
+		btn.setTooltip(Tooltip.create(Component.translatable("gui.recipebook.close")));
+
+		this.closeBtn = btn;
 	}
 
-	private int getXOrigin() {
-		return (this.parentWidth - this.getUVSize().width) / 2 - this.xOffset;
+	private void closeBook(Button btn) {
+		this.setVisible(false);
+	}
+
+	public int getYOrigin() {
+		return (this.parentHeight - this.size.height) / 2;
+	}
+
+	public int getXOrigin() {
+		return (this.parentWidth - this.size.width) / 2 - this.xOffset;
 	}
 
 	public int updateScreenPosition(int width, int imageWidth) {
 		int leftPos;
 		if (this.isVisible() && !this.widthTooNarrow) {
-			leftPos = 177 + (width - imageWidth - 200) / 2;
+			leftPos = 170 + (width - imageWidth - this.size.width) / 2;
 		} else {
 			leftPos = (width - imageWidth) / 2;
 		}
@@ -246,7 +304,9 @@ public abstract class RecipeBookComponent<T extends RecipeBookMenu> implements G
 		}
 	}
 
-	private void selectMatchingRecipes() {
+	public int selectMatchingRecipes() {
+		int matchedRecipes = 0;
+
 		for (TabInfo tab : this.tabInfos) {
 			ExtendedRecipeBookCategory category = tab.category();
 
@@ -254,17 +314,25 @@ public abstract class RecipeBookComponent<T extends RecipeBookMenu> implements G
 				for (RecipeBookCategory recipeCategory : modRecipeBookType.includedCategories()) {
 					for (RecipeCollection recipeResultCollection : this.book.getCollection(recipeCategory)) {
 						this.selectMatchingRecipes(recipeResultCollection, this.stackedContents);
+						matchedRecipes++;
 					}
 				}
 			} else {
 				for (RecipeCollection recipeResultCollection : this.book.getCollection(category)) {
 					this.selectMatchingRecipes(recipeResultCollection, this.stackedContents);
+					matchedRecipes++;
 				}
 			}
 		}
+
+		return matchedRecipes;
 	}
 
 	private void updateCollections(boolean resetPage, boolean isFiltering) {
+		if (this.selectedTab == null) {
+			return;
+		}
+
 		ExtendedRecipeBookCategory category = this.selectedTab.getCategory();
 		List<RecipeCollection> tabCollection = this.book.getCollection(category);
 		List<RecipeCollection> collection = Lists.newArrayList(tabCollection);
@@ -277,7 +345,7 @@ public abstract class RecipeBookComponent<T extends RecipeBookMenu> implements G
 			}
 		}
 
-		String searchTxt = this.searchBox.getValue();
+		String searchTxt = this.searchBox == null ? "" : this.searchBox.getValue();
 		if (!searchTxt.isEmpty()) {
 			ClientPacketListener connection = this.minecraft.getConnection();
 
@@ -302,8 +370,8 @@ public abstract class RecipeBookComponent<T extends RecipeBookMenu> implements G
 	}
 
 	private void updateTabs(boolean filteringCraftable) {
-		int xPosTab = (this.parentWidth - this.getUVSize().width) / 2 - this.xOffset - 30;
-		int yPosTab = (this.parentHeight - this.getUVSize().height) / 2 + 3;
+		int xPosTab = (this.parentWidth - this.size.width) / 2 - this.xOffset - 30;
+		int yPosTab = (this.parentHeight - this.size.height) / 2 + 3;
 		int yOffset = 27;
 		int index = 0;
 
@@ -321,13 +389,17 @@ public abstract class RecipeBookComponent<T extends RecipeBookMenu> implements G
 		}
 	}
 
+	public int getTimesInventoryChanged() {
+		return this.timesInventoryChanged;
+	}
+
 	public void tick() {
 		boolean shouldBeVisible = this.isVisibleAccordingToBookData();
 		if (this.isVisible() != shouldBeVisible) {
 			this.setVisible(shouldBeVisible);
 		}
 
-		if (this.isVisible()) {
+		if (this.isVisible() && this.minecraft.player != null) {
 			int timesChanged = this.minecraft.player.getInventory().getTimesChanged();
 
 			if (this.timesInventoryChanged != timesChanged) {
@@ -338,11 +410,13 @@ public abstract class RecipeBookComponent<T extends RecipeBookMenu> implements G
 	}
 
 	private void updateStackedContents() {
-		this.stackedContents.clear();
-		this.minecraft.player.getInventory().fillStackedContents(this.stackedContents);
-		this.menu.fillCraftSlotsStackedContents(this.stackedContents);
-		this.selectMatchingRecipes();
-		this.updateCollections(false, this.isFiltering());
+		if (this.minecraft.player != null) {
+			this.stackedContents.clear();
+			this.minecraft.player.getInventory().fillStackedContents(this.stackedContents);
+			this.menu.fillCraftSlotsStackedContents(this.stackedContents);
+			this.selectMatchingRecipes();
+			this.updateCollections(false, this.isFiltering());
+		}
 	}
 
 	private boolean isFiltering() {
@@ -357,21 +431,24 @@ public abstract class RecipeBookComponent<T extends RecipeBookMenu> implements G
 
 			int xOrigin = this.getXOrigin();
 			int yOrigin = this.getYOrigin();
+			Dimension size = this.size;
 
-			Dimension uvDimension = this.getUVSize();
-			Dimension textureDimension = this.getTextureSize();
-
-			graphics.blit(
+			graphics.blitSprite(
 				RenderPipelines.GUI_TEXTURED, this.getUITexture(),
-				xOrigin, yOrigin, 1.0F, 1.0F,
-				uvDimension.width, uvDimension.height,
-				textureDimension.width, textureDimension.height
+				xOrigin, yOrigin,
+				size.width, size.height
 			);
 
-			this.searchBox.extractRenderState(graphics, mouseX, mouseY, deltaTicks);
+			if (this.searchBox != null) {
+				this.searchBox.extractRenderState(graphics, mouseX, mouseY, deltaTicks);
+			}
 
 			for (BaseRecipeBookTabButton tabButton : this.tabButtons) {
 				tabButton.extractRenderState(graphics, mouseX, mouseY, deltaTicks);
+			}
+
+			if (this.closeBtn != null) {
+				this.closeBtn.extractRenderState(graphics, mouseX, mouseY, deltaTicks);
 			}
 
 			this.filterButton.extractRenderState(graphics, mouseX, mouseY, deltaTicks);
@@ -393,12 +470,12 @@ public abstract class RecipeBookComponent<T extends RecipeBookMenu> implements G
 	}
 
 	public boolean mouseClicked(@NonNull MouseButtonEvent event, boolean doubleClick) {
-		if (this.isVisible() && !this.minecraft.player.isSpectator()) {
-			Dimension uvDimension = this.getUVSize();
+		if (this.isVisible() && this.minecraft.player != null) {
+			Dimension size = this.size;
 			boolean recipesAreaClicked = this.recipeBookPage
 				.mouseClicked(event,
 					this.getXOrigin(), this.getYOrigin(),
-					uvDimension.width, uvDimension.height,
+					size.width, size.height,
 					doubleClick);
 
 			if (recipesAreaClicked) {
@@ -419,6 +496,10 @@ public abstract class RecipeBookComponent<T extends RecipeBookMenu> implements G
 
 				return true;
 			} else {
+				if (this.closeBtn != null && this.closeBtn.mouseClicked(event, doubleClick)) {
+					return true;
+				}
+
 				if (this.searchBox != null) {
 					boolean clickedMagnifierIcon = this.magnifierIconPlacement != null && this.magnifierIconPlacement.containsPoint(Mth.floor(event.x()), Mth.floor(event.y()));
 					if (clickedMagnifierIcon || this.searchBox.mouseClicked(event, doubleClick)) {
@@ -451,7 +532,9 @@ public abstract class RecipeBookComponent<T extends RecipeBookMenu> implements G
 	}
 
 	private boolean tryPlaceRecipe(RecipeCollection recipeCollection, RecipeDisplayId recipe, boolean useMaxItems) {
-		if (!recipeCollection.isCraftable(recipe) && recipe.equals(this.lastPlacedRecipe)) {
+		if ((!recipeCollection.isCraftable(recipe) && recipe.equals(this.lastPlacedRecipe))
+			|| this.minecraft.gameMode == null || this.minecraft.player == null
+		) {
 			return false;
 		} else {
 			this.lastPlacedRecipe = recipe;
@@ -493,26 +576,26 @@ public abstract class RecipeBookComponent<T extends RecipeBookMenu> implements G
 				mouseX >= (double) (x + imageWidth) ||
 				mouseY >= (double) (y + imageHeight);
 
-			boolean clickedOnRecipeBook = (double) (x - this.getUVSize().width) < mouseX &&
+			boolean clickedOnRecipeBook = (double) (x - this.size.width) < mouseX &&
 				mouseX < (double) x &&
 				(double) y < mouseY &&
 				mouseY < (double) (y + imageHeight);
 
-			return clickedOutside && !clickedOnRecipeBook && !this.selectedTab.isHoveredOrFocused();
+			return clickedOutside && !clickedOnRecipeBook && this.selectedTab != null && !this.selectedTab.isHoveredOrFocused();
 		}
 	}
 
 	public boolean keyPressed(KeyEvent event) {
 		this.ignoreTextInput = false;
 
-		if (this.isVisible() && !this.minecraft.player.isSpectator()) {
+		if (this.isVisible() && this.minecraft.player != null && !this.minecraft.player.isSpectator()) {
 			if (event.isEscape() && !this.isOffsetNextToMainGUI()) {
 				this.setVisible(false);
 				return true;
-			} else if (this.searchBox.keyPressed(event)) {
+			} else if (this.searchBox != null && this.searchBox.keyPressed(event)) {
 				this.checkSearchStringUpdate();
 				return true;
-			} else if (this.searchBox.isFocused() && this.searchBox.isVisible() && !event.isEscape()) {
+			} else if (this.searchBox != null && this.searchBox.isFocused() && this.searchBox.isVisible() && !event.isEscape()) {
 				return true;
 			} else if (this.minecraft.options.keyChat.matches(event) && !this.searchBox.isFocused()) {
 				this.ignoreTextInput = true;
@@ -538,8 +621,8 @@ public abstract class RecipeBookComponent<T extends RecipeBookMenu> implements G
 	public boolean charTyped(CharacterEvent event) {
 		if (this.ignoreTextInput) {
 			return false;
-		} else if (this.isVisible() && !this.minecraft.player.isSpectator()) {
-			if (this.searchBox.charTyped(event)) {
+		} else if (this.isVisible() && this.minecraft.player != null && !this.minecraft.player.isSpectator()) {
+			if (this.searchBox != null && this.searchBox.charTyped(event)) {
 				this.checkSearchStringUpdate();
 				return true;
 			} else {
@@ -562,7 +645,7 @@ public abstract class RecipeBookComponent<T extends RecipeBookMenu> implements G
 	}
 
 	private void checkSearchStringUpdate() {
-		String searchInput = this.searchBox.getValue().toLowerCase(Locale.ROOT);
+		String searchInput = this.searchBox == null ? "" : this.searchBox.getValue().toLowerCase(Locale.ROOT);
 		this.pirateSpeechForThePeople(searchInput);
 
 		if (!searchInput.equals(this.lastSearch)) {
@@ -591,7 +674,7 @@ public abstract class RecipeBookComponent<T extends RecipeBookMenu> implements G
 	}
 
 	private boolean isOffsetNextToMainGUI() {
-		return this.xOffset == this.getxOffset();
+		return this.xOffset == this.getXOffset();
 	}
 
 	public void recipesUpdated() {
@@ -605,7 +688,9 @@ public abstract class RecipeBookComponent<T extends RecipeBookMenu> implements G
 	}
 
 	public void recipeShown(RecipeDisplayId recipe) {
-		this.minecraft.player.removeRecipeHighlight(recipe);
+		if (this.minecraft.player != null) {
+			this.minecraft.player.removeRecipeHighlight(recipe);
+		}
 	}
 
 	public void fillGhostRecipe(RecipeDisplay recipe) {
@@ -616,7 +701,29 @@ public abstract class RecipeBookComponent<T extends RecipeBookMenu> implements G
 		this.fillGhostRecipe(this.ghostRecipe, recipe, context);
 	}
 
-	protected abstract void fillGhostRecipe(GhostSlots ghostRecipe, RecipeDisplay display, ContextMap context);
+	/**
+	 * Determines if a recipe display can be shown in the recipe book.
+	 *
+	 * @param display The recipe display to check.
+	 *
+	 * @return {@code true} if the display can be shown, {@code false} otherwise.
+	 *
+	 * @implNote Update this method if a {@link #fillGhostRecipe(GhostSlots, RecipeDisplay, ContextMap)}
+	 * handles a new {@link RecipeDisplay}.
+	 */
+	protected abstract boolean canDisplay(RecipeDisplay display);
+
+	/**
+	 * Fills the crafting grid input slots with ghost items to show the recipe.
+	 *
+	 * @param ghostSlots The {@link GhostSlots} instance to fill with ghost items.
+	 * @param display    The {@link RecipeDisplay} to display in the crafting grid.
+	 * @param context    The {@link ContextMap} to use for the ghost slots.
+	 *
+	 * @implNote Update this method when the {@link #canDisplay(RecipeDisplay)} to also display the
+	 * accepted display from said method.
+	 */
+	protected abstract void fillGhostRecipe(GhostSlots ghostSlots, RecipeDisplay display, ContextMap context);
 
 	protected void sendUpdateSettings() {
 		if (this.minecraft.getConnection() != null) {
@@ -648,6 +755,13 @@ public abstract class RecipeBookComponent<T extends RecipeBookMenu> implements G
 		}
 	}
 
+	protected static WidgetSprites getCloseButtonTexture() {
+		return new WidgetSprites(
+			Identifier.fromNamespaceAndPath(DefensiveMeasures.MOD_ID, "widget/text_sprite_button"),
+			Identifier.fromNamespaceAndPath(DefensiveMeasures.MOD_ID, "widget/text_sprite_button_highlighted")
+		);
+	}
+
 	// ///////////// //
 	// FINAL METHODS //
 	// ///////////// //
@@ -669,18 +783,19 @@ public abstract class RecipeBookComponent<T extends RecipeBookMenu> implements G
 	}
 
 	protected Dimension getTextureSize() {
-		return this.dimension;
+		return this.textureSize;
 	}
 
 	/**
-	 * Identifies the dimension of the actual texture to be used for the GUI.
+	 * Identifies the dimension of the this component.
 	 * @return Dimension
 	 */
-	protected Dimension getUVSize() {
-		return this.uvSize;
+	protected Dimension getComponentSize() {
+		return this.size;
 	}
 
-	protected int getxOffset() {
+
+	protected int getXOffset() {
 		return 86;
 	}
 
@@ -723,18 +838,22 @@ public abstract class RecipeBookComponent<T extends RecipeBookMenu> implements G
 	// CUSTOM RECORD //
 	// ///////////// //
 
-	public record TabInfo(ItemStack primaryIcon, Optional<ItemStack> secondaryIcon,
-	                      ExtendedRecipeBookCategory category) {
+	public record TabInfo(
+		String langGuiKey,
+		ItemStack primaryIcon,
+		Optional<ItemStack> secondaryIcon,
+		ExtendedRecipeBookCategory category
+	) {
 		public TabInfo(ModRecipeBookCategory type) {
-			this(new ItemStack(Items.COMPASS), Optional.empty(), type);
+			this("all", new ItemStack(Items.COMPASS), Optional.empty(), type);
 		}
 
-		public TabInfo(Item primaryIcon, RecipeBookCategory category) {
-			this(new ItemStack(primaryIcon), Optional.empty(), category);
+		public TabInfo(String langGuiKey, Item primaryIcon, RecipeBookCategory category) {
+			this(langGuiKey, new ItemStack(primaryIcon), Optional.empty(), category);
 		}
 
-		public TabInfo(Item primaryIcon, Item secondaryIcon, RecipeBookCategory category) {
-			this(new ItemStack(primaryIcon), Optional.of(new ItemStack(secondaryIcon)), category);
+		public TabInfo(String langGuiKey, Item primaryIcon, Item secondaryIcon, RecipeBookCategory category) {
+			this(langGuiKey, new ItemStack(primaryIcon), Optional.of(new ItemStack(secondaryIcon)), category);
 		}
 	}
 }

@@ -8,10 +8,15 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.BedBlock;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.CraftingTableBlock;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
+
+import com.virus5600.defensive_measures.block.misc.tier1.TurretAssemblyStationBlock;
+import com.virus5600.defensive_measures.block.traps.tier1.BoltHeadBlock;
 
 import java.util.function.Function;
 
@@ -22,18 +27,20 @@ import org.jspecify.annotations.NonNull;
  * opened by the player, allowing players to interact with the block in a more complex way than
  * just placing and breaking it. This class provides the basic functionality for opening a GUI when
  * the block is used, as well as some abstract methods that must be implemented by any subclass of
- * this block to provide the necessary information for the GUI and its functionality.<br>
- * <br>
+ * this block to provide the necessary information for the GUI and its functionality.
+ * <br><br>
  * {@code BaseFunctionalBlock} extends the {@link Block} class, meaning that it inherits all of the
  * properties and methods of a normal block, but ith its methods are derived from the {@link net.minecraft.world.level.block.CraftingTableBlock CraftingTableBlock}
  * to simplify and centralize the common logic code of future functional blocks such as {@link TurretAssemblyStationBlock}.
+ * <br><br>
+ * The use of this abstract class will also allow the block to inherit this to be 2-block wide,
+ * similar to the {@link BedBlock Bed}, which takes up 2 blocks.
  *
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
  * @since 1.1.0
  *
- * @see net.minecraft.world.level.block.Block
- * @see net.minecraft.world.level.block.CraftingTableBlock
- * @see TurretAssemblyStationBlock
+ * @see Block
+ * @see CraftingTableBlock
  */
 public abstract class BaseFunctionalBlock extends Block {
 	public BaseFunctionalBlock(BlockBehaviour.Properties settings) {
@@ -95,7 +102,7 @@ public abstract class BaseFunctionalBlock extends Block {
 	 *
 	 * @return {@link MapCodec} A MapCodec that will be used to serialize and deserialize this block.
 	 */
-	public abstract @NonNull MapCodec<? extends BaseFunctionalBlock> codec();
+	protected abstract @NonNull MapCodec<? extends BaseFunctionalBlock> codec();
 
 	/**
 	 * A dedicated stat to increment when interacting with this block.<br><br>

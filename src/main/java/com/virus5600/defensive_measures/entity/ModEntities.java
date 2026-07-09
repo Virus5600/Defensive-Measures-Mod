@@ -167,7 +167,7 @@ public class ModEntities {
 
 	// REGISTRY //
 	@SuppressWarnings("ConstantConditions")
-	public static void registerModEntityAttributes() {
+	public static void init() {
 		DefensiveMeasures.LOGGER.info("REGISTERING ENTITY ATTRIBUTES FOR {}...", DefensiveMeasures.MOD_NAME);
 
 		// TURRETS //

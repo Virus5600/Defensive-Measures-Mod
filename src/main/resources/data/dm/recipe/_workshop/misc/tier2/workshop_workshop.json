@@ -1,0 +1,20 @@
+{
+	"type": "dm:workshop_shaped",
+	"category": "misc",
+	"pattern": [
+		"iirii",
+		"itsti",
+		"b   b"
+	],
+	"key": {
+		"s": "dm:turret_assembly_station",
+		"t": "minecraft:crafting_table",
+		"b": "minecraft:iron_bars",
+		"i": "minecraft:iron_ingot",
+		"r": "minecraft:redstone"
+	},
+	"result": {
+		"id": "dm:workshop",
+		"count": 1
+	}
+}
