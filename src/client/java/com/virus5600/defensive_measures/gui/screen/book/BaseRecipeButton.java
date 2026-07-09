@@ -27,6 +27,14 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
 
+/**
+ * A button that represents a recipe collection in the recipe book.
+ * <br><br>
+ * I don't know what this is ffs.
+ *
+ * @since 1.1.0-beta
+ * @author <a href="https://github.com/Virus5600">Virus5600</a>
+ */
 public class BaseRecipeButton extends AbstractWidget {
 	private final SlotSelectTime currentIndexProvider;
 	private static final Identifier SLOT_MANY_CRAFTABLE_TEXTURE = Identifier.withDefaultNamespace("recipe_book/slot_many_craftable");

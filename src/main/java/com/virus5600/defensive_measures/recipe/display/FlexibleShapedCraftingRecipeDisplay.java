@@ -14,6 +14,20 @@ import org.jspecify.annotations.NonNull;
 
 import java.util.List;
 
+/**
+ * A base record for creating shaped crafting recipe displays with a flexible width and height.
+ * This allows for crafting recipes that can have different dimensions, rather than being limited to
+ * a fixed size.
+ *
+ * @param width
+ * @param height
+ * @param ingredients
+ * @param result
+ * @param craftingStation
+ *
+ * @since 1.2.0-beta
+ * @author <a href="https://github.com/Virus5600">Virus5600</a>
+ */
 public record FlexibleShapedCraftingRecipeDisplay(
 	int width, int height,
 	List<SlotDisplay> ingredients, SlotDisplay result,

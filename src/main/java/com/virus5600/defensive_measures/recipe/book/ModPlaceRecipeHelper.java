@@ -4,6 +4,12 @@ import net.minecraft.recipebook.PlaceRecipeHelper;
 
 import java.util.Iterator;
 
+/**
+ * A custom place recipe helper for handling recipe placement logic.
+ *
+ * @since 1.2.0-beta
+ * @author <a href="https://github.com/Virus5600">Virus5600</a>
+ */
 public interface ModPlaceRecipeHelper extends PlaceRecipeHelper {
 	static <T> void placeRecipeCentered(final int gridWidth, final int gridHeight, final int recipeWidth, final int recipeHeight, final Iterable<T> entries, final Output<T> output) {
 		Iterator<T> iterator = entries.iterator();

@@ -12,6 +12,12 @@ import io.netty.buffer.ByteBuf;
 
 import java.util.function.IntFunction;
 
+/**
+ * An enum representing the different categories of crafting recipes in the mod.
+ *
+ * @since 1.2.0-beta
+ * @author <a href="https://github.com/Virus5600">Virus5600</a>
+ */
 public enum ModCraftingRecipeCategory implements StringRepresentable {
 	TURRETS("turrets", 0),
 	PARTS("parts", 1),

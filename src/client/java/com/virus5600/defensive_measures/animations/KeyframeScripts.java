@@ -15,6 +15,17 @@ import com.virus5600.defensive_measures.entity.damage.ModDamageSources;
 import com.virus5600.defensive_measures.entity.damage.ModDamageTypes;
 import com.virus5600.defensive_measures.particle.ModParticles;
 
+/**
+ * This class contains scripts for keyframe actions that can be used in animations. These scripts
+ * define specific behaviors that occur at certain keyframes during an animation sequence.
+ * <br><br>
+ * Pre-made scripts are defined here, allowing reusability of certain scripts.
+ *
+ * @see KeyframeAction
+ *
+ * @since 1.1.0-beta
+ * @author <a href="https://github.com/Virus5600">Virus5600</a>
+ */
 public class KeyframeScripts {
 	/** An explosion effect for VFX. Does not deal damage nor destroy environment. */
 	public static KeyframeAction EXPLODE_SCRIPT;

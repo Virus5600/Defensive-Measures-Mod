@@ -15,6 +15,14 @@ import java.util.List;
 
 import org.jspecify.annotations.NonNull;
 
+/**
+ * Base class for recipe book tab buttons.
+ * <br><br>
+ * This button will serve as the "tab" for the following benches of this mod:
+ *
+ * @since 1.1.0-beta
+ * @author <a href="https://github.com/Virus5600">Virus5600</a>
+ */
 public class BaseRecipeBookTabButton extends ImageButton {
 	private static final WidgetSprites TEXTURES = new WidgetSprites(Identifier.withDefaultNamespace("recipe_book/tab"), Identifier.withDefaultNamespace("recipe_book/tab_selected"));
 	public static final int WIDTH = 35;

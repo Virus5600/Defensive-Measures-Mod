@@ -9,6 +9,12 @@ import com.virus5600.defensive_measures.recipe.book.ModRecipeBookCategories;
 
 import java.util.List;
 
+/**
+ * An enumeration of custom recipe book categories for the mod.
+ *
+ * @since 1.1.0-beta
+ * @author <a href="https://github.com/Virus5600">Virus5600</a>
+ */
 @Environment(EnvType.CLIENT)
 public enum ModRecipeBookCategory implements ExtendedRecipeBookCategory {
 	TURRET_ASSEMBLY_STATION(

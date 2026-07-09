@@ -6,6 +6,12 @@ import net.minecraft.world.entity.Entity;
 
 import com.virus5600.defensive_measures.entity.LoopingSoundEntity;
 
+/**
+ * A sound instance that loops, playing the rocket engine sound while looping.
+ *
+ * @since 1.1.0-beta
+ * @author <a href="https://github.com/Virus5600">Virus5600</a>
+ */
 public class RocketEngineLoopSoundInstance extends LoopingSoundInstance {
 	private final LoopingSoundEntity entity;
 

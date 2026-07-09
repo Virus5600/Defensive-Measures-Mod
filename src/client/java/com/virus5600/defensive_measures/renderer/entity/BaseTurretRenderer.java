@@ -15,6 +15,18 @@ import org.jspecify.annotations.NonNull;
 
 import java.util.function.Supplier;
 
+/**
+ * The base turret renderer, centralizing the handling of common logics and rendering for all
+ * turret types. This design also allows for unique turrets to handle their own unique custom logic
+ * while just calling methods from this class to implement the common logic across all turrets.
+ *
+ * @param <T> The turret entity for this renderer.
+ * @param <S> The render state for this renderer.
+ * @param <M> The model for this renderer.
+ *
+ * @since 1.0.0-beta
+ * @author <a href="https://github.com/Virus5600">Virus5600</a>
+ */
 public abstract class BaseTurretRenderer<
 	T extends TurretEntity,
 	S extends BaseTurretRenderState,

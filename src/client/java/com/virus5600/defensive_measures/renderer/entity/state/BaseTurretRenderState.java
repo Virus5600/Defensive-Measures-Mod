@@ -6,6 +6,13 @@ import net.minecraft.world.phys.Vec3;
 
 import java.util.UUID;
 
+/**
+ * Base class for all turret render states. Contains common properties and animation states for
+ * turrets.
+ *
+ * @since 1.0.0-beta
+ * @author <a href="https://github.com/Virus5600">Virus5600</a>
+ */
 public class BaseTurretRenderState extends LivingEntityRenderState {
 	public final AnimationState setupAnimationState = new AnimationState();
 	public final AnimationState teardownAnimationState = new AnimationState();

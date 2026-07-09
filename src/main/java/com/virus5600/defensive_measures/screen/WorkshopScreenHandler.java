@@ -5,11 +5,18 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.ContainerLevelAccess;
 
 import com.virus5600.defensive_measures.block.ModBlocks;
+import com.virus5600.defensive_measures.block.misc.tier2.WorkshopBlock;
 import com.virus5600.defensive_measures.recipe.ModRecipeTypes;
 import com.virus5600.defensive_measures.recipe.WorkshopShapedRecipe;
 
 import org.jspecify.annotations.NonNull;
 
+/**
+ * A screen handler which provides the menu for the {@link WorkshopBlock Workshop}'s crafting UI.
+ *
+ * @since 1.2.0-beta
+ * @author <a href="https://github.com/Virus5600">Virus5600</a>
+ */
 public class WorkshopScreenHandler extends BaseCraftingScreenHandler<WorkshopShapedRecipe> {
 	private static final int WIDTH = 9;
 	private static final int HEIGHT = 9;

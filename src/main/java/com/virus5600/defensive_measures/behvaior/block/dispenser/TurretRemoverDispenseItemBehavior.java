@@ -12,9 +12,17 @@ import net.minecraft.world.phys.AABB;
 
 import com.virus5600.defensive_measures.entity.turrets.TurretEntity;
 import com.virus5600.defensive_measures.entity.turrets.interfaces.Itemable;
+import com.virus5600.defensive_measures.item.equipments.TurretRemoverItem;
 
 import java.util.List;
 
+/**
+ * A custom dispenser item behavior for the {@link TurretRemoverItem Turret Remover}, allowing it
+ * to remove a {@link TurretEntity Turret Entity} when the dispenser uses said item.
+ *
+ * @since 1.2.0-beta
+ * @author <a href="https://github.com/Virus5600">Virus5600</a>
+ */
 public class TurretRemoverDispenseItemBehavior extends OptionalDispenseItemBehavior {
 	public TurretRemoverDispenseItemBehavior() {}
 

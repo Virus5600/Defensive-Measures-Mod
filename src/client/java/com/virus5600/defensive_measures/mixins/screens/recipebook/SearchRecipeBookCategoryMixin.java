@@ -15,6 +15,12 @@ import com.virus5600.defensive_measures.recipe.book.ModRecipeBookCategories;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Mixin to modify the included categories in the SearchRecipeBookCategory enum.
+ *
+ * @since 1.2.0-beta
+ * @author <a href="https://github.com/Virus5600">Virus5600</a>
+ */
 @Mixin(SearchRecipeBookCategory.class)
 public class SearchRecipeBookCategoryMixin {
 	@Shadow @Final @Mutable

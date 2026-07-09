@@ -31,6 +31,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * This abstract class serves as the base for all crafting menu that will be used by this mod. This
+ * class is only able to handle grid-system crafting menus and thus, other kind of menu requires a
+ * different abstract class.
+ *
+ * @param <T> The type of recipe this crafting screen handler is for.
+ *
+ * @since 1.1.0-beta
+ * @author <a href="https://github.com/Virus5600">Virus5600</a>
+ */
 public abstract class BaseCraftingScreenHandler<T extends BaseCraftingRecipe<CraftingInput>> extends AbstractCraftingMenu {
 	protected final RecipeType<T> recipeType;
 	protected final ContainerLevelAccess access;

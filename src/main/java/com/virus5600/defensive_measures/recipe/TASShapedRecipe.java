@@ -1,15 +1,12 @@
 package com.virus5600.defensive_measures.recipe;
 
 import com.mojang.serialization.MapCodec;
-import com.virus5600.defensive_measures.recipe.display.FlexibleShapedCraftingRecipeDisplay;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.crafting.*;
-import net.minecraft.world.item.crafting.display.RecipeDisplay;
-import net.minecraft.world.item.crafting.display.SlotDisplay;
 import net.minecraft.world.level.Level;
 
 import com.virus5600.defensive_measures.block.misc.tier1.TurretAssemblyStationBlock;

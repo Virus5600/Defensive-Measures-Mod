@@ -6,6 +6,14 @@ import net.minecraft.world.inventory.Slot;
 
 import com.virus5600.defensive_measures.DefensiveMeasures;
 
+/**
+ * An extension of the {@link Slot} UI component which stores data of its own sprite, allowing it
+ * the option to draw its own texture instead of relying on its container to include its slot
+ * texture in its own image file.
+ *
+ * @since 1.2.0-beta
+ * @author <a href="https://github.com/Virus5600">Virus5600</a>
+ */
 public class SpriteSlot extends Slot {
 	private final Identifier sprite;
 

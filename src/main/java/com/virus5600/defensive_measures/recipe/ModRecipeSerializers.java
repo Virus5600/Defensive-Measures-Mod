@@ -5,10 +5,23 @@ import net.minecraft.world.item.crafting.RecipeSerializer;
 import com.virus5600.defensive_measures.DefensiveMeasures;
 import com.virus5600.defensive_measures._helper.RegistryHelper;
 
+/**
+ * This class is responsible for registering all custom recipe serializers used in the mod. It
+ * defines and registers serializers for both shaped and shapeless recipes, registered using the
+ * {@link RegistryHelper} utility class, which handles the registration process with Minecraft's
+ * registry system.
+ *
+ * @since 1.1.0-beta
+ * @author <a href="https://github.com/Virus5600">Virus5600</a>
+ */
 public class ModRecipeSerializers {
+	// v1.1.0-beta //
+
 	// Turret Assembly Station
 	public static final RecipeSerializer<TASShapedRecipe> TAS_SERIALIZER;
 	public static final RecipeSerializer<TASShapelessRecipe> TAS_SHAPELESS_SERIALIZER;
+
+	// v1.2.0-beta //
 
 	// Workshop
 	public static final RecipeSerializer<WorkshopShapedRecipe> WORKSHOP_SERIALIZER;

@@ -9,6 +9,13 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.virus5600.defensive_measures.recipe.book.ModRecipeBookCategories;
 
+/**
+ * A custom mixin to let the {@link net.minecraft.world.level.block.CraftingTableBlock Crafting Table}
+ * handle the new DM Turrets category.
+ *
+ * @since 1.2.0-beta
+ * @author <a href="https://github.com/Virus5600">Virus5600</a>
+ */
 @Mixin(CraftingRecipe.class)
 public interface CraftingRecipeMixin {
 	@Inject(method = "recipeBookCategory", at = @At("HEAD"), cancellable = true)

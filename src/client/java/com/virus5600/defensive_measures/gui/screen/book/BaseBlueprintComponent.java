@@ -25,6 +25,20 @@ import net.minecraft.world.item.crafting.display.SlotDisplay;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * Base class for blueprint components in the recipe book.
+ * <br><br>
+ * This component will serve as the "recipe book" for the following benches of this mod:
+ * <ul>
+ *     <li>{@link TASBlueprintComponent Turret Assembly Station (TAS)}</li>
+ *     <li>{@link WorkshopBlueprintComponent Workshop}</li>
+ * </ul>
+ * This allows the modded benches to show the crafting recipes of the modded items, assisting
+ * players in creating what they need.
+ *
+ * @since 1.1.0-beta
+ * @author <a href="https://github.com/Virus5600">Virus5600</a>
+ */
 public abstract class BaseBlueprintComponent extends RecipeBookComponent<AbstractCraftingMenu> {
 	private static final WidgetSprites FILTER_BUTTON_SPRITES;
 	private static final Component ONLY_CRAFTABLES_TOOLTIP = Component.translatable("gui.recipebook.toggleRecipes.craftable");
@@ -84,9 +98,7 @@ public abstract class BaseBlueprintComponent extends RecipeBookComponent<Abstrac
 				}
 			}
 
-			default -> {
-				DefensiveMeasures.LOGGER.warn("Recipe '{}' not supported for {}", recipe, this.getItemForSlotDisplay().toString());
-			}
+			default -> DefensiveMeasures.LOGGER.warn("Recipe '{}' not supported for {}", recipe, this.getItemForSlotDisplay().toString());
 		}
 	}
 

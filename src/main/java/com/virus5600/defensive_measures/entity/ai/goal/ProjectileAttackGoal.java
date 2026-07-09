@@ -2,6 +2,7 @@ package com.virus5600.defensive_measures.entity.ai.goal;
 
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.goal.RangedAttackGoal;
 import net.minecraft.world.entity.monster.RangedAttackMob;
 import net.minecraft.world.phys.Vec3;
 
@@ -31,19 +32,19 @@ import java.util.EnumSet;
  * 		This method is modified to also check if the target is within the rotation limits of the turret.
  * 	</li>
  *
- * 	<li><s>
- * 		{@code getShootingPitch(LivingEntity)} to calculate the initial pitch angle in degrees for
+ * 	<li>
+ * 		{@link #getShootingPitch(LivingEntity, boolean)} to calculate the initial pitch angle in degrees for
  * 		the shooter to aim at the target.<br>
  * 		This is due to the use of {@link TurretEntity.TurretProjectileVelocity} class to calculate
  * 		the projectile velocity based on the target's position and the turret's position.
- * 	</s></li>
+ * 	</li>
  *
- * 	<li><s>
- * 		{@code getShootingYaw(LivingEntity)} to calculate the initial yaw angle in degrees for
+ * 	<li>
+ * 		{@link #getShootingYaw(LivingEntity, boolean)} to calculate the initial yaw angle in degrees for
  * 		the shooter to aim at the target.<br>
  * 		This is due to the use of {@link TurretEntity.TurretProjectileVelocity} class to calculate
  * 		the projectile velocity based on the target's position and the turret's position.
- * 	</s></li>
+ * 	</li>
  *
  * 	<li>
  * 		{@link #isWithinRotationLimit(LivingEntity)} to determine if the target is within the
@@ -53,18 +54,15 @@ import java.util.EnumSet;
  * 	</li>
  * </ul>
  *
- * <b>NOTE:</b> {@code getShootingPitch(LivingEntity)} and {@code getShootingYaw(LivingEntity)} are
- * 			yet to be implemented as they are not yet needed.
  * @see net.minecraft.world.entity.ai.goal.RangedAttackGoal ProjectileAttackGoal
  *
  * @since 1.0.0-beta
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
  */
-public class ProjectileAttackGoal extends net.minecraft.world.entity.ai.goal.RangedAttackGoal {
+public class ProjectileAttackGoal extends RangedAttackGoal {
 	private final TurretEntity mob;
 	private final RangedAttackMob owner;
-	@Nullable
-	private LivingEntity target;
+	@Nullable private LivingEntity target;
 	private int updateCountdownTicks = -1;
 	private final double mobSpeed;
 	private int seenTargetTicks;

@@ -10,6 +10,18 @@ import com.virus5600.defensive_measures.recipe.book.ModRecipeBookCategories;
 
 import org.jspecify.annotations.NonNull;
 
+/**
+ * An interface that extends the {@link Recipe} interface and provides additional methods for
+ * crafting recipes in the mod. It defines a method to get the recipe's category, which is used to
+ * determine the appropriate recipe book category for the recipe. This interface is intended to be
+ * implemented by specific crafting recipe classes, such as {@link BaseCraftingRecipe}, which will
+ * provide the actual implementation of the methods defined in this interface.
+ *
+ * @param <T> the type of {@link RecipeInput} this recipe takes in, which is usually {@link CraftingInput}
+ *
+ * @since 1.1.0-beta
+ * @author <a href="https://github.com/Virus5600">Virus5600</a>
+ */
 public interface BaseCraftingRecipeInterface<T extends RecipeInput> extends Recipe<T> {
 	ModCraftingRecipeCategory category();
 

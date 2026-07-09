@@ -3,6 +3,12 @@ package com.virus5600.defensive_measures.item.turrets.tier_2.aa_turret;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Rarity;
 
+/**
+ * The class for the AA Gun Barrel {@link Item item}.
+ *
+ * @since 1.1.0-beta
+ * @author <a href="https://github.com/Virus5600">Virus5600</a>
+ */
 public class AAGunBarrelItem extends Item {
 	public AAGunBarrelItem(final Properties settings) {
 		super(

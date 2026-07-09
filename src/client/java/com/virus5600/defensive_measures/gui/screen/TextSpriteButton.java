@@ -11,7 +11,6 @@ import net.minecraft.network.chat.ComponentUtils;
 import net.minecraft.network.chat.Style;
 import net.minecraft.util.Mth;
 
-import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import java.awt.*;
@@ -19,11 +18,32 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
 
+/**
+ * A button that displays text using sprites.
+ * <br><br>
+ * This button allows for custom text rendering with various alignment options and styling. It also
+ * supports the implementation of hover effect on a button with a text written instead of just a
+ * sprite, allowing for the creation of a more simple button that does not involve additional sprite
+ * as an icon.
+ * <br><br>
+ * This implementation of an {@link ImageButton} supports the following:
+ * <ul>
+ *     <li>{@link TextAlignment Text Alignment}</li>
+ *     <li>{@link TextColor Text Color}</li>
+ *     <li>{@link #hasShadow() Text Shadow}</li>
+ *     <li>{@link #doUnderline() Underlined Text}</li>
+ *     <li>{@link #getMargin() Button's Text Margin}</li>
+ *
+ * </ul>
+ *
+ * @since 1.2.0-beta
+ * @author <a href="https://github.com/Virus5600">Virus5600</a>
+ */
 public class TextSpriteButton extends ImageButton {
 	private final Font font;
 	private final Component text;
 	private final Component underlinedText;
-	private @NonNull TextColor textColor;
+	private TextColor textColor;
 	private TextAlignment textAlignment;
 	private boolean hasShadow = false;
 	private boolean doUnderline = false;
@@ -137,7 +157,7 @@ public class TextSpriteButton extends ImageButton {
 		return this.margin;
 	}
 
-	public TextSpriteButton setTextColor(@Nullable final TextColor textColor) {
+	public TextSpriteButton setTextColor(final TextColor textColor) {
 		this.textColor = Objects.requireNonNullElseGet(
 			textColor,
 			() -> new TextColor(0x505050, 0x404040)
@@ -172,6 +192,17 @@ public class TextSpriteButton extends ImageButton {
 	// LOCAL RECORD //
 	// //////////// //
 
+	/**
+	 * A record representing the colors for different states of the text.
+	 *
+	 * @param enabled       The color of the text when the button is enabled and not focused.
+	 * @param disabled      The color of the text when the button is disabled and not focused.
+	 * @param enabledFocus  The color of the text when the button is enabled and focused.
+	 * @param disabledFocus The color of the text when the button is disabled and focused.
+	 *
+	 * @since 1.2.0-beta
+	 * @author <a href="https://github.com/Virus5600">Virus5600</a>
+	 */
 	public record TextColor(int enabled, int disabled, int enabledFocus, int disabledFocus) {
 		public TextColor() {
 			this(0xFFFFFF, 0xAAAAAA);
@@ -202,6 +233,13 @@ public class TextSpriteButton extends ImageButton {
 	// ////////// //
 	// LOCAL ENUM //
 	// ////////// //
+
+	/**
+	 * An enum representing the alignment of text within the button.
+	 *
+	 * @since 1.2.0-beta
+	 * @author <a href="https://github.com/Virus5600">Virus5600</a>
+	 */
 	public enum TextAlignment {
 		/**
 		 * <table>

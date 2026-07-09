@@ -10,6 +10,14 @@ import com.virus5600.defensive_measures.entity.turrets.TurretEntity;
 import com.virus5600.defensive_measures.network.clientbound.entity.PlayAnimationPacket;
 import com.virus5600.defensive_measures.network.serverbound.entity.StopAnimationPacket;
 
+/**
+ * A packet receiver that handles the {@link StopAnimationPacket} sent from the client to the
+ * server. It stops the specified animation on a turret entity and sends a PlayAnimationPacket back
+ * to the client to synchronize the animation state.
+ *
+ * @since 1.2.0-beta
+ * @author <a href="https://github.com/Virus5600">Virus5600</a>
+ */
 public final class StopAnimationPacketReceiver {
 	public static void handle(StopAnimationPacket payload, Context ctx) {
 		ServerPlayer player = ctx.player();

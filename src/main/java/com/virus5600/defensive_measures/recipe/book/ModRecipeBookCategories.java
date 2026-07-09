@@ -8,6 +8,9 @@ import com.virus5600.defensive_measures._helper.RegistryHelper;
 
 /**
  * Derives from the {@link RecipeBookCategories}
+ *
+ * @since 1.1.0-beta
+ * @author <a href="https://github.com/Virus5600">Virus5600</a>
  */
 public class ModRecipeBookCategories {
 	// Crafting Table

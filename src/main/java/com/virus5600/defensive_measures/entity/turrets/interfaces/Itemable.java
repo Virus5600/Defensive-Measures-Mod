@@ -166,7 +166,6 @@ public interface Itemable {
 					return Optional.of(InteractionResult.SUCCESS);
 				}
 
-				ItemStack stack = new ItemStack(dropItem);
 				if (spawnItem) {
 					ItemEntity itemStackEntity = tryItem(entity, dropItem, world);
 					world.addFreshEntity(itemStackEntity);
@@ -175,8 +174,6 @@ public interface Itemable {
 				if (discard) {
 					entity.discard();
 				}
-
-				ModCriterion.TURRET_ITEM_RETRIEVED_CRITERION.trigger((ServerPlayer) player, stack);
 			}
 
 			return Optional.of(InteractionResult.SUCCESS);

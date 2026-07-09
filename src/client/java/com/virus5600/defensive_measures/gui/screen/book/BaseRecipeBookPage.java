@@ -1,7 +1,5 @@
 package com.virus5600.defensive_measures.gui.screen.book;
 
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.minecraft.client.ClientRecipeBook;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -30,7 +28,15 @@ import com.google.common.collect.Lists;
 
 import org.jetbrains.annotations.Nullable;
 
-@Environment(EnvType.CLIENT)
+/**
+ * The base class for a recipe book's page.
+ * <br><br>
+ * This class serves as the central logic hub for creating the recipe book's page,
+ * drawing the available recipes for the workshop and such.
+ *
+ * @since 1.1.0-beta
+ * @author <a href="https://github.com/Virus5600">Virus5600</a>
+ */
 public class BaseRecipeBookPage {
 	protected static final WidgetSprites PAGE_BACKWARD_TEXTURES = new WidgetSprites(Identifier.withDefaultNamespace("recipe_book/page_backward"), Identifier.withDefaultNamespace("recipe_book/page_backward_highlighted"));
 	protected static final WidgetSprites PAGE_FORWARD_TEXTURES = new WidgetSprites(Identifier.withDefaultNamespace("recipe_book/page_forward"), Identifier.withDefaultNamespace("recipe_book/page_forward_highlighted"));

@@ -42,6 +42,17 @@ import net.minecraft.world.level.ScheduledTickAccess;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
+/**
+ * A defensive block that blocks off entities from passing through through it. An additional
+ * defensive feature of the block is it deals damage against entities that makes contact with it,
+ * "electrecuting" them to death.
+ * <br><br>
+ * This block's implementation follows the implementation of the vanilla fence and wall blocks,
+ * allowing it to connect to other Electric Fences.
+ *
+ * @since 1.2.0-beta
+ * @author <a href="https://github.com/Virus5600">Virus5600</a>
+ */
 public class ElectricFenceBlock extends CrossCollisionBlock {
 	public static final MapCodec<ElectricFenceBlock> CODEC = simpleCodec(ElectricFenceBlock::new);
 
