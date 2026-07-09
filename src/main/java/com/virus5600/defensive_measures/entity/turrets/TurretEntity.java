@@ -39,6 +39,8 @@ import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.entity.monster.RangedAttackMob;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Projectile;
+import net.minecraft.world.entity.vehicle.VehicleEntity;
+import net.minecraft.world.entity.vehicle.boat.AbstractBoat;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -671,6 +673,7 @@ public abstract class TurretEntity extends Mob implements Itemable, RangedAttack
 	 * @param projectile The projectile that is created by this turret.
 	 * @param <P>        The type of the projectile, which must be a subclass of {@link Projectile}.
 	 */
+	@SuppressWarnings("JavadocDeclaration")
 	protected <P extends Projectile> void onProjectileCreateCallback(P projectile) {
 	}
 
@@ -884,6 +887,7 @@ public abstract class TurretEntity extends Mob implements Itemable, RangedAttack
 		}
 
 		this.setAttachedFace(Direction.DOWN);
+
 		return super.startRiding(entity, force, emitEvent);
 	}
 
@@ -1283,7 +1287,20 @@ public abstract class TurretEntity extends Mob implements Itemable, RangedAttack
 
 	@Override
 	public boolean isPushable() {
-		return false;
+		boolean canFit = true;
+		List<Entity> vehicles = this.level().getEntities(
+			this, this.getBoundingBox().inflate(0.2F),
+			entity -> entity instanceof VehicleEntity
+		);
+
+		// Only make it pushable when the the vehicle can accommodate it.
+		for (Entity vehicle : vehicles) {
+			if (vehicle instanceof AbstractBoat boat) {
+				canFit = boat.hasEnoughSpaceFor(this);
+			}
+		}
+
+		return !vehicles.isEmpty() && canFit;
 	}
 
 	@Override
@@ -2419,6 +2436,10 @@ public abstract class TurretEntity extends Mob implements Itemable, RangedAttack
 	// LOCAL CLASSES //
 	// ///////////// //
 
+	/**
+	 * @since 1.0.0-beta
+	 * @author <a href="https://github.com/Virus5600">Virus5600</a>
+	 */
 	static class TurretBodyControl extends BodyRotationControl {
 		public TurretBodyControl(Mob entity) {
 			super(entity);

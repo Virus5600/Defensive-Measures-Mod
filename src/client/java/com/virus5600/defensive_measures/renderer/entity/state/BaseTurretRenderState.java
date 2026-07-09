@@ -14,6 +14,7 @@ public class BaseTurretRenderState extends LivingEntityRenderState {
 	public final AnimationState deathAnimationState = new AnimationState();
 
 	public UUID id;
+	public UUID vehicleId;
 	public Vec3 eyePos;
 	public Vec3 currentBarrelPos;
 	public int turretLvl;

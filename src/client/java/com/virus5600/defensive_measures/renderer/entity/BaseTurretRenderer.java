@@ -91,6 +91,7 @@ public abstract class BaseTurretRenderer<
 		turretRenderState.currentBarrelPos = turretEntity.getCurrentBarrel(false);
 
 		turretRenderState.id = turretEntity.getUUID();
+		turretRenderState.vehicleId = turretEntity.getVehicle() != null ? turretEntity.getVehicle().getUUID() : null;
 		turretRenderState.turretLvl = turretEntity.getTrackedLevel();
 		turretRenderState.hasTarget = turretEntity.hasTarget();
 		turretRenderState.isLockedButNotAttacking = turretEntity.getTrackedLockedButNotAttacking();
