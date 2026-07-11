@@ -2,19 +2,16 @@
 name: Feature request
 about: Suggest an idea for this project
 title: "[FEATURE REQ]"
-labels: enhancement
+labels: addition
 assignees: Virus5600
 
 ---
 
-**Is your feature request related to a problem? Please describe.**
-A clear and concise description of what the problem is. Ex. I'm always frustrated when [...]
+# [FEATURE NAME]
 
-**Describe the solution you'd like**
-A clear and concise description of what you want to happen.
+Describe this new feature. What do they do? What do they look? Any references to use for inspiration?
 
-**Describe alternatives you've considered**
-A clear and concise description of any alternative solutions or features you've considered.
+## Additional Information
 
-**Additional context**
-Add any other context or screenshots about the feature request here.
+What other information is important to know about this feature request? Are there any specific
+requirments needed for it to work? How does it interact with other features?
