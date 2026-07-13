@@ -1,0 +1,53 @@
+{
+	"variants": {
+		"facing=east,fabrication_matrix_part=left": {
+			"model": "dm:block/fabrication_matrix_left",
+			"y": 90
+		},
+		"facing=north,fabrication_matrix_part=left": {
+			"model": "dm:block/fabrication_matrix_left"
+		},
+		"facing=south,fabrication_matrix_part=left": {
+			"model": "dm:block/fabrication_matrix_left",
+			"y": 180
+		},
+		"facing=west,fabrication_matrix_part=left": {
+			"model": "dm:block/fabrication_matrix_left",
+			"y": 270
+		},
+
+		"facing=east,fabrication_matrix_part=right,active=false": {
+			"model": "dm:block/fabrication_matrix_right",
+			"y": 90
+		},
+		"facing=east,fabrication_matrix_part=right,active=true": {
+			"model": "dm:block/fabrication_matrix_right_active",
+			"y": 90
+		},
+
+		"facing=north,fabrication_matrix_part=right,active=false": {
+			"model": "dm:block/fabrication_matrix_right"
+		},
+		"facing=north,fabrication_matrix_part=right,active=true": {
+			"model": "dm:block/fabrication_matrix_right_active"
+		},
+
+		"facing=south,fabrication_matrix_part=right,active=false": {
+			"model": "dm:block/fabrication_matrix_right",
+			"y": 180
+		},
+		"facing=south,fabrication_matrix_part=right,active=true": {
+			"model": "dm:block/fabrication_matrix_right_active",
+			"y": 180
+		},
+
+		"facing=west,fabrication_matrix_part=right,active=false": {
+			"model": "dm:block/fabrication_matrix_right",
+			"y": 270
+		},
+		"facing=west,fabrication_matrix_part=right,active=true": {
+			"model": "dm:block/fabrication_matrix_right_active",
+			"y": 270
+		}
+	}
+}

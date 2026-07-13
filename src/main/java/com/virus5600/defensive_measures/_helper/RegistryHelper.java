@@ -20,6 +20,7 @@ import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Item.Properties;
+import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeBookCategory;
 import net.minecraft.world.item.crafting.RecipeSerializer;
@@ -104,12 +105,14 @@ public final class RegistryHelper {
 	}
 
 	public static Item registerItem(Block block) {
-		Properties prop = new Properties();
+		return registerItem(block, new Properties());
+	}
 
+	public static Item registerItem(Block block, Properties props) {
 		return registerItem(
 			createBlockItemKey(block),
 			settings -> new BlockItem(block, settings),
-			prop
+			props
 		);
 	}
 

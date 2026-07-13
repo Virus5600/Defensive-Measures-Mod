@@ -25,12 +25,10 @@
 				"items": [
 					{
 						"items": [
-							"minecraft:iron_ingot",
-							"minecraft:iron_block",
-							"minecraft:smooth_stone_slab",
-							"minecraft:blaze_powder",
-							"minecraft:copper_ingot",
-							"minecraft:tnt"
+							"dm:missile_turret_battery",
+							"dm:missile_turret_radar",
+							"dm:missile_turret_column",
+							"dm:missile_turret_base"
 						]
 					}
 				]

@@ -27,7 +27,11 @@ public class TurretAssemblyStationScreenHandler extends BaseCraftingScreenHandle
 	}
 
 	public TurretAssemblyStationScreenHandler(int syncId, Inventory playerInventory, ContainerLevelAccess access) {
-		super(ModScreenHandlers.TURRET_ASSEMBLY_STATION, syncId, playerInventory, access, WIDTH, HEIGHT, ModRecipeTypes.TAS_RECIPE_TYPE);
+		super(
+			ModScreenHandlers.TURRET_ASSEMBLY_STATION, syncId,
+			playerInventory, access,
+			WIDTH, HEIGHT, ModRecipeTypes.TAS_RECIPE_TYPE
+		);
 
 		this.setArrowPos(169, 73);
 		this.addResultSlot(this.player, 206, 71);

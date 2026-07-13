@@ -26,7 +26,11 @@ public class WorkshopScreenHandler extends BaseCraftingScreenHandler<WorkshopSha
 	}
 
 	public WorkshopScreenHandler(int syncId, Inventory playerInventory, ContainerLevelAccess access) {
-		super(ModScreenHandlers.WORKSHOP, syncId, playerInventory, access, WIDTH, HEIGHT, ModRecipeTypes.WORKSHOP_RECIPE_TYPE);
+		super(
+			ModScreenHandlers.WORKSHOP, syncId,
+			playerInventory, access,
+			WIDTH, HEIGHT, ModRecipeTypes.WORKSHOP_RECIPE_TYPE
+		);
 
 		this.setArrowPos(169, 57);
 		this.addResultSlot(this.player, 195, 55);

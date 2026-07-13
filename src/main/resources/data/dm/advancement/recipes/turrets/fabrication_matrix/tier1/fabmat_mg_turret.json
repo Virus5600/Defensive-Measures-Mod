@@ -1,0 +1,46 @@
+﻿{
+	"parent": "minecraft:recipes/root",
+	"criteria": {
+		"fabmat_interacted": {
+			"trigger": "minecraft:tick",
+			"conditions": {
+				"player": {
+					"minecraft:type_specific/player": {
+						"stats": [
+							{
+								"type": "minecraft:custom",
+								"stat": "dm:interact_with_fabrication_matrix",
+								"value": {
+									"min": 1
+								}
+							}
+						]
+					}
+				}
+			}
+		},
+		"has_ingredients": {
+			"trigger": "minecraft:inventory_changed",
+			"conditions": {
+				"items": [
+					{
+						"items": [
+							"dm:mg_head",
+							"dm:mg_stand",
+							"dm:mg_base"
+						]
+					}
+				]
+			}
+		}
+	},
+	"requirements": [
+		["fabmat_interacted"],
+		["has_ingredients"]
+	],
+	"rewards": {
+		"recipes": [
+			"dm:_fabrication_matrix/turrets/tier1/fabmat_mg_turret"
+		]
+	}
+}
