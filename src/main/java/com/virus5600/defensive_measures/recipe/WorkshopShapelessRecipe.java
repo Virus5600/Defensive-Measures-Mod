@@ -79,12 +79,12 @@ public class WorkshopShapelessRecipe extends BaseCraftingRecipe<CraftingInput> {
 
 	@Override
 	public RecipeType<? extends Recipe<CraftingInput>> getType() {
-		return ModRecipeTypes.TAS_RECIPE_TYPE;
+		return ModRecipeTypes.WORKSHOP_RECIPE_TYPE;
 	}
 
 	@Override
 	public RecipeSerializer<? extends BaseCraftingRecipe<CraftingInput>> getSerializer() {
-		return ModRecipeSerializers.TAS_SHAPELESS_SERIALIZER;
+		return SERIALIZER;
 	}
 
 	public boolean matches(final CraftingInput craftingRecipeInput, final Level level) {

@@ -1,0 +1,46 @@
+﻿{
+	"parent": "minecraft:recipes/root",
+	"criteria": {
+		"workshop_interacted": {
+			"trigger": "minecraft:tick",
+			"conditions": {
+				"player": {
+					"minecraft:type_specific/player": {
+						"stats": [
+							{
+								"type": "minecraft:custom",
+								"stat": "dm:interact_with_workshop",
+								"value": {
+									"min": 1
+								}
+							}
+						]
+					}
+				}
+			}
+		},
+		"has_ingredients": {
+			"trigger": "minecraft:inventory_changed",
+			"conditions": {
+				"items": [
+					{
+						"items": [
+							"dm:flame_turret_base",
+							"dm:flame_turret_head",
+							"dm:flame_turret_nozzle"
+						]
+					}
+				]
+			}
+		}
+	},
+	"requirements": [
+		["workshop_interacted"],
+		["has_ingredients"]
+	],
+	"rewards": {
+		"recipes": [
+			"dm:_workshop/turrets/tier2/workshop_flame_turret"
+		]
+	}
+}

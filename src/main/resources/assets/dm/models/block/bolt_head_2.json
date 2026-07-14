@@ -1,7 +1,7 @@
 {
 	"format_version": "1.21.11",
 	"credit": "Made with Blockbench",
-	"parent": "block/block",
+	"parent": "dm:block/bolt_head",
 	"textures": {
 		"0": "dm:block/bolt_head",
 		"particle": "dm:block/bolt_head"

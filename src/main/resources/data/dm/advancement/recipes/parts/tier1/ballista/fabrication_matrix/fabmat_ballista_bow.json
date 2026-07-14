@@ -1,7 +1,7 @@
 ﻿{
 	"parent": "minecraft:recipes/root",
 	"criteria": {
-		"tas_interacted": {
+		"fabmat_interacted": {
 			"trigger": "minecraft:tick",
 			"conditions": {
 				"player": {

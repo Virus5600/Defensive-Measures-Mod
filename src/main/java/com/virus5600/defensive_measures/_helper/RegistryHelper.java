@@ -104,12 +104,14 @@ public final class RegistryHelper {
 	}
 
 	public static Item registerItem(Block block) {
-		Properties prop = new Properties();
+		return registerItem(block, new Properties());
+	}
 
+	public static Item registerItem(Block block, Properties props) {
 		return registerItem(
 			createBlockItemKey(block),
 			settings -> new BlockItem(block, settings),
-			prop
+			props
 		);
 	}
 

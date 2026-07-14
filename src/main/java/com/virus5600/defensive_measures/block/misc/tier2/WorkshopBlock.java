@@ -196,6 +196,10 @@ public class WorkshopBlock extends BaseHorizontalFunctionalBlock implements TwoB
 		}
 	}
 
+	// ////// //
+	// STATIC //
+	// ////// //
+
 	static {
 		PART = ModBlockStateProperties.WORKSHOP_PART;
 		CODEC = simpleCodec(WorkshopBlock::new);

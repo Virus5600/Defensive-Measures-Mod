@@ -1,0 +1,48 @@
+﻿{
+	"parent": "minecraft:recipes/root",
+	"criteria": {
+		"tas_interacted": {
+			"trigger": "minecraft:tick",
+			"conditions": {
+				"player": {
+					"minecraft:type_specific/player": {
+						"stats": [
+							{
+								"type": "minecraft:custom",
+								"stat": "dm:interact_with_turret_assembly_station",
+								"value": {
+									"min": 1
+								}
+							}
+						]
+					}
+				}
+			}
+		},
+		"has_ingredients": {
+			"trigger": "minecraft:inventory_changed",
+			"conditions": {
+				"items": [
+					{
+						"items": [
+							"dm:turret_assembly_station",
+							"minecraft:crafting_table",
+							"minecraft:iron_bars",
+							"minecraft:iron_ingot",
+							"minecraft:redstone"
+						]
+					}
+				]
+			}
+		}
+	},
+	"requirements": [
+		["tas_interacted"],
+		["has_ingredients"]
+	],
+	"rewards": {
+		"recipes": [
+			"dm:_turret_assembly_station/misc/tier2/tas_workshop"
+		]
+	}
+}

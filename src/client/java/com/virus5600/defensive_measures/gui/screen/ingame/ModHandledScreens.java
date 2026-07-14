@@ -21,5 +21,6 @@ public class ModHandledScreens {
 
 		MenuScreens.register(ModScreenHandlers.TURRET_ASSEMBLY_STATION, TurretAssemblyStationScreen::new);
 		MenuScreens.register(ModScreenHandlers.WORKSHOP, WorkshopScreen::new);
+		MenuScreens.register(ModScreenHandlers.FABRICATION_MATRIX, FabricationMatrixScreen::new);
 	}
 }

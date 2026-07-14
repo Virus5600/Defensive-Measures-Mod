@@ -25,12 +25,9 @@
 				"items": [
 					{
 						"items": [
-							"minecraft:blaze_powder",
-							"minecraft:smooth_stone_slab",
-							"minecraft:copper_ingot",
-							"minecraft:iron_block",
-							"minecraft:iron_ingot",
-							"minecraft:red_dye"
+							"dm:flame_turret_base",
+							"dm:flame_turret_head",
+							"dm:flame_turret_nozzle"
 						]
 					}
 				]

@@ -1,6 +1,6 @@
 {
-	"type": "minecraft:fabmat_shaped",
-	"category": "misc",
+	"type": "dm:fabmat_shaped",
+	"category": "parts",
 	"pattern": [
 		"tst",
 		"sbt",

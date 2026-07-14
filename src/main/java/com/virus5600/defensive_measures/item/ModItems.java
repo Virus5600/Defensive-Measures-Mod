@@ -7,6 +7,7 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.Item.Properties;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Rarity;
 import net.minecraft.world.level.block.Block;
 
 import com.virus5600.defensive_measures.DefensiveMeasures;
@@ -23,6 +24,7 @@ import com.virus5600.defensive_measures.item.turrets.tier_1.mg_turret.*;
 import com.virus5600.defensive_measures.item.turrets.tier_2.aa_turret.*;
 import com.virus5600.defensive_measures.item.turrets.tier_2.flame_turret.*;
 import com.virus5600.defensive_measures.item.turrets.tier_2.missile_turret.*;
+import com.virus5600.defensive_measures.item.turrets.tier_3.*;
 
 import java.util.Arrays;
 import java.util.function.Function;
@@ -109,11 +111,20 @@ public class ModItems {
 	// ////// //
 
 	// TURRET ASSEMBLY STATION
-	public final static Item TURRET_ASSEMBLY_STATION = registerItem(ModBlocks.TURRET_ASSEMBLY_STATION);
-	public final static Item ELECTRIC_FENCE = registerItem(ModBlocks.ELECTRIC_FENCE);
+	public final static Item TURRET_ASSEMBLY_STATION = registerItem(ModBlocks.TURRET_ASSEMBLY_STATION, new Properties().rarity(Rarity.UNCOMMON));
+	public final static Item ELECTRIC_FENCE = registerItem(ModBlocks.ELECTRIC_FENCE, new Properties().rarity(Rarity.UNCOMMON));
 
 	// WORKSHOP
-	public final static Item WORKSHOP = registerItem(ModBlocks.WORKSHOP);
+	public final static Item WORKSHOP = registerItem(ModBlocks.WORKSHOP, new Properties().rarity(Rarity.RARE));
+
+	// FABRICATION MATRIX
+	public final static Item FABRICATION_MATRIX = registerItem(ModBlocks.FABRICATION_MATRIX, new Properties().rarity(Rarity.EPIC));
+
+	// //// //
+	// MISC //
+	// //// //
+
+	public final static Item GEAR = registerItem("gear", GearItem::new);
 
 	// //////////////////////// //
 	// REGISTRY RELATED METHODS //
@@ -172,6 +183,16 @@ public class ModItems {
 		return RegistryHelper.registerItem(block);
 	}
 
+	/**
+	 * Registers a block item.
+	 * @param block The block to register as an item.
+	 * @param props The properties of the item.
+	 * @return The registered item.
+	 */
+	private static Item registerItem(Block block, Properties props) {
+		return RegistryHelper.registerItem(block, props);
+	}
+
 	public static void init() {
 		DefensiveMeasures.LOGGER.info("REGISTERING ITEMS TO ITEM GROUPS...");
 
@@ -227,7 +248,8 @@ public class ModItems {
 	static {
 		FUNCTIONAL_ITEMS = new Item[] {
 			TURRET_ASSEMBLY_STATION,
-			WORKSHOP
+			WORKSHOP,
+			FABRICATION_MATRIX
 		};
 
 		DM_ITEMS = new Item[] {
@@ -265,6 +287,9 @@ public class ModItems {
 			MISSILE_TURRET_COLUMN,
 			MISSILE_TURRET_BATTERY,
 			MISSILE_TURRET_RADAR,
+
+			// MISC
+			GEAR,
 		};
 
 		DM_EQUIPMENTS = new Item[] {

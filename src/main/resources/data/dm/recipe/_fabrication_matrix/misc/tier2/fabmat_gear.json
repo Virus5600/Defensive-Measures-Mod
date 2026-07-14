@@ -1,0 +1,18 @@
+{
+	"type": "dm:fabmat_shaped",
+	"category": "misc",
+	"pattern": [
+		"n n n",
+		" nnn ",
+		"nnnnn",
+		" nnn ",
+		"n n n"
+	],
+	"key": {
+		"n": "minecraft:iron_nugget"
+	},
+	"result": {
+		"id": "dm:gear",
+		"count": 1
+	}
+}

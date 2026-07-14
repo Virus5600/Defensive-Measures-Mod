@@ -21,6 +21,7 @@ public class ModStats {
 	public static final Identifier INTERACT_WITH_TURRET_ASSEMBLY_STATION = RegistryHelper.registerStat("interact_with_turret_assembly_station", StatFormatter.DEFAULT);
 	// v1.2.0-beta //
 	public static final Identifier INTERACT_WITH_WORKSHOP = RegistryHelper.registerStat("interact_with_workshop", StatFormatter.DEFAULT);
+	public static final Identifier INTERACT_WITH_FABRICATION_MATRIX = RegistryHelper.registerStat("interact_with_fabrication_matrix", StatFormatter.DEFAULT);
 
 	public static void init() {
 		DefensiveMeasures.LOGGER.info("REGISTERING STATS FOR {}...", DefensiveMeasures.MOD_NAME);

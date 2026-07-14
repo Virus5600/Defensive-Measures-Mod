@@ -17,7 +17,7 @@
 	],
 	"rewards": {
 		"recipes": [
-			"dm:_crafting_table/parts/ballista/ballista_base"
+			"dm:_crafting_table/parts/tier1/ballista/ballista_base"
 		]
 	}
 }
