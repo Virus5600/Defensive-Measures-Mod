@@ -24,7 +24,7 @@
 	],
 	"rewards": {
 		"recipes": [
-			"dm:_crafting_table/turrets/tier1/mg_turret/mg_ammo_rounds"
+			"dm:_crafting_table/parts/mg_turret/mg_ammo_rounds"
 		]
 	}
 }

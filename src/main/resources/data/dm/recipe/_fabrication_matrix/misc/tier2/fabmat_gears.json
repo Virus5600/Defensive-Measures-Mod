@@ -1,0 +1,18 @@
+{
+	"type": "dm:fabmat_shaped",
+	"category": "misc",
+	"pattern": [
+		"i i i",
+		" iii ",
+		"iiiii",
+		" iii ",
+		"i i i"
+	],
+	"key": {
+		"i": "minecraft:iron_ingot"
+	},
+	"result": {
+		"id": "dm:gear",
+		"count": 12
+	}
+}

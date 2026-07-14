@@ -23,7 +23,7 @@
 	],
 	"rewards": {
 		"recipes": [
-			"dm:_crafting_table/turrets/tier1/cannon_turret/unfinished_cannon_head"
+			"dm:_crafting_table/parts/cannon_turret/unfinished_cannon_head"
 		]
 	}
 }

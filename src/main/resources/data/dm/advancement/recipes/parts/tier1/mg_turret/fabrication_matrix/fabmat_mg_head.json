@@ -42,7 +42,7 @@
 	],
 	"rewards": {
 		"recipes": [
-			"dm:_fabrication_matrix/turrets/tier1/mg_turret/fabmat_mg_head"
+			"dm:_fabrication_matrix/parts/tier1/mg_turret/fabmat_mg_head"
 		]
 	}
 }

@@ -27,6 +27,10 @@ public class ModRecipeSerializers {
 	public static final RecipeSerializer<WorkshopShapedRecipe> WORKSHOP_SERIALIZER;
 	public static final RecipeSerializer<WorkshopShapelessRecipe> WORKSHOP_SHAPELESS_SERIALIZER;
 
+	// Fabrication Matrix
+	public static final RecipeSerializer<FabMatShapedRecipe> FABMAT_SERIALIZER;
+	public static final RecipeSerializer<FabMatShapelessRecipe> FABMAT_SHAPELESS_SERIALIZER;
+
 	public static void init() {
 		DefensiveMeasures.LOGGER.info("REGISTERING RECIPE SERIALIZERS FOR {}...", DefensiveMeasures.MOD_NAME);
 	}
@@ -59,6 +63,21 @@ public class ModRecipeSerializers {
 			"workshop_shapeless", BaseCraftingRecipe.createSerializer(
 				WorkshopShapelessRecipe.MAP_CODEC,
 				WorkshopShapelessRecipe.STREAM_CODEC
+			)
+		);
+
+		// FABRICATION MATRIX
+		FABMAT_SERIALIZER = RegistryHelper.registerRecipeSerializer(
+			"fabmat_shaped", BaseCraftingRecipe.createSerializer(
+				FabMatShapedRecipe.MAP_CODEC,
+				FabMatShapedRecipe.STREAM_CODEC
+			)
+		);
+
+		FABMAT_SHAPELESS_SERIALIZER =  RegistryHelper.registerRecipeSerializer(
+			"fabmat_shapeless", BaseCraftingRecipe.createSerializer(
+				FabMatShapelessRecipe.MAP_CODEC,
+				FabMatShapelessRecipe.STREAM_CODEC
 			)
 		);
 	}

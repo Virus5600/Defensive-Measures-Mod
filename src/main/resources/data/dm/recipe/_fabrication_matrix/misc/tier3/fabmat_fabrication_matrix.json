@@ -1,0 +1,26 @@
+{
+	"type": "dm:fabmat_shaped",
+	"category": "misc",
+	"pattern": [
+		"     n   ",
+		"uuuuri   ",
+		"siwhcis  ",
+		"sgggggs  ",
+		"sssssssss"
+	],
+	"key": {
+		"w": "dm:workshop",
+		"g": "dm:gear",
+		"s": "minecraft:smooth_stone_slab",
+		"c": "minecraft:crafter",
+		"u": "minecraft:copper_ingot",
+		"i": "minecraft:iron_ingot",
+		"n": "minecraft:iron_nugget",
+		"r": "minecraft:redstone_block",
+		"h": "minecraft:hopper"
+	},
+	"result": {
+		"id": "dm:fabrication_matrix",
+		"count": 1
+	}
+}

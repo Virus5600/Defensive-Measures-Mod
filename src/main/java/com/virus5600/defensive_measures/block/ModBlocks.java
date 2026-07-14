@@ -8,6 +8,7 @@ import com.virus5600.defensive_measures._helper.RegistryHelper;
 import com.virus5600.defensive_measures.block.defenses.tier2.*;
 import com.virus5600.defensive_measures.block.misc.tier1.*;
 import com.virus5600.defensive_measures.block.misc.tier2.*;
+import com.virus5600.defensive_measures.block.misc.tier3.*;
 import com.virus5600.defensive_measures.block.traps.tier1.*;
 
 /**
@@ -30,6 +31,7 @@ public class ModBlocks {
 
 	// v1.2.0-beta
 	public final static Block WORKSHOP = RegistryHelper.registerBlock("workshop", WorkshopBlock::new, Properties.of());
+	public final static Block FABRICATION_MATRIX = RegistryHelper.registerBlock("fabrication_matrix", FabricationMatrixBlock::new, Properties.of());
 
 	public static void init() {
 		DefensiveMeasures.LOGGER.info("REGISTERING BLOCKS FOR {}...", DefensiveMeasures.MOD_NAME);

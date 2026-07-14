@@ -1,7 +1,7 @@
 ﻿{
 	"parent": "minecraft:recipes/root",
 	"criteria": {
-		"tas_interacted": {
+		"workshop_interacted": {
 			"trigger": "minecraft:tick",
 			"conditions": {
 				"player": {
@@ -9,7 +9,7 @@
 						"stats": [
 							{
 								"type": "minecraft:custom",
-								"stat": "dm:interact_with_turret_assembly_station",
+								"stat": "dm:interact_with_workshop",
 								"value": {
 									"min": 1
 								}
@@ -35,12 +35,12 @@
 		}
 	},
 	"requirements": [
-		["tas_interacted"],
+		["workshop_interacted"],
 		["has_ingredients"]
 	],
 	"rewards": {
 		"recipes": [
-			"dm:_turret_assembly_station/turrets/tier1/tas_cannon_turret"
+			"dm:_workshop/turrets/tier1/workshop_cannon_turret"
 		]
 	}
 }

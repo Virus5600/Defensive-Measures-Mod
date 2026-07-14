@@ -30,7 +30,8 @@
 		"minecraft:lantern",
 		"minecraft:soul_lantern",
 		"dm:turret_assembly_station",
-		"dm:workshop"
+		"dm:workshop",
+		"dm:fabrication_matrix"
 	]
 }
 

@@ -41,14 +41,20 @@ import java.util.Optional;
  * @since 1.1.0-beta
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
  */
-public abstract class BaseCraftingScreenHandler<T extends BaseCraftingRecipe<CraftingInput>> extends AbstractCraftingMenu {
+public abstract class BaseCraftingScreenHandler<
+	T extends BaseCraftingRecipe<CraftingInput>
+> extends AbstractCraftingMenu {
 	protected final RecipeType<T> recipeType;
 	protected final ContainerLevelAccess access;
 	protected final Player player;
 	protected boolean placingRecipe;
 	protected Point arrowPos;
 
-	public BaseCraftingScreenHandler(MenuType type, int syncId, Inventory playerInventory, ContainerLevelAccess access, int width, int height, RecipeType<T> recipeType) {
+	public BaseCraftingScreenHandler(
+		MenuType type, int syncId,
+		Inventory playerInventory, ContainerLevelAccess access,
+		int width, int height, RecipeType<T> recipeType
+	) {
 		super(type, syncId, width, height);
 
 		this.access = access;
@@ -73,7 +79,34 @@ public abstract class BaseCraftingScreenHandler<T extends BaseCraftingRecipe<Cra
 		return this.arrowPos;
 	}
 
+	/**
+	 * Adds a result slot using the {@link SpriteResultSlot} slot.
+	 *
+	 * @param player The player who is using the crafting screen.
+	 * @param x      The x position of the slot.
+	 * @param y      The y position of the slot.
+	 *
+	 * @return {@link Slot} The result slot that was added.
+	 */
 	protected Slot addResultSlot(final Player player, final int x, final int y) {
+		return this.addResultSlot(new SpriteResultSlot(
+			player, this.craftSlots,
+			this.resultSlots, 0,
+			x, y
+		), x, y);
+	}
+
+	/**
+	 * Adds a custom {@link Slot} as the result slot. This method allows inheritors to provide
+	 * their own custom slot, allowing the result slot to be modified as needed.
+	 *
+	 * @param slot The custom slot to be added as the result slot.
+	 * @param x    The x position of the slot.
+	 * @param y    The y position of the slot.
+	 *
+	 * @return {@link Slot} The result slot that was added.
+	 */
+	protected Slot addResultSlot(final Slot slot, final int x, final int y) {
 		int padding = 6;
 
 		if (this.arrowPos == null) {
@@ -84,11 +117,11 @@ public abstract class BaseCraftingScreenHandler<T extends BaseCraftingRecipe<Cra
 			this.arrowPos = new Point(arrowX, arrowY);
 		}
 
-		return this.addSlot(new SpriteResultSlot(
-			player, this.craftSlots,
-			this.resultSlots, 0,
-			x, y
-		).setPadding(padding));
+		if (slot instanceof SpriteResultSlot srs) {
+			srs.setPadding(padding);
+		}
+
+		return this.addSlot(slot);
 	}
 
 	protected void addCraftingGridSlots(final int left, final int top) {
