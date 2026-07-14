@@ -14,4 +14,4 @@ Describe this new feature. What do they do? What do they look? Any references to
 ## Additional Information
 
 What other information is important to know about this feature request? Are there any specific
-requirments needed for it to work? How does it interact with other features?
+requirements needed for it to work? How does it interact with other features?

@@ -14,7 +14,8 @@ import com.virus5600.defensive_measures.screen.slots.FabMatResultSlot;
 import org.jspecify.annotations.NonNull;
 
 /**
- * A screen handler which provides the menu for the {@link FabricationMatrixBlock Workshop}'s crafting UI.
+ * A screen handler which provides the menu for the
+ * {@link FabricationMatrixBlock Fabrication Matrix}'s crafting UI.
  *
  * @since 1.2.0-beta
  * @author <a href="https://github.com/Virus5600">Virus5600</a>

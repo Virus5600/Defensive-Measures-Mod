@@ -1,4 +1,4 @@
-﻿{
+{
 	"parent": "minecraft:recipes/root",
 	"criteria": {
 		"workshop_interacted": {

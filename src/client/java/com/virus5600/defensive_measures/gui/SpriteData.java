@@ -4,7 +4,6 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.navigation.ScreenPosition;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.resources.Identifier;
-import net.minecraft.util.Mth;
 
 import com.virus5600.defensive_measures._util.MathUtil;
 
@@ -109,8 +108,10 @@ public class SpriteData {
 	 * @param yOffset The y-offset for the sprite position.
 	 */
 	public void drawSprite(GuiGraphicsExtractor graphics, int xOffset, int yOffset) {
+		float finalRot = this.getFinalRotation();
+
 		// If no rotation or just a rotation that returns it to the same rotation, draw and return immediately.
-		if (this.getFinalRotation() == 0 || this.getFinalRotation() % 360 == 0) {
+		if (finalRot == 0 || finalRot % 360 == 0) {
 			graphics.blitSprite(
 				RenderPipelines.GUI_TEXTURED, this.texture,
 				xOffset + this.position.x(), yOffset + this.position.y(),

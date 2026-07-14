@@ -11,6 +11,7 @@ import net.minecraft.world.level.block.state.BlockState;
 
 import com.virus5600.defensive_measures.block.ModBlocks;
 import com.virus5600.defensive_measures.block.misc.tier3.FabricationMatrixBlock;
+import com.virus5600.defensive_measures.block.misc.tier3.FabricationMatrixBlock.FabricationMatrixPart;
 
 public class FabMatResultSlot extends SpriteResultSlot {
 	private final Level level;
@@ -45,6 +46,20 @@ public class FabMatResultSlot extends SpriteResultSlot {
 			if (state.is(ModBlocks.FABRICATION_MATRIX)) {
 				lvl.setBlock(this.pos, state.setValue(FabricationMatrixBlock.ACTIVE, true), 3);
 				lvl.scheduleTick(this.pos, state.getBlock(), FabricationMatrixBlock.getActiveDurationTicks());
+
+				BlockPos targetPos = this.pos;
+
+				if (state.getBlock() instanceof FabricationMatrixBlock fabMat
+					&& state.getValue(FabricationMatrixBlock.PART) == FabricationMatrixPart.LEFT
+				) {
+					targetPos = this.pos.relative(fabMat.getOtherPartDirection(state.getValue(fabMat.getDirectionProperty())));
+				}
+
+				BlockState targetState = lvl.getBlockState(targetPos);
+				if (targetState.is(ModBlocks.FABRICATION_MATRIX)) {
+					lvl.setBlock(targetPos, targetState.setValue(FabricationMatrixBlock.ACTIVE, true), 3);
+					lvl.scheduleTick(targetPos, targetState.getBlock(), FabricationMatrixBlock.getActiveDurationTicks());
+				}
 			}
 		}
 	}
