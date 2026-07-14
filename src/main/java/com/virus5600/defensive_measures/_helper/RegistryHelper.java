@@ -73,6 +73,10 @@ public final class RegistryHelper {
 		return Blocks.register(createBlockKey(path), function, settings);
 	}
 
+	public static Block registerBlock(String path, Function<BlockBehaviour.Properties, Block> function) {
+		return registerBlock(path, function, BlockBehaviour.Properties.of());
+	}
+
 	// Item Registry
 	private static ResourceKey<Item> createItemKey(String path) {
 		return ResourceKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath(DefensiveMeasures.MOD_ID, path));

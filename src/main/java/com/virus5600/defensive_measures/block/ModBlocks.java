@@ -1,7 +1,6 @@
 package com.virus5600.defensive_measures.block;
 
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.state.BlockBehaviour.Properties;
 
 import com.virus5600.defensive_measures.DefensiveMeasures;
 import com.virus5600.defensive_measures._helper.RegistryHelper;
@@ -10,6 +9,7 @@ import com.virus5600.defensive_measures.block.misc.tier1.*;
 import com.virus5600.defensive_measures.block.misc.tier2.*;
 import com.virus5600.defensive_measures.block.misc.tier3.*;
 import com.virus5600.defensive_measures.block.traps.tier1.*;
+import com.virus5600.defensive_measures.block.traps.tier2.*;
 
 /**
  * Register and store all custom blocks for the mod.
@@ -23,15 +23,17 @@ import com.virus5600.defensive_measures.block.traps.tier1.*;
  */
 public class ModBlocks {
 	// v1.0.0-beta
-	public final static Block BOLT_HEAD = RegistryHelper.registerBlock("bolt_head", BoltHeadBlock::new, Properties.of());
+	public final static Block BOLT_HEAD = RegistryHelper.registerBlock("bolt_head", BoltHeadBlock::new);
 
 	// v1.1.0-beta
-	public final static Block TURRET_ASSEMBLY_STATION = RegistryHelper.registerBlock("turret_assembly_station", TurretAssemblyStationBlock::new, Properties.of());
-	public final static Block ELECTRIC_FENCE = RegistryHelper.registerBlock("electric_fence", ElectricFenceBlock::new, Properties.of());
+	public final static Block TURRET_ASSEMBLY_STATION = RegistryHelper.registerBlock("turret_assembly_station", TurretAssemblyStationBlock::new);
+	public final static Block ELECTRIC_FENCE = RegistryHelper.registerBlock("electric_fence", ElectricFenceBlock::new);
 
 	// v1.2.0-beta
-	public final static Block WORKSHOP = RegistryHelper.registerBlock("workshop", WorkshopBlock::new, Properties.of());
-	public final static Block FABRICATION_MATRIX = RegistryHelper.registerBlock("fabrication_matrix", FabricationMatrixBlock::new, Properties.of());
+	public final static Block WORKSHOP = RegistryHelper.registerBlock("workshop", WorkshopBlock::new);
+	public final static Block FABRICATION_MATRIX = RegistryHelper.registerBlock("fabrication_matrix", FabricationMatrixBlock::new);
+	public final static Block M14_ANTI_PERSONNEL_MINE = RegistryHelper.registerBlock("m14_anti_personnel_mine", AntiPersonnelMineM14Block::new);
+	public final static Block ANTI_TANK_MINE = RegistryHelper.registerBlock("anti_tank_mine", AntiTankMineBlock::new);
 
 	public static void init() {
 		DefensiveMeasures.LOGGER.info("REGISTERING BLOCKS FOR {}...", DefensiveMeasures.MOD_NAME);
