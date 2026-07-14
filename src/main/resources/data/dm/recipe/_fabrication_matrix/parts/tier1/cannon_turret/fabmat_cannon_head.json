@@ -1,6 +1,6 @@
 {
-	"type": "minecraft:fabmat_shapeless",
-	"category": "misc",
+	"type": "dm:fabmat_shapeless",
+	"category": "parts",
 	"ingredients": [
 		"dm:unfinished_cannon_head",
 		"minecraft:string"

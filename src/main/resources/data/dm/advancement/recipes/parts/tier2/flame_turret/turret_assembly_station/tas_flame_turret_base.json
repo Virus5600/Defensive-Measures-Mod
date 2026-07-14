@@ -40,7 +40,7 @@
 	],
 	"rewards": {
 		"recipes": [
-			"dm:_turret_assembly_station/parts/tier2/flamer_turret/tas_flame_turret_base"
+			"dm:_turret_assembly_station/parts/tier2/flame_turret/tas_flame_turret_base"
 		]
 	}
 }

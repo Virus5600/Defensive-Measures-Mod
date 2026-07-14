@@ -98,7 +98,10 @@ public class WorkshopScreen extends BaseRecipeBookScreen<WorkshopScreenHandler> 
 			size.width, size.height
 		);
 
-		if (this.isNarrow() && !this.getRecipeBook().isVisible()) {
+		boolean paintClutter = this.isNarrow() && !this.getRecipeBook().isVisible();
+		paintClutter = paintClutter || !this.isNarrow();
+
+		if (paintClutter) {
 			// Draw the clutter of the block onto the UI (Yes, it's part of the BG)
 			// - Redstone, 2 Iron Ingots, and the Crafting Table Pliers.
 			int xSpritesOrigin = xContainerOrigin + (int) (this.imageWidth * 0.6875);

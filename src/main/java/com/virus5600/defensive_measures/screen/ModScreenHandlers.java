@@ -16,6 +16,7 @@ public class ModScreenHandlers {
 	public static final MenuType<TurretAssemblyStationScreenHandler> TURRET_ASSEMBLY_STATION = RegistryHelper.registerScreenHandlerType("turret_assembly_station", TurretAssemblyStationScreenHandler::new);
 	// v1.2.0-beta
 	public static final MenuType<WorkshopScreenHandler> WORKSHOP = RegistryHelper.registerScreenHandlerType("workshop", WorkshopScreenHandler::new);
+	public static final MenuType<FabricationMatrixScreenHandler> FABRICATION_MATRIX = RegistryHelper.registerScreenHandlerType("fabrication_matrix", FabricationMatrixScreenHandler::new);
 
 	public static void init() {
 		DefensiveMeasures.LOGGER.info("REGISTERING SCREEN HANDLERS FOR {}...", DefensiveMeasures.MOD_NAME);

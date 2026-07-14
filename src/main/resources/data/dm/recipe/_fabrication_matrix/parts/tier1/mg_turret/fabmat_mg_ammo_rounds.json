@@ -1,6 +1,6 @@
 {
-	"type": "minecraft:crafting_shapeless",
-	"category": "misc",
+	"type": "dm:fabmat_shapeless",
+	"category": "parts",
 	"ingredients": [
 		"minecraft:iron_ingot",
 		"minecraft:flint",

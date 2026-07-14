@@ -1,6 +1,6 @@
 {
-	"type": "minecraft:crafting_shaped",
-	"category": "misc",
+	"type": "dm:fabmat_shaped",
+	"category": "parts",
 	"pattern": [
 		"bbb",
 		"bpb",

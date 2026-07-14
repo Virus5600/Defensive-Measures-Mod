@@ -78,7 +78,7 @@ public class TASShapedRecipe extends BaseCraftingRecipe<CraftingInput> {
 
 	@Override @NonNull
 	public RecipeSerializer<? extends BaseCraftingRecipe<CraftingInput>> getSerializer() {
-		return ModRecipeSerializers.TAS_SERIALIZER;
+		return SERIALIZER;
 	}
 
 	public boolean matches(final CraftingInput craftingRecipeInput, final Level level) {

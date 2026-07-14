@@ -1,0 +1,28 @@
+{
+	"type": "minecraft:block",
+	"pools": [
+		{
+			"rolls": 1,
+			"entries": [
+				{
+					"type": "minecraft:item",
+					"name": "dm:fabrication_matrix",
+					"conditions": [
+						{
+							"block": "dm:fabrication_matrix",
+							"condition": "minecraft:block_state_property",
+							"properties": {
+								"fabrication_matrix_part": "left"
+							}
+						}
+					]
+				}
+			],
+			"conditions": [
+				{
+					"condition": "minecraft:survives_explosion"
+				}
+			]
+		}
+	]
+}

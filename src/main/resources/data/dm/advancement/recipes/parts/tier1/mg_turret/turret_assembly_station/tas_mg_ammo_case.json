@@ -38,7 +38,7 @@
 	],
 	"rewards": {
 		"recipes": [
-			"dm:_turret_assembly_station/turrets/tier1/mg_turret/tas_mg_ammo_case"
+			"dm:_turret_assembly_station/parts/tier1/mg_turret/tas_mg_ammo_case"
 		]
 	}
 }
