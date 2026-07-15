@@ -10,13 +10,15 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.level.ExplosionDamageCalculator;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerExplosion;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
+import com.virus5600.defensive_measures._util.interfaces.ModExplosives;
+import com.virus5600.defensive_measures.block.ExplosiveBlock;
 import com.virus5600.defensive_measures.entity.ExplosiveEntity;
 import com.virus5600.defensive_measures.entity.projectiles.ExplosiveProjectileEntity;
 
@@ -33,7 +35,9 @@ import java.util.List;
  * the {@link ExplosiveEntity} interface.
  *
  * @see ExplosiveProjectileEntity
+ * @see ExplosiveBlock
  * @see ExplosiveEntity
+ * @see ModExplosives
  *
  * @since 1.1.2-beta
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
@@ -48,11 +52,11 @@ public class ModExplosionImpl extends ServerExplosion {
 	// /////////////// //
 
 	private void damageEntities() {
-		if (!(this.getDirectSourceEntity() instanceof ExplosiveProjectileEntity epe)) {
+		if (!(this.getDirectSourceEntity() instanceof ModExplosives explosive)) {
 			throw new IllegalStateException("The damageEntities() method can only be called if the exploding entity is an instance of ExplosiveProjectileEntity.");
 		}
 
-		double maxDmgRadius = epe.getMaxDamageRadius();
+		double maxDmgRadius = explosive.getMaxDamageRadius();
 		Vec3 explosionPos = this.center();
 
 		// Single query with max radius — damageEntity handles zone detection internally
@@ -66,17 +70,20 @@ public class ModExplosionImpl extends ServerExplosion {
 		);
 
 		List<Entity> damagedEntities = new ArrayList<>();
-		epe.level()
-			.getEntities(epe, fullReceiver)
-			.forEach(entity -> this.damageEntity(epe, entity, damagedEntities, explosionPos));
+		Level lvl = explosive.level();
+
+		if (lvl != null) {
+			lvl.getEntities(this.getDirectSourceEntity(), fullReceiver)
+				.forEach(entity -> this.damageEntity(explosive, entity, damagedEntities, explosionPos));
+		}
 	}
 
-	private void damageEntity(Projectile projectile, Entity entity, List<Entity> list, Vec3 explosionPos) {
+	private void damageEntity(ModExplosives explosive, Entity entity, List<Entity> list, Vec3 explosionPos) {
 		if (list.contains(entity)) return;
 
-		if (!entity.ignoreExplosion(this) && (projectile instanceof ExplosiveEntity epe)) {
-			double effectiveRadius = epe.getEffectiveRadius();
-			double maxDmgRadius = epe.getMaxDamageRadius();
+		if (!entity.ignoreExplosion(this)) {
+			double effectiveRadius = explosive.getEffectiveRadius();
+			double maxDmgRadius = explosive.getMaxDamageRadius();
 			double distance = Math.sqrt(entity.distanceToSqr(explosionPos));
 
 			// Spherical radius guard
@@ -86,8 +93,8 @@ public class ModExplosionImpl extends ServerExplosion {
 			}
 
 			boolean shouldDmg = this.damageCalculator.shouldDamageEntity(this, entity);
-			double baseDmg = epe.getBaseDamage();
-			double dmgReduction = epe.getDamageReduction();
+			double baseDmg = explosive.getBaseDamage();
+			double dmgReduction = explosive.getDamageReduction();
 			float knockbackMod = this.damageCalculator.getKnockbackMultiplier(entity);
 			float exposure = !shouldDmg && knockbackMod == 0 ?
 				0f : getSeenPercent(this.center(), entity);
@@ -120,7 +127,7 @@ public class ModExplosionImpl extends ServerExplosion {
 
 			if (shouldDmg) {
 				entity.hurtServer(
-					(ServerLevel) projectile.level(),
+					(ServerLevel) explosive.level(),
 					this.getDamageSource(),
 					dmg
 				);
@@ -146,7 +153,7 @@ public class ModExplosionImpl extends ServerExplosion {
 				}
 			}
 
-			entity.onExplosionHit(projectile.getOwner());
+			entity.onExplosionHit(explosive.getOwner());
 		}
 
 		list.add(entity);
@@ -175,7 +182,7 @@ public class ModExplosionImpl extends ServerExplosion {
 	/**
 	 * An overloaded version of the {@link #explode()} method which utilizes the mod's custom damage
 	 * formula. However, this method only works if the exploding entity is using the custom
-	 * {@link ExplosiveProjectileEntity}.
+	 * {@link ModExplosives}.
 	 * <br><br>
 	 * The way the damage works is similar to vanilla but now, two more stages are added to identify
 	 * the damage falloff:
@@ -218,7 +225,7 @@ public class ModExplosionImpl extends ServerExplosion {
 	 */
 	public int explode(boolean destroyBlocks) {
 		// If not an instance of the custom explosive entity, then use the vanilla explosion.
-		if (!(this.getDirectSourceEntity() instanceof ExplosiveProjectileEntity)) {
+		if (!(this.getDirectSourceEntity() instanceof ModExplosives)) {
 			return super.explode();
 		}
 

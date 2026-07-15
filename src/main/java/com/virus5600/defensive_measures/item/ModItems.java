@@ -120,6 +120,10 @@ public class ModItems {
 	// FABRICATION MATRIX
 	public final static Item FABRICATION_MATRIX = registerItem(ModBlocks.FABRICATION_MATRIX, new Properties().rarity(Rarity.EPIC));
 
+	// LANDMINES
+	public final static Item M14_ANTI_PERSONNEL_MINE = registerItem(ModBlocks.ANTI_PERSONNEL_MINE_M14, new Properties().rarity(Rarity.UNCOMMON));
+	public final static Item ANTI_TANK_MINE = registerItem(ModBlocks.ANTI_TANK_MINE, new Properties().rarity(Rarity.UNCOMMON));
+
 	// //// //
 	// MISC //
 	// //// //
@@ -299,6 +303,9 @@ public class ModItems {
 		DM_TRAPS = new Item[] {
 			BOLT_HEAD,
 			ELECTRIC_FENCE,
+
+			M14_ANTI_PERSONNEL_MINE,
+			ANTI_TANK_MINE
 		};
 
 		DM_TURRETS = new Item[] {

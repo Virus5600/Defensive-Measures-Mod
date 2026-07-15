@@ -159,7 +159,8 @@ public class BoltHeadBlock extends Block implements SimpleWaterloggedBlock {
 
 		if (blockState.is(this)) {
 			return blockState.cycle(BOLT_HEADS);
-		} else {
+		}
+		else {
 			FluidState fluidState = ctx.getLevel().getFluidState(ctx.getClickedPos());
 
 			boolean isFluidWater = fluidState.getType() == Fluids.WATER;

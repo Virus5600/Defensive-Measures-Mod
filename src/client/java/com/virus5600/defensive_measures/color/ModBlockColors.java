@@ -12,7 +12,7 @@ public class ModBlockColors extends BlockColors {
 
 		// v1.2.0-beta
 		colors.register(List.of(new LandmineTintSources()),
-			ModBlocks.M14_ANTI_PERSONNEL_MINE,
+			ModBlocks.ANTI_PERSONNEL_MINE_M14,
 			ModBlocks.ANTI_TANK_MINE
 		);
 	}

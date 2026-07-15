@@ -32,7 +32,7 @@ public class ModBlocks {
 	// v1.2.0-beta
 	public final static Block WORKSHOP = RegistryHelper.registerBlock("workshop", WorkshopBlock::new);
 	public final static Block FABRICATION_MATRIX = RegistryHelper.registerBlock("fabrication_matrix", FabricationMatrixBlock::new);
-	public final static Block M14_ANTI_PERSONNEL_MINE = RegistryHelper.registerBlock("m14_anti_personnel_mine", AntiPersonnelMineM14Block::new);
+	public final static Block ANTI_PERSONNEL_MINE_M14 = RegistryHelper.registerBlock("anti_personnel_mine_m14", AntiPersonnelMineM14Block::new);
 	public final static Block ANTI_TANK_MINE = RegistryHelper.registerBlock("anti_tank_mine", AntiTankMineBlock::new);
 
 	public static void init() {
