@@ -1,6 +1,12 @@
 {
 	"model": {
 		"type": "minecraft:model",
-		"model": "dm:block/anti_personnel_mine_m14"
+		"model": "dm:item/tier3/traps/anti_personnel_mine_m14",
+		"tints": [
+			{
+				"type": "minecraft:constant",
+				"value": 5071920
+			}
+		]
 	}
 }

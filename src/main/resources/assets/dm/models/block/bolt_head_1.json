@@ -78,13 +78,6 @@
 			}
 		}
 	],
-	"display": {
-		"gui": {
-			"rotation": [30, -135, 0],
-			"translation": [0, 12, 0],
-			"scale": [2, 2, 2]
-		}
-	},
 	"groups": [
 		{
 			"name": "point",

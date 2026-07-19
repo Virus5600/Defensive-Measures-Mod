@@ -10,7 +10,8 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public class LandmineTintSources implements BlockTintSource {
 	private static final int GREEN = 0x4D6430;
-	private static final int YELLOW = 0xE7E4BB;
+	private static final int LIGHT_YELLOW = 0xE7E4BB;
+	private static final int YELLOW = 0xFFEE33;
 	private static final int WHITE = 0xF0FDFD;
 	private static final int GRAY = 0x8F8F8F;
 	private static final int BLUE = 0x4D6B8F;
@@ -37,7 +38,11 @@ public class LandmineTintSources implements BlockTintSource {
 		}
 		else if (
 			stateBelow.is(BlockTags.SAND)
-			|| stateBelow.is(ConventionalBlockTags.YELLOW_DYED)
+		) {
+			color = LIGHT_YELLOW;
+		}
+		else if (
+			stateBelow.is(ConventionalBlockTags.YELLOW_DYED)
 			|| stateBelow.getBlock() == Blocks.GOLD_BLOCK
 		) {
 			color = YELLOW;
