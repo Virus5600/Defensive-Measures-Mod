@@ -85,6 +85,9 @@ public class ModSoundEvents {
 	public static final SoundEvent TURRET_PELLET_DESTROYED = ModSoundEvents.registerSoundEvent("turret.pellet_turret.destroyed");
 	public static final SoundEvent TURRET_PELLET_SHOOT = ModSoundEvents.registerSoundEvent("turret.pellet_turret.shoot");
 
+	public static final SoundEvent BLOCK_LANDMINE_ARMED = ModSoundEvents.registerSoundEvent("block.landmine.armed");
+	public static final SoundEvent BLOCK_LANDMINE_DISARMED = ModSoundEvents.registerSoundEvent("block.landmine.disarmed");
+
 	private static SoundEvent registerSoundEvent(final String soundID) {
 		Identifier identifier = Identifier.fromNamespaceAndPath(DefensiveMeasures.MOD_ID, soundID);
 		return Registry.register(

@@ -1,19 +1,22 @@
-package com.virus5600.defensive_measures.block.traps.tier2;
+package com.virus5600.defensive_measures.block.traps.tier3;
 
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityReference;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.vehicle.VehicleEntity;
 import net.minecraft.world.level.*;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.SimpleWaterloggedBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
+import com.virus5600.defensive_measures.block.entity.traps.BaseLandmineBlockEntity;
 import com.virus5600.defensive_measures.block.traps.BaseLandmineBlock;
+import com.virus5600.defensive_measures.registry.tag.ModEntityTypeTags;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -34,7 +37,7 @@ import org.jspecify.annotations.Nullable;
  * @since 1.2.0-beta
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
  */
-public class AntiTankMineBlock extends BaseLandmineBlock implements SimpleWaterloggedBlock {
+public class AntiTankMineBlock extends BaseLandmineBlock {
 	public static final MapCodec<AntiTankMineBlock> CODEC = simpleCodec(AntiTankMineBlock::new);
 	private static final VoxelShape SHAPE;
 
@@ -48,27 +51,39 @@ public class AntiTankMineBlock extends BaseLandmineBlock implements SimpleWaterl
 		);
 	}
 
-	// /////// //
-	// METHODS //
-	// /////// //
+	// ////// //
+	// METHOD //
+	// ////// //
 
 	@Override
 	public boolean canTrigger(BlockState state, Level level, BlockPos pos, Entity entity) {
-		return false;
+
+		boolean doingTriggerActions = entity.isSprinting() || entity.fallDistance > 3.0F;
+		boolean isLarge = entity.getBoundingBox().getSize() > 3.0 || entity.is(ModEntityTypeTags.HEAVY_ENTITIES);
+		boolean isVehicle = entity instanceof VehicleEntity;
+		boolean isArmed = state.getValue(ARMED);
+
+		return isArmed && (doingTriggerActions || isLarge || isVehicle);
 	}
 
 	@Override
-	public void detonate(BlockState state, Level level, BlockPos pos, @Nullable Player player) {
-
+	public void detonate(BlockState state, Level level, BlockPos pos) {
+		if (level instanceof ServerLevel lvl) {
+			lvl.sendParticles(
+				ParticleTypes.EXPLOSION,
+				pos.getX() + 0.5D, pos.getY() + 0.5D, pos.getZ() + 0.5D,
+				1, 0, 0, 0, 0
+			);
+		}
 	}
 
-	@Override
-	protected @NonNull VoxelShape getShape(BlockState state, @NonNull BlockGetter world, @NonNull BlockPos pos, @NonNull CollisionContext context) {
+	@Override @NonNull
+	protected VoxelShape getShape(BlockState state, @NonNull BlockGetter world, @NonNull BlockPos pos, @NonNull CollisionContext context) {
 		return SHAPE;
 	}
 
-	@Override
-	public @NonNull MapCodec<AntiTankMineBlock> codec() {
+	@Override @NonNull
+	public MapCodec<AntiTankMineBlock> codec() {
 		return CODEC;
 	}
 
@@ -103,16 +118,11 @@ public class AntiTankMineBlock extends BaseLandmineBlock implements SimpleWaterl
 		return 10;
 	}
 
-	@Nullable
-	public Level level() {
-		return this.level;
-	}
-
-	// OwnableBlock
+	// EntityBlock
 
 	@Nullable
-	public EntityReference<LivingEntity> getOwnerReference() {
-		return null;
+	public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
+		return new BaseLandmineBlockEntity(pos, state);
 	}
 
 	// ////////////////// //
@@ -120,6 +130,9 @@ public class AntiTankMineBlock extends BaseLandmineBlock implements SimpleWaterl
 	// ////////////////// //
 
 	static {
-		SHAPE = Block.box(0.0D, 0.0D, 0.0D, 16.0D, 2.0D, 16.0D);
+		SHAPE = Block.box(
+			7.0, 0.0, 7.0,
+			9.0, 0.4, 9.0
+		);
 	}
 }

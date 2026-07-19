@@ -11,6 +11,8 @@ import net.minecraft.stats.StatFormatter;
 import net.minecraft.stats.StatType;
 import net.minecraft.stats.Stats;
 import net.minecraft.tags.TagKey;
+import net.minecraft.util.Util;
+import net.minecraft.util.datafix.fixes.References;
 import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -27,10 +29,16 @@ import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.item.crafting.display.RecipeDisplay;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 
 import com.virus5600.defensive_measures.DefensiveMeasures;
 
+import org.slf4j.Logger;
+
+import java.util.List;
+import java.util.Set;
 import java.util.function.Function;
 
 /**
@@ -41,12 +49,14 @@ import java.util.function.Function;
  * while keeping the code clean and easy to read. And in a way, allows the developer
  * to easily maintain the codes and update them when needed.
  *
- * @see <a href="https://github.com/Khazoda/basic-weapons/blob/latest-stable/src/main/java/com/seacroak/basicweapons/util/Reggie.java">Reggie.java 「(c) Khazoda」</a>
+ * @see <a href="https://github.com/khazoda/basicweapons-legacy/blob/1.21.4-fabric/src/main/java/com/seacroak/basicweapons/util/Reggie.java">Reggie.java 「(c) Khazoda」</a>
  *
  * @since 1.0.0-beta
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
  */
 public final class RegistryHelper {
+	private static final Logger LOGGER = DefensiveMeasures.LOGGER;
+
 	// Holder
 	public static Holder<Item> getHolder(Item item) {
 		return BuiltInRegistries.ITEM.wrapAsHolder(item);
@@ -75,6 +85,39 @@ public final class RegistryHelper {
 
 	public static Block registerBlock(String path, Function<BlockBehaviour.Properties, Block> function) {
 		return registerBlock(path, function, BlockBehaviour.Properties.of());
+	}
+
+	// Block Entity Registry
+	private static ResourceKey<BlockEntityType<?>> createBlockEntityKey(String name) {
+		return ResourceKey.create(Registries.BLOCK_ENTITY_TYPE, Identifier.fromNamespaceAndPath(DefensiveMeasures.MOD_ID, name));
+	}
+
+	public static <T extends BlockEntity> BlockEntityType<T> registerBlockEntity(
+		String path, BlockEntityType.BlockEntitySupplier<? extends T> factory,
+		Block... validBlocks
+	) {
+		ResourceKey<BlockEntityType<?>> key = createBlockEntityKey(path);
+		Identifier id = key.identifier();
+
+		if (validBlocks.length == 0) {
+			LOGGER.warn("{}Block entity type {} requires at least one valid block to be defined!{}", LoggerFormat.YELLOW, id, LoggerFormat.RESET);
+		}
+
+		if (id.getNamespace().equals("minecraft")) {
+			Util.fetchChoiceType(References.BLOCK_ENTITY, id.getPath());
+		}
+
+		return Registry.register(
+			BuiltInRegistries.BLOCK_ENTITY_TYPE, key,
+			new BlockEntityType<>(factory, Set.of(validBlocks))
+		);
+	}
+
+	public static <T extends BlockEntity> BlockEntityType<T> registerBlockEntity(
+		String path, BlockEntityType.BlockEntitySupplier<? extends T> factory,
+		List<Block> validBlocks
+	) {
+		return registerBlockEntity(path, factory, validBlocks.toArray(new Block[0]));
 	}
 
 	// Item Registry
@@ -205,5 +248,25 @@ public final class RegistryHelper {
 
 	public static RecipeBookCategory registerRecipeBookCat(String id) {
 		return Registry.register(BuiltInRegistries.RECIPE_BOOK_CATEGORY, id, new RecipeBookCategory());
+	}
+
+	// PRIVATE ENUM
+	private enum LoggerFormat {
+		RESET("\\u001B[0m"),
+		RED("\\u001B[31m"),
+		GREEN("\\u001B[32m"),
+		YELLOW("\\u001B[33m"),
+		BLUE("\\u001B[34m"),
+		CYAN("\\u001B[36m");
+
+		final String format;
+
+		LoggerFormat(String text) {
+			this.format = text;
+		}
+
+		public String toString() {
+			return this.format;
+		}
 	}
 }

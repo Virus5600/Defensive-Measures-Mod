@@ -1,21 +1,21 @@
 package com.virus5600.defensive_measures.block.traps;
 
-import com.virus5600.defensive_measures.sound.ModSoundEvents;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.particles.BlockParticleOption;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.sounds.SoundEvent;
-import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.tags.EntityTypeTags;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityReference;
-import net.minecraft.world.entity.InsideBlockEffectApplier;
+import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.item.FallingBlockEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.*;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.SimpleWaterloggedBlock;
+import net.minecraft.world.level.block.*;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
@@ -25,9 +25,15 @@ import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 
 import com.virus5600.defensive_measures.block.ExplosiveBlock;
+import com.virus5600.defensive_measures.block.entity.traps.BaseLandmineBlockEntity;
+import com.virus5600.defensive_measures.sound.ModSoundEvents;
 import com.virus5600.defensive_measures.state.properties.ModProperties;
 import com.virus5600.defensive_measures.world.ModExplosionImpl;
 
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -57,13 +63,13 @@ import java.util.Objects;
  * @since 1.2.0-beta
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
  */
-public abstract class BaseLandmineBlock extends Block implements SimpleWaterloggedBlock, ExplosiveBlock {
+public abstract class BaseLandmineBlock extends BaseEntityBlock implements SimpleWaterloggedBlock, ExplosiveBlock, EntityBlock {
 	public static final IntegerProperty LANDMINES = ModProperties.LANDMINES;
 	public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
 	public static final BooleanProperty ARMED = ModProperties.ARMED;
 
+	@Nullable protected Entity owner;
 	protected Level level;
-	protected @Nullable EntityReference<Entity> owner;
 
 	/**
 	 * Creates an instance of a landmine.
@@ -91,15 +97,23 @@ public abstract class BaseLandmineBlock extends Block implements SimpleWaterlogg
 		super.onPlace(state, level, pos, oldState, movedByPiston);
 
 		this.level = level;
+		BaseLandmineBlockEntity entity = (BaseLandmineBlockEntity) level.getBlockEntity(pos);
+
+		if (entity != null) {
+			entity.setLevel(level);
+		}
+
 		level.scheduleTick(pos, state.getBlock(), this.getArmingDelay());
 	}
 
 	@Override
 	protected boolean canBeReplaced(@NonNull BlockState state, BlockPlaceContext context) {
-		return !context.isSecondaryUseActive()
-			&& context.getItemInHand().getItem() == this.asItem()
-			&& state.getValue(LANDMINES) < this.getMaxMines()
-			|| super.canBeReplaced(state, context);
+		boolean isNotSneaking = !context.isSecondaryUseActive();
+		boolean isSameItem = context.getItemInHand().getItem() == this.asItem();
+		boolean mineInRange = state.getValue(LANDMINES) < this.getMaxMines();
+		boolean superMethod = super.canBeReplaced(state, context);
+
+		return (isNotSneaking && isSameItem && mineInRange) || superMethod;
 	}
 
 	@Override
@@ -111,14 +125,14 @@ public abstract class BaseLandmineBlock extends Block implements SimpleWaterlogg
 		);
 	}
 
-	@Override
-	protected @NonNull FluidState getFluidState(BlockState state) {
+	@Override @NonNull
+	protected FluidState getFluidState(BlockState state) {
 		return state.getValue(WATERLOGGED) ? Fluids.WATER.getSource(false) : super.getFluidState(state);
 	}
 
-	@Override
-	protected @NonNull BlockState updateShape(
-		BlockState state, LevelReader world,
+	@Override @NonNull
+	protected BlockState updateShape(
+		BlockState state, LevelReader level,
 		ScheduledTickAccess tickView,
 		BlockPos pos, Direction direction,
 		BlockPos neighborPos, BlockState neighborState,
@@ -128,46 +142,47 @@ public abstract class BaseLandmineBlock extends Block implements SimpleWaterlogg
 			tickView.scheduleTick(
 				pos,
 				Fluids.WATER,
-				Fluids.WATER.getTickDelay(world)
+				Fluids.WATER.getTickDelay(level)
 			);
 		}
 
-		return super.updateShape(state, world, tickView, pos, direction, neighborPos, neighborState, random);
+		if (direction == Direction.DOWN && !state.canSurvive(level, pos)) {
+			((Level) level).scheduleTick(pos, this, 2);
+		}
+
+		return super.updateShape(state, level, tickView, pos, direction, neighborPos, neighborState, random);
 	}
 
 	protected void tick(final BlockState state, final ServerLevel level, final BlockPos pos, final RandomSource random) {
-		level.setBlockAndUpdate(pos, state.setValue(ARMED, true));
-
-		if (state.getValue(ARMED)) {
-			level.playLocalSound(
-				pos, SoundEvents.DISPENSER_DISPENSE, SoundSource.BLOCKS,
-				1, 1, false
+		if (!state.getValue(ARMED)) {
+			level.setBlockAndUpdate(pos, state.setValue(ARMED, true));
+			level.playSound(
+				null, pos,
+				ModSoundEvents.BLOCK_LANDMINE_ARMED, SoundSource.BLOCKS,
+				1, 1
 			);
 		}
-	}
 
-	protected void setOwner(final @Nullable EntityReference<Entity> owner) {
-		this.owner = owner;
-	}
+		// If it does care for the armed state
+		if (!this.canSurvive(state, level, pos) && pos.getY() >= level.getMinSectionY()) {
+			FallingBlockEntity fbe = FallingBlockEntity.fall(level, pos, state);
+			BlockEntity be = level.getBlockEntity(pos);
 
-	public void setOwner(final @Nullable Entity owner) {
-		this.setOwner(EntityReference.of(owner));
-	}
-
-	@Nullable
-	public Entity getOwner() {
-		Level lvl = this.level;
-
-		if (this.owner == null || lvl == null) {
-			return null;
+			if (be != null) {
+				fbe.blockData = be.saveWithFullMetadata(level.registryAccess());
+			}
 		}
-
-		return EntityReference.getEntity(this.owner, lvl);
 	}
 
-	@Nullable
-	public Level level() {
-		return this.level;
+	public void setPlacedBy(final Level level, final BlockPos pos, final BlockState state, final @Nullable LivingEntity by, final ItemStack itemStack) {
+		super.setPlacedBy(level, pos, state, by, itemStack);
+
+		if (by != null) {
+			if (level.getBlockEntity(pos) instanceof BaseLandmineBlockEntity mine) {
+				this.owner = by;
+				mine.setOwner(by);
+			}
+		}
 	}
 
 	@Override
@@ -179,7 +194,8 @@ public abstract class BaseLandmineBlock extends Block implements SimpleWaterlogg
 			world.scheduleTick(pos, fluidState.getType(), fluidState.getType().getTickDelay(world));
 
 			return true;
-		} else {
+		}
+		else {
 			return false;
 		}
 	}
@@ -191,7 +207,7 @@ public abstract class BaseLandmineBlock extends Block implements SimpleWaterlogg
  	 * @return The maximum number of mines this block will have.
 	 */
 	public final int getMaxMines() {
-		return Math.max(3, this.maxMines());
+		return Math.max(1, Math.min(3, this.maxMines()));
 	}
 
 	@Override
@@ -216,26 +232,97 @@ public abstract class BaseLandmineBlock extends Block implements SimpleWaterlogg
 		return false;
 	}
 
+	@Override
+	protected boolean canSurvive(final BlockState state, final LevelReader level, final BlockPos pos) {
+		return level.getBlockState(pos.below())
+			.isFaceSturdy(level, pos.below(), Direction.UP);
+	}
+
 	// /////////////////// //
 	// OVERRIDABLE METHODS //
 	// /////////////////// //
 
+	protected VoxelShape getCollisionShape(final BlockState state, final BlockGetter level, final BlockPos pos, final CollisionContext context) {
+		return Shapes.empty();
+	}
+
 	protected void attack(final BlockState state, final Level level, final BlockPos pos, final Player player) {
 		if (!level.isClientSide()) {
-			if (!player.isCreative()) {
+			boolean isArmed = state.getValue(ARMED);
+
+			if (!player.isCrouching() && isArmed) {
 				// TODO: Add disarming tool (probably shears for disposing and a custom one for retrieving?)
-				this.detonate(state, level, pos, player);
+				this.detonate(state, level, pos);
 			}
 		}
 	}
 
-	protected void entityInside(
-		final BlockState state, final Level level, final BlockPos pos,
-		final Entity entity, final InsideBlockEffectApplier effectApplier, final boolean isPrecise
+	public void playerDestroy(final Level level, final Player player, final BlockPos pos, final BlockState state, final @Nullable BlockEntity blockEntity, final ItemStack destroyedWith) {
+		if (!level.isClientSide()) {
+			boolean isArmed = state.getValue(ARMED);
+
+			if (!player.isCrouching() && isArmed) {
+				// TODO: Add disarming tool (probably shears for disposing and a custom one for retrieving?)
+				this.detonate(state, level, pos);
+			}
+		}
+	}
+
+	public BlockState playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
+		if (!level.isClientSide()) {
+			boolean isArmed = state.getValue(ARMED);
+
+			if (!player.isCrouching() && isArmed) {
+				// TODO: Add disarming tool (probably shears for disposing and a custom one for retrieving?)
+				this.detonate(state, level, pos);
+
+				BlockState replacedBy = state.getValue(WATERLOGGED) ?
+					Blocks.WATER.defaultBlockState() : Blocks.AIR.defaultBlockState();
+
+				return level.setBlock(pos, replacedBy, Block.UPDATE_ALL) ?
+					replacedBy : state;
+			}
+		}
+
+		return super.playerWillDestroy(level, pos, state, player);
+	}
+
+	public void wasExploded(final ServerLevel level, final BlockPos pos, final Explosion explosion) {
+		if (!level.isClientSide()) {
+			this.detonate(level.getBlockState(pos), level, pos);
+		}
+	}
+
+	public void entityInside(
+		BlockState state, Level level, BlockPos pos, Entity entity,
+		InsideBlockEffectApplier effectApplier, boolean isPrecise
 	) {
 		if (!level.isClientSide()) {
-			if (this.canTrigger(state, level, pos, entity)) {
-				this.detonate(state, level, pos, entity instanceof Player player ? player : null);
+			boolean canTrigger = this.canTrigger(state, level, pos, entity);
+
+			if (canTrigger) {
+				if (entity.is(EntityTypeTags.IMPACT_PROJECTILES)) {
+					entity.discard();
+
+					if (level instanceof ServerLevel sl) {
+						RandomSource rand = level.getRandom();
+						BlockState particleState = level.getBlockState(pos.below());
+						Vec3 boundPos = state.getShape(level, pos)
+							.bounds()
+							.move(pos)
+							.getCenter();
+
+						sl.sendParticles(
+							new BlockParticleOption(ParticleTypes.BLOCK, particleState),
+							boundPos.x, boundPos.y, boundPos.z,
+							rand.nextIntBetweenInclusive(10, 15),
+							0.0, 0.125, 0.0,
+							rand.nextIntBetweenInclusive(10, 25)
+						);
+					}
+				}
+
+				this.detonate(state, level, pos);
 			}
 		}
 	}
@@ -262,6 +349,15 @@ public abstract class BaseLandmineBlock extends Block implements SimpleWaterlogg
 	 */
 	public int getArmingDelay() {
 		return (int) (20 * 2.5);
+	}
+
+	public Level level() {
+		return this.level;
+	}
+
+	@Nullable
+	public Entity getOwner() {
+		return this.owner;
 	}
 
 	// //////////////// //
@@ -300,7 +396,6 @@ public abstract class BaseLandmineBlock extends Block implements SimpleWaterlogg
 	 * @param state  The current state of this landmine.
 	 * @param level  The level in which this landmine is placed.
 	 * @param pos    The position of this landmine in the level.
-	 * @param player The player that triggered the detonation of this landmine.
 	 */
-	public abstract void detonate(final BlockState state, final Level level, final BlockPos pos, final @Nullable Player player);
+	public abstract void detonate(final BlockState state, final Level level, final BlockPos pos);
 }

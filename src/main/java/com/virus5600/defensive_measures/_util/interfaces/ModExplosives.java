@@ -16,6 +16,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.gamerules.GameRules;
 import net.minecraft.world.phys.Vec3;
 
+import com.virus5600.defensive_measures.block.ExplosiveBlock;
 import com.virus5600.defensive_measures.world.ModExplosionImpl;
 
 import org.jspecify.annotations.Nullable;
@@ -92,48 +93,126 @@ public interface ModExplosives extends TraceableEntity {
 		return true;
 	}
 
-	default void createExplosion(Entity entity, @Nullable DamageSource damageSource, @Nullable ExplosionDamageCalculator behavior, double x, double y, double z, float power, boolean createFire, Level.ExplosionInteraction explosionSourceType, ParticleOptions smallParticle, ParticleOptions largeParticle, WeightedList<ExplosionParticleInfo> blockParticles, Holder<SoundEvent> soundEvent) {
+	default void createExplosion(
+		Entity source,
+		@Nullable DamageSource damageSource, @Nullable ExplosionDamageCalculator behavior,
+		double x, double y, double z,
+		float power, boolean createFire,
+		Level.ExplosionInteraction explosionSourceType,
+		ParticleOptions smallParticle, ParticleOptions largeParticle,
+		WeightedList<ExplosionParticleInfo> blockParticles, Holder<SoundEvent> soundEvent
+	) {
 		this.createExplosion(
-			entity, damageSource, behavior, x, y, z, power, createFire,
+			source, damageSource, behavior, x, y, z, power, createFire,
 			explosionSourceType, smallParticle, largeParticle,
 			blockParticles, soundEvent, true
 		);
 	}
 
-	default void createExplosion(Entity entity, @Nullable DamageSource damageSource, @Nullable ExplosionDamageCalculator behavior, double x, double y, double z, float power, boolean createFire, Level.ExplosionInteraction explosionSourceType, ParticleOptions smallParticle, ParticleOptions largeParticle, WeightedList<ExplosionParticleInfo> blockParticles, Holder<SoundEvent> soundEvent, boolean destroyBlocks) {
-		if (entity.level().isClientSide()) {
-			return;
-		}
-
-		ServerLevel world = (ServerLevel) entity.level();
-
-
+	default void createExplosion(
+		Entity source,
+		@Nullable DamageSource damageSource, @Nullable ExplosionDamageCalculator behavior,
+		double x, double y, double z,
+		float power, boolean createFire,
+		Level.ExplosionInteraction explosionSourceType,
+		ParticleOptions smallParticle, ParticleOptions largeParticle,
+		WeightedList<ExplosionParticleInfo> blockParticles, Holder<SoundEvent> soundEvent,
+		boolean destroyBlocks
+	) {
+		ServerLevel level = (ServerLevel) level();
 		Explosion.BlockInteraction blockInteraction;
-		boolean mobGriefing = world.getGameRules().get(GameRules.MOB_GRIEFING);
+		boolean mobGriefing = level.getGameRules().get(GameRules.MOB_GRIEFING);
 
 		switch (explosionSourceType) {
 			case NONE -> blockInteraction = Explosion.BlockInteraction.KEEP;
-			case BLOCK -> blockInteraction = mobGriefing ? world.getDestroyType(GameRules.BLOCK_EXPLOSION_DROP_DECAY) : Explosion.BlockInteraction.KEEP;
-			case MOB -> blockInteraction = mobGriefing ? world.getDestroyType(GameRules.MOB_EXPLOSION_DROP_DECAY) : Explosion.BlockInteraction.KEEP;
-			case TNT -> blockInteraction = world.getDestroyType(GameRules.TNT_EXPLOSION_DROP_DECAY);
+			case BLOCK -> blockInteraction = mobGriefing ? level.getDestroyType(GameRules.BLOCK_EXPLOSION_DROP_DECAY) : Explosion.BlockInteraction.KEEP;
+			case MOB -> blockInteraction = mobGriefing ? level.getDestroyType(GameRules.MOB_EXPLOSION_DROP_DECAY) : Explosion.BlockInteraction.KEEP;
+			case TNT -> blockInteraction = level.getDestroyType(GameRules.TNT_EXPLOSION_DROP_DECAY);
 			case TRIGGER -> blockInteraction = Explosion.BlockInteraction.TRIGGER_BLOCK;
 			default -> throw new MatchException(null, null);
 		}
 
-		Explosion.BlockInteraction destructionType = destroyBlocks ? blockInteraction : Explosion.BlockInteraction.KEEP;
-		Vec3 vec3d = new Vec3(x, y, z);
+		explode(
+			level, blockInteraction, destroyBlocks, new Vec3(x, y, z),
+			source, null, damageSource, behavior,
+			smallParticle, largeParticle, blockParticles, soundEvent,
+			power, createFire
+		);
+	}
+
+	default void createExplosion(
+		ExplosiveBlock block,
+		@Nullable DamageSource damageSource, @Nullable ExplosionDamageCalculator behavior,
+		double x, double y, double z,
+		float power, boolean createFire,
+		Level.ExplosionInteraction explosionSourceType,
+		ParticleOptions smallParticle, ParticleOptions largeParticle,
+		WeightedList<ExplosionParticleInfo> blockParticles, Holder<SoundEvent> soundEvent
+	) {
+		this.createExplosion(
+			block,
+			damageSource, behavior,
+			x, y, z, power, createFire,
+			explosionSourceType,
+			smallParticle, largeParticle,
+			blockParticles, soundEvent, true
+		);
+	}
+
+	default void createExplosion(
+		ExplosiveBlock block,
+		@Nullable DamageSource damageSource, @Nullable ExplosionDamageCalculator behavior,
+		double x, double y, double z,
+		float power, boolean createFire,
+		Level.ExplosionInteraction explosionSourceType,
+		ParticleOptions smallParticle, ParticleOptions largeParticle,
+		WeightedList<ExplosionParticleInfo> blockParticles, Holder<SoundEvent> soundEvent,
+		boolean destroyBlocks
+	) {
+		ServerLevel level = (ServerLevel) block.level();
+		Explosion.BlockInteraction blockInteraction;
+		boolean mobGriefing = level.getGameRules().get(GameRules.MOB_GRIEFING);
+
+		switch (explosionSourceType) {
+			case NONE -> blockInteraction = Explosion.BlockInteraction.KEEP;
+			case BLOCK -> blockInteraction = mobGriefing ? level.getDestroyType(GameRules.BLOCK_EXPLOSION_DROP_DECAY) : Explosion.BlockInteraction.KEEP;
+			case MOB -> blockInteraction = mobGriefing ? level.getDestroyType(GameRules.MOB_EXPLOSION_DROP_DECAY) : Explosion.BlockInteraction.KEEP;
+			case TNT -> blockInteraction = level.getDestroyType(GameRules.TNT_EXPLOSION_DROP_DECAY);
+			case TRIGGER -> blockInteraction = Explosion.BlockInteraction.TRIGGER_BLOCK;
+			default -> throw new MatchException(null, null);
+		}
+
+		Vec3 pos = new Vec3(x, y, z);
+
+		explode(
+			level, blockInteraction, destroyBlocks, pos,
+			block.getOwner(), block, damageSource, behavior,
+			smallParticle, largeParticle, blockParticles, soundEvent,
+			power, createFire
+		);
+	}
+
+	private static void explode(
+		ServerLevel level, Explosion.BlockInteraction interaction, boolean destroyBlocks, Vec3 pos,
+		@Nullable Entity source, @Nullable ExplosiveBlock blockSrc,
+		@Nullable DamageSource damageSource, @Nullable ExplosionDamageCalculator calc,
+		ParticleOptions smallParticle, ParticleOptions largeParticle,
+		WeightedList<ExplosionParticleInfo> blockParticles, Holder<SoundEvent> soundEvent,
+		float power, boolean createFire
+	) {
+		Explosion.BlockInteraction destructionType = destroyBlocks ? interaction : Explosion.BlockInteraction.KEEP;
 		ModExplosionImpl explosionImpl = new ModExplosionImpl(
-			world,
-			entity, damageSource,
-			behavior, vec3d,
+			level,
+			source, blockSrc,
+			damageSource, calc, pos,
 			power, createFire, destructionType
 		);
 
 		int blocksDestroyed = explosionImpl.explode(destroyBlocks);
 		ParticleOptions particleEffect = explosionImpl.isSmall() ? smallParticle : largeParticle;
 
-		for(ServerPlayer serverPlayerEntity : world.players()) {
-			if (serverPlayerEntity.distanceToSqr(vec3d) < (double) 4096.0F) {
+		for(ServerPlayer serverPlayerEntity : level.players()) {
+			if (serverPlayerEntity.distanceToSqr(pos) < (double) 4096.0F) {
 				Optional<Vec3> optional = Optional.ofNullable(
 					explosionImpl.getHitPlayers()
 						.get(serverPlayerEntity)
@@ -142,7 +221,7 @@ public interface ModExplosives extends TraceableEntity {
 				serverPlayerEntity.connection
 					.send(
 						new ClientboundExplodePacket(
-							vec3d, power, blocksDestroyed, optional,
+							pos, power, blocksDestroyed, optional,
 							particleEffect, soundEvent, blockParticles
 						)
 					);

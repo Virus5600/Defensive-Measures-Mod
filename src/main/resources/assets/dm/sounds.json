@@ -408,5 +408,26 @@
 			}
 		],
 		"subtitle": "subtitles.generic.missile.explode"
+	},
+
+	"block.landmine.armed": {
+		"sounds": [
+			{
+				"name": "block/lodestone/lock1",
+				"pitch": 1.25
+			},
+			{
+				"name": "block/lodestone/lock2",
+				"pitch": 1.25
+			}
+		],
+		"subtitle": "subtitles.block.landmine.armed"
+	},
+	"block.landmine.disarmed": {
+		"sounds": [
+			"block/lodestone/lock1",
+			"block/lodestone/lock2"
+		],
+		"subtitle": "subtitles.block.landmine.disarmed"
 	}
 }

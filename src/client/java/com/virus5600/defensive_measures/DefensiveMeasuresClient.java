@@ -1,5 +1,6 @@
 package com.virus5600.defensive_measures;
 
+import com.virus5600.defensive_measures.color.ModClientColorProviderRegistry;
 import net.fabricmc.api.ClientModInitializer;
 
 import com.virus5600.defensive_measures.command.ModClientCommands;
@@ -30,6 +31,7 @@ public class DefensiveMeasuresClient implements ClientModInitializer {
 		// Renderers
 		ModEntityRenderers.registerEntityRenderers();
 		ModClientParticles.registerParticles();
+		ModClientColorProviderRegistry.init();
 
 		// Models
 		ModEntityModels.registerEntityModels();

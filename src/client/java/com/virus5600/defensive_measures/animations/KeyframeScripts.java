@@ -32,12 +32,12 @@ public class KeyframeScripts {
 
 	static {
 		EXPLODE_SCRIPT = (animState, state, pos) -> {
-			ClientLevel world = Minecraft.getInstance().level;
+			ClientLevel level = Minecraft.getInstance().level;
 
-			if (world == null) { return; }
+			if (level == null) { return; }
 
-			Entity entity = world.getEntity(state.id);
-			DamageSource src = ModDamageSources.create(world, ModDamageTypes.SECONDARY_EXPLOSION, entity, null);
+			Entity entity = level.getEntity(state.id);
+			DamageSource src = ModDamageSources.create(level, ModDamageTypes.SECONDARY_EXPLOSION, entity, null);
 
 			EntityDimensions dim = EntityDimensions.fixed(1, 1);
 
@@ -45,7 +45,8 @@ public class KeyframeScripts {
 				dim = entity.getDimensions(entity.getPose());
 			}
 
-			world.explode(
+
+			level.explode(
 				entity, src, new ExplosionDamageCalculator(),
 				pos.x(), pos.y(), pos.z(),
 				dim.width() + 0.5f, false,

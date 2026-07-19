@@ -15,6 +15,7 @@
 
 	"item.dm.bolt_head": "Bolt Head",
 	"item.dm.electric_fence": "Electric Fence",
+	"item.dm.anti_personnel_mine_m14": "Anti-Personnel Mine (M14)",
 
 	"item.dm.turret_assembly_station": "Turret Assembly Station",
 	"item.dm.workshop": "Workshop",
@@ -125,6 +126,9 @@
 	"death.attack.flint_pellet": "%2$s got annoyed because of %1$s.",
 	"death.attack.flint_pellet.player": "A lucky pellet shot by %2$s hit and killed %1$s.",
 
+	"death.attack.landmine": "%1$s stepped on a forgotten landmine and blew up.",
+	"death.attack.landmine.player": "%2$s violated the Ottawa Treaty just to kill %1$s.",
+
 	"subtitles.turret.remove.metal" : "Металлическая турель убрана",
 	"subtitles.turret.remove.wood" : "Деревянная турель убрана",
 
@@ -145,6 +149,9 @@
 	"subtitles.generic.rocket.engine.loop": "Rocket Engine firing",
 	"subtitles.generic.rocket.explode": "Rocket explodes",
 	"subtitles.generic.missile.explode": "Missile explodes",
+
+	"subtitles.block.landmine.armed": "Landmine armed",
+	"subtitles.block.landmine.disarmed": "Landmine disarmed",
 
 	"subtitles.turret.hurt.metal" : "Metal turret damaged",
 	"subtitles.turret.hurt.wood" : "Wooden turret damaged",

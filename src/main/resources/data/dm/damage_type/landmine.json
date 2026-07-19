@@ -1,0 +1,6 @@
+{
+	"message_id": "landmine",
+	"exhaustion": 20,
+	"scaling": "never",
+	"effects": "hurt"
+}

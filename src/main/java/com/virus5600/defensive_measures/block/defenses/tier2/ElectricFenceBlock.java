@@ -97,7 +97,7 @@ public class ElectricFenceBlock extends CrossCollisionBlock {
 		if (entity instanceof LivingEntity) {
 			if (world instanceof ServerLevel serverWorld) {
 				// Damage the entity
-				DamageSource dmgSrc = ModDamageSources.create(world, ModDamageTypes.ELECTRICITY, null, null);
+				DamageSource dmgSrc = ModDamageSources.create(world, ModDamageTypes.ELECTRICITY, (Entity) null, null);
 				entity.hurtServer(serverWorld, dmgSrc, this.getDamageDealt(state));
 
 				// Spawn Electric Particles
