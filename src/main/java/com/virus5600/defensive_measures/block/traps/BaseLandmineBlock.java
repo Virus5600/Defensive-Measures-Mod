@@ -38,6 +38,7 @@ import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import java.util.Objects;
+import java.util.function.BiConsumer;
 
 /**
  * Am abstract class that will serve as the base class for all landmine implementations of this mod.
@@ -242,6 +243,13 @@ public abstract class BaseLandmineBlock extends BaseEntityBlock implements Simpl
 	// OVERRIDABLE METHODS //
 	// /////////////////// //
 
+	protected void onExplosionHit(
+		final BlockState state, final ServerLevel level, final BlockPos pos,
+		final Explosion explosion, final BiConsumer<ItemStack, BlockPos> onHit
+	) {
+		this.wasExploded(level, pos, explosion);
+	}
+
 	protected VoxelShape getCollisionShape(final BlockState state, final BlockGetter level, final BlockPos pos, final CollisionContext context) {
 		return Shapes.empty();
 	}
@@ -288,9 +296,7 @@ public abstract class BaseLandmineBlock extends BaseEntityBlock implements Simpl
 	}
 
 	public void wasExploded(final ServerLevel level, final BlockPos pos, final Explosion explosion) {
-		if (!level.isClientSide()) {
-			this.detonate(level.getBlockState(pos), level, pos);
-		}
+		this.detonate(level.getBlockState(pos), level, pos);
 	}
 
 	public void entityInside(
@@ -327,13 +333,10 @@ public abstract class BaseLandmineBlock extends BaseEntityBlock implements Simpl
 		}
 	}
 
-	/**
-	 * Returns the final damage to be dealth when this block is detonated.
-	 *
-	 * @param state The block state of this landmine block.
-	 *
-	 * @return The final damage to be dealt when this block is detonated.
-	 */
+	public boolean dropFromExplosion(final Explosion explosion) {
+		return false;
+	}
+
 	public double getDamageDealt(final BlockState state, final Level level) {
 		int mines = state.getValue(LANDMINES);
 		int difficultyId = level.getDifficulty().getId();

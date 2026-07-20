@@ -1,17 +1,16 @@
 package com.virus5600.defensive_measures.block.traps.tier3;
 
 import com.mojang.serialization.MapCodec;
-import com.virus5600.defensive_measures.registry.tag.ModEntityTypeTags;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ExplosionParticleInfo;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
-import net.minecraft.tags.EntityTypeTags;
 import net.minecraft.util.random.WeightedList;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ExperienceOrb;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.level.*;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -20,6 +19,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
+import com.virus5600.defensive_measures.block.ModBlocks;
 import com.virus5600.defensive_measures.block.entity.traps.BaseLandmineBlockEntity;
 import com.virus5600.defensive_measures.block.traps.BaseLandmineBlock;
 import com.virus5600.defensive_measures.entity.damage.ModDamageSources;
@@ -59,20 +59,18 @@ public class AntiPersonnelMineM14Block extends BaseLandmineBlock {
 	@Override
 	public boolean canTrigger(BlockState state, Level level, BlockPos pos, Entity entity) {
 		boolean isArmed = state.getValue(ARMED);
-		boolean isLiving = entity instanceof LivingEntity
-			|| entity.is(EntityTypeTags.IMPACT_PROJECTILES)
-			|| entity.is(ModEntityTypeTags.PROJECTILES);
+		boolean isGameMechanicEntity = entity instanceof ExperienceOrb || entity instanceof ItemEntity;
 		boolean isInCollision = state.getShape(level, pos)
 			.move(pos)
 			.bounds()
 			.intersects(entity.getBoundingBox());
 
-		return isArmed && isLiving && isInCollision;
+		return isArmed && !isGameMechanicEntity && isInCollision;
 	}
 
 	@Override
 	public void detonate(BlockState state, Level level, BlockPos pos) {
-		if (level instanceof ServerLevel lvl) {
+		if (level instanceof ServerLevel lvl && state.getBlock() == ModBlocks.ANTI_PERSONNEL_MINE_M14) {
 			BaseLandmineBlockEntity entity = (BaseLandmineBlockEntity) level.getBlockEntity(pos);
 			if (entity != null) {
 				entity.setLevel(lvl);
@@ -84,17 +82,17 @@ public class AntiPersonnelMineM14Block extends BaseLandmineBlock {
 				(Entity) null, null
 			);
 
+			lvl.setBlock(pos, Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL);
+
 			this.createExplosion(
 				this, dmgSrc, new ExplosionDamageCalculator(),
 				pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5,
-				(float) this.getDamageDealt(state, lvl),  false,
-				Level.ExplosionInteraction.BLOCK,
+				(float) this.getDamageDealt(state, level), (float) this.getMaxDamageRadius(),
+				false, Level.ExplosionInteraction.BLOCK,
 				ParticleTypes.EXPLOSION, ParticleTypes.EXPLOSION_EMITTER,
 				WeightedList.<ExplosionParticleInfo>builder().build(),
 				SoundEvents.GENERIC_EXPLODE, false
 			);
-
-			lvl.setBlock(pos, Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL);
 		}
 	}
 
@@ -124,11 +122,11 @@ public class AntiPersonnelMineM14Block extends BaseLandmineBlock {
 	// ModExplosives
 
 	public double getEffectiveRadius() {
-		return 2;
+		return 1;
 	}
 
 	public double getMaxDamageRadius() {
-		return 4;
+		return 2;
 	}
 
 	public double getDamageReduction() {
@@ -137,10 +135,6 @@ public class AntiPersonnelMineM14Block extends BaseLandmineBlock {
 
 	public double getBaseDamage() {
 		return 10;
-	}
-
-	public BlockEntity getBlockEntity(BlockPos pos) {
-		return this.level().getBlockEntity(pos);
 	}
 
 	// EntityBlock

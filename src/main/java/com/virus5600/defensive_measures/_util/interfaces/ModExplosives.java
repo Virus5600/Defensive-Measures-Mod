@@ -13,10 +13,12 @@ import net.minecraft.world.entity.*;
 import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.ExplosionDamageCalculator;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gamerules.GameRules;
 import net.minecraft.world.phys.Vec3;
 
 import com.virus5600.defensive_measures.block.ExplosiveBlock;
+import com.virus5600.defensive_measures.entity.ExplosiveEntity;
 import com.virus5600.defensive_measures.world.ModExplosionImpl;
 
 import org.jspecify.annotations.Nullable;
@@ -94,26 +96,26 @@ public interface ModExplosives extends TraceableEntity {
 	}
 
 	default void createExplosion(
-		Entity source,
+		ExplosiveEntity source,
 		@Nullable DamageSource damageSource, @Nullable ExplosionDamageCalculator behavior,
 		double x, double y, double z,
-		float power, boolean createFire,
+		float power, float radius, boolean createFire,
 		Level.ExplosionInteraction explosionSourceType,
 		ParticleOptions smallParticle, ParticleOptions largeParticle,
 		WeightedList<ExplosionParticleInfo> blockParticles, Holder<SoundEvent> soundEvent
 	) {
 		this.createExplosion(
-			source, damageSource, behavior, x, y, z, power, createFire,
+			source, damageSource, behavior, x, y, z, power, radius, createFire,
 			explosionSourceType, smallParticle, largeParticle,
 			blockParticles, soundEvent, true
 		);
 	}
 
 	default void createExplosion(
-		Entity source,
+		ExplosiveEntity source,
 		@Nullable DamageSource damageSource, @Nullable ExplosionDamageCalculator behavior,
 		double x, double y, double z,
-		float power, boolean createFire,
+		float power, float radius, boolean createFire,
 		Level.ExplosionInteraction explosionSourceType,
 		ParticleOptions smallParticle, ParticleOptions largeParticle,
 		WeightedList<ExplosionParticleInfo> blockParticles, Holder<SoundEvent> soundEvent,
@@ -136,7 +138,7 @@ public interface ModExplosives extends TraceableEntity {
 			level, blockInteraction, destroyBlocks, new Vec3(x, y, z),
 			source, null, damageSource, behavior,
 			smallParticle, largeParticle, blockParticles, soundEvent,
-			power, createFire
+			power, radius, createFire
 		);
 	}
 
@@ -144,7 +146,7 @@ public interface ModExplosives extends TraceableEntity {
 		ExplosiveBlock block,
 		@Nullable DamageSource damageSource, @Nullable ExplosionDamageCalculator behavior,
 		double x, double y, double z,
-		float power, boolean createFire,
+		float power, float radius, boolean createFire,
 		Level.ExplosionInteraction explosionSourceType,
 		ParticleOptions smallParticle, ParticleOptions largeParticle,
 		WeightedList<ExplosionParticleInfo> blockParticles, Holder<SoundEvent> soundEvent
@@ -152,7 +154,7 @@ public interface ModExplosives extends TraceableEntity {
 		this.createExplosion(
 			block,
 			damageSource, behavior,
-			x, y, z, power, createFire,
+			x, y, z, power, radius, createFire,
 			explosionSourceType,
 			smallParticle, largeParticle,
 			blockParticles, soundEvent, true
@@ -163,7 +165,7 @@ public interface ModExplosives extends TraceableEntity {
 		ExplosiveBlock block,
 		@Nullable DamageSource damageSource, @Nullable ExplosionDamageCalculator behavior,
 		double x, double y, double z,
-		float power, boolean createFire,
+		float power, float radius, boolean createFire,
 		Level.ExplosionInteraction explosionSourceType,
 		ParticleOptions smallParticle, ParticleOptions largeParticle,
 		WeightedList<ExplosionParticleInfo> blockParticles, Holder<SoundEvent> soundEvent,
@@ -186,26 +188,33 @@ public interface ModExplosives extends TraceableEntity {
 
 		explode(
 			level, blockInteraction, destroyBlocks, pos,
-			block.getOwner(), block, damageSource, behavior,
+			null, block, damageSource, behavior,
 			smallParticle, largeParticle, blockParticles, soundEvent,
-			power, createFire
+			power, radius, createFire
 		);
 	}
 
 	private static void explode(
 		ServerLevel level, Explosion.BlockInteraction interaction, boolean destroyBlocks, Vec3 pos,
-		@Nullable Entity source, @Nullable ExplosiveBlock blockSrc,
+		@Nullable ExplosiveEntity source, @Nullable ExplosiveBlock blockSrc,
 		@Nullable DamageSource damageSource, @Nullable ExplosionDamageCalculator calc,
 		ParticleOptions smallParticle, ParticleOptions largeParticle,
 		WeightedList<ExplosionParticleInfo> blockParticles, Holder<SoundEvent> soundEvent,
-		float power, boolean createFire
+		float power, float radius, boolean createFire
 	) {
+		if (source == null && blockSrc == null) {
+			throw new IllegalArgumentException("Either source or blockSrc must be non-null");
+		}
+
+		ModExplosives explosives = source != null  ? source : blockSrc;
+		Entity owner = explosives.getOwner();
+
 		Explosion.BlockInteraction destructionType = destroyBlocks ? interaction : Explosion.BlockInteraction.KEEP;
 		ModExplosionImpl explosionImpl = new ModExplosionImpl(
 			level,
-			source, blockSrc,
+			owner, explosives,
 			damageSource, calc, pos,
-			power, createFire, destructionType
+			power, radius, createFire, destructionType
 		);
 
 		int blocksDestroyed = explosionImpl.explode(destroyBlocks);
@@ -221,7 +230,7 @@ public interface ModExplosives extends TraceableEntity {
 				serverPlayerEntity.connection
 					.send(
 						new ClientboundExplodePacket(
-							pos, power, blocksDestroyed, optional,
+							pos, radius, blocksDestroyed, optional,
 							particleEffect, soundEvent, blockParticles
 						)
 					);

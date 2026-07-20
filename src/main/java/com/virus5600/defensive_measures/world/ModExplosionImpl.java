@@ -13,6 +13,8 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.level.ExplosionDamageCalculator;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerExplosion;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -21,7 +23,9 @@ import com.virus5600.defensive_measures._util.interfaces.ModExplosives;
 import com.virus5600.defensive_measures.block.ExplosiveBlock;
 import com.virus5600.defensive_measures.entity.ExplosiveEntity;
 import com.virus5600.defensive_measures.entity.projectiles.ExplosiveProjectileEntity;
+import com.virus5600.defensive_measures.registry.tag.ModBlockTags;
 
+import org.apache.commons.compress.utils.Lists;
 import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -44,15 +48,17 @@ import java.util.List;
  */
 public class ModExplosionImpl extends ServerExplosion {
 	protected ModExplosives explosiveSource;
+	protected float power;
 
 	public ModExplosionImpl(
 		ServerLevel world, @Nullable Entity source, @Nullable ModExplosives explosiveSource,
 		@Nullable DamageSource damageSource, @Nullable ExplosionDamageCalculator behavior,
-		Vec3 pos, float power, boolean createFire, BlockInteraction destructionType
+		Vec3 pos, float power, float radius, boolean createFire, BlockInteraction destructionType
 	) {
-		super(world, source, damageSource, behavior, pos, power, createFire, destructionType);
+		super(world, source, damageSource, behavior, pos, radius, createFire, destructionType);
 
 		this.explosiveSource = explosiveSource;
+		this.power = power;
 	}
 
 	// /////////////// //
@@ -109,7 +115,7 @@ public class ModExplosionImpl extends ServerExplosion {
 			}
 
 			boolean shouldDmg = this.damageCalculator.shouldDamageEntity(this, entity);
-			double baseDmg = explosive.getBaseDamage();
+			double damageDealt = this.getPower();
 			double dmgReduction = explosive.getDamageReduction();
 			float knockbackMod = this.damageCalculator.getKnockbackMultiplier(entity);
 			float exposure = !shouldDmg && knockbackMod == 0 ?
@@ -128,14 +134,14 @@ public class ModExplosionImpl extends ServerExplosion {
 			double baseDmgFinal;
 			if (distance <= effectiveRadius) {
 				// Inner zone — full damage
-				baseDmgFinal = baseDmg;
+				baseDmgFinal = damageDealt;
 			}
 			else {
 				// Outer zone — exponential falloff
 				float normalizedRadius = (float) ((distance - effectiveRadius) / (maxDmgRadius - effectiveRadius));
 				float numerator = (float) (Math.exp(-dmgReduction * normalizedRadius) - Math.exp(-dmgReduction));
 				float denominator = (float) (1 - Math.exp(-dmgReduction));
-				baseDmgFinal = baseDmg * (numerator / denominator);
+				baseDmgFinal = damageDealt * (numerator / denominator);
 			}
 
 			float dmg = (float) (baseDmgFinal * sizeFactor * exposure);
@@ -186,23 +192,41 @@ public class ModExplosionImpl extends ServerExplosion {
 	}
 
 	/**
+	 * The vanilla explosion mechanic, which is the same as calling {@link ServerExplosion#explode()}.
+	 *
+	 * @return The number of blocks destroyed by the explosion, using the vanilla explosion mechanic.
+	 *
+	 * @see #vanillaExplode()
+	 * @see #explode()
+	 * @see #explode(boolean)
+	 * @see #explode(boolean, boolean)
+	 */
+	public final int vanillaExplode() {
+		return super.explode();
+	}
+
+	/**
 	 * An overloaded version of the {@link #explode()} method which allows the caller to specify
 	 * whether to use the vanilla explosion mechanic, or use the mod's custom explosion mechanic.
 	 * However, the custom explosion mechanic only works if the exploding entity is using the
 	 * custom {@link ModExplosives} interface. Otherwise, it will revert to the vanilla
 	 * explosion mechanic.
+	 * <br><br>
+	 * Using this method meant that the explosive can trigger other explosive blocks defined under
+	 * the {@link ModBlockTags#EXPLOSIVES} tag.
 	 *
-	 * @param useVanilla    Whether to use the vanilla explosion mechanic. If false, will use the mod's custom explosion mechanic.
-	 * @param destroyBlocks Whether the explosion should destroy blocks. Only applicable if {@code useVanilla} is false and the exploding entity is an instance of {@code ModExplosives}.
+	 * @param destroyBlocks Whether the explosion should destroy blocks.
 	 *
 	 * @return The number of blocks destroyed by the explosion.
 	 *
+	 * @see #vanillaExplode()
 	 * @see #explode()
 	 * @see #explode(boolean)
+	 * @see #explode(boolean, boolean)
 	 */
-	public int explode(boolean useVanilla, boolean destroyBlocks) {
-		return useVanilla || !(this.getDirectSourceEntity() instanceof ModExplosives) ?
-			super.explode() : this.explode(destroyBlocks);
+	public int explode(boolean destroyBlocks) {
+		return (this.getDirectSourceEntity() instanceof ModExplosives) ?
+			this.vanillaExplode() : this.explode(destroyBlocks, true);
 	}
 
 	/**
@@ -237,11 +261,14 @@ public class ModExplosionImpl extends ServerExplosion {
 	 *     <li>{@code dmg} is the reduced damage dealt to the entity.</li>
 	 * </ul>
 	 *
-	 * @param destroyBlocks Whether the explosion should destroy blocks. Only applicable if the exploding entity is an instance of {@code ExplosiveProjectileEntity}.
+	 * @param destroyBlocks Whether the explosion should destroy blocks.
+	 * @param triggerExplosives Whether the explosion should trigger other explosives.
 	 *
 	 * @return The number of blocks destroyed by the explosion.
 	 *
+	 * @see #vanillaExplode()
 	 * @see #explode()
+	 * @see #explode(boolean)
 	 * @see #explode(boolean, boolean)
 	 *
 	 * @apiNote This method still reverts to the vanilla formula via {@link #explode()} if the
@@ -249,7 +276,7 @@ public class ModExplosionImpl extends ServerExplosion {
 	 *
 	 * @implNote The graphing calculator could be found at <a href="https://www.desmos.com/calculator/pdm27kw9oe">this link</a>.
 	 */
-	public int explode(boolean destroyBlocks) {
+	public int explode(boolean destroyBlocks, boolean triggerExplosives) {
 		ModExplosives explosive = this.explosiveSource;
 
 		if (explosive != null && this.getDirectSourceEntity() instanceof ModExplosives explosiveEntity) {
@@ -265,12 +292,26 @@ public class ModExplosionImpl extends ServerExplosion {
 		this.level().gameEvent(this.getDirectSourceEntity(), GameEvent.EXPLODE, this.center());
 		this.damageEntities();
 
-		if (this.interactsWithBlocks() && destroyBlocks) {
+		if (this.interactsWithBlocks() || destroyBlocks || triggerExplosives) {
 			ProfilerFiller profiler = Profiler.get();
 
-			profiler.push("explosion_blocks");
-			this.interactWithBlocks(list);
-			profiler.pop();
+			if (destroyBlocks) {
+				profiler.push("explosion_blocks");
+				this.interactWithBlocks(list);
+				profiler.pop();
+			}
+			else if (triggerExplosives) {
+				profiler.push("explosion_trigger");
+				List<BlockPos> forTrigger = Lists.newArrayList();
+				for (BlockPos pos : list) {
+					BlockState block = this.level().getBlockState(pos);
+					if (block.is(Blocks.TNT) || block.is(ModBlockTags.EXPLOSIVES)) {
+						forTrigger.add(pos);
+					}
+				}
+				this.interactWithBlocks(forTrigger);
+				profiler.pop();
+			}
 		}
 
 		if (this.fire) {
@@ -278,5 +319,13 @@ public class ModExplosionImpl extends ServerExplosion {
 		}
 
 		return list.size();
+	}
+
+	// /////////////////// //
+	// OVERRIDANLE METHODS //
+	// /////////////////// //
+
+	public float getPower() {
+		return this.power;
 	}
 }
