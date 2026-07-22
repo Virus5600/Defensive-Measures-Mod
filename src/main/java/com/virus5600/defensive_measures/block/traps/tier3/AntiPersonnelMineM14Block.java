@@ -59,13 +59,14 @@ public class AntiPersonnelMineM14Block extends BaseLandmineBlock {
 	@Override
 	public boolean canTrigger(BlockState state, Level level, BlockPos pos, Entity entity) {
 		boolean isArmed = state.getValue(ARMED);
+		boolean isInShallowWaters = isWithinFluidDepthThreshold(level, pos, this.getFluidLevelThreshold());
 		boolean isGameMechanicEntity = entity instanceof ExperienceOrb || entity instanceof ItemEntity;
 		boolean isInCollision = state.getShape(level, pos)
 			.move(pos)
 			.bounds()
 			.intersects(entity.getBoundingBox());
 
-		return isArmed && !isGameMechanicEntity && isInCollision;
+		return isArmed && isInShallowWaters && !isGameMechanicEntity && isInCollision;
 	}
 
 	@Override
@@ -150,8 +151,8 @@ public class AntiPersonnelMineM14Block extends BaseLandmineBlock {
 
 	static {
 		SHAPE = Block.box(
-			7.0, 0.0, 7.0,
-			9.0, 0.4, 9.0
+			7.0, -0.75, 7.0,
+			9.0, 0.375, 9.0
 		);
 	}
 }

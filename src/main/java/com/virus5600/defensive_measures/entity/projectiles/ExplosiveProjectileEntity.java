@@ -1,6 +1,5 @@
 package com.virus5600.defensive_measures.entity.projectiles;
 
-import com.virus5600.defensive_measures._util.MathUtil;
 import net.minecraft.core.Holder;
 import net.minecraft.core.particles.ExplosionParticleInfo;
 import net.minecraft.core.particles.ParticleOptions;
@@ -32,6 +31,7 @@ import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 
+import com.virus5600.defensive_measures._util.MathUtil;
 import com.virus5600.defensive_measures.entity.ExplosiveEntity;
 
 import org.jspecify.annotations.NonNull;

@@ -7,6 +7,7 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.EntityTypeTags;
+import net.minecraft.tags.FluidTags;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.item.FallingBlockEntity;
@@ -139,6 +140,10 @@ public abstract class BaseLandmineBlock extends BaseEntityBlock implements Simpl
 		BlockPos neighborPos, BlockState neighborState,
 		RandomSource random
 	) {
+		if (!isWithinFluidDepthThreshold((Level) level, pos, this.getFluidLevelThreshold())) {
+			this.detonate(state, (Level) level, pos);
+		}
+
 		if (state.getValue(WATERLOGGED)) {
 			tickView.scheduleTick(
 				pos,
@@ -164,13 +169,14 @@ public abstract class BaseLandmineBlock extends BaseEntityBlock implements Simpl
 			);
 		}
 
-		// If it does care for the armed state
 		if (!this.canSurvive(state, level, pos) && pos.getY() >= level.getMinSectionY()) {
-			FallingBlockEntity fbe = FallingBlockEntity.fall(level, pos, state);
-			BlockEntity be = level.getBlockEntity(pos);
+			if (level.getBlockState(pos.below()).isAir()) {
+				FallingBlockEntity fbe = FallingBlockEntity.fall(level, pos, state);
+				BlockEntity be = level.getBlockEntity(pos);
 
-			if (be != null) {
-				fbe.blockData = be.saveWithFullMetadata(level.registryAccess());
+				if (be != null) {
+					fbe.blockData = be.saveWithFullMetadata(level.registryAccess());
+				}
 			}
 		}
 	}
@@ -361,6 +367,51 @@ public abstract class BaseLandmineBlock extends BaseEntityBlock implements Simpl
 	@Nullable
 	public Entity getOwner() {
 		return this.owner;
+	}
+
+	/**
+	 * Defines the maximum fluid depth threshold for the landmine to be triggered. If the fluid
+	 * column above the landmine exceeds this threshold, the landmine will be triggered. This is
+	 * useful for triggering landmines when they are submerged in water or other fluids below this
+	 * threshold.
+	 *
+	 * @return The maximum fluid depth threshold for the landmine to be triggered.
+	 *
+	 * @apiNote Default value is {@code 3} blocks.
+	 */
+	public int getFluidLevelThreshold() {
+		return 3;
+	}
+
+	// ////////////// //
+	// STATIC METHODS //
+	// ////////////// //
+
+	/**
+	 * Checks if the given position is within the specified fluid depth threshold. This allows for
+	 * checks where a mine should trigger if under a certain depth. The {@code maxDepth} parameter
+	 * is an inclusive value, meaning that if the water column is equal to or less than
+	 * {@code maxDepth}, the method will return {@code true}. If the water column exceeds
+	 * {@code maxDepth}, it will return {@code false}.
+	 *
+	 * @param level    The level in which the check is performed.
+	 * @param pos      The position to check.
+	 * @param maxDepth The maximum depth to check.
+	 *
+	 * @return         {@code true} if the position is within the fluid depth threshold; {@code false} otherwise.
+	 */
+	public static boolean isWithinFluidDepthThreshold(Level level, BlockPos pos, int maxDepth) {
+		for (int i = 1; i <= maxDepth; i++) {
+			BlockPos check = pos.above(i);
+
+			if (!level.getBlockState(check).getFluidState().is(FluidTags.WATER)) {
+				// Water column ended before exceeding maxDepth
+				return true;
+			}
+		}
+
+		// Water continues beyond maxDepth
+		return false;
 	}
 
 	// //////////////// //
