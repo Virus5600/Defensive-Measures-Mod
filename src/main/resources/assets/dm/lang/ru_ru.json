@@ -6,6 +6,8 @@
 
 	"block.dm.bolt_head" : "Bolt Head",
 	"block.dm.electric_fence" : "Electric Fence",
+	"block.dm.anti_personnel_mine_m14": "Anti-Personnel Mine (M14)",
+	"block.dm.anti_tank_mine_hawkins": "Anti-Tank Mine (Hawkins)",
 
 	"block.dm.turret_assembly_station": "Turret Assembly Station",
 	"block.dm.workshop": "Workshop",
@@ -16,6 +18,7 @@
 	"item.dm.bolt_head": "Bolt Head",
 	"item.dm.electric_fence": "Electric Fence",
 	"item.dm.anti_personnel_mine_m14": "Anti-Personnel Mine (M14)",
+	"item.dm.anti_tank_mine_hawkins": "Anti-Tank Mine (Hawkins)",
 
 	"item.dm.turret_assembly_station": "Turret Assembly Station",
 	"item.dm.workshop": "Workshop",

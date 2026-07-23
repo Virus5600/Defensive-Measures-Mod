@@ -17,5 +17,6 @@ public class ModDispenserItemBehavior {
 		DispenserBlock.registerBehavior(ModItems.TURRET_REMOVER, new TurretRemoverDispenseItemBehavior());
 		for (Item item : ModItems.DM_TURRETS) DispenserBlock.registerBehavior(item, new SpawnEggItemBehavior());
 		DispenserBlock.registerBehavior(ModBlocks.ANTI_PERSONNEL_MINE_M14, new APLandmineM14DispenseItemBehavior());
+		DispenserBlock.registerBehavior(ModBlocks.ANTI_TANK_MINE_HAWKINS, new ATLandmineHawkinsDispenseItemBehavior());
 	}
 }

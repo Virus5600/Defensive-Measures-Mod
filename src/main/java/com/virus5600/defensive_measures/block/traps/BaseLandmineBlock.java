@@ -156,6 +156,17 @@ public abstract class BaseLandmineBlock extends BaseEntityBlock implements Simpl
 			((Level) level).scheduleTick(pos, this, 2);
 		}
 
+		if (!this.canSurvive(state, level, pos) && pos.getY() >= level.getMinSectionY()) {
+			if (level.getBlockState(pos.below()).isAir()) {
+				FallingBlockEntity fbe = FallingBlockEntity.fall((Level) level, pos, state);
+				BlockEntity be = level.getBlockEntity(pos);
+
+				if (be != null) {
+					fbe.blockData = be.saveWithFullMetadata(level.registryAccess());
+				}
+			}
+		}
+
 		return super.updateShape(state, level, tickView, pos, direction, neighborPos, neighborState, random);
 	}
 
@@ -167,17 +178,6 @@ public abstract class BaseLandmineBlock extends BaseEntityBlock implements Simpl
 				ModSoundEvents.BLOCK_LANDMINE_ARMED, SoundSource.BLOCKS,
 				1, 1
 			);
-		}
-
-		if (!this.canSurvive(state, level, pos) && pos.getY() >= level.getMinSectionY()) {
-			if (level.getBlockState(pos.below()).isAir()) {
-				FallingBlockEntity fbe = FallingBlockEntity.fall(level, pos, state);
-				BlockEntity be = level.getBlockEntity(pos);
-
-				if (be != null) {
-					fbe.blockData = be.saveWithFullMetadata(level.registryAccess());
-				}
-			}
 		}
 	}
 

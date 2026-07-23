@@ -121,8 +121,10 @@ public class ModItems {
 	public final static Item FABRICATION_MATRIX = registerItem(ModBlocks.FABRICATION_MATRIX, new Properties().rarity(Rarity.EPIC));
 
 	// LANDMINES
-	public final static Item M14_ANTI_PERSONNEL_MINE = registerItem(ModBlocks.ANTI_PERSONNEL_MINE_M14, new Properties().rarity(Rarity.UNCOMMON));
-	public final static Item ANTI_TANK_MINE = registerItem(ModBlocks.ANTI_TANK_MINE, new Properties().rarity(Rarity.UNCOMMON));
+	// AP Mines
+	public final static Item M14_ANTI_PERSONNEL_MINE = registerItem(ModBlocks.ANTI_PERSONNEL_MINE_M14, new Properties().rarity(Rarity.RARE));
+	// AT Mines
+	public final static Item HAWKINS_ANTI_TANK_MINE = registerItem(ModBlocks.ANTI_TANK_MINE_HAWKINS, new Properties().rarity(Rarity.RARE));
 
 	// //// //
 	// MISC //
@@ -305,7 +307,7 @@ public class ModItems {
 			ELECTRIC_FENCE,
 
 			M14_ANTI_PERSONNEL_MINE,
-			ANTI_TANK_MINE
+			HAWKINS_ANTI_TANK_MINE
 		};
 
 		DM_TURRETS = new Item[] {

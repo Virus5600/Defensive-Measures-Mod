@@ -13,7 +13,7 @@ public class ModClientBlockColors {
 		BlockColorRegistry.register(
 			List.of(new LandmineTintSources()),
 			ModBlocks.ANTI_PERSONNEL_MINE_M14,
-			ModBlocks.ANTI_TANK_MINE
+			ModBlocks.ANTI_TANK_MINE_HAWKINS
 		);
 	}
 }

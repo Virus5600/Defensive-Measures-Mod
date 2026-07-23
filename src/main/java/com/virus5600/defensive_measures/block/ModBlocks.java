@@ -36,7 +36,7 @@ public class ModBlocks {
 	public final static Block WORKSHOP = RegistryHelper.registerBlock("workshop", WorkshopBlock::new);
 	public final static Block FABRICATION_MATRIX = RegistryHelper.registerBlock("fabrication_matrix", FabricationMatrixBlock::new);
 	public final static Block ANTI_PERSONNEL_MINE_M14 = RegistryHelper.registerBlock("anti_personnel_mine_m14", AntiPersonnelMineM14Block::new);
-	public final static Block ANTI_TANK_MINE = RegistryHelper.registerBlock("anti_tank_mine", AntiTankMineBlock::new);
+	public final static Block ANTI_TANK_MINE_HAWKINS = RegistryHelper.registerBlock("anti_tank_mine_hawkins", AntiTankMineHawkinsBlock::new);
 
 	public final static List<Block> LANDMINES;
 
@@ -56,7 +56,7 @@ public class ModBlocks {
 			ANTI_PERSONNEL_MINE_M14,
 
 			// ANTI-TAK
-			ANTI_TANK_MINE
+			ANTI_TANK_MINE_HAWKINS
 		);
 	}
 }

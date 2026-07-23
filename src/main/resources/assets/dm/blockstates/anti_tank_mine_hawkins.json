@@ -1,0 +1,10 @@
+{
+	"variants": {
+		"armed=false": {
+			"model": "dm:block/anti_tank_mine_hawkins_unarmed"
+		},
+		"armed=true": {
+			"model": "dm:block/anti_tank_mine_hawkins_armed"
+		}
+	}
+}
