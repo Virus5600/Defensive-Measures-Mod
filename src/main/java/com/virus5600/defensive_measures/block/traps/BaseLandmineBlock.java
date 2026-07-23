@@ -165,6 +165,12 @@ public abstract class BaseLandmineBlock extends BaseEntityBlock implements Simpl
 					fbe.blockData = be.saveWithFullMetadata(level.registryAccess());
 				}
 			}
+			else {
+				this.detonate(state, (Level) level, pos);
+				return state.getValue(WATERLOGGED) ?
+					Fluids.WATER.defaultFluidState().createLegacyBlock()
+					: Blocks.AIR.defaultBlockState();
+			}
 		}
 
 		return super.updateShape(state, level, tickView, pos, direction, neighborPos, neighborState, random);
