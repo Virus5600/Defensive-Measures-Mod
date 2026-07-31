@@ -33,7 +33,7 @@ import java.util.List;
 
 /**
  * An extension of the {@link ServerExplosion} class, allowing the mod to apply its own custom
- * explosion damage formula as mentioned in {@link #explode(boolean)}. While it allows the usage of
+ * explosion damage formula as mentioned in {@link #explode(boolean, boolean)}. While it allows the usage of
  * the new damage formula, it still allows the use of the vanilla one, keeping the class vanilla
  * friendly. The new damage formula is only applied, and it is still optional, if the entity uses
  * the {@link ExplosiveEntity} interface.
