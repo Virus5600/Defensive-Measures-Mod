@@ -27,5 +27,12 @@ public class ModProperties {
 	 * position. Value ranges from {@code 1} to {@code 3}.
 	 */
 	public static final IntegerProperty LANDMINES = IntegerProperty.create("landmines", 1, 3);
+	/**
+	 * Defines a block property whether something is armed (activated) or not.
+	 */
 	public static final BooleanProperty ARMED = BooleanProperty.create("armed");
+	/**
+	 * Defines a block property whether it placed by being thrown or not.
+	 */
+	public static final BooleanProperty THROWN = BooleanProperty.create("thrown");
 }

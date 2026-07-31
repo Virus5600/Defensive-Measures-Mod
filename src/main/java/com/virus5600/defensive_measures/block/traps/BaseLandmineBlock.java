@@ -25,7 +25,6 @@ import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 
-import com.virus5600.defensive_measures.block.ExplosiveBlock;
 import com.virus5600.defensive_measures.block.entity.traps.BaseLandmineBlockEntity;
 import com.virus5600.defensive_measures.sound.ModSoundEvents;
 import com.virus5600.defensive_measures.state.properties.ModProperties;
@@ -65,13 +64,10 @@ import java.util.function.BiConsumer;
  * @since 1.2.0-beta
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
  */
-public abstract class BaseLandmineBlock extends BaseEntityBlock implements SimpleWaterloggedBlock, ExplosiveBlock, EntityBlock {
+public abstract class BaseLandmineBlock extends BaseEntityBlock implements SimpleWaterloggedBlock, EntityBlock {
 	public static final IntegerProperty LANDMINES = ModProperties.LANDMINES;
 	public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
 	public static final BooleanProperty ARMED = ModProperties.ARMED;
-
-	@Nullable protected Entity owner;
-	protected Level level;
 
 	/**
 	 * Creates an instance of a landmine.
@@ -98,7 +94,6 @@ public abstract class BaseLandmineBlock extends BaseEntityBlock implements Simpl
 	protected void onPlace(final BlockState state, final Level level, final BlockPos pos, final BlockState oldState, final boolean movedByPiston) {
 		super.onPlace(state, level, pos, oldState, movedByPiston);
 
-		this.level = level;
 		BaseLandmineBlockEntity entity = (BaseLandmineBlockEntity) level.getBlockEntity(pos);
 
 		if (entity != null) {
@@ -140,6 +135,10 @@ public abstract class BaseLandmineBlock extends BaseEntityBlock implements Simpl
 		BlockPos neighborPos, BlockState neighborState,
 		RandomSource random
 	) {
+		if (level instanceof ServerLevel serverLevel && !serverLevel.isHandlingTick()) {
+			return super.updateShape(state, level, tickView, pos, direction, neighborPos, neighborState, random);
+		}
+
 		if (!isWithinFluidDepthThreshold((Level) level, pos, this.getFluidLevelThreshold())) {
 			this.detonate(state, (Level) level, pos);
 		}
@@ -192,7 +191,6 @@ public abstract class BaseLandmineBlock extends BaseEntityBlock implements Simpl
 
 		if (by != null) {
 			if (level.getBlockEntity(pos) instanceof BaseLandmineBlockEntity mine) {
-				this.owner = by;
 				mine.setOwner(by);
 			}
 		}
@@ -281,7 +279,7 @@ public abstract class BaseLandmineBlock extends BaseEntityBlock implements Simpl
 		if (!level.isClientSide()) {
 			boolean isArmed = state.getValue(ARMED);
 
-			if (!player.isCrouching() && isArmed) {
+			if (!player.isCrouching() && !player.isCreative() && isArmed) {
 				// TODO: Add disarming tool (probably shears for disposing and a custom one for retrieving?)
 				this.detonate(state, level, pos);
 			}
@@ -315,29 +313,27 @@ public abstract class BaseLandmineBlock extends BaseEntityBlock implements Simpl
 		BlockState state, Level level, BlockPos pos, Entity entity,
 		InsideBlockEffectApplier effectApplier, boolean isPrecise
 	) {
-		if (!level.isClientSide()) {
+		if (level instanceof ServerLevel sl) {
 			boolean canTrigger = this.canTrigger(state, level, pos, entity);
 
 			if (canTrigger) {
 				if (entity.is(EntityTypeTags.IMPACT_PROJECTILES)) {
 					entity.discard();
 
-					if (level instanceof ServerLevel sl) {
-						RandomSource rand = level.getRandom();
-						BlockState particleState = level.getBlockState(pos.below());
-						Vec3 boundPos = state.getShape(level, pos)
-							.bounds()
-							.move(pos)
-							.getCenter();
+					RandomSource rand = level.getRandom();
+					BlockState particleState = level.getBlockState(pos.below());
+					Vec3 boundPos = state.getShape(level, pos)
+						.bounds()
+						.move(pos)
+						.getCenter();
 
-						sl.sendParticles(
-							new BlockParticleOption(ParticleTypes.BLOCK, particleState),
-							boundPos.x, boundPos.y, boundPos.z,
-							rand.nextIntBetweenInclusive(10, 15),
-							0.0, 0.125, 0.0,
-							rand.nextIntBetweenInclusive(10, 25)
-						);
-					}
+					sl.sendParticles(
+						new BlockParticleOption(ParticleTypes.BLOCK, particleState),
+						boundPos.x, boundPos.y, boundPos.z,
+						rand.nextIntBetweenInclusive(10, 15),
+						0.0, 0.125, 0.0,
+						rand.nextIntBetweenInclusive(10, 25)
+					);
 				}
 
 				this.detonate(state, level, pos);
@@ -364,15 +360,6 @@ public abstract class BaseLandmineBlock extends BaseEntityBlock implements Simpl
 	 */
 	public int getArmingDelay() {
 		return (int) (20 * 2.5);
-	}
-
-	public Level level() {
-		return this.level;
-	}
-
-	@Nullable
-	public Entity getOwner() {
-		return this.owner;
 	}
 
 	/**
@@ -430,6 +417,35 @@ public abstract class BaseLandmineBlock extends BaseEntityBlock implements Simpl
 	 * @return The maximum number of mines this block will have.
 	 */
 	protected abstract int maxMines();
+
+	/**
+	 * Defines the maximum effective radius of the explosion. Within this
+	 * radius, all entities will receive the full base damage. Entities
+	 * outside this radius will receive reduced damage based on the damage
+	 * reduction multiplier.
+	 *
+	 * @return The maximum effective radius of the explosion.
+	 */
+	public abstract double getEffectiveRadius();
+
+	/**
+	 * Defines the maximum radius this explosion can reach. Entities within this
+	 * radius will receive damage, but the damage will be reduced based on the
+	 * distance from the {@link #getEffectiveRadius() effective radius} of the
+	 * explosion.
+	 *
+	 * @return The maximum radius of the explosion.
+	 */
+	public abstract double getMaxDamageRadius();
+
+	/**
+	 * Defines the damage reduction multiplier for entities between the
+	 * {@link #getEffectiveRadius() effective radius} and {@link #getMaxDamageRadius() max radius}
+	 * of the explosion.
+	 *
+	 * @return The damage reduction multiplier for entities outside the effective radius.
+	 */
+	public abstract double getDamageReduction();
 
 	/**
 	 * Defines the base damage this landmine will deal.

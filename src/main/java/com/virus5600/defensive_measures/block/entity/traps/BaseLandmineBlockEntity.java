@@ -1,20 +1,21 @@
 package com.virus5600.defensive_measures.block.entity.traps;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityReference;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-
-import com.virus5600.defensive_measures.block.entity.ModBlockEntities;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 
-import java.util.UUID;
+import com.virus5600.defensive_measures.block.ExplosiveBlock;
+import com.virus5600.defensive_measures.block.entity.ModBlockEntities;
+import com.virus5600.defensive_measures.block.traps.BaseLandmineBlock;
 
 import org.jspecify.annotations.Nullable;
+
+import java.util.UUID;
 
 /**
  * The base block entity that all {@link BaseLandmineBlockEntity Landmine} blocks will use, allowing
@@ -24,11 +25,15 @@ import org.jspecify.annotations.Nullable;
  * @since 1.2.0-beta
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
  */
-public class BaseLandmineBlockEntity extends BlockEntity {
+public class BaseLandmineBlockEntity extends BlockEntity implements ExplosiveBlock {
+	private final BaseLandmineBlock landmine;
+
 	@Nullable private UUID ownerId;
 
 	public BaseLandmineBlockEntity(BlockPos pos, BlockState state) {
 		super(ModBlockEntities.LAND_MINE, pos, state);
+
+		this.landmine = (BaseLandmineBlock) state.getBlock();
 	}
 
 	// ////// //
@@ -41,8 +46,10 @@ public class BaseLandmineBlockEntity extends BlockEntity {
 	}
 
 	@Nullable
-	public Entity getOwner(ServerLevel level) {
-		if (this.ownerId == null) {
+	public Entity getOwner() {
+		Level level = this.getLevel();
+
+		if (this.ownerId == null || level == null) {
 			return null;
 		}
 
@@ -77,5 +84,41 @@ public class BaseLandmineBlockEntity extends BlockEntity {
 		if (owner != null) {
 			this.ownerId = owner.getUUID();
 		}
+	}
+
+	// ///////////////// //
+	// INTERFACE METHODS //
+	// ///////////////// //
+
+	// ExplosiveBlock
+	@Override
+	public double getDamageDealt(BlockState state, Level level) {
+		return this.landmine.getDamageDealt(state, level);
+	}
+
+	// ModExplosives
+	@Override
+	public double getEffectiveRadius() {
+		return this.landmine.getEffectiveRadius();
+	}
+
+	@Override
+	public double getMaxDamageRadius() {
+		return this.landmine.getMaxDamageRadius();
+	}
+
+	@Override
+	public double getDamageReduction() {
+		return this.landmine.getDamageReduction();
+	}
+
+	@Override
+	public double getBaseDamage() {
+		return this.landmine.getBaseDamage();
+	}
+
+	@Override
+	public Level level() {
+		return this.getLevel();
 	}
 }

@@ -148,13 +148,7 @@ public class ModExplosionImpl extends ServerExplosion {
 			dmg = Math.max(1, dmg);
 
 			if (shouldDmg) {
-				boolean hurt = entity.hurtServer(
-					(ServerLevel) explosive.level(),
-					this.getDamageSource(),
-					dmg
-				);
-
-				if (hurt && entity instanceof LivingEntity le && explosive instanceof ExplosiveBlock) {
+				if (entity instanceof LivingEntity le && explosive instanceof ModExplosives) {
 					LivingEntity by = null;
 
 					if (explosive.getOwner() instanceof LivingEntity ownerLe) {
@@ -163,6 +157,12 @@ public class ModExplosionImpl extends ServerExplosion {
 
 					le.setLastHurtByMob(by);
 				}
+
+				entity.hurtServer(
+					(ServerLevel) explosive.level(),
+					this.getDamageSource(),
+					dmg
+				);
 			}
 
 			// Knockback

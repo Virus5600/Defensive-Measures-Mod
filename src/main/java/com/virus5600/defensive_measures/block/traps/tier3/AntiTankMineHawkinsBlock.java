@@ -16,6 +16,9 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
@@ -25,7 +28,9 @@ import com.virus5600.defensive_measures.block.entity.traps.BaseLandmineBlockEnti
 import com.virus5600.defensive_measures.block.traps.BaseLandmineBlock;
 import com.virus5600.defensive_measures.entity.damage.ModDamageSources;
 import com.virus5600.defensive_measures.entity.damage.ModDamageTypes;
+import com.virus5600.defensive_measures.entity.projectiles.AntiTankHawkinsEntity;
 import com.virus5600.defensive_measures.registry.tag.ModEntityTypeTags;
+import com.virus5600.defensive_measures.state.properties.ModProperties;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -47,8 +52,9 @@ import org.jspecify.annotations.Nullable;
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
  */
 public class AntiTankMineHawkinsBlock extends BaseLandmineBlock {
-	public static final MapCodec<AntiTankMineHawkinsBlock> CODEC = simpleCodec(AntiTankMineHawkinsBlock::new);
 	private static final VoxelShape SHAPE;
+	public static final MapCodec<AntiTankMineHawkinsBlock> CODEC = simpleCodec(AntiTankMineHawkinsBlock::new);
+	public static final BooleanProperty THROWN = ModProperties.THROWN;
 
 	public AntiTankMineHawkinsBlock(Properties settings) {
 		super(
@@ -58,11 +64,37 @@ public class AntiTankMineHawkinsBlock extends BaseLandmineBlock {
 				.noTerrainParticles()
 				.noOcclusion()
 		);
+
+		this.registerDefaultState(
+			this.stateDefinition
+				.any()
+				.setValue(ARMED, false)
+				.setValue(THROWN, false)
+				.setValue(WATERLOGGED, false)
+		);
+	}
+
+	// ////////////////// //
+	// INITIALIZE METHODS //
+	// ////////////////// //
+
+	@Override
+	protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+		super.createBlockStateDefinition(builder);
+
+		builder.add(
+			THROWN
+		);
 	}
 
 	// /////// //
 	// METHODS //
 	// /////// //
+
+	@Override @NonNull
+	protected VoxelShape getShape(BlockState state, @NonNull BlockGetter world, @NonNull BlockPos pos, @NonNull CollisionContext context) {
+		return SHAPE;
+	}
 
 	@Override
 	public boolean canTrigger(BlockState state, Level level, BlockPos pos, Entity entity) {
@@ -81,25 +113,16 @@ public class AntiTankMineHawkinsBlock extends BaseLandmineBlock {
 			&& (doingTriggerActions || isLarge || isVehicle || isLandmine);
 	}
 
-	@Override
-	public void detonate(BlockState state, Level level, BlockPos pos) {
-		if (level instanceof ServerLevel lvl && state.getBlock() == ModBlocks.ANTI_TANK_MINE_HAWKINS) {
-			BaseLandmineBlockEntity entity = (BaseLandmineBlockEntity) level.getBlockEntity(pos);
-			if (entity != null) {
-				entity.setLevel(lvl);
-				this.level = lvl;
-			}
-
+	public void detonate(BlockState state, AntiTankHawkinsEntity mine, Level level, Vec3 pos) {
+		if (level instanceof ServerLevel && state.getBlock() == ModBlocks.ANTI_TANK_MINE_HAWKINS) {
 			DamageSource dmgSrc = ModDamageSources.create(
-				level, ModDamageTypes.LANDMINE,
+				level, ModDamageTypes.THROWN_LANDMINE,
 				(Entity) null, null
 			);
 
-			lvl.setBlock(pos, Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL);
-
-			this.createExplosion(
-				this, dmgSrc, new ExplosionDamageCalculator(),
-				pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5,
+			mine.createExplosion(
+				mine, dmgSrc, new ExplosionDamageCalculator(),
+				pos.x(), pos.y(), pos.z(),
 				(float) this.getDamageDealt(state, level), (float) this.getMaxDamageRadius(),
 				false, Level.ExplosionInteraction.BLOCK,
 				ParticleTypes.EXPLOSION, ParticleTypes.EXPLOSION_EMITTER,
@@ -109,9 +132,31 @@ public class AntiTankMineHawkinsBlock extends BaseLandmineBlock {
 		}
 	}
 
-	@Override @NonNull
-	protected VoxelShape getShape(BlockState state, @NonNull BlockGetter world, @NonNull BlockPos pos, @NonNull CollisionContext context) {
-		return SHAPE;
+	@Override
+	public void detonate(BlockState state, Level level, BlockPos pos) {
+		if (level instanceof ServerLevel lvl && state.getBlock() == ModBlocks.ANTI_TANK_MINE_HAWKINS) {
+			BaseLandmineBlockEntity mine = (BaseLandmineBlockEntity) level.getBlockEntity(pos);
+			if (mine != null) {
+				mine.setLevel(lvl);
+
+				DamageSource dmgSrc = ModDamageSources.create(
+					level, ModDamageTypes.LANDMINE,
+					(Entity) null, null
+				);
+
+				lvl.setBlock(pos, Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL);
+
+				mine.createExplosion(
+					mine, dmgSrc, new ExplosionDamageCalculator(),
+					pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5,
+					(float) this.getDamageDealt(state, level), (float) this.getMaxDamageRadius(),
+					false, Level.ExplosionInteraction.BLOCK,
+					ParticleTypes.EXPLOSION, ParticleTypes.EXPLOSION_EMITTER,
+					WeightedList.<ExplosionParticleInfo>builder().build(),
+					SoundEvents.GENERIC_EXPLODE, false
+				);
+			}
+		}
 	}
 
 	@Override @NonNull
@@ -133,11 +178,11 @@ public class AntiTankMineHawkinsBlock extends BaseLandmineBlock {
 		return 1;
 	}
 
-	// ///////////////// //
-	// INTERFACE METHODS //
-	// ///////////////// //
+	// //////////////// //
+	// ABSTRACT METHODS //
+	// //////////////// //
 
-	// ModExplosives
+	// BaseLandmineBlock
 
 	public double getEffectiveRadius() {
 		return 3;

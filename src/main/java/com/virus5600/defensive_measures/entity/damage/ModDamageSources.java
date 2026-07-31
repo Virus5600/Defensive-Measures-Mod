@@ -1,6 +1,5 @@
 package com.virus5600.defensive_measures.entity.damage;
 
-import com.virus5600.defensive_measures._util.interfaces.ModExplosives;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
@@ -9,8 +8,10 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
-
 import net.minecraft.world.level.block.entity.BlockEntity;
+
+import com.virus5600.defensive_measures._util.interfaces.ModExplosives;
+
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
@@ -48,7 +49,12 @@ public class ModDamageSources {
 		Registry<DamageType> registry = optionalRegistry.get();
 		Holder<DamageType> dmgEntry = registry.wrapAsHolder(registry.getValue(type));
 
-		return new DamageSource(dmgEntry, source, attacker);
+		Entity dealer = attacker;
+		if (source instanceof ModExplosives explosive) {
+			dealer = explosive.getOwner();
+		}
+
+		return new DamageSource(dmgEntry, dealer, attacker);
 	}
 
 	/**
@@ -76,7 +82,7 @@ public class ModDamageSources {
 		Registry<DamageType> registry = optionalRegistry.get();
 		Holder<DamageType> dmgEntry = registry.wrapAsHolder(registry.getValue(type));
 
-		Entity dealer = null;
+		Entity dealer = attacker;
 		if (source != null && source.getBlockState().getBlock() instanceof ModExplosives explosive) {
 			dealer = explosive.getOwner();
 		}

@@ -102,7 +102,7 @@ public class ModEntities {
 	public static final EntityType<BallistaBoltEntity> BALLISTA_BOLT = RegistryHelper.registerEntity(
 		"ballista_bolt",
 		Builder
-			.<BallistaBoltEntity>of(BallistaBoltEntity::new, MobCategory.MISC)
+			.of(BallistaBoltEntity::new, MobCategory.MISC)
 			.noLootTable()
 			.sized(0.5f, 0.5f)
 			.clientTrackingRange(4)
@@ -113,7 +113,7 @@ public class ModEntities {
 	public static final EntityType<MGBulletEntity> MG_BULLET = RegistryHelper.registerEntity(
 		"mg_bullet",
 		Builder
-			.<MGBulletEntity>of(MGBulletEntity::new, MobCategory.MISC)
+			.of(MGBulletEntity::new, MobCategory.MISC)
 			.noLootTable()
 			.sized(0.125f, 0.125f)
 			.clientTrackingRange(4)
@@ -157,12 +157,22 @@ public class ModEntities {
 	public static final EntityType<FlintPelletEntity> FLINT_PELLET = RegistryHelper.registerEntity(
 		"flint_pellet",
 		Builder
-			.<FlintPelletEntity>of(FlintPelletEntity::new, MobCategory.MISC)
+			.of(FlintPelletEntity::new, MobCategory.MISC)
 			.noLootTable()
 			.sized(0.0625f, 0.0625f)
 			.clientTrackingRange(4)
 			.updateInterval(10)
 			.eyeHeight(0.03125f)
+	);
+
+	public static final EntityType<AntiTankHawkinsEntity> ANTI_TANK_HAWKINS = RegistryHelper.registerEntity(
+		"anti_tank_hawkins",
+		Builder
+			.<AntiTankHawkinsEntity>of(AntiTankHawkinsEntity::new, MobCategory.MISC)
+			.noLootTable()
+			.sized(0.25f, 0.125f)
+			.clientTrackingRange(4)
+			.updateInterval(10)
 	);
 
 	// REGISTRY //

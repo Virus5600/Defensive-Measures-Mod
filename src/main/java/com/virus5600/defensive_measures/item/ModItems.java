@@ -1,5 +1,6 @@
 package com.virus5600.defensive_measures.item;
 
+import com.virus5600.defensive_measures.item.misc.tier3.AntiTankMineHawkinsItem;
 import net.fabricmc.fabric.api.creativetab.v1.CreativeModeTabEvents;
 import net.fabricmc.fabric.api.registry.FuelValueEvents;
 import net.minecraft.world.entity.EntityType;
@@ -27,6 +28,7 @@ import com.virus5600.defensive_measures.item.turrets.tier_2.missile_turret.*;
 import com.virus5600.defensive_measures.item.turrets.tier_3.*;
 
 import java.util.Arrays;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 
 /**
@@ -124,7 +126,7 @@ public class ModItems {
 	// AP Mines
 	public final static Item M14_ANTI_PERSONNEL_MINE = registerItem(ModBlocks.ANTI_PERSONNEL_MINE_M14, new Properties().rarity(Rarity.RARE));
 	// AT Mines
-	public final static Item HAWKINS_ANTI_TANK_MINE = registerItem(ModBlocks.ANTI_TANK_MINE_HAWKINS, new Properties().rarity(Rarity.RARE));
+	public final static Item HAWKINS_ANTI_TANK_MINE = registerItem(ModBlocks.ANTI_TANK_MINE_HAWKINS, AntiTankMineHawkinsItem::new);
 
 	// //// //
 	// MISC //
@@ -197,6 +199,19 @@ public class ModItems {
 	 */
 	private static Item registerItem(Block block, Properties props) {
 		return RegistryHelper.registerItem(block, props);
+	}
+
+	/**
+	 * Registers a block item using a custom {@link net.minecraft.world.item.BlockItem BlockItem}
+	 * class.
+	 *
+	 * @param block   The block to register as an item.
+	 * @param factory The factory method to create the item. Usually a lambda expression like {@code (block1, settings) -> new CustomBlockItem(block1, settings)}.
+	 *
+	 * @return The registered item.
+	 */
+	private static Item registerItem(Block block, BiFunction<Block, Properties, Item> factory) {
+		return RegistryHelper.registerItem(block, factory);
 	}
 
 	public static void init() {

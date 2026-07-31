@@ -55,6 +55,7 @@ public class ModEntityModels {
 
 	// v1.2.0-beta
 	public static final ModelLayerLocation FLINT_PELLET = registerMain("flint_pellet");
+	public static final ModelLayerLocation ANTI_TANK_MINE_HAWKINS = registerMain("anti_tank_mine_hawkins");
 
 	public static void registerEntityModels() {
 		DefensiveMeasures.LOGGER.info("REGISTERING ENTITY MODELS FOR {}...", DefensiveMeasures.MOD_NAME);
@@ -92,6 +93,7 @@ public class ModEntityModels {
 
 		// v1.2.0-beta
 		ModelLayerRegistry.registerModelLayer(FLINT_PELLET, FlintPelletProjectileModel::createBodyLayer);
+		ModelLayerRegistry.registerModelLayer(ANTI_TANK_MINE_HAWKINS, AntiTankMineHawkinsModel::createBodyLayer);
 	}
 
 	private static ModelLayerLocation registerMain(String id) {

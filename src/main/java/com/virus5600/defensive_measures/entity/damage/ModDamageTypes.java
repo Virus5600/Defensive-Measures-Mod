@@ -27,6 +27,7 @@ public class ModDamageTypes {
 
 	// v1.2.0-beta
 	public static final ResourceKey<DamageType> LANDMINE = RegistryHelper.getDamageTypeKey("landmine");
+	public static final ResourceKey<DamageType> THROWN_LANDMINE = RegistryHelper.getDamageTypeKey("thrown_landmine");
 
 	public static void init() {
 		DefensiveMeasures.LOGGER.info("REGISTERING DAMAGE TYPES FOR {}...", DefensiveMeasures.MOD_NAME);

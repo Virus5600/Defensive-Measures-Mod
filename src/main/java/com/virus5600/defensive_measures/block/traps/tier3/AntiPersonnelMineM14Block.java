@@ -72,28 +72,27 @@ public class AntiPersonnelMineM14Block extends BaseLandmineBlock {
 	@Override
 	public void detonate(BlockState state, Level level, BlockPos pos) {
 		if (level instanceof ServerLevel lvl && state.getBlock() == ModBlocks.ANTI_PERSONNEL_MINE_M14) {
-			BaseLandmineBlockEntity entity = (BaseLandmineBlockEntity) level.getBlockEntity(pos);
-			if (entity != null) {
-				entity.setLevel(lvl);
-				this.level = lvl;
+			BaseLandmineBlockEntity mine = (BaseLandmineBlockEntity) level.getBlockEntity(pos);
+			if (mine != null) {
+				mine.setLevel(lvl);
+
+				DamageSource dmgSrc = ModDamageSources.create(
+					level, ModDamageTypes.LANDMINE,
+					(Entity) null, null
+				);
+
+				lvl.setBlock(pos, Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL);
+
+				mine.createExplosion(
+					mine, dmgSrc, new ExplosionDamageCalculator(),
+					pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5,
+					(float) this.getDamageDealt(state, level), (float) this.getMaxDamageRadius(),
+					false, Level.ExplosionInteraction.BLOCK,
+					ParticleTypes.EXPLOSION, ParticleTypes.EXPLOSION_EMITTER,
+					WeightedList.<ExplosionParticleInfo>builder().build(),
+					SoundEvents.GENERIC_EXPLODE, false
+				);
 			}
-
-			DamageSource dmgSrc = ModDamageSources.create(
-				level, ModDamageTypes.LANDMINE,
-				(Entity) null, null
-			);
-
-			lvl.setBlock(pos, Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL);
-
-			this.createExplosion(
-				this, dmgSrc, new ExplosionDamageCalculator(),
-				pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5,
-				(float) this.getDamageDealt(state, level), (float) this.getMaxDamageRadius(),
-				false, Level.ExplosionInteraction.BLOCK,
-				ParticleTypes.EXPLOSION, ParticleTypes.EXPLOSION_EMITTER,
-				WeightedList.<ExplosionParticleInfo>builder().build(),
-				SoundEvents.GENERIC_EXPLODE, false
-			);
 		}
 	}
 

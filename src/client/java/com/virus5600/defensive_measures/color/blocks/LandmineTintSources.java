@@ -18,9 +18,11 @@ public class LandmineTintSources implements BlockTintSource {
 	private static final int GRAY = 0x8F8F8F;
 	private static final int BLUE = 0x4D6B8F;
 
+	private int previousColor = GREEN;
+
 	@Override
 	public int color(BlockState state) {
-		return GREEN;
+		return this.previousColor;
 	}
 
 	@Override
@@ -69,6 +71,7 @@ public class LandmineTintSources implements BlockTintSource {
 			color = GRAY;
 		}
 
+		this.previousColor = color;
 		return color;
 	}
 }

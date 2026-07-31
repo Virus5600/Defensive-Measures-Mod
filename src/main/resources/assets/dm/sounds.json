@@ -410,6 +410,13 @@
 		"subtitle": "subtitles.generic.missile.explode"
 	},
 
+	"projectile.at_hawkins.throw": {
+		"sounds": [
+			"random/bow"
+		],
+		"subtitles": "subtitles.projectile.at_hawkins_throw"
+	},
+
 	"block.landmine.armed": {
 		"sounds": [
 			{

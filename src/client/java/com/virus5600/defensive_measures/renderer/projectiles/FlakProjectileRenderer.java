@@ -13,7 +13,7 @@ import org.jspecify.annotations.NonNull;
  * @since 1.1.0-beta
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
  */
-public class FlakProjectileRenderer extends BaseProjectileRenderer<
+public class FlakProjectileRenderer extends BaseTurretProjectileRenderer<
 	FlakProjectileEntity,
 	BaseProjectileRenderState,
 	FlakProjectileModel
@@ -26,12 +26,5 @@ public class FlakProjectileRenderer extends BaseProjectileRenderer<
 			0.5f,
 			BaseProjectileRenderState::new
 		);
-	}
-
-	@Override
-	public void extractRenderState(@NonNull FlakProjectileEntity entity, @NonNull BaseProjectileRenderState state, float tickProgress) {
-		super.extractRenderState(entity, state, tickProgress);
-
-		state.pitch = entity.getXRot(tickProgress);
 	}
 }

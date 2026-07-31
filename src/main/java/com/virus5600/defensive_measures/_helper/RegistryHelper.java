@@ -39,6 +39,7 @@ import org.slf4j.Logger;
 
 import java.util.List;
 import java.util.Set;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 
 /**
@@ -131,6 +132,10 @@ public final class RegistryHelper {
 		return ResourceKey.create(Registries.ITEM, key.identifier());
 	}
 
+	public static Item registerItem(String path, Function<Properties, Item> factory) {
+		return registerItem(path, factory, new Properties());
+	}
+
 	public static Item registerItem(String path, Function<Properties, Item> factory, Properties settings) {
 		return registerItem(createItemKey(path), factory, settings);
 	}
@@ -146,20 +151,32 @@ public final class RegistryHelper {
 		return Registry.register(BuiltInRegistries.ITEM, key, item);
 	}
 
-	public static Item registerItem(String path, Function<Properties, Item> factory) {
-		return registerItem(path, factory, new Properties());
-	}
-
 	public static Item registerItem(Block block) {
 		return registerItem(block, new Properties());
 	}
 
-	public static Item registerItem(Block block, Properties props) {
+	public static Item registerItem(Block block, Properties settings) {
 		return registerItem(
-			createBlockItemKey(block),
-			settings -> new BlockItem(block, settings),
-			props
+			block,
+			BlockItem::new,
+			settings
 		);
+	}
+
+	public static Item registerItem(Block block, BiFunction<Block, Properties, Item> factory) {
+		return registerItem(block, factory, new Properties());
+	}
+
+	public static Item registerItem(Block block, BiFunction<Block, Properties, Item> factory, Properties settings) {
+		ResourceKey<Item> key = createBlockItemKey(block);
+		settings.setId(key);
+		Item item = factory.apply(block, settings);
+
+		if (item instanceof BlockItem blockItem) {
+			blockItem.registerBlocks(Item.BY_BLOCK, item);
+		}
+
+		return Registry.register(BuiltInRegistries.ITEM, key, item);
 	}
 
 	// Tag Registry

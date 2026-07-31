@@ -93,6 +93,8 @@
 	"itemTooltip.dm.pellet_turret.line2" : "Firing Arc: X: ±360° | Y: ±30°",
 	"itemTooltip.dm.pellet_turret.line3" : "Reload Time: 2 seconds",
 
+	"entity.dm.anti_tank_hawkins" : "(Thrown) Hawkins Anti-Tank",
+
 	"entity.dm.cannon_turret" : "Cannon Turret",
 	"entity.dm.cannonball" : "Cannon ball",
 
@@ -131,6 +133,9 @@
 
 	"death.attack.landmine": "%1$s stepped on a forgotten landmine and blew up.",
 	"death.attack.landmine.player": "%2$s violated the Ottawa Treaty just to kill %1$s.",
+
+	"death.attack.thrown_landmine": "%1$s was torn to pieces by a flying landmine.",
+	"death.attack.thrown_landmine.player": "%1$s was blown to smithereens by %2$s.",
 
 	"subtitles.turret.remove.metal" : "Metallic Turret Removed",
 	"subtitles.turret.remove.wood" : "Wooden Turret Removed",
@@ -184,6 +189,8 @@
 	"subtitles.turret.pellet_turret.hurt" : "Pellet Turret damaged",
 	"subtitles.turret.pellet_turret.destroyed" : "Pellet Turret destroyed",
 	"subtitles.turret.pellet_turret.shoot" : "Pellet Turret shoots",
+
+	"subtitles.projectile.at_hawkins_throw": "Hawkins AT Mine thrown",
 
 	"tag.item.dm.tier_0_turrets" : "Tier 0 Turrets",
 	"tag.item.dm.tier_1_turrets" : "Tier 1 Turrets",
