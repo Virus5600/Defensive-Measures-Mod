@@ -36,13 +36,13 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 
 import com.virus5600.defensive_measures.DefensiveMeasures;
 
-import org.slf4j.Logger;
-
 import java.util.List;
 import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
+
+import org.slf4j.Logger;
 
 /**
  * Registry helper class for registering items, blocks, etc.
@@ -63,7 +63,8 @@ public final class RegistryHelper {
 	// Components
 	public static <T> DataComponentType<T> registerComponent(String id, UnaryOperator<DataComponentType.Builder<T>> builder) {
 		return Registry.register(
-			BuiltInRegistries.DATA_COMPONENT_TYPE, id,
+			BuiltInRegistries.DATA_COMPONENT_TYPE,
+			Identifier.fromNamespaceAndPath(DefensiveMeasures.MOD_ID, id),
 			builder.apply(DataComponentType.builder()).build()
 		);
 	}

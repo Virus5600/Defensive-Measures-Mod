@@ -107,12 +107,16 @@ public class ModItems {
 	// EQUIPMENTS //
 	// ////////// //
 
+	// v1.0.0-beta //
+
 	// TURRET REMOVER
 	public final static Item TURRET_REMOVER = registerToolItem("turret_remover", (settings) -> new TurretRemoverItem(ModToolMaterials.TURRET_REMOVER, 0.0f, 0.0f, settings));
 
+	// v1.2.0-beta //
+
 	// METAL DETECTORS
-	public final static Item IRON_METAL_DETECTOR = registerToolItem("iron_metal_detector", (settings) -> new MetalDetectorItem(ModToolMaterials.IRON_METAL_DETECTOR, 0.0f, 0.0f, settings.component(ModDataComponents.DETECTION_RANGE, 4).durability(500)));
-	public final static Item NETHERITE_METAL_DETECTOR = registerToolItem("netherite_metal_detector", (settings) -> new MetalDetectorItem(ModToolMaterials.NETHERITE_METAL_DETECTOR, 0.0f, 0.0f, settings.component(ModDataComponents.DETECTION_RANGE, 7).durability(1200)));
+	public final static Item IRON_METAL_DETECTOR = registerToolItem("iron_metal_detector", (settings) -> new MetalDetectorItem(ModToolMaterials.IRON_METAL_DETECTOR, 0.0f, 0.0f, settings.component(ModDataComponents.DETECTION_RANGE, 4)));
+	public final static Item NETHERITE_METAL_DETECTOR = registerToolItem("netherite_metal_detector", (settings) -> new MetalDetectorItem(ModToolMaterials.NETHERITE_METAL_DETECTOR, 0.0f, 0.0f, settings.component(ModDataComponents.DETECTION_RANGE, 7)));
 
 	// ////// //
 	// BLOCKS //

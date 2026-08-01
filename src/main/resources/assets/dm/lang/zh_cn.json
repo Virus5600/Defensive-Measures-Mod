@@ -26,6 +26,9 @@
 
 	"item.dm.turret_remover": "拆卸工具",
 
+	"item.dm.iron_metal_detector": "Iron Metal Detector",
+	"item.dm.netherite_metal_detector": "Netherite Metal Detector",
+
 	"item.dm.cannon_base" : "炮塔底座",
 	"item.dm.cannon_stand" : "炮架",
 	"item.dm.unfinished_cannon_head" : "粗制炮身",

@@ -1,4 +1,4 @@
-package com.virus5600.defensive_measures.network.clientbound.sounds;
+package com.virus5600.defensive_measures.network.clientbound.sound;
 
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;

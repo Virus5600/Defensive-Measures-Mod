@@ -26,6 +26,9 @@
 
 	"item.dm.turret_remover": "Съёмник турели",
 
+	"item.dm.iron_metal_detector": "Iron Metal Detector",
+	"item.dm.netherite_metal_detector": "Netherite Metal Detector",
+
 	"item.dm.cannon_base" : "Основание пушки",
 	"item.dm.cannon_stand" : "Крепление для пушки",
 	"item.dm.unfinished_cannon_head" : "Незаконченная картечная голова",

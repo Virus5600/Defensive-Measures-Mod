@@ -7,6 +7,10 @@ import com.virus5600.defensive_measures.color.blocks.LandmineTintSources;
 
 import java.util.List;
 
+/**
+ * @since 1.2.0-beta
+ * @author <a href="https://github.com/Virus5600">Virus5600</a>
+ */
 public class ModClientBlockColors {
 	public static void init() {
 		// v1.2.0-beta

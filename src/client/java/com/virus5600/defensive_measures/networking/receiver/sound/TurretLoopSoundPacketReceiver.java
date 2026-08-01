@@ -9,7 +9,7 @@ import net.minecraft.world.entity.Entity;
 
 import com.virus5600.defensive_measures.entity.turrets.TurretEntity;
 import com.virus5600.defensive_measures.entity.turrets.interfaces.LoopableShootingSound;
-import com.virus5600.defensive_measures.network.clientbound.sounds.TurretLoopSoundPacket;
+import com.virus5600.defensive_measures.network.clientbound.sound.TurretLoopSoundPacket;
 import com.virus5600.defensive_measures.sound.LoopingShootSoundInstance;
 
 import java.util.Map;
@@ -28,7 +28,7 @@ import com.google.common.collect.Maps;
  * @since 1.1.0-beta
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
  */
-public final class TurretLoopSoundReceiver {
+public final class TurretLoopSoundPacketReceiver {
 	private static final Map<Integer, LoopingShootSoundInstance> ACTIVE_SOUNDS = Maps.newConcurrentMap();
 
 	public static void handle(TurretLoopSoundPacket payload, Context ctx) {

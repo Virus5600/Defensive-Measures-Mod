@@ -17,7 +17,6 @@ import java.util.function.UnaryOperator;
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
  */
 public class ModDataComponents extends DataComponents {
-	public static final DataComponentType<Integer> TICK_COUNT = register("tick_count", b -> b.persistent(ExtraCodecs.POSITIVE_INT).networkSynchronized(ByteBufCodecs.VAR_INT));
 	public static final DataComponentType<Integer> DETECTION_RANGE = register("detection_range", b -> b.persistent(ExtraCodecs.POSITIVE_INT).networkSynchronized(ByteBufCodecs.VAR_INT));
 
 	public static void init() {

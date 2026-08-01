@@ -26,6 +26,9 @@
 
 	"item.dm.turret_remover": "Turret Remover",
 
+	"item.dm.iron_metal_detector": "Iron Metal Detector",
+	"item.dm.netherite_metal_detector": "Netherite Metal Detector",
+
 	"item.dm.cannon_base" : "Cannon Base",
 	"item.dm.cannon_stand" : "Cannon Stand",
 	"item.dm.unfinished_cannon_head" : "Unfinished Cannon Head",

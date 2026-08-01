@@ -34,12 +34,14 @@ public final class ModToolMaterials {
 	}
 
 	static {
+		// TURRET REMOVER
 		TURRET_REMOVER = ModToolMaterials.createToolMaterial(
 			BlockTags.INCORRECT_FOR_WOODEN_TOOL,
 			100, 1.0f, 0.0f,  15,
 			ModItemTags.TURRET_REMOVER_REPAIRABLE
 		);
 
+		// METAL DETECTOR
 		IRON_METAL_DETECTOR = ModToolMaterials.createToolMaterial(
 			BlockTags.INCORRECT_FOR_WOODEN_TOOL,
 			500, 1.0f, 0.0f, 15,
@@ -47,7 +49,7 @@ public final class ModToolMaterials {
 		);
 		NETHERITE_METAL_DETECTOR = ModToolMaterials.createToolMaterial(
 			BlockTags.INCORRECT_FOR_WOODEN_TOOL,
-			500, 1.0f, 0.0f, 15,
+			1200, 1.0f, 0.0f, 15,
 			ModItemTags.NETHERITE_METAL_DETECTOR_REPAIRABLE
 		);
 	}

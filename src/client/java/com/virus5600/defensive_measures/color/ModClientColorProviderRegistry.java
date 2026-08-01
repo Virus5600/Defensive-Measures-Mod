@@ -7,5 +7,6 @@ public class ModClientColorProviderRegistry {
 		DefensiveMeasures.LOGGER.info("REGISTERING COLOR PROVIDERS FOR {}...", DefensiveMeasures.MOD_NAME);
 
 		ModClientBlockColors.init();
+		ModClientItemColors.init();
 	}
 }

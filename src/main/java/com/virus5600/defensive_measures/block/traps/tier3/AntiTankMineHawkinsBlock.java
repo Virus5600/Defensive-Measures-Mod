@@ -94,7 +94,8 @@ public class AntiTankMineHawkinsBlock extends BaseLandmineBlock {
 
 	@Override @NonNull
 	protected VoxelShape getShape(BlockState state, @NonNull BlockGetter world, @NonNull BlockPos pos, @NonNull CollisionContext context) {
-		return state.getValue(THROWN) ? SHAPE_THROWN : SHAPE_PLACED;
+		return state.getValue(THROWN) ?
+			SHAPE_THROWN : SHAPE_PLACED;
 	}
 
 	@Override
@@ -223,11 +224,24 @@ public class AntiTankMineHawkinsBlock extends BaseLandmineBlock {
 				8.625, 0.625, 5.5
 			),
 			Block.box(
-				7.25, 1.38, 6.0,
+				7.25, 1.0, 6.0,
 				8.75, 1.38, 9.75
 			)
 		);
 
-		SHAPE_THROWN = SHAPE_PLACED.move(0.0, 0.5, 0.0);
+		SHAPE_THROWN = Shapes.or(
+			Block.box(
+				6.5, -0.5, 5.5,
+				9.5, 1.75, 10.5
+			),
+			Block.box(
+				7.375, 0.125, 5.0,
+				8.625, 1.375, 5.5
+			),
+			Block.box(
+				7.25, 1.0, 6.0,
+				8.75, 2.38, 9.75
+			)
+		);
 	}
 }

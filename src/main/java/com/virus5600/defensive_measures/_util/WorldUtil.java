@@ -1,5 +1,6 @@
 package com.virus5600.defensive_measures._util;
 
+import com.virus5600.defensive_measures.DefensiveMeasures;
 import net.minecraft.core.BlockPos;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.Mth;
@@ -39,8 +40,8 @@ public class WorldUtil {
 	 */
 	public static void scanChunk(Level level, AABB area, int chunkX, int chunkZ, Consumer<BlockPos> action, Predicate<BlockState> filter) {
 		ChunkAccess chunk = level.getChunk(chunkX, chunkZ);
-		int minSectionY = level.getSectionIndex(Mth.floor(area.minY));
-		int maxSectionY = level.getSectionIndex(Mth.floor(area.maxY));
+		int minSectionY = Math.max(0, level.getSectionIndex(Mth.floor(area.minY)));
+		int maxSectionY = Math.min(chunk.getSections().length - 1, level.getSectionIndex(Mth.floor(area.maxY)));
 		int chunkWorldMinX = chunkX * 16;
 		int chunkWorldMinZ = chunkZ * 16;
 		int localMinX = Math.max(0, Mth.floor(area.minX) - chunkWorldMinX);
@@ -48,29 +49,36 @@ public class WorldUtil {
 		int localMinZ = Math.max(0, Mth.floor(area.minZ) - chunkWorldMinZ);
 		int localMaxZ = Math.min(15, Mth.floor(area.maxZ) - chunkWorldMinZ);
 
-		for (int sy = minSectionY; sy <= maxSectionY; sy++) {
-			LevelChunkSection section = chunk.getSection(sy);
-			if (section.hasOnlyAir()) continue; // whole 16^3 cube is empty, skip it
+		try {
+			for (int sy = minSectionY; sy <= maxSectionY; sy++) {
+				LevelChunkSection section = chunk.getSection(sy);
+				if (section.hasOnlyAir()) continue; // whole 16^3 cube is empty, skip it
 
-			int sectionWorldMinY = level.getSectionYFromSectionIndex(sy) * 16;
-			int localMinY = Math.max(0, Mth.floor(area.minY) - sectionWorldMinY);
-			int localMaxY = Math.min(15, Mth.floor(area.maxY) - sectionWorldMinY);
+				int sectionWorldMinY = level.getSectionYFromSectionIndex(sy) * 16;
+				int localMinY = Math.max(0, Mth.floor(area.minY) - sectionWorldMinY);
+				int localMaxY = Math.min(15, Mth.floor(area.maxY) - sectionWorldMinY);
 
-			for (int lx = localMinX; lx <= localMaxX; lx++) {
-				for (int ly = localMinY; ly <= localMaxY; ly++) {
-					for (int lz = localMinZ; lz <= localMaxZ; lz++) {
-						BlockState state = section.getBlockState(lx, ly, lz);
+				for (int lx = localMinX; lx <= localMaxX; lx++) {
+					for (int ly = localMinY; ly <= localMaxY; ly++) {
+						for (int lz = localMinZ; lz <= localMaxZ; lz++) {
+							BlockState state = section.getBlockState(lx, ly, lz);
 
-						if (filter.test(state)) {
-							action.accept(new BlockPos(
-								chunkWorldMinX + lx,
-								sectionWorldMinY + ly,
-								chunkWorldMinZ + lz
-							));
+							if (filter.test(state)) {
+								action.accept(new BlockPos(
+									chunkWorldMinX + lx,
+									sectionWorldMinY + ly,
+									chunkWorldMinZ + lz
+								));
+							}
 						}
 					}
 				}
 			}
+		} catch (Exception e) {
+			area = area.deflate(50);
+			DefensiveMeasures.LOGGER.warn("An error occurred while scanning chunk ({}, {}) in level {}: {}; Lowering scan range by 1 block across all direction.", chunkX, chunkZ, level.dimension().identifier().getPath(), e.getLocalizedMessage());
+
+			scanChunk(level, area, chunkX, chunkZ, action, filter);
 		}
 	}
 

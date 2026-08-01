@@ -1,9 +1,11 @@
 package com.virus5600.defensive_measures.item.equipments.tier2;
 
+import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.SectionPos;
-import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -21,10 +23,15 @@ import net.minecraft.world.phys.Vec3;
 import com.virus5600.defensive_measures._util.WorldUtil;
 import com.virus5600.defensive_measures.item.ModToolMaterials;
 import com.virus5600.defensive_measures.item.component.ModDataComponents;
+import com.virus5600.defensive_measures.network.clientbound.item.BlockHighlightPacket;
 import com.virus5600.defensive_measures.registry.tag.ModBlockTags;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
+
+import com.google.common.collect.Maps;
+import java.util.Map;
+import java.util.UUID;
 
 /**
  * An item that allows the player to detect metalic traps.
@@ -41,6 +48,11 @@ import org.jspecify.annotations.Nullable;
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
  */
 public class MetalDetectorItem extends Item {
+	/**
+	 * A map that tracks the tick count for each metal detector item in the world. This is used to
+	 * determine when to apply durability damage to the item.
+	 */
+	private static final Map<UUID, Integer> TICK_COUNT_MAP = Maps.newHashMap();
 	/**
 	 * Delay (in ticks) between each durability damage of the metal detector item.
 	 */
@@ -76,13 +88,12 @@ public class MetalDetectorItem extends Item {
 	// METHODS //
 	// /////// //
 
-
 	@Override
 	public void inventoryTick(final ItemStack stack, final ServerLevel level, final Entity owner, final @Nullable EquipmentSlot slot) {
 		super.inventoryTick(stack, level, owner, slot);
 
 		if (slot != null && owner instanceof LivingEntity le) {
-			int tickCount = stack.getOrDefault(ModDataComponents.TICK_COUNT, 0);
+			int tickCount = this.getTickCount(le.getUUID());
 
 			switch (slot) {
 				case MAINHAND, OFFHAND -> {
@@ -100,13 +111,13 @@ public class MetalDetectorItem extends Item {
 				}
 
 				default -> {
-					if (--tickCount > 0) {
+					if (tickCount > 0) {
 						--tickCount;
 					}
 				}
 			}
 
-			stack.set(ModDataComponents.TICK_COUNT, tickCount);
+			this.setTickCountEntry(le.getUUID(), tickCount);
 		}
 	}
 
@@ -126,6 +137,14 @@ public class MetalDetectorItem extends Item {
 	// ////////////// //
 	// CUSTOM METHODS //
 	// ////////////// //
+
+	protected void setTickCountEntry(UUID uuid, int tickCount) {
+		TICK_COUNT_MAP.put(uuid, tickCount);
+	}
+
+	protected int getTickCount(UUID uuid) {
+		return TICK_COUNT_MAP.getOrDefault(uuid, 0);
+	}
 
 	/**
 	 * Detects metalic traps around the given owner entity within the specified range.
@@ -151,11 +170,16 @@ public class MetalDetectorItem extends Item {
 				WorldUtil.scanChunk(
 					level, area, cx, cz,
 					blockPos -> {
-						((ServerLevel) level).sendParticles(
-							ParticleTypes.OMINOUS_SPAWNING,
-							blockPos.getX() + 0.5, blockPos.getY() + 0.5, blockPos.getZ() + 0.5,
-							1, 0, 0, 0, 0.025
-						);
+						for (ServerPlayer player : PlayerLookup.around((ServerLevel) level, pos, 8)) {
+							ServerPlayNetworking.send(
+								player,
+								new BlockHighlightPacket(
+									blockPos,
+									0xFF0000,	// Red color in ARGB format
+									1 * 20			// Duration in ticks (1 second)
+								)
+							);
+						}
 					},
 					ModBlockTags.METAL_DETECTABLE
 				);
