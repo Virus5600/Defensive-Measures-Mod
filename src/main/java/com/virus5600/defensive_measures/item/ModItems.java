@@ -1,6 +1,5 @@
 package com.virus5600.defensive_measures.item;
 
-import com.virus5600.defensive_measures.item.misc.tier3.AntiTankMineHawkinsItem;
 import net.fabricmc.fabric.api.creativetab.v1.CreativeModeTabEvents;
 import net.fabricmc.fabric.api.registry.FuelValueEvents;
 import net.minecraft.world.entity.EntityType;
@@ -15,8 +14,11 @@ import com.virus5600.defensive_measures.DefensiveMeasures;
 import com.virus5600.defensive_measures._helper.RegistryHelper;
 import com.virus5600.defensive_measures.block.ModBlocks;
 import com.virus5600.defensive_measures.entity.ModEntities;
-import com.virus5600.defensive_measures.item.equipments.TurretRemoverItem;
+import com.virus5600.defensive_measures.item.component.ModDataComponents;
+import com.virus5600.defensive_measures.item.equipments.tier1.*;
+import com.virus5600.defensive_measures.item.equipments.tier2.*;
 import com.virus5600.defensive_measures.item.interfaces.FuelItem;
+import com.virus5600.defensive_measures.item.misc.tier3.*;
 import com.virus5600.defensive_measures.item.turrets.TurretItem;
 import com.virus5600.defensive_measures.item.turrets.tier_0.pellet_turret.*;
 import com.virus5600.defensive_measures.item.turrets.tier_1.ballista.*;
@@ -107,6 +109,10 @@ public class ModItems {
 
 	// TURRET REMOVER
 	public final static Item TURRET_REMOVER = registerToolItem("turret_remover", (settings) -> new TurretRemoverItem(ModToolMaterials.TURRET_REMOVER, 0.0f, 0.0f, settings));
+
+	// METAL DETECTORS
+	public final static Item IRON_METAL_DETECTOR = registerToolItem("iron_metal_detector", (settings) -> new MetalDetectorItem(ModToolMaterials.IRON_METAL_DETECTOR, 0.0f, 0.0f, settings.component(ModDataComponents.DETECTION_RANGE, 4).durability(500)));
+	public final static Item NETHERITE_METAL_DETECTOR = registerToolItem("netherite_metal_detector", (settings) -> new MetalDetectorItem(ModToolMaterials.NETHERITE_METAL_DETECTOR, 0.0f, 0.0f, settings.component(ModDataComponents.DETECTION_RANGE, 7).durability(1200)));
 
 	// ////// //
 	// BLOCKS //
@@ -215,10 +221,11 @@ public class ModItems {
 	}
 
 	public static void init() {
+		ModDataComponents.init();
 		DefensiveMeasures.LOGGER.info("REGISTERING ITEMS TO ITEM GROUPS...");
 
 		Arrays.stream(FUNCTIONAL_ITEMS).iterator().forEachRemaining(
-			(item) -> CreativeModeTabEvents.modifyOutputEvent(CreativeModeTabs.FUNCTIONAL_BLOCKS).register(
+		(item) -> CreativeModeTabEvents.modifyOutputEvent(CreativeModeTabs.FUNCTIONAL_BLOCKS).register(
 				(output) -> output.accept(item)
 			)
 		);
@@ -314,7 +321,9 @@ public class ModItems {
 		};
 
 		DM_EQUIPMENTS = new Item[] {
-			TURRET_REMOVER
+			TURRET_REMOVER,
+			IRON_METAL_DETECTOR,
+			NETHERITE_METAL_DETECTOR
 		};
 
 		DM_TRAPS = new Item[] {

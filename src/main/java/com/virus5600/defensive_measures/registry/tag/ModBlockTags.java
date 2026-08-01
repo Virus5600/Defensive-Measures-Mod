@@ -25,4 +25,6 @@ public class ModBlockTags {
 	// Groups
 	public static final TagKey<Block> ELECTRIC_FENCE = RegistryHelper.createBlockTagKey("electric_fence");
 	public static final TagKey<Block> EXPLOSIVES = RegistryHelper.createBlockTagKey("explosives");
+	public static final TagKey<Block> LANDMINES = RegistryHelper.createBlockTagKey("landmines");
+	public static final TagKey<Block> METAL_DETECTABLE = RegistryHelper.createBlockTagKey("metal_detectable");
 }

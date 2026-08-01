@@ -1,4 +1,4 @@
-package com.virus5600.defensive_measures.item.equipments;
+package com.virus5600.defensive_measures.item.equipments.tier1;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.tags.BlockTags;

@@ -15,6 +15,7 @@ import com.virus5600.defensive_measures.animations.Keyframe;
 import com.virus5600.defensive_measures.animations.entity.CommonTurretAnimation;
 import com.virus5600.defensive_measures.entity.CommonTurretAnimations;
 import com.virus5600.defensive_measures.entity.turrets.TurretEntity;
+import com.virus5600.defensive_measures.item.equipments.tier1.TurretRemoverItem;
 import com.virus5600.defensive_measures.model.BaseModel;
 import com.virus5600.defensive_measures.model.entity.tier1.CannonTurretModel;
 import com.virus5600.defensive_measures.network.serverbound.entity.StopAnimationPacket;
@@ -98,7 +99,7 @@ public abstract class BaseTurretModel<S extends BaseTurretRenderState> extends B
 	/**
 	 * A selected teardown animation from one of the map entries from {@link #teardownAnims}. This
 	 * is used to render the teardown animation of the turret when it is being taken (using the
-	 * {@link com.virus5600.defensive_measures.item.equipments.TurretRemoverItem Turret Remover}).
+	 * {@link TurretRemoverItem Turret Remover}).
 	 */
 	protected final KeyframeAnimation teardownAnim;
 
@@ -108,7 +109,7 @@ public abstract class BaseTurretModel<S extends BaseTurretRenderState> extends B
 	protected final Map<KeyframeAnimation, Float> setupAnims;
 	/**
 	 * The teardown animations that this turret can play when taken (using the
-	 * {@link com.virus5600.defensive_measures.item.equipments.TurretRemoverItem Turret Remover}).
+	 * {@link TurretRemoverItem Turret Remover}).
 	 */
 	protected final Map<KeyframeAnimation, Float> teardownAnims;
 

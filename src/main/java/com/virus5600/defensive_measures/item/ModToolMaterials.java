@@ -19,8 +19,10 @@ import com.virus5600.defensive_measures.registry.tag.ModItemTags;
  */
 public final class ModToolMaterials {
 	public static final ToolMaterial TURRET_REMOVER;
+	public static final ToolMaterial IRON_METAL_DETECTOR;
+	public static final ToolMaterial NETHERITE_METAL_DETECTOR;
 
-	public static ToolMaterial createMaterial(TagKey<Block> incorrectBlockForDrops, int durability, float speed, float attackDmgBonus, int enchantmentValue, TagKey<Item> repairItems) {
+	public static ToolMaterial createToolMaterial(TagKey<Block> incorrectBlockForDrops, int durability, float speed, float attackDmgBonus, int enchantmentValue, TagKey<Item> repairItems) {
 		return new ToolMaterial(
 			incorrectBlockForDrops,
 			durability,
@@ -32,10 +34,21 @@ public final class ModToolMaterials {
 	}
 
 	static {
-		TURRET_REMOVER = ModToolMaterials.createMaterial(
+		TURRET_REMOVER = ModToolMaterials.createToolMaterial(
 			BlockTags.INCORRECT_FOR_WOODEN_TOOL,
 			100, 1.0f, 0.0f,  15,
 			ModItemTags.TURRET_REMOVER_REPAIRABLE
+		);
+
+		IRON_METAL_DETECTOR = ModToolMaterials.createToolMaterial(
+			BlockTags.INCORRECT_FOR_WOODEN_TOOL,
+			500, 1.0f, 0.0f, 15,
+			ModItemTags.IRON_METAL_DETECTOR_REPAIRABLE
+		);
+		NETHERITE_METAL_DETECTOR = ModToolMaterials.createToolMaterial(
+			BlockTags.INCORRECT_FOR_WOODEN_TOOL,
+			500, 1.0f, 0.0f, 15,
+			ModItemTags.NETHERITE_METAL_DETECTOR_REPAIRABLE
 		);
 	}
 }

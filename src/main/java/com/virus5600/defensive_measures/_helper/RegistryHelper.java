@@ -2,6 +2,7 @@ package com.virus5600.defensive_measures._helper;
 
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
+import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
@@ -41,6 +42,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.function.UnaryOperator;
 
 /**
  * Registry helper class for registering items, blocks, etc.
@@ -57,6 +59,14 @@ import java.util.function.Function;
  */
 public final class RegistryHelper {
 	private static final Logger LOGGER = DefensiveMeasures.LOGGER;
+
+	// Components
+	public static <T> DataComponentType<T> registerComponent(String id, UnaryOperator<DataComponentType.Builder<T>> builder) {
+		return Registry.register(
+			BuiltInRegistries.DATA_COMPONENT_TYPE, id,
+			builder.apply(DataComponentType.builder()).build()
+		);
+	}
 
 	// Holder
 	public static Holder<Item> getHolder(Item item) {

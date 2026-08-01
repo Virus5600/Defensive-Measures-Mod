@@ -52,7 +52,8 @@ import org.jspecify.annotations.Nullable;
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
  */
 public class AntiTankMineHawkinsBlock extends BaseLandmineBlock {
-	private static final VoxelShape SHAPE;
+	private static final VoxelShape SHAPE_PLACED;
+	private static final VoxelShape SHAPE_THROWN;
 	public static final MapCodec<AntiTankMineHawkinsBlock> CODEC = simpleCodec(AntiTankMineHawkinsBlock::new);
 	public static final BooleanProperty THROWN = ModProperties.THROWN;
 
@@ -93,7 +94,7 @@ public class AntiTankMineHawkinsBlock extends BaseLandmineBlock {
 
 	@Override @NonNull
 	protected VoxelShape getShape(BlockState state, @NonNull BlockGetter world, @NonNull BlockPos pos, @NonNull CollisionContext context) {
-		return SHAPE;
+		return state.getValue(THROWN) ? SHAPE_THROWN : SHAPE_PLACED;
 	}
 
 	@Override
@@ -212,7 +213,7 @@ public class AntiTankMineHawkinsBlock extends BaseLandmineBlock {
 	// ////////////////// //
 
 	static {
-		SHAPE = Shapes.or(
+		SHAPE_PLACED = Shapes.or(
 			Block.box(
 				6.5, -1.0, 5.5,
 				9.5, 1.0, 10.5
@@ -226,5 +227,7 @@ public class AntiTankMineHawkinsBlock extends BaseLandmineBlock {
 				8.75, 1.38, 9.75
 			)
 		);
+
+		SHAPE_THROWN = SHAPE_PLACED.move(0.0, 0.5, 0.0);
 	}
 }

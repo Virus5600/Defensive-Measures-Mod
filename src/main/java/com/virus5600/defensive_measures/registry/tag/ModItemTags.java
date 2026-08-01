@@ -18,4 +18,6 @@ public final class ModItemTags {
 	public static final TagKey<Item> TURRETS = RegistryHelper.createItemTagKey("turrets");
 	public static final TagKey<Item> TURRET_REMOVERS = RegistryHelper.createItemTagKey("turret_removers");
 	public static final TagKey<Item> TURRET_REMOVER_REPAIRABLE = RegistryHelper.createItemTagKey("turret_remover_repairable");
+	public static final TagKey<Item> IRON_METAL_DETECTOR_REPAIRABLE = RegistryHelper.createItemTagKey("iron_metal_detector_repairable");
+	public static final TagKey<Item> NETHERITE_METAL_DETECTOR_REPAIRABLE = RegistryHelper.createItemTagKey("netherite_metal_detector_repairable");
 }
