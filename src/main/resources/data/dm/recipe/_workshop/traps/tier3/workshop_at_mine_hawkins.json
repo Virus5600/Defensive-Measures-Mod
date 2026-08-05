@@ -1,0 +1,22 @@
+{
+	"type": "dm:workshop_shaped",
+	"category": "traps",
+	"pattern": [
+		" nhhn   ",
+		" nbbn   ",
+		"nnnnnnn ",
+		"ngggggnn",
+		"ngggggnn",
+		"nnnnnnn "
+	],
+	"key": {
+		"h": "minecraft:heavy_weighted_pressure_plate",
+		"b": "minecraft:blaze_powder",
+		"n": "minecraft:iron_nugget",
+		"g": "minecraft:gunpowder"
+	},
+	"result": {
+		"id": "dm:anti_tank_mine_hawkins",
+		"count": 4
+	}
+}

@@ -1,0 +1,50 @@
+﻿{
+	"parent": "minecraft:recipes/root",
+	"criteria": {
+		"fabmat_interacted": {
+			"trigger": "minecraft:tick",
+			"conditions": {
+				"player": {
+					"minecraft:type_specific/player": {
+						"stats": [
+							{
+								"type": "minecraft:custom",
+								"stat": "dm:interact_with_fabrication_matrix",
+								"value": {
+									"min": 1
+								}
+							}
+						]
+					}
+				}
+			}
+		},
+		"has_ingredients": {
+			"trigger": "minecraft:inventory_changed",
+			"conditions": {
+				"items": [
+					{
+						"items": [
+							"minecraft:leather",
+							"minecraft:iron_nugget",
+							"minecraft:stick",
+							"minecraft:glass",
+							"minecraft:redstone",
+							"dm:steel_drop",
+							"dm:steel_ingot"
+						]
+					}
+				]
+			}
+		}
+	},
+	"requirements": [
+		["fabmat_interacted"],
+		["has_ingredients"]
+	],
+	"rewards": {
+		"recipes": [
+			"dm:_fabrication_matrix/tools/tier2/fabmat_iron_metal_detector"
+		]
+	}
+}

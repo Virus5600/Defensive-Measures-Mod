@@ -99,6 +99,14 @@ public final class RegistryHelper {
 		return registerBlock(path, function, BlockBehaviour.Properties.of());
 	}
 
+	public static Block registerBlock(String path, BlockBehaviour.Properties settings) {
+		return registerBlock(path, Block::new, settings);
+	}
+
+	public static Block registerBlock(String path) {
+		return registerBlock(path, Block::new, BlockBehaviour.Properties.of());
+	}
+
 	// Block Entity Registry
 	private static ResourceKey<BlockEntityType<?>> createBlockEntityKey(String name) {
 		return ResourceKey.create(Registries.BLOCK_ENTITY_TYPE, Identifier.fromNamespaceAndPath(DefensiveMeasures.MOD_ID, name));

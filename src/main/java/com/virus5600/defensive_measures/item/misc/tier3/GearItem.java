@@ -1,4 +1,4 @@
-package com.virus5600.defensive_measures.item.turrets.tier_3;
+package com.virus5600.defensive_measures.item.misc.tier3;
 
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Rarity;

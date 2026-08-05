@@ -1,6 +1,5 @@
 package com.virus5600.defensive_measures.entity.projectiles;
 
-import com.virus5600.defensive_measures.registry.tag.ModBlockTags;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleOptions;
@@ -27,6 +26,7 @@ import com.virus5600.defensive_measures.block.traps.tier3.AntiTankMineHawkinsBlo
 import com.virus5600.defensive_measures.entity.ExplosiveEntity;
 import com.virus5600.defensive_measures.entity.ModEntities;
 import com.virus5600.defensive_measures.item.ModItems;
+import com.virus5600.defensive_measures.registry.tag.ModBlockTags;
 
 import org.jetbrains.annotations.NotNull;
 

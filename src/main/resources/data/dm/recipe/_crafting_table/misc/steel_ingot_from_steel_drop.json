@@ -1,0 +1,17 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"category": "misc",
+	"group": "steel_ingot",
+	"pattern": [
+		"sss",
+		"sss",
+		"sss"
+	],
+	"key": {
+		"s": "dm:steel_drop"
+	},
+	"result": {
+		"id": "dm:steel_ingot",
+		"count": 1
+	}
+}

@@ -1,6 +1,7 @@
 package com.virus5600.defensive_measures.block.traps.tier3;
 
 import com.mojang.serialization.MapCodec;
+import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ExplosionParticleInfo;
 import net.minecraft.core.particles.ParticleTypes;
@@ -8,6 +9,8 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.random.WeightedList;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.ExperienceOrb;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -92,6 +95,15 @@ public class AntiPersonnelMineM14Block extends BaseLandmineBlock {
 					WeightedList.<ExplosionParticleInfo>builder().build(),
 					SoundEvents.GENERIC_EXPLODE, false
 				);
+
+				PlayerLookup.around(lvl, pos, this.getEffectiveRadius())
+					.forEach(player -> player.addEffect(
+						new MobEffectInstance(
+							MobEffects.SLOWNESS,
+							2 * 60 * 20,
+							2
+						)
+					));
 			}
 		}
 	}

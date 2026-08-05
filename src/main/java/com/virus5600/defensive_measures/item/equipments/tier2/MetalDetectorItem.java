@@ -43,6 +43,8 @@ import java.util.UUID;
  * To use the item, the metal detector must be held in the player's main hand, or in the offhand.
  * This will actively deplete and damage the item but when in Creative, the item's durability will
  * not decrease.
+ * <br><br>
+ * For optimization and performance reasons, the maximum detection range will be capped at 50 blocks.
  *
  * @since 1.2.0-beta
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
@@ -101,12 +103,18 @@ public class MetalDetectorItem extends Item {
 						int range = stack.getOrDefault(ModDataComponents.DETECTION_RANGE, 4);
 						tickCount = 0;
 
-						stack.hurtAndConvertOnBreak(
-							1, this.getDepletedItem(),
-							le, slot
-						);
+						if (stack.isDamageableItem()) {
+							if ((stack.getDamageValue() + 1) < stack.getMaxDamage()) {
+								this.detectMetals(level, le, range);
 
-						this.detectMetals(level, le, range);
+								if (le instanceof Player player) {
+									stack.hurtWithoutBreaking(1, player);
+								}
+							}
+							else {
+								stack.setDamageValue(stack.getDamageValue() + 1);
+							}
+						}
 					}
 				}
 
@@ -185,15 +193,5 @@ public class MetalDetectorItem extends Item {
 				);
 			}
 		}
-	}
-
-	/**
-	 * The item that the metal detector will convert to when it is depleted.
-	 *
-	 * @return The item that the metal detector will convert to when it is depleted
-	 */
-	public Item getDepletedItem() {
-		// Temporarily set to "this"
-		return this;
 	}
 }

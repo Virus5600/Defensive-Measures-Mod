@@ -1,0 +1,16 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"category": "building",
+	"pattern": [
+		"sss",
+		"sss",
+		"sss"
+	],
+	"key": {
+		"s": "dm:steel_ingot"
+	},
+	"result": {
+		"id": "dm:steel_block",
+		"count": 1
+	}
+}

@@ -13,7 +13,12 @@
 	"block.dm.workshop": "Workshop",
 	"block.dm.fabrication_matrix": "Fabrication Matrix",
 
+	"block.dm.steel_block": "Steel Block",
+
 	"item.dm.gear": "Gear",
+	"item.dm.steel_block": "Steel Block",
+	"item.dm.steel_ingot": "Steel Ingot",
+	"item.dm.steel_drop": "Steel Drop",
 
 	"item.dm.bolt_head": "Bolt Head",
 	"item.dm.electric_fence": "Electric Fence",

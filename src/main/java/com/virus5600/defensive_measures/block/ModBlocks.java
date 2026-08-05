@@ -1,6 +1,10 @@
 package com.virus5600.defensive_measures.block;
 
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.state.BlockBehaviour.Properties;
+import net.minecraft.world.level.block.state.properties.NoteBlockInstrument;
+import net.minecraft.world.level.material.MapColor;
 
 import com.virus5600.defensive_measures.DefensiveMeasures;
 import com.virus5600.defensive_measures._helper.RegistryHelper;
@@ -37,6 +41,7 @@ public class ModBlocks {
 	public final static Block FABRICATION_MATRIX = RegistryHelper.registerBlock("fabrication_matrix", FabricationMatrixBlock::new);
 	public final static Block ANTI_PERSONNEL_MINE_M14 = RegistryHelper.registerBlock("anti_personnel_mine_m14", AntiPersonnelMineM14Block::new);
 	public final static Block ANTI_TANK_MINE_HAWKINS = RegistryHelper.registerBlock("anti_tank_mine_hawkins", AntiTankMineHawkinsBlock::new);
+	public final static Block STEEL_BLOCK = RegistryHelper.registerBlock("steel_block", Properties.of().mapColor(MapColor.METAL).instrument(NoteBlockInstrument.IRON_XYLOPHONE).requiresCorrectToolForDrops().strength(7.5F, 9.0F).sound(SoundType.IRON));
 
 	public final static List<Block> LANDMINES;
 
