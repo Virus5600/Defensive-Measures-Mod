@@ -15,6 +15,8 @@ import com.virus5600.defensive_measures.gui.screen.ingame.WorkshopScreen;
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
  */
 public class WorkshopOverlayRecipeComponent extends BaseOverlayRecipeComponent {
+	public static int SLOT_COUNT = 9;
+
 	public WorkshopOverlayRecipeComponent(final SlotSelectTime slotSelectTime, final boolean isFurnaceMenu) {
 		super(slotSelectTime, isFurnaceMenu);
 	}
@@ -34,9 +36,10 @@ public class WorkshopOverlayRecipeComponent extends BaseOverlayRecipeComponent {
 	protected int getButtonSize() {
 		int borderSize = ModOverlayCraftingRecipeButton.SPRITE_BORDER_SIZE;
 		int slotSize = ModOverlayCraftingRecipeButton.SPRITE_SLOT_SIZE;
+		int slotCount = SLOT_COUNT;
 
-		// (6px slot size * 7 row/col) + (2px border size * 2 opposing sides) + (7 row/col - 1 grid line)
-		return (slotSize * 7) + (borderSize * 2) + (7 - 1);
+		// (6px slot size * 9 row/col) + (2px border size * 2 opposing sides) + (9 row/col - 1 grid line)
+		return (slotSize * slotCount) + (borderSize * 2) + (slotCount - 1);
 	}
 
 	protected WorkshopOverlayCraftingRecipeButton getCraftingOverlayRecipeButton(

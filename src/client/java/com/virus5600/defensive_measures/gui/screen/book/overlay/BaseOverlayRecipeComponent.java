@@ -209,8 +209,8 @@ public class BaseOverlayRecipeComponent implements GuiEventListener, Renderable 
 			graphics.blitSprite(
 				RenderPipelines.GUI_TEXTURED, this.getOverlayTexture(),
 				this.x, this.y,
-				width * this.getButtonSize() + 13,
-				height * this.getButtonSize() + 13
+				width * this.getButtonSize() + 12,
+				height * this.getButtonSize() + 10
 			);
 
 			for(BaseOverlayRecipeButton component : this.recipeButtons) {

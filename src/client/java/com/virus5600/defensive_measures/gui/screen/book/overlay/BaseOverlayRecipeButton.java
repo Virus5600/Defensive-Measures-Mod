@@ -38,12 +38,12 @@ public abstract class BaseOverlayRecipeButton extends AbstractWidget {
 		this.slots = this.calculateIngredientsPositions(recipe, context, gridWidth, gridHeight);
 
 		int slotSize = this.getSlotSize();
-		int borderSize = this.getSlotSize();
-		int combinedHorizontalGridSize = gridWidth - 2;
-		int combinedVerticalGridSize = gridHeight - 2;
+		int borderSize = this.getBorderSize();
+		int combinedHorizontalGridSize = gridWidth - 1;
+		int combinedVerticalGridSize = gridHeight - 1;
 
-		this.width = (slotSize * (gridWidth - 1)) + (borderSize * 2) + combinedHorizontalGridSize;
-		this.height = (slotSize * (gridHeight - 1)) + (borderSize * 2) + combinedVerticalGridSize;
+		this.width = (slotSize * gridWidth) + (borderSize * 2) + combinedHorizontalGridSize;
+		this.height = (slotSize * gridHeight) + (borderSize * 2) + combinedVerticalGridSize;
 	}
 
 	protected Pos createGridPos(final int gridXPos, final int gridYPos, final List<ItemStack> itemStacks) {
