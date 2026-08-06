@@ -16,9 +16,22 @@ import net.minecraft.world.item.Rarity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 
+import com.virus5600.defensive_measures.block.traps.tier3.AntiTankMineHawkinsBlock;
 import com.virus5600.defensive_measures.entity.projectiles.AntiTankHawkinsEntity;
 import com.virus5600.defensive_measures.sound.ModSoundEvents;
 
+/**
+ * The custom {@link BlockItem} class for the {@link AntiTankMineHawkinsBlock}, allowing said
+ * block's item to have custom behavior and properties.
+ * <br><br>
+ * Historically, while the <a href="https://en.wikipedia.org/wiki/Hawkins_grenade">Hawkins AT mine</a>
+ * was officially designated as a "grenade," it was designed from the ground up as a dual-purpose
+ * weapon. This class mirrors that history by allowing the Hawkins to be thrown as a projectile
+ * (like a grenade), which then places itself as a block (a landmine) upon landing.
+ *
+ * @since 1.2.0-beta
+ * @author <a href="https://github.com/Virus5600">Virus5600</a>
+ */
 public class AntiTankMineHawkinsItem extends BlockItem implements ProjectileItem {
 	public static final float PROJECTILE_SHOOT_POWER = 1.5F;
 

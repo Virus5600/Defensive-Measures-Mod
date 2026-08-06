@@ -10,6 +10,14 @@ import net.minecraft.resources.Identifier;
 import com.virus5600.defensive_measures.DefensiveMeasures;
 
 /**
+ * A packet sent from the server to the client to highlight a block. The block being highlighted
+ * can be seen through other blocks as the highlighting is primarily designed to catch the attention
+ * of the player to the target block.
+ *
+ * @param pos           The position of the block to highlight.
+ * @param argb          The ARGB color of the highlight.
+ * @param durationTicks The duration of the highlight in ticks.
+ *
  * @since 1.2.0-beta
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
  */

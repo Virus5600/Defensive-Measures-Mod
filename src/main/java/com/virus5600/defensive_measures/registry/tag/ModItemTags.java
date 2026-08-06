@@ -12,11 +12,14 @@ import com.virus5600.defensive_measures._helper.RegistryHelper;
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
  */
 public final class ModItemTags {
+	// CATEGORICAL TAGS
 	public static final TagKey<Item> TIER_0_TURRETS = RegistryHelper.createItemTagKey("tier_0_turrets");
 	public static final TagKey<Item> TIER_1_TURRETS = RegistryHelper.createItemTagKey("tier_1_turrets");
 	public static final TagKey<Item> TIER_2_TURRETS = RegistryHelper.createItemTagKey("tier_2_turrets");
 	public static final TagKey<Item> TURRETS = RegistryHelper.createItemTagKey("turrets");
 	public static final TagKey<Item> TURRET_REMOVERS = RegistryHelper.createItemTagKey("turret_removers");
+
+	// REPAIRABLE TAGS
 	public static final TagKey<Item> TURRET_REMOVER_REPAIRABLE = RegistryHelper.createItemTagKey("turret_remover_repairable");
 	public static final TagKey<Item> IRON_METAL_DETECTOR_REPAIRABLE = RegistryHelper.createItemTagKey("iron_metal_detector_repairable");
 	public static final TagKey<Item> NETHERITE_METAL_DETECTOR_REPAIRABLE = RegistryHelper.createItemTagKey("netherite_metal_detector_repairable");

@@ -4,10 +4,21 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking.Context
 
 import com.virus5600.defensive_measures.network.clientbound.item.BlockHighlightPacket;
 import com.virus5600.defensive_measures.renderer.BlockHighlightRenderer;
+import net.minecraft.core.BlockPos;
 
 /**
+ * A client-side packer receiver for the {@link BlockHighlightPacket}. This receiver just basically
+ * calls the {@link BlockHighlightRenderer#highlight(BlockPos, int, int)} method with the data from
+ * the packet.
+ * <br><br>
+ * The actual logic is already handled by the renderer, leaving a clean packet receiver.
+ *
  * @since 1.2.0-beta
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
+ *
+ * @see BlockHighlightPacket
+ * @see BlockHighlightRenderer
+ * @see BlockHighlightRenderer#highlight(BlockPos, int, int)
  */
 public final class BlockHighlightPacketReceiver {
 	public static void handle(BlockHighlightPacket payload, Context ctx) {

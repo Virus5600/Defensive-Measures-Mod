@@ -29,8 +29,8 @@ import org.jspecify.annotations.Nullable;
  * the {@link HorizontalDirectionalBlock}, which is an abstract class (preventing this class from
  * extending or implementing said class).
  *
+ * @since 1.2.0-beta
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
- * @since 1.2.0
  *
  * @see net.minecraft.world.level.block.HorizontalDirectionalBlock
  */

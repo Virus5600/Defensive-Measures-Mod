@@ -13,6 +13,10 @@ import net.minecraft.world.item.crafting.display.RecipeDisplayId;
 
 import java.util.List;
 
+/**
+ * @since 1.2.0-beta
+ * @author <a href="https://github.com/Virus5600">Virus5600</a>
+ */
 public abstract class BaseOverlayRecipeButton extends AbstractWidget {
 	private final BaseOverlayRecipeComponent component;
 	private final RecipeDisplayId recipe;

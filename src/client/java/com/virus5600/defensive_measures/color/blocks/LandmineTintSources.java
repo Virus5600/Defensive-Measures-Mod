@@ -10,6 +10,18 @@ import net.minecraft.world.level.block.state.BlockState;
 
 import com.virus5600.defensive_measures.block.traps.BaseLandmineBlock;
 
+/**
+ * Defines tint colors for all the {@link BaseLandmineBlock landmine blocks} to use when rendering
+ * as a block in the world.
+ * <br><br>
+ * How this work is that the landmine block will check the block below it and change its color
+ * based on that block's type. If the block below is not a valid block, it will use the last valid
+ * color it had, allowing the landmine to blend in with the environment and not be too obvious to
+ * players.
+ *
+ * @since 1.2.0-beta
+ * @author <a href="https://github.com/Virus5600">Virus5600</a>
+ */
 public class LandmineTintSources implements BlockTintSource {
 	private static final int GREEN = 0x7CB342;
 	private static final int LIGHT_YELLOW = 0xE7E4BB;

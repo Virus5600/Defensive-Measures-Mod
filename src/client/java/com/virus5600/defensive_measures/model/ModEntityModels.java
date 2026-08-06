@@ -18,6 +18,10 @@ import java.util.stream.Stream;
 
 import com.google.common.collect.Sets;
 
+/**
+ * @since 1.0.0-beta
+ * @author <a href="https://github.com/Virus5600">Virus5600</a>
+ */
 public class ModEntityModels {
 
 	private static final Set<ModelLayerLocation> LAYERS = Sets.newHashSet();

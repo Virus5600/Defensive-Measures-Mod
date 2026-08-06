@@ -10,16 +10,31 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 
 import com.virus5600.defensive_measures.item.ModItems;
+import com.virus5600.defensive_measures.item.equipments.tier2.MetalDetectorItem;
 
 import org.jspecify.annotations.Nullable;
 
 /**
+ * A record that implements the {@link ItemTintSource} interface to provide tinting for
+ * {@link MetalDetectorItem metal detector items}.
+ * <br><br>
+ * Specifically, it is used to apply tinting to the metal coil detector (the circular part on the
+ * bottom end of the detector) to mirror the color of the material used on creating said detector.
+ * <br><br>
+ * The tinting is applied based on the item type, with the:
+ * <ul>
+ *     <li><b>IRON Metal Detector</b> using a {@link #IRON_TINT light gray tint}</li>
+ *     <li><b>NETHERITE Metal Detector</b> using a {@link #NETHERITE_TINT dark gray tint}</li>
+ * </ul>
+ *
  * @since 1.2.0-beta
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
  */
 public record MetalDetectorTintSources(int color) implements ItemTintSource {
-	private static final int IRON_TINT = 14211288;		// 0xD8D8D8
-	private static final int NETHERITE_TINT = 4471355;  // 0x443A3B
+	/**	0xD8D8D8 */
+	private static final int IRON_TINT = 14211288;
+	/** 0x443A3B */
+	private static final int NETHERITE_TINT = 4471355;
 
 	public static final MapCodec<MetalDetectorTintSources> CODEC = RecordCodecBuilder.mapCodec(
 		instance -> instance.group(

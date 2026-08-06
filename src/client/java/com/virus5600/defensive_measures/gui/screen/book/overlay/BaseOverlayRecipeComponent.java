@@ -20,6 +20,10 @@ import com.google.common.collect.Lists;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * @since 1.2.0-beta
+ * @author <a href="https://github.com/Virus5600">Virus5600</a>
+ */
 public class BaseOverlayRecipeComponent implements GuiEventListener, Renderable {
 	public static final int MAX_ROW = 4;
 	public static final int MAX_ROW_LARGE = 5;

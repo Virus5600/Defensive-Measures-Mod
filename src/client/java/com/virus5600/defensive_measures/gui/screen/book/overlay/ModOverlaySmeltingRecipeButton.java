@@ -9,6 +9,10 @@ import net.minecraft.world.item.crafting.display.RecipeDisplayId;
 
 import java.util.List;
 
+/**
+ * @since 1.2.0-beta
+ * @author <a href="https://github.com/Virus5600">Virus5600</a>
+ */
 public class ModOverlaySmeltingRecipeButton extends BaseOverlayRecipeButton {
 	private static final Identifier ENABLED_SPRITE = Identifier.withDefaultNamespace("recipe_book/furnace_overlay");
 	private static final Identifier HIGHLIGHTED_ENABLED_SPRITE = Identifier.withDefaultNamespace("recipe_book/furnace_overlay_highlighted");

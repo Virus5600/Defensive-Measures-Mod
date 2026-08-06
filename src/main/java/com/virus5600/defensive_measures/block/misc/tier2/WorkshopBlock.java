@@ -48,7 +48,7 @@ import java.util.Map;
  * turret with the modules, providing a more enticing way of crafting lower-tiered turrets in this
  * workbench compared to the crafting table.
  *
- * @since 1.2.0
+ * @since 1.2.0-beta
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
  */
 public class WorkshopBlock extends BaseHorizontalFunctionalBlock implements TwoBlockWide<WorkshopPart> {

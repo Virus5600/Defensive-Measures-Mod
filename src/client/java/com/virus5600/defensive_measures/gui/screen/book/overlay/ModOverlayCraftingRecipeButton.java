@@ -13,6 +13,10 @@ import com.virus5600.defensive_measures.recipe.display.FlexibleShapedCraftingRec
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * @since 1.2.0-beta
+ * @author <a href="https://github.com/Virus5600">Virus5600</a>
+ */
 public class ModOverlayCraftingRecipeButton extends BaseOverlayRecipeButton {
 	private static final Identifier ENABLED_SPRITE = Identifier.fromNamespaceAndPath(DefensiveMeasures.MOD_ID, "blueprint/overlay/crafting_overlay");
 	private static final Identifier HIGHLIGHTED_ENABLED_SPRITE = Identifier.fromNamespaceAndPath(DefensiveMeasures.MOD_ID, "blueprint/overlay/crafting_overlay_highlighted");
