@@ -1,9 +1,12 @@
 package com.virus5600.defensive_measures.gui.screen.book;
 
 import net.minecraft.client.gui.screens.recipebook.GhostSlots;
+import net.minecraft.client.gui.screens.recipebook.SlotSelectTime;
+import net.minecraft.util.Mth;
 import net.minecraft.util.context.ContextMap;
 import net.minecraft.world.item.Item;
 
+import com.virus5600.defensive_measures.gui.screen.book.overlay.TASOverlayRecipeComponent;
 import com.virus5600.defensive_measures.gui.screen.ingame.TurretAssemblyStationScreen;
 import com.virus5600.defensive_measures.item.ModItems;
 import com.virus5600.defensive_measures.recipe.display.FlexibleShapedCraftingRecipeDisplay;
@@ -16,8 +19,26 @@ import com.virus5600.defensive_measures.screen.TurretAssemblyStationScreenHandle
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
  */
 public class TASBlueprintComponent extends BaseBlueprintComponent {
+	private final BaseRecipeBookPage recipeBookPage;
+
 	public TASBlueprintComponent(TurretAssemblyStationScreenHandler screenHandler) {
 		super(screenHandler);
+
+		SlotSelectTime slotSelectTime = () -> Mth.floor(this.displayTime / 30.0F);
+
+		this.recipeBookPage = new BaseRecipeBookPage(
+			this,
+			slotSelectTime,
+			new TASOverlayRecipeComponent(slotSelectTime, false)
+		);
+	}
+
+	// ///////////////// //
+	// OVERRIDEN METHODS //
+	// ///////////////// //
+
+	protected BaseRecipeBookPage recipeBookPage() {
+		return this.recipeBookPage;
 	}
 
 	// //////////////// //

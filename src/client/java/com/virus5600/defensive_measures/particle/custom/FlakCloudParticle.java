@@ -10,11 +10,13 @@ import net.minecraft.client.particle.SpriteSet;
 import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.util.RandomSource;
 
+import com.virus5600.defensive_measures.entity.projectiles.FlakProjectileEntity;
+
 import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.NonNull;
 
 /**
- * Defines the other particles emitted by the {@code Flak Projectile} when it explodes. This particular
+ * Defines the other particles emitted by the {@link FlakProjectileEntity Flak Projectile} when it explodes. This particular
  * particle creates the black cloud that lingers after the explosion, simulating the accumulated
  * flak cloud that forms after a large explosion.
  *

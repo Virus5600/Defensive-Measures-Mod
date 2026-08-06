@@ -1,0 +1,169 @@
+package com.virus5600.defensive_measures.block.traps.tier3;
+
+import com.mojang.serialization.MapCodec;
+import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.ExplosionParticleInfo;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.util.random.WeightedList;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.ExperienceOrb;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.level.*;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.VoxelShape;
+
+import com.virus5600.defensive_measures.block.ModBlocks;
+import com.virus5600.defensive_measures.block.entity.traps.BaseLandmineBlockEntity;
+import com.virus5600.defensive_measures.block.traps.BaseLandmineBlock;
+import com.virus5600.defensive_measures.entity.damage.ModDamageSources;
+import com.virus5600.defensive_measures.entity.damage.ModDamageTypes;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
+/**
+ * Anti Personnel Mine is a trap block that only get triggered when an entity steps over it.
+ * <br><br>
+ * Modelled after the M14 AP mine, it is designed to be effective in maiming an entity instead of
+ * dealing a lethal amount of damage. This is to ensure that the entity will be incapacitated and
+ * unable to continue moving, allowing for a follow-up attack or capture.
+ *
+ * @since 1.2.0-beta
+ * @author <a href="https://github.com/Virus5600">Virus5600</a>
+ */
+public class AntiPersonnelMineM14Block extends BaseLandmineBlock {
+	public static final MapCodec<AntiPersonnelMineM14Block> CODEC = simpleCodec(AntiPersonnelMineM14Block::new);
+	private static final VoxelShape SHAPE;
+
+	public AntiPersonnelMineM14Block(Properties settings) {
+		super(
+			settings.instabreak()
+				.requiresCorrectToolForDrops()
+				.explosionResistance(1.0f)
+				.noTerrainParticles()
+				.noOcclusion()
+		);
+	}
+
+	// /////// //
+	// METHODS //
+	// /////// //
+
+	@Override
+	public boolean canTrigger(BlockState state, Level level, BlockPos pos, Entity entity) {
+		boolean isArmed = state.getValue(ARMED);
+		boolean isInShallowWaters = isWithinFluidDepthThreshold(level, pos, this.getFluidLevelThreshold());
+		boolean isGameMechanicEntity = entity instanceof ExperienceOrb || entity instanceof ItemEntity;
+		boolean isInCollision = state.getShape(level, pos)
+			.move(pos)
+			.bounds()
+			.intersects(entity.getBoundingBox());
+
+		return isArmed && isInShallowWaters && !isGameMechanicEntity && isInCollision;
+	}
+
+	@Override
+	public void detonate(BlockState state, Level level, BlockPos pos) {
+		if (level instanceof ServerLevel lvl && state.getBlock() == ModBlocks.ANTI_PERSONNEL_MINE_M14) {
+			BaseLandmineBlockEntity mine = (BaseLandmineBlockEntity) level.getBlockEntity(pos);
+			if (mine != null) {
+				mine.setLevel(lvl);
+
+				DamageSource dmgSrc = ModDamageSources.create(
+					level, ModDamageTypes.LANDMINE,
+					(Entity) null, null
+				);
+
+				lvl.setBlock(pos, Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL);
+
+				mine.createExplosion(
+					mine, dmgSrc, new ExplosionDamageCalculator(),
+					pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5,
+					(float) this.getDamageDealt(state, level), (float) this.getMaxDamageRadius(),
+					false, Level.ExplosionInteraction.BLOCK,
+					ParticleTypes.EXPLOSION, ParticleTypes.EXPLOSION_EMITTER,
+					WeightedList.<ExplosionParticleInfo>builder().build(),
+					SoundEvents.GENERIC_EXPLODE, false
+				);
+
+				PlayerLookup.around(lvl, pos, this.getEffectiveRadius())
+					.forEach(player -> player.addEffect(
+						new MobEffectInstance(
+							MobEffects.SLOWNESS,
+							2 * 60 * 20,
+							2
+						)
+					));
+			}
+		}
+	}
+
+	@Override @NonNull
+	protected VoxelShape getShape(BlockState state, @NonNull BlockGetter world, @NonNull BlockPos pos, @NonNull CollisionContext context) {
+		return SHAPE;
+	}
+
+	@Override @NonNull
+	public MapCodec<AntiPersonnelMineM14Block> codec() {
+		return CODEC;
+	}
+
+	// //////////////// //
+	// ABSTRACT METHODS //
+	// //////////////// //
+
+	@Override
+	protected int maxMines() {
+		return 1;
+	}
+
+	// ///////////////// //
+	// INTERFACE METHODS //
+	// ///////////////// //
+
+	// ModExplosives
+
+	public double getEffectiveRadius() {
+		return 1;
+	}
+
+	public double getMaxDamageRadius() {
+		return 2;
+	}
+
+	public double getDamageReduction() {
+		return 0.5;
+	}
+
+	public double getBaseDamage() {
+		return 10;
+	}
+
+	// EntityBlock
+
+	@Nullable
+	public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
+		return new BaseLandmineBlockEntity(pos, state);
+	}
+
+	// ////////////////// //
+	// STATIC INITIALIZER //
+	// ////////////////// //
+
+	static {
+		SHAPE = Block.box(
+			7.0, -0.75, 7.0,
+			9.0, 0.375, 9.0
+		);
+	}
+}

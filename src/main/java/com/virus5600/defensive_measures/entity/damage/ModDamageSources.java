@@ -8,6 +8,9 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+
+import com.virus5600.defensive_measures._util.interfaces.ModExplosives;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -46,6 +49,44 @@ public class ModDamageSources {
 		Registry<DamageType> registry = optionalRegistry.get();
 		Holder<DamageType> dmgEntry = registry.wrapAsHolder(registry.getValue(type));
 
-		return new DamageSource(dmgEntry, source, attacker);
+		Entity dealer = attacker;
+		if (source instanceof ModExplosives explosive) {
+			dealer = explosive.getOwner();
+		}
+
+		return new DamageSource(dmgEntry, dealer, attacker);
+	}
+
+	/**
+	 * Creates a {@link DamageSource} from a {@link ResourceKey < DamageType >} and a {@link Level}
+	 *
+	 * @param world The world to create the {@link DamageSource} in
+	 * @param type The {@link ResourceKey < DamageType >} to create the {@link DamageSource} from
+	 * @param source The source where the damage is coming from.
+	 * @param attacker The entity from which the source of the damage came from.
+	 *
+	 * @return The created {@link DamageSource}
+	 *
+	 * @throws IllegalStateException If the {@link Registry < DamageType >} is not present in the world
+	 */
+	public static DamageSource create(
+		Level world, ResourceKey<DamageType> type,
+		@Nullable BlockEntity source, @Nullable Entity attacker
+	) throws IllegalStateException {
+		Optional<Registry<DamageType>> optionalRegistry = world.registryAccess()
+			.lookup(Registries.DAMAGE_TYPE);
+
+		if (optionalRegistry.isEmpty()) {
+			throw new IllegalStateException("DamageType optionalRegistry is not present");
+		}
+		Registry<DamageType> registry = optionalRegistry.get();
+		Holder<DamageType> dmgEntry = registry.wrapAsHolder(registry.getValue(type));
+
+		Entity dealer = attacker;
+		if (source != null && source.getBlockState().getBlock() instanceof ModExplosives explosive) {
+			dealer = explosive.getOwner();
+		}
+
+		return new DamageSource(dmgEntry, dealer, attacker);
 	}
 }

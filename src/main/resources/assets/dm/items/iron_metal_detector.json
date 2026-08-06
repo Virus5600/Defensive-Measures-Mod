@@ -1,0 +1,12 @@
+{
+	"model": {
+		"type": "minecraft:model",
+		"model": "dm:item/tier2/equipments/metal_detector",
+		"tints": [
+			{
+				"type": "dm:metal_detector",
+				"color": 14211288
+			}
+		]
+	}
+}

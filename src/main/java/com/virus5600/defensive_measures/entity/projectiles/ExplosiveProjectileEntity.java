@@ -1,6 +1,5 @@
 package com.virus5600.defensive_measures.entity.projectiles;
 
-import com.virus5600.defensive_measures._util.MathUtil;
 import net.minecraft.core.Holder;
 import net.minecraft.core.particles.ExplosionParticleInfo;
 import net.minecraft.core.particles.ParticleOptions;
@@ -32,11 +31,11 @@ import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 
+import com.virus5600.defensive_measures._util.MathUtil;
 import com.virus5600.defensive_measures.entity.ExplosiveEntity;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * {@code ExplosiveProjectileEntity} is an abstract class that extends {@link TurretProjectileEntity}.
@@ -181,7 +180,8 @@ public abstract class ExplosiveProjectileEntity extends TurretProjectileEntity i
 			this.getX(),
 			this.getY(0.0625),
 			this.getZ(),
-			1.25F,
+			(float) this.getDamage(),
+			(float) this.getMaxDamageRadius(),
 			false,
 			this.getExplosionSourceType(),
 			this.getSmallExplosionParticleType(),
@@ -343,7 +343,6 @@ public abstract class ExplosiveProjectileEntity extends TurretProjectileEntity i
 	 *
 	 * @return The offset vector for the trail particle. This vector is added to the projectile's position to determine where the trail particle will be spawned.
 	 */
-	@NotNull
 	protected Vec3 trailOffset() {
 		return Vec3.ZERO;
 	}
@@ -366,7 +365,6 @@ public abstract class ExplosiveProjectileEntity extends TurretProjectileEntity i
 	 *
 	 * @return The particle effect to use for the small explosion. This method should not return {@code null} as the small explosion particle is essential for the explosion effect.
 	 */
-	@NotNull
 	protected ParticleOptions getSmallExplosionParticleType() {
 		return ParticleTypes.EXPLOSION;
 	}
@@ -378,7 +376,6 @@ public abstract class ExplosiveProjectileEntity extends TurretProjectileEntity i
 	 *
 	 * @return The particle effect to use for the large explosion. This method should not return {@code null} as the large explosion particle is essential for the explosion effect.
 	 */
-	@NotNull
 	protected ParticleOptions getLargeExplosionParticleType() {
 		return ParticleTypes.EXPLOSION_EMITTER;
 	}
@@ -388,7 +385,6 @@ public abstract class ExplosiveProjectileEntity extends TurretProjectileEntity i
 	 *
 	 * @return {@link SoundEvents#GENERIC_EXPLODE}
 	 */
-	@NotNull
 	protected Holder<SoundEvent> getExplosionSoundEvent() {
 		return SoundEvents.GENERIC_EXPLODE;
 	}

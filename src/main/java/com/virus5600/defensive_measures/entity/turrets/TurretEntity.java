@@ -107,7 +107,7 @@ import java.util.stream.Collectors;
  * update the attributes accordingly.
  *
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
- * @since 1.0.1
+ * @since 1.0.1-beta
  *
  * @see Mob
  * @see Itemable

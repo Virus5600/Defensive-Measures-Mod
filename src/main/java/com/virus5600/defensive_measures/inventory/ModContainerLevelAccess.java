@@ -7,6 +7,10 @@ import net.minecraft.world.level.Level;
 import java.util.Optional;
 import java.util.function.BiFunction;
 
+/**
+ * @since 1.2.0-beta
+ * @author <a href="https://github.com/Virus5600">Virus5600</a>
+ */
 public interface ModContainerLevelAccess extends ContainerLevelAccess {
 	ModContainerLevelAccess NULL = new ModContainerLevelAccess() {
 		@Override

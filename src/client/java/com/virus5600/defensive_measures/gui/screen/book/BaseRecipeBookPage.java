@@ -1,5 +1,6 @@
 package com.virus5600.defensive_measures.gui.screen.book;
 
+import com.virus5600.defensive_measures.gui.screen.book.overlay.BaseOverlayRecipeComponent;
 import net.minecraft.client.ClientRecipeBook;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -7,7 +8,6 @@ import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.ImageButton;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.components.WidgetSprites;
-import net.minecraft.client.gui.screens.recipebook.OverlayRecipeComponent;
 import net.minecraft.client.gui.screens.recipebook.RecipeCollection;
 import net.minecraft.client.gui.screens.recipebook.SlotSelectTime;
 import net.minecraft.client.input.MouseButtonEvent;
@@ -42,7 +42,7 @@ public class BaseRecipeBookPage {
 	protected static final WidgetSprites PAGE_FORWARD_TEXTURES = new WidgetSprites(Identifier.withDefaultNamespace("recipe_book/page_forward"), Identifier.withDefaultNamespace("recipe_book/page_forward_highlighted"));
 
 	private final RecipeBookComponent<?> recipeBookWidget;
-	private final OverlayRecipeComponent altWidget;
+	private final BaseOverlayRecipeComponent overlay;
 	private final List<BaseRecipeButton> buttons = Lists.newArrayListWithCapacity(20);
 
 	private Minecraft client;
@@ -61,8 +61,19 @@ public class BaseRecipeBookPage {
 	protected int resultGridLeftMargin = 11;
 
 	public BaseRecipeBookPage(RecipeBookComponent<?> recipeBookWidget, SlotSelectTime currentIndexProvider) {
+		this(
+			recipeBookWidget, currentIndexProvider,
+			new BaseOverlayRecipeComponent(currentIndexProvider, false)
+		);
+	}
+
+	public BaseRecipeBookPage(
+		RecipeBookComponent<?> recipeBookWidget,
+		SlotSelectTime currentIndexProvider,
+		BaseOverlayRecipeComponent overlayComponent
+	) {
 		this.recipeBookWidget = recipeBookWidget;
-		this.altWidget = new OverlayRecipeComponent(currentIndexProvider, false);
+		this.overlay = overlayComponent;
 
 		for (int i = 0; i < this.getSlotCount(); ++i) {
 			this.buttons.add(new BaseRecipeButton(currentIndexProvider));
@@ -189,13 +200,13 @@ public class BaseRecipeBookPage {
 		}
 
 		graphics.nextStratum();
-		this.altWidget.extractRenderState(graphics, mouseX, mouseY, deltaTicks);
+		this.overlay.extractRenderState(graphics, mouseX, mouseY, deltaTicks);
 	}
 
 	public void extractTooltip(GuiGraphicsExtractor context, int x, int y) {
 		if (this.client.gui.screen() != null &&
 			this.hoveredButton != null &&
-			!this.altWidget.isVisible()) {
+			!this.overlay.isVisible()) {
 			ItemStack itemStack = this.hoveredButton.getDisplayStack();
 			Identifier identifier = itemStack.get(DataComponents.TOOLTIP_STYLE);
 
@@ -216,30 +227,27 @@ public class BaseRecipeBookPage {
 	}
 
 	public void hideAlternates() {
-		this.altWidget.setVisible(false);
+		this.overlay.setVisible(false);
 	}
 
 	public boolean mouseClicked(MouseButtonEvent click, int left, int top, int width, int height, boolean doubled) {
-		Objects.requireNonNull(this.backButton);
-		Objects.requireNonNull(this.forwardButton);
-
 		this.lastClickedRecipe = null;
 		this.resultCollection = null;
 
-		if (this.altWidget.isVisible()) {
-			if (this.altWidget.mouseClicked(click, doubled)) {
-				this.lastClickedRecipe = this.altWidget.getLastRecipeClicked();
-				this.resultCollection = this.altWidget.getRecipeCollection();
+		if (this.overlay.isVisible()) {
+			if (this.overlay.mouseClicked(click, doubled)) {
+				this.lastClickedRecipe = this.overlay.getLastRecipeClicked();
+				this.resultCollection = this.overlay.getRecipeCollection();
 			} else {
-				this.altWidget.setVisible(false);
+				this.overlay.setVisible(false);
 			}
 
 			return true;
-		} else if (this.forwardButton.mouseClicked(click, doubled)) {
+		} else if (this.forwardButton != null && this.forwardButton.mouseClicked(click, doubled)) {
 			++this.currentPage;
 			this.updateButtonsForPage();
 			return true;
-		} else if (this.backButton.mouseClicked(click, doubled)) {
+		} else if (this.backButton != null && this.backButton.mouseClicked(click, doubled)) {
 			--this.currentPage;
 			this.updateButtonsForPage();
 			return true;
@@ -253,8 +261,13 @@ public class BaseRecipeBookPage {
 					if (click.button() == 0) {
 						this.lastClickedRecipe = animatedResultButton.getCurrentId();
 						this.resultCollection = animatedResultButton.getCollection();
-					} else if (click.button() == 1 && !this.altWidget.isVisible() && !animatedResultButton.hasSingleResult()) {
-						this.altWidget.init(animatedResultButton.getCollection(), contextParameterMap, this.isFiltering, animatedResultButton.getX(), animatedResultButton.getY(), left + width / 2, top + 13 + height / 2, (float)animatedResultButton.getWidth());
+					} else if (click.button() == 1 && !this.overlay.isVisible() && !animatedResultButton.hasSingleResult()) {
+						this.overlay.init(
+							animatedResultButton.getCollection(), contextParameterMap, this.isFiltering,
+							animatedResultButton.getX(), animatedResultButton.getY(),
+							left + width / 2, top + 13 + height / 2,
+							(float)animatedResultButton.getWidth()
+						);
 					}
 
 					return true;

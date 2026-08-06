@@ -1,0 +1,20 @@
+{
+	"type": "dm:workshop_shaped",
+	"category": "traps",
+	"pattern": [
+		"  l  ",
+		"nnnnn",
+		"ngggn",
+		"ngggn",
+		"nnnnn"
+	],
+	"key": {
+		"l": "#minecraft:wooden_pressure_plates",
+		"n": "minecraft:iron_nugget",
+		"g": "minecraft:gunpowder"
+	},
+	"result": {
+		"id": "dm:anti_personnel_mine_m14",
+		"count": 4
+	}
+}

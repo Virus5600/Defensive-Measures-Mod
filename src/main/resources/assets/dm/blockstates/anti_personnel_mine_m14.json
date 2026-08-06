@@ -1,0 +1,10 @@
+{
+	"variants": {
+		"armed=false": {
+			"model": "dm:block/anti_personnel_mine_m14_unarmed"
+		},
+		"armed=true": {
+			"model": "dm:block/anti_personnel_mine_m14_armed"
+		}
+	}
+}
