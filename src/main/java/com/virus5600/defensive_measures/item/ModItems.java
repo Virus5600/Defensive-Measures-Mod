@@ -14,8 +14,11 @@ import com.virus5600.defensive_measures.DefensiveMeasures;
 import com.virus5600.defensive_measures._helper.RegistryHelper;
 import com.virus5600.defensive_measures.block.ModBlocks;
 import com.virus5600.defensive_measures.entity.ModEntities;
-import com.virus5600.defensive_measures.item.equipments.TurretRemoverItem;
+import com.virus5600.defensive_measures.item.component.ModDataComponents;
+import com.virus5600.defensive_measures.item.equipments.tier1.*;
+import com.virus5600.defensive_measures.item.equipments.tier2.*;
 import com.virus5600.defensive_measures.item.interfaces.FuelItem;
+import com.virus5600.defensive_measures.item.misc.tier3.*;
 import com.virus5600.defensive_measures.item.turrets.TurretItem;
 import com.virus5600.defensive_measures.item.turrets.tier_0.pellet_turret.*;
 import com.virus5600.defensive_measures.item.turrets.tier_1.ballista.*;
@@ -24,9 +27,9 @@ import com.virus5600.defensive_measures.item.turrets.tier_1.mg_turret.*;
 import com.virus5600.defensive_measures.item.turrets.tier_2.aa_turret.*;
 import com.virus5600.defensive_measures.item.turrets.tier_2.flame_turret.*;
 import com.virus5600.defensive_measures.item.turrets.tier_2.missile_turret.*;
-import com.virus5600.defensive_measures.item.turrets.tier_3.*;
 
 import java.util.Arrays;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 
 /**
@@ -41,7 +44,9 @@ import java.util.function.Function;
  */
 public class ModItems {
 	// VANILLA GROUPS
+	public final static Item[] BUILDING_BLOCK_ITEMS;
 	public final static Item[] FUNCTIONAL_ITEMS;
+	public final static Item[] INGREDIENT_ITEMS;
 
 	// MODDED GROUPS
 	public final static Item[] DM_ITEMS;
@@ -103,16 +108,28 @@ public class ModItems {
 	// EQUIPMENTS //
 	// ////////// //
 
+	// v1.0.0-beta //
+
 	// TURRET REMOVER
 	public final static Item TURRET_REMOVER = registerToolItem("turret_remover", (settings) -> new TurretRemoverItem(ModToolMaterials.TURRET_REMOVER, 0.0f, 0.0f, settings));
+
+	// v1.2.0-beta //
+
+	// METAL DETECTORS
+	public final static Item IRON_METAL_DETECTOR = registerToolItem("iron_metal_detector", (settings) -> new MetalDetectorItem(ModToolMaterials.IRON_METAL_DETECTOR, 0.0f, 0.0f, settings.component(ModDataComponents.DETECTION_RANGE, 4)));
+	public final static Item NETHERITE_METAL_DETECTOR = registerToolItem("netherite_metal_detector", (settings) -> new MetalDetectorItem(ModToolMaterials.NETHERITE_METAL_DETECTOR, 0.0f, 0.0f, settings.component(ModDataComponents.DETECTION_RANGE, 7)));
 
 	// ////// //
 	// BLOCKS //
 	// ////// //
 
+	// v1.1.0-beta //
+
 	// TURRET ASSEMBLY STATION
 	public final static Item TURRET_ASSEMBLY_STATION = registerItem(ModBlocks.TURRET_ASSEMBLY_STATION, new Properties().rarity(Rarity.UNCOMMON));
 	public final static Item ELECTRIC_FENCE = registerItem(ModBlocks.ELECTRIC_FENCE, new Properties().rarity(Rarity.UNCOMMON));
+
+	// v1.2.0-beta //
 
 	// WORKSHOP
 	public final static Item WORKSHOP = registerItem(ModBlocks.WORKSHOP, new Properties().rarity(Rarity.RARE));
@@ -120,11 +137,24 @@ public class ModItems {
 	// FABRICATION MATRIX
 	public final static Item FABRICATION_MATRIX = registerItem(ModBlocks.FABRICATION_MATRIX, new Properties().rarity(Rarity.EPIC));
 
+	// LANDMINES
+	// AP Mines
+	public final static Item M14_ANTI_PERSONNEL_MINE = registerItem(ModBlocks.ANTI_PERSONNEL_MINE_M14, new Properties().rarity(Rarity.RARE));
+	// AT Mines
+	public final static Item HAWKINS_ANTI_TANK_MINE = registerItem(ModBlocks.ANTI_TANK_MINE_HAWKINS, AntiTankMineHawkinsItem::new);
+
+	// REGULAR BLOCKS
+	public final static Item STEEL_BLOCK = registerItem(ModBlocks.STEEL_BLOCK);
+
 	// //// //
 	// MISC //
 	// //// //
 
+	// v1.2.0-beta //
+
 	public final static Item GEAR = registerItem("gear", GearItem::new);
+	public final static Item STEEL_INGOT = registerItem("steel_ingot");
+	public final static Item STEEL_DROP = registerItem("steel_drop");
 
 	// //////////////////////// //
 	// REGISTRY RELATED METHODS //
@@ -175,6 +205,33 @@ public class ModItems {
 	}
 
 	/**
+	 * Registers a normal item such as ingredients, etc.
+	 *
+	 * @param name  The name of the item. (e.g. {@code "cannon_base"})
+	 * @param props The properties of the item. (e.g. {@code new Item.Properties().rarity(Rarity.UNCOMMON)})
+	 *
+	 * @return The registered item.
+	 */
+	private static Item registerItem(String name, Properties props) {
+		return RegistryHelper.registerItem(
+			name,
+			Item::new,
+			props
+		);
+	}
+
+	/**
+	 * Registers a normal item such as ingredients, etc.
+	 *
+	 * @param name The name of the item. (e.g. {@code "cannon_base"})
+	 *
+	 * @return The registered item.
+	 */
+	private static Item registerItem(String name) {
+		return registerItem(name, new Properties());
+	}
+
+	/**
 	 * Registers a block item.
 	 * @param block The block to register as an item.
 	 * @return The registered item.
@@ -193,14 +250,44 @@ public class ModItems {
 		return RegistryHelper.registerItem(block, props);
 	}
 
+	/**
+	 * Registers a block item using a custom {@link net.minecraft.world.item.BlockItem BlockItem}
+	 * class.
+	 *
+	 * @param block   The block to register as an item.
+	 * @param factory The factory method to create the item. Usually a lambda expression like {@code (block1, settings) -> new CustomBlockItem(block1, settings)}.
+	 *
+	 * @return The registered item.
+	 */
+	private static Item registerItem(Block block, BiFunction<Block, Properties, Item> factory) {
+		return RegistryHelper.registerItem(block, factory);
+	}
+
 	public static void init() {
+		ModDataComponents.init();
 		DefensiveMeasures.LOGGER.info("REGISTERING ITEMS TO ITEM GROUPS...");
+
+		// VANILLA REGISTRATION //
+
+		Arrays.stream(BUILDING_BLOCK_ITEMS).iterator().forEachRemaining(
+			(item) -> CreativeModeTabEvents.modifyOutputEvent(CreativeModeTabs.BUILDING_BLOCKS).register(
+				(output) -> output.accept(item)
+			)
+		);
 
 		Arrays.stream(FUNCTIONAL_ITEMS).iterator().forEachRemaining(
 			(item) -> CreativeModeTabEvents.modifyOutputEvent(CreativeModeTabs.FUNCTIONAL_BLOCKS).register(
 				(output) -> output.accept(item)
 			)
 		);
+
+		Arrays.stream(INGREDIENT_ITEMS).iterator().forEachRemaining(
+			(item) -> CreativeModeTabEvents.modifyOutputEvent(CreativeModeTabs.INGREDIENTS).register(
+				(output) -> output.accept(item)
+			)
+		);
+
+		// MODDED REGISTRATION //
 
 		Arrays.stream(DM_ITEMS).iterator().forEachRemaining(
 			(item) -> CreativeModeTabEvents.modifyOutputEvent(ModItemGroups.DMI_KEY).register(
@@ -246,11 +333,24 @@ public class ModItems {
 	}
 
 	static {
+		// VANILLA CATEGORIES //
+
+		BUILDING_BLOCK_ITEMS = new Item[] {
+			STEEL_BLOCK,
+		};
+
 		FUNCTIONAL_ITEMS = new Item[] {
 			TURRET_ASSEMBLY_STATION,
 			WORKSHOP,
-			FABRICATION_MATRIX
+			FABRICATION_MATRIX,
 		};
+
+		INGREDIENT_ITEMS = new Item[] {
+			STEEL_INGOT,
+			STEEL_DROP,
+		};
+
+		// MODDED CATEGORIES //
 
 		DM_ITEMS = new Item[] {
 			// CANNON
@@ -293,12 +393,17 @@ public class ModItems {
 		};
 
 		DM_EQUIPMENTS = new Item[] {
-			TURRET_REMOVER
+			TURRET_REMOVER,
+			IRON_METAL_DETECTOR,
+			NETHERITE_METAL_DETECTOR,
 		};
 
 		DM_TRAPS = new Item[] {
 			BOLT_HEAD,
 			ELECTRIC_FENCE,
+
+			M14_ANTI_PERSONNEL_MINE,
+			HAWKINS_ANTI_TANK_MINE,
 		};
 
 		DM_TURRETS = new Item[] {
@@ -313,7 +418,7 @@ public class ModItems {
 			// TIER 2
 			AA_TURRET,
 			FLAME_TURRET,
-			MISSILE_TURRET
+			MISSILE_TURRET,
 		};
 
 		FUEL_ITEMS = new Item[] {

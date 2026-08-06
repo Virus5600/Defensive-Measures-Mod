@@ -13,6 +13,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.display.RecipeDisplay;
 import net.minecraft.world.item.crafting.display.ShapelessCraftingRecipeDisplay;
+import net.minecraft.world.item.crafting.display.SlotDisplay;
 
 import com.virus5600.defensive_measures.DefensiveMeasures;
 import com.virus5600.defensive_measures.item.ModItems;
@@ -20,7 +21,6 @@ import com.virus5600.defensive_measures.recipe.book.ModPlaceRecipeHelper;
 import com.virus5600.defensive_measures.recipe.book.ModRecipeBookCategories;
 import com.virus5600.defensive_measures.recipe.display.FlexibleShapedCraftingRecipeDisplay;
 import com.virus5600.defensive_measures.recipebook.ModRecipeBookCategory;
-import net.minecraft.world.item.crafting.display.SlotDisplay;
 
 import java.util.List;
 import java.util.Objects;

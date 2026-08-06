@@ -1,0 +1,25 @@
+﻿{
+	"parent": "minecraft:recipes/root",
+	"criteria": {
+		"has_ingredients": {
+			"trigger": "minecraft:inventory_changed",
+			"conditions": {
+				"items": [
+					{
+						"items": [
+							"dm:steel_block"
+						]
+					}
+				]
+			}
+		}
+	},
+	"requirements": [
+		["has_ingredients"]
+	],
+	"rewards": {
+		"recipes": [
+			"dm:_crafting_table/misc/steel_ingot_from_steel_block"
+		]
+	}
+}

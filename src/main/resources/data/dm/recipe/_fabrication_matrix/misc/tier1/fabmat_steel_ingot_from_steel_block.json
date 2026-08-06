@@ -1,0 +1,12 @@
+{
+	"type": "dm:fabmat_shapeless",
+	"group": "steel_ingot",
+	"category": "misc",
+	"ingredients": [
+		"dm:steel_block"
+	],
+	"result": {
+		"id": "dm:steel_ingot",
+		"count": 9
+	}
+}

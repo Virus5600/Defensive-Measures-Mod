@@ -13,6 +13,14 @@ import com.virus5600.defensive_measures.block.ModBlocks;
 import com.virus5600.defensive_measures.block.misc.tier3.FabricationMatrixBlock;
 import com.virus5600.defensive_measures.block.misc.tier3.FabricationMatrixBlock.FabricationMatrixPart;
 
+/**
+ * A custom {@link SpriteResultSlot} designed to intercept the {@link #onTake(Player, ItemStack)}
+ * method, allowing the {@link FabricationMatrixBlock} to show an "activated" texture and puff a
+ * smoke particle effect when a player takes an item from the crafting result slot.
+ *
+ * @since 1.2.0-beta
+ * @author <a href="https://github.com/Virus5600">Virus5600</a>
+ */
 public class FabMatResultSlot extends SpriteResultSlot {
 	private final Level level;
 	private final BlockPos pos;

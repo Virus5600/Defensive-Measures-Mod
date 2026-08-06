@@ -12,7 +12,7 @@ import net.minecraft.world.phys.AABB;
 
 import com.virus5600.defensive_measures.entity.turrets.TurretEntity;
 import com.virus5600.defensive_measures.entity.turrets.interfaces.Itemable;
-import com.virus5600.defensive_measures.item.equipments.TurretRemoverItem;
+import com.virus5600.defensive_measures.item.equipments.tier1.TurretRemoverItem;
 
 import java.util.List;
 

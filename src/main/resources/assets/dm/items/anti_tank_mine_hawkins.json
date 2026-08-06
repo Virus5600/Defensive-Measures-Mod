@@ -1,0 +1,12 @@
+{
+	"model": {
+		"type": "minecraft:model",
+		"model": "dm:item/tier3/traps/anti_tank_mine_hawkins",
+		"tints": [
+			{
+				"type": "minecraft:constant",
+				"value": 5071920
+			}
+		]
+	}
+}

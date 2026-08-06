@@ -9,7 +9,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.level.Level;
 
 import com.virus5600.defensive_measures.entity.turrets.TurretEntity;
-import com.virus5600.defensive_measures.network.clientbound.sounds.TurretLoopSoundPacket;
+import com.virus5600.defensive_measures.network.clientbound.sound.TurretLoopSoundPacket;
 
 /**
  * An interface that can be implemented by turret entities that have a shooting loopSound which should

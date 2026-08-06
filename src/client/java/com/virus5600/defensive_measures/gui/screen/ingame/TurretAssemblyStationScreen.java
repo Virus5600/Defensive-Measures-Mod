@@ -1,7 +1,5 @@
 package com.virus5600.defensive_measures.gui.screen.ingame;
 
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.WidgetSprites;
 import net.minecraft.client.gui.navigation.ScreenPosition;

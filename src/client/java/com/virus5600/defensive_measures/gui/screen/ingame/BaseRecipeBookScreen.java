@@ -46,9 +46,9 @@ import java.util.Map;
 public abstract class BaseRecipeBookScreen<T extends RecipeBookMenu> extends AbstractContainerScreen<T> implements RecipeUpdateListener {
 	public static Identifier ARROW = Identifier.fromNamespaceAndPath(DefensiveMeasures.MOD_ID, "container/crafting_arrow");
 
+	private final Dimension size;
 	private final RecipeBookComponent<?> recipeBook;
 	protected final Map<AbstractWidget, UpdateScreenPosition> widgets;
-	private final Dimension size;
 
 	private ImageButton recipeBookBtn;
 	private boolean narrow;
@@ -132,6 +132,14 @@ public abstract class BaseRecipeBookScreen<T extends RecipeBookMenu> extends Abs
 	// /////// //
 	// METHODS //
 	// /////// //
+
+	protected int getXOrigin() {
+		return (this.width - this.imageWidth) / 2 - this.leftPos;
+	}
+
+	protected int getYOrigin() {
+		return (this.height - this.imageHeight) / 2 - this.topPos;
+	}
 
 	public boolean hasRecipes() {
 		int recipes = this.recipeBook.selectMatchingRecipes();
