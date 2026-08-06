@@ -36,7 +36,7 @@ import java.util.Optional;
  *
  * @param <T> the type of {@link RecipeInput} this recipe takes in, which is usually {@link CraftingInput}
  *
- * @since 1.1.0
+ * @since 1.1.0-beta
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
  *
  * @see Recipe

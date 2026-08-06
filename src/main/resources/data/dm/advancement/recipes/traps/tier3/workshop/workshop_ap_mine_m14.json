@@ -1,0 +1,58 @@
+﻿{
+	"parent": "minecraft:recipes/root",
+	"criteria": {
+		"workshop_interacted": {
+			"trigger": "minecraft:tick",
+			"conditions": {
+				"player": {
+					"minecraft:type_specific/player": {
+						"stats": [
+							{
+								"type": "minecraft:custom",
+								"stat": "dm:interact_with_workshop",
+								"value": {
+									"min": 1
+								}
+							}
+						]
+					}
+				}
+			}
+		},
+		"has_ingredients": {
+			"trigger": "minecraft:inventory_changed",
+			"conditions": {
+				"items": [
+					{
+						"items": [
+							"minecraft:iron_nugget",
+							"minecraft:gunpowder"
+						]
+					}
+				]
+			}
+		},
+		"has_wooden_pressure_plates": {
+			"trigger": "minecraft:inventory_changed",
+			"conditions": {
+				"items": [
+					{
+						"items": "#minecraft:wooden_pressure_plates"
+					}
+				]
+			}
+		}
+	},
+	"requirements": [
+		["workshop_interacted"],
+		[
+			"has_ingredients",
+			"has_wooden_pressure_plates"
+		]
+	],
+	"rewards": {
+		"recipes": [
+			"dm:_workshop_matrix/traps/tier3/workshop_ap_mine_m14"
+		]
+	}
+}

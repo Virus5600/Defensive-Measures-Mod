@@ -1,0 +1,11 @@
+{
+	"type": "dm:fabmat_shapeless",
+	"category": "misc",
+	"ingredients": [
+		"dm:steel_ingot"
+	],
+	"result": {
+		"id": "dm:steel_drop",
+		"count": 9
+	}
+}

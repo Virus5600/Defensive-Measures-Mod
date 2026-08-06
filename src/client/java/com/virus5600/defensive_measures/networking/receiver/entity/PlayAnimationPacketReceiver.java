@@ -8,6 +8,12 @@ import com.virus5600.defensive_measures.entity.turrets.TurretEntity;
 import com.virus5600.defensive_measures.network.clientbound.entity.PlayAnimationPacket;
 
 /**
+ * A client-side packet receiver for the {@link PlayAnimationPacket}. This receiver handles the
+ * basic logic of when to trigger the {@link TurretEntity#playAnimation(String)} method.
+ * <br><br>
+ * As this method is exclusive to all {@link TurretEntity}, it only has to check if the entity do
+ * extend (or specifically, an instance of) the said class.
+ *
  * @since 1.2.0-beta
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
  */

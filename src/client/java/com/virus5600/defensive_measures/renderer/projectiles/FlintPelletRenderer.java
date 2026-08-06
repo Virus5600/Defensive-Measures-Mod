@@ -11,7 +11,7 @@ import com.virus5600.defensive_measures.renderer.projectiles.state.BaseProjectil
  * @since 1.2.0-beta
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
  */
-public class FlintPelletRenderer extends BaseProjectileRenderer<
+public class FlintPelletRenderer extends BaseTurretProjectileRenderer<
 	FlintPelletEntity,
 	BaseProjectileRenderState,
 	FlintPelletProjectileModel

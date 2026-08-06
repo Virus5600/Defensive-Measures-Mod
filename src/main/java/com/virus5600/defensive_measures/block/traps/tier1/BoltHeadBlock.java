@@ -159,7 +159,8 @@ public class BoltHeadBlock extends Block implements SimpleWaterloggedBlock {
 
 		if (blockState.is(this)) {
 			return blockState.cycle(BOLT_HEADS);
-		} else {
+		}
+		else {
 			FluidState fluidState = ctx.getLevel().getFluidState(ctx.getClickedPos());
 
 			boolean isFluidWater = fluidState.getType() == Fluids.WATER;
@@ -172,7 +173,7 @@ public class BoltHeadBlock extends Block implements SimpleWaterloggedBlock {
 	public void stepOn(@NonNull Level world, @NonNull BlockPos pos, @NonNull BlockState state, Entity entity) {
 		if (!entity.isSteppingCarefully() && entity instanceof LivingEntity) {
 			if (world instanceof ServerLevel serverWorld) {
-				DamageSource dmgSrc = ModDamageSources.create(world, ModDamageTypes.BOLT_HEAD, null, null);
+				DamageSource dmgSrc = ModDamageSources.create(world, ModDamageTypes.BOLT_HEAD, (Entity) null, null);
 				entity.hurtServer(serverWorld, dmgSrc, this.getDamageDealt(state));
 			}
 		}

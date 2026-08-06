@@ -36,8 +36,8 @@ import org.jspecify.annotations.NonNull;
  * The use of this abstract class will also allow the block to inherit this to be 2-block wide,
  * similar to the {@link BedBlock Bed}, which takes up 2 blocks.
  *
+ * @since 1.1.0-beta
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
- * @since 1.1.0
  *
  * @see Block
  * @see CraftingTableBlock

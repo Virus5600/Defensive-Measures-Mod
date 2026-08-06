@@ -9,10 +9,10 @@ import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.Identifier;
+import net.minecraft.util.ARGB;
+import net.minecraft.world.entity.projectile.Projectile;
 
-import com.virus5600.defensive_measures.entity.projectiles.ExplosiveProjectileEntity;
-import com.virus5600.defensive_measures.entity.projectiles.TurretProjectileEntity;
-import com.virus5600.defensive_measures.model.projectiles.BaseProjectileModel;
+import com.virus5600.defensive_measures.model.BaseModel;
 import com.virus5600.defensive_measures.renderer.projectiles.state.BaseProjectileRenderState;
 
 import org.jetbrains.annotations.Nullable;
@@ -21,34 +21,34 @@ import org.jspecify.annotations.NonNull;
 import java.util.function.Supplier;
 
 /**
- * The base projectile renderer, centralizing the handling of common logics and rendering for all
- * projectile types. This design also allows for unique projectiles to handle their own unique
- * custom logic while just calling methods from this class to implement the common logic across all
- * projectiles.
+ * The base projectile renderer, providing common functionality for rendering different types of
+ * projectiles. This allows for centralization of all common logics and rendering for all
+ * projectile types. When needed, a class can extend this abstract class to implement its own
+ * unique custom logic while just calling methods from this class to implement the common logic
+ * across all projectiles.
  *
- * @param <T> The projectile entity for this renderer.
+ * @param <P> The projectile entity for this renderer.
  * @param <S> The render state for this renderer.
  * @param <M> The model for this renderer.
  *
- * @since 1.0.0-beta
+ * @since 1.2.0-beta
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
  */
 public abstract class BaseProjectileRenderer<
-	T extends TurretProjectileEntity,
+	P extends Projectile,
 	S extends BaseProjectileRenderState,
-	M extends BaseProjectileModel<S>
-	> extends EntityRenderer<T, S> {
-
-	private final Supplier<S> renderStateFactory;
+	M extends BaseModel<S>
+	> extends EntityRenderer<P, S> {
+	protected final Supplier<S> renderStateFactory;
 	/** Determines whether this projectile will look at the direction it is going like how an arrow behave. */
-	private boolean lookAtDirection = true;
-	private final M model;
+	protected boolean lookAtDirection = true;
+	protected final M model;
 
 	public BaseProjectileRenderer(
-            EntityRendererProvider.Context context,
-            M entityModel,
-            float shadowRadius,
-            Supplier<S> renderStateFactory
+		EntityRendererProvider.Context context,
+		M entityModel,
+		float shadowRadius,
+		Supplier<S> renderStateFactory
 	) {
 		super(context);
 
@@ -57,16 +57,18 @@ public abstract class BaseProjectileRenderer<
 		this.shadowRadius = shadowRadius;
 	}
 
+	// /////// //
+	// METHODS //
+	// /////// //
+
 	@Override
 	public @NonNull S createRenderState() {
 		return this.renderStateFactory.get();
 	}
 
 	@Override
-	public void extractRenderState(@NonNull T entity, @NonNull S state, float tickProgress) {
+	public void extractRenderState(@NonNull P entity, @NonNull S state, float tickProgress) {
 		super.extractRenderState(entity, state, tickProgress);
-
-		state.loopAnimationState.copyFrom(entity.getLoopAnimationState());
 
 		state.pitch = entity.getXRot(tickProgress);
 		state.yaw = entity.getYRot(tickProgress);
@@ -83,23 +85,31 @@ public abstract class BaseProjectileRenderer<
 
 		Identifier textureId = this.getTexture(state);
 		if (textureId != null) {
+			boolean isBodyVisible = !state.isInvisible;
+			int baseColor = !isBodyVisible ? 0x26FFFFFF : 0xFFFFFFFF;
+			int tintedColor = ARGB.multiply(baseColor, this.getModelTint(state));
+
 			queue.submitModel(
 				this.getModel(), state, stack,
 				RenderTypes.entityCutout(textureId),
 				state.lightCoords,
 				OverlayTexture.NO_OVERLAY,
-				state.outlineColor,
+				tintedColor, null, state.outlineColor,
 				null
 			);
 		}
 
-		stack.popPose();
 		super.submit(state, stack, queue, camState);
+		stack.popPose();
 	}
 
 	// ////////////// //
 	// CUSTOM METHODS //
 	// ////////////// //
+
+	protected int getModelTint(final S state) {
+		return -1;
+	}
 
 	public M getModel() {
 		return this.model;

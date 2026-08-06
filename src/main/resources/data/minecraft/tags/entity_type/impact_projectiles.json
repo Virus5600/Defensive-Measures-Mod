@@ -1,0 +1,7 @@
+{
+	"replace": false,
+	"values": [
+		"#dm:projectiles",
+		"minecraft:splash_potion"
+	]
+}

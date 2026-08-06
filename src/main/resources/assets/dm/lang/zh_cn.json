@@ -6,21 +6,33 @@
 
 	"block.dm.bolt_head" : "Bolt Head",
 	"block.dm.electric_fence" : "Electric Fence",
+	"block.dm.anti_personnel_mine_m14": "Anti-Personnel Mine (M14)",
+	"block.dm.anti_tank_mine_hawkins": "Anti-Tank Mine (Hawkins)",
 
 	"block.dm.turret_assembly_station": "Turret Assembly Station",
 	"block.dm.workshop": "Workshop",
 	"block.dm.fabrication_matrix": "Fabrication Matrix",
 
+	"block.dm.steel_block": "Steel Block",
+
 	"item.dm.gear": "Gear",
+	"item.dm.steel_block": "Steel Block",
+	"item.dm.steel_ingot": "Steel Ingot",
+	"item.dm.steel_drop": "Steel Drop",
 
 	"item.dm.bolt_head": "Bolt Head",
 	"item.dm.electric_fence": "Electric Fence",
+	"item.dm.anti_personnel_mine_m14": "Anti-Personnel Mine (M14)",
+	"item.dm.anti_tank_mine_hawkins": "Anti-Tank Mine (Hawkins)",
 
 	"item.dm.turret_assembly_station": "Turret Assembly Station",
 	"item.dm.workshop": "Workshop",
 	"item.dm.fabrication_matrix": "Fabrication Matrix",
 
 	"item.dm.turret_remover": "拆卸工具",
+
+	"item.dm.iron_metal_detector": "Iron Metal Detector",
+	"item.dm.netherite_metal_detector": "Netherite Metal Detector",
 
 	"item.dm.cannon_base" : "炮塔底座",
 	"item.dm.cannon_stand" : "炮架",
@@ -89,6 +101,8 @@
 	"itemTooltip.dm.pellet_turret.line2" : "Firing Arc: X: ±360° | Y: ±30°",
 	"itemTooltip.dm.pellet_turret.line3" : "Reload Time: 2 seconds",
 
+	"entity.dm.anti_tank_hawkins" : "(Thrown) Hawkins Anti-Tank",
+
 	"entity.dm.cannon_turret" : "炮塔",
 	"entity.dm.cannonball" : "炮弹",
 
@@ -125,6 +139,12 @@
 	"death.attack.flint_pellet": "%2$s got annoyed because of %1$s.",
 	"death.attack.flint_pellet.player": "A lucky pellet shot by %2$s hit and killed %1$s.",
 
+	"death.attack.landmine": "%1$s stepped on a forgotten landmine and blew up.",
+	"death.attack.landmine.player": "%2$s violated the Ottawa Treaty just to kill %1$s.",
+
+	"death.attack.thrown_landmine": "%1$s was torn to pieces by a flying landmine.",
+	"death.attack.thrown_landmine.player": "%1$s was blown to smithereens by %2$s.",
+
 	"subtitles.turret.remove.metal" : "防御塔：拆除",
 	"subtitles.turret.remove.wood" : "防御塔：拆除",
 
@@ -145,6 +165,9 @@
 	"subtitles.generic.rocket.engine.loop": "Rocket Engine firing",
 	"subtitles.generic.rocket.explode": "Rocket explodes",
 	"subtitles.generic.missile.explode": "Missile explodes",
+
+	"subtitles.block.landmine.armed": "Landmine armed",
+	"subtitles.block.landmine.disarmed": "Landmine disarmed",
 
 	"subtitles.turret.hurt.metal" : "Metal turret damaged",
 	"subtitles.turret.hurt.wood" : "Wooden turret damaged",
@@ -174,6 +197,8 @@
 	"subtitles.turret.pellet_turret.hurt" : "Pellet Turret damaged",
 	"subtitles.turret.pellet_turret.destroyed" : "Pellet Turret destroyed",
 	"subtitles.turret.pellet_turret.shoot" : "Pellet Turret shoots",
+
+	"subtitles.projectile.at_hawkins_throw": "Hawkins AT Mine thrown",
 
 	"tag.item.dm.tier_0_turrets" : "Tier 0 Turrets",
 	"tag.item.dm.tier_1_turrets" : "Tier 1 Turrets",

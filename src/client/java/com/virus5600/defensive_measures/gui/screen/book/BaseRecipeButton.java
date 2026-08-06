@@ -11,6 +11,7 @@ import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.recipebook.RecipeCollection;
 import net.minecraft.client.gui.screens.recipebook.SlotSelectTime;
+import net.minecraft.client.input.MouseButtonInfo;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
@@ -202,6 +203,10 @@ public class BaseRecipeButton extends AbstractWidget {
 			}
 		}
 		return true;
+	}
+
+	protected boolean isValidClickButton(final MouseButtonInfo buttonInfo) {
+		return buttonInfo.button() == 0 || buttonInfo.button() == 1;
 	}
 
 	// ///////////// //

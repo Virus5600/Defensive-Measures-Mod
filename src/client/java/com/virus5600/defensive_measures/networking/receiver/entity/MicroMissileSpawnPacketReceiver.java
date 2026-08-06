@@ -15,6 +15,15 @@ import java.util.UUID;
 import com.google.common.collect.Maps;
 
 /**
+ * A client-side packet receiver for the {@link MicroMissileSpawnPacketReceiver}. Specifically,
+ * when the missile spawns in, is also still alive, and the sound is still playing.
+ * <br><br>
+ * This receiver handles the logic of starting and stopping the rocket engine loop sound for micro
+ * missiles. When a micro missile is detected within a certain range of the player, it checks if
+ * the sound is already active for that missile. If not, it starts playing the rocket engine loop
+ * sound. It also cleans up any sounds that are no longer needed, such as when the missile is
+ * destroyed or the sound has stopped playing.
+ *
  * @since 1.1.0-beta
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
  */

@@ -1,0 +1,16 @@
+{
+	"type": "dm:fabmat_shaped",
+	"category": "misc",
+	"pattern": [
+		"sss",
+		"sss",
+		"sss"
+	],
+	"key": {
+		"s": "dm:steel_ingot"
+	},
+	"result": {
+		"id": "dm:steel_block",
+		"count": 1
+	}
+}

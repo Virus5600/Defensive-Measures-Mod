@@ -10,11 +10,13 @@ import net.minecraft.client.particle.SpriteSet;
 import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.util.RandomSource;
 
+import com.virus5600.defensive_measures.entity.projectiles.FlakProjectileEntity;
+
 import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.NonNull;
 
 /**
- * Defines the particles emitted by the {@code Flak Projectile} when it explodes.
+ * Defines the particles emitted by the {@link FlakProjectileEntity Flak Projectile} when it explodes.
  *
  * @since 1.1.0-beta
  * @author <a href="https://github.com/Virus5600">Virus5600</a>

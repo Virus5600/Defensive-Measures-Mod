@@ -1,0 +1,26 @@
+{
+	"type": "dm:fabmat_shaped",
+	"category": "equipment",
+	"pattern": [
+		" l     ",
+		"lln gr ",
+		" nsns  ",
+		"  nsn  ",
+		"   nd d",
+		"     i ",
+		"    d d"
+	],
+	"key": {
+		"l": "minecraft:leather",
+		"n": "minecraft:iron_nugget",
+		"s": "minecraft:stick",
+		"g": "minecraft:glass",
+		"r": "minecraft:redstone",
+		"d": "minecraft:netherite_scrap",
+		"i": "minecraft:netherite_ingot"
+	},
+	"result": {
+		"id": "dm:netherite_metal_detector",
+		"count": 1
+	}
+}

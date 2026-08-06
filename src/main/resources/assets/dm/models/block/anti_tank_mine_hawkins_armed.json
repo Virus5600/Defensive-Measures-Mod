@@ -1,0 +1,120 @@
+{
+	"format_version": "1.21.11",
+	"credit": "Made with Blockbench",
+	"parent": "dm:block/anti_tank_mine_hawkins",
+	"textures": {
+		"0": "dm:block/landmines/anti_tank/hawkins/anti_tank_mine",
+		"particle": "dm:block/landmines/anti_tank/hawkins/anti_tank_mine"
+	},
+	"elements": [
+		{
+			"name": "base",
+			"from": [6.5, -1, 5.5],
+			"to": [9.5, 1, 10.5],
+			"rotation": {"angle": 0, "axis": "y", "origin": [8, 0, 8]},
+			"faces": {
+				"north": {"uv": [6, 0, 9, 2], "texture": "#0", "tintindex": 0},
+				"east": {"uv": [0, 5, 5, 7], "texture": "#0", "tintindex": 0},
+				"south": {"uv": [6, 2, 9, 4], "texture": "#0", "tintindex": 0},
+				"west": {"uv": [5, 5, 10, 7], "texture": "#0", "tintindex": 0},
+				"up": {"uv": [3, 5, 0, 0], "texture": "#0", "tintindex": 0},
+				"down": {"uv": [6, 0, 3, 5], "texture": "#0", "tintindex": 0}
+			}
+		},
+		{
+			"name": "cap",
+			"from": [7.375, -0.625, 5],
+			"to": [8.625, 0.625, 5.5],
+			"rotation": {"angle": 0, "axis": "y", "origin": [8, 0, 5.375]},
+			"faces": {
+				"north": {"uv": [14, 5, 16, 7], "texture": "#0", "tintindex": 0},
+				"east": {"uv": [13, 3, 14, 5], "texture": "#0", "tintindex": 0},
+				"south": {"uv": [12, 5, 14, 7], "texture": "#0", "tintindex": 0},
+				"west": {"uv": [12, 3, 13, 5], "texture": "#0", "tintindex": 0},
+				"up": {"uv": [14, 3, 16, 4], "texture": "#0", "tintindex": 0},
+				"down": {"uv": [14, 4, 16, 5], "texture": "#0", "tintindex": 0}
+			}
+		},
+		{
+			"name": "support",
+			"from": [7.25, 1, 6],
+			"to": [8.75, 1.375, 6.5],
+			"rotation": {"angle": 0, "axis": "y", "origin": [8, 1, 6.25]},
+			"faces": {
+				"north": {"uv": [12, 0, 14, 1], "texture": "#0", "tintindex": 0},
+				"east": {"uv": [11, 0, 12, 1], "texture": "#0", "tintindex": 0},
+				"south": {"uv": [12, 1, 14, 2], "texture": "#0", "tintindex": 0},
+				"west": {"uv": [11, 1, 12, 2], "texture": "#0", "tintindex": 0},
+				"up": {"uv": [14, 0, 16, 1], "texture": "#0", "tintindex": 0},
+				"down": {"uv": [14, 1, 16, 2], "texture": "#0", "tintindex": 0}
+			}
+		},
+		{
+			"name": "support",
+			"from": [7.25, 1, 9.25],
+			"to": [8.75, 1.375, 9.75],
+			"rotation": {"angle": 0, "axis": "y", "origin": [8, 1, 9.5]},
+			"faces": {
+				"north": {"uv": [12, 0, 14, 1], "texture": "#0", "tintindex": 0},
+				"east": {"uv": [11, 0, 12, 1], "texture": "#0", "tintindex": 0},
+				"south": {"uv": [14, 1, 16, 2], "texture": "#0", "tintindex": 0},
+				"west": {"uv": [11, 1, 12, 2], "texture": "#0", "tintindex": 0},
+				"up": {"uv": [12, 1, 14, 2], "texture": "#0", "tintindex": 0},
+				"down": {"uv": [14, 0, 16, 1], "texture": "#0", "tintindex": 0}
+			}
+		},
+		{
+			"name": "trigger_plate",
+			"from": [7.25, 1.38, 6],
+			"to": [8.75, 1.38, 9.75],
+			"rotation": {"angle": 0, "axis": "y", "origin": [8, 1.376, 7.875]},
+			"faces": {
+				"north": {"uv": [0, 0, 1, 1], "texture": "#0", "tintindex": 0},
+				"east": {"uv": [0, 0, 1, 1], "texture": "#0", "tintindex": 0},
+				"south": {"uv": [0, 0, 1, 1], "texture": "#0", "tintindex": 0},
+				"west": {"uv": [0, 0, 1, 1], "texture": "#0", "tintindex": 0},
+				"up": {"uv": [12, 8, 14, 13], "texture": "#0", "tintindex": 0},
+				"down": {"uv": [14, 8, 16, 13], "texture": "#0", "tintindex": 0}
+			}
+		},
+		{
+			"name": "chemical_holder",
+			"from": [7.5, 1, 7.5],
+			"to": [8.5, 1.25, 9.5],
+			"rotation": {"angle": 0, "axis": "y", "origin": [8, 1, 8.5]},
+			"faces": {
+				"north": {"uv": [4, 9, 8, 10], "texture": "#0", "tintindex": 0},
+				"east": {"uv": [4, 11, 8, 12], "texture": "#0", "tintindex": 0},
+				"south": {"uv": [4, 10, 8, 11], "texture": "#0", "tintindex": 0},
+				"west": {"uv": [4, 12, 8, 13], "texture": "#0", "tintindex": 0},
+				"up": {"uv": [0, 8, 4, 12], "texture": "#0", "tintindex": 0},
+				"down": {"uv": [0, 12, 4, 16], "texture": "#0", "tintindex": 0}
+			}
+		},
+		{
+			"name": "chemical_igniter",
+			"from": [7.775, 0.9, 7],
+			"to": [8.225, 1.35, 9],
+			"rotation": {"angle": 0, "axis": "y", "origin": [8, 1.125, 8]},
+			"faces": {
+				"north": {"uv": [8, 14, 9, 15], "texture": "#0", "tintindex": 0},
+				"east": {"uv": [11, 15, 16, 16], "texture": "#0", "tintindex": 0},
+				"south": {"uv": [8, 15, 9, 16], "texture": "#0", "tintindex": 0},
+				"west": {"uv": [11, 14, 16, 15], "texture": "#0", "tintindex": 0},
+				"up": {"uv": [10, 11, 11, 16], "texture": "#0", "tintindex": 0},
+				"down": {"uv": [9, 11, 10, 16], "texture": "#0", "tintindex": 0}
+			}
+		}
+	],
+	"groups": [
+		0,
+		1,
+		{
+			"name": "trigger",
+			"origin": [8, 8, 8],
+			"scope": 0,
+			"color": 0,
+			"children": [2, 3, 4, 5, 6]
+		}
+	]
+}
