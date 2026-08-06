@@ -70,14 +70,16 @@ public abstract class RecipeBookComponent<T extends RecipeBookMenu> implements G
 	private static final Identifier TEXTURE = Identifier.fromNamespaceAndPath(DefensiveMeasures.MOD_ID, "container/recipe_book");
 	private static final Component SEARCH_HINT_TEXT = Component.translatable("gui.recipebook.search_hint").withStyle(EditBox.SEARCH_HINT_STYLE);
 	private static final Component TOGGLE_ALL_RECIPES_TEXT = Component.translatable("gui.recipebook.toggleRecipes.all");
+	public static final int DEFAULT_WIDTH = 147;
+	public static final int DEFAULT_HEIGHT = 195;
 
 	private final Dimension textureSize = new Dimension(256, 256);
 	private final Dimension size;
 	private final GhostSlots ghostRecipe;
 	private final List<BaseRecipeBookTabButton> tabButtons = Lists.newArrayList();
 	private final List<TabInfo> tabInfos;
-	private final BaseRecipeBookPage recipeBookPage;
 	private final StackedItemContents stackedContents = new StackedItemContents();
+	private final BaseRecipeBookPage recipeBookPage;
 	protected final T menu;
 
 	private @Nullable TextSpriteButton closeBtn;
@@ -85,8 +87,9 @@ public abstract class RecipeBookComponent<T extends RecipeBookMenu> implements G
 	private @Nullable BaseRecipeBookTabButton selectedTab;
 	private @Nullable EditBox searchBox;
 	private @Nullable ScreenRectangle magnifierIconPlacement;
-	private @Nullable RecipeDisplayId lastRecipe;
-	private @Nullable RecipeCollection lastRecipeCollection;
+	protected @Nullable RecipeDisplayId lastRecipe;
+	protected @Nullable RecipeCollection lastRecipeCollection;
+
 	private Minecraft minecraft;
 	private ClientRecipeBook book;
 	private String lastSearch = "";
@@ -101,7 +104,7 @@ public abstract class RecipeBookComponent<T extends RecipeBookMenu> implements G
 	protected float displayTime;
 
 	public RecipeBookComponent(T screenHandler, List<TabInfo> tabInfos) {
-		this(screenHandler, tabInfos, 147, 195);
+		this(screenHandler, tabInfos, DEFAULT_WIDTH, DEFAULT_HEIGHT);
 	}
 
 	public RecipeBookComponent(T screenHandler, List<TabInfo> tabInfos, int width, int height) {
@@ -161,7 +164,7 @@ public abstract class RecipeBookComponent<T extends RecipeBookMenu> implements G
 			this.searchBox.getHeight()
 		);
 
-		this.recipeBookPage.init(this.minecraft, xOrigin, yOrigin);
+		this.recipeBookPage().init(this.minecraft, xOrigin, yOrigin);
 
 		this.filterButton = CycleButton.booleanBuilder(
 				this.getRecipeFilterName(),
@@ -288,7 +291,7 @@ public abstract class RecipeBookComponent<T extends RecipeBookMenu> implements G
 		this.visible = visible;
 		this.book.setOpen(this.menu.getRecipeBookType(), visible);
 		if (!visible) {
-			this.recipeBookPage.hideAlternates();
+			this.recipeBookPage().hideAlternates();
 		}
 
 		this.sendUpdateSettings();
@@ -366,7 +369,7 @@ public abstract class RecipeBookComponent<T extends RecipeBookMenu> implements G
 			collection.removeIf((resultCollection) -> !resultCollection.hasCraftable());
 		}
 
-		this.recipeBookPage.updateCollections(collection, resetPage, isFiltering);
+		this.recipeBookPage().updateCollections(collection, resetPage, isFiltering);
 	}
 
 	private void updateTabs(boolean filteringCraftable) {
@@ -452,13 +455,13 @@ public abstract class RecipeBookComponent<T extends RecipeBookMenu> implements G
 			}
 
 			this.filterButton.extractRenderState(graphics, mouseX, mouseY, deltaTicks);
-			this.recipeBookPage.extractRenderState(graphics, xOrigin, yOrigin, mouseX, mouseY, deltaTicks);
+			this.recipeBookPage().extractRenderState(graphics, xOrigin, yOrigin, mouseX, mouseY, deltaTicks);
 		}
 	}
 
 	public void extractTooltip(GuiGraphicsExtractor graphics, int x, int y, @Nullable Slot hoveredSlot) {
 		if (this.isVisible()) {
-			this.recipeBookPage.extractTooltip(graphics, x, y);
+			this.recipeBookPage().extractTooltip(graphics, x, y);
 			this.ghostRecipe.extractTooltip(graphics, this.minecraft, x, y, hoveredSlot);
 		}
 	}
@@ -472,15 +475,15 @@ public abstract class RecipeBookComponent<T extends RecipeBookMenu> implements G
 	public boolean mouseClicked(@NonNull MouseButtonEvent event, boolean doubleClick) {
 		if (this.isVisible() && this.minecraft.player != null) {
 			Dimension size = this.size;
-			boolean recipesAreaClicked = this.recipeBookPage
+			boolean recipesAreaClicked = this.recipeBookPage()
 				.mouseClicked(event,
 					this.getXOrigin(), this.getYOrigin(),
 					size.width, size.height,
 					doubleClick);
 
 			if (recipesAreaClicked) {
-				RecipeDisplayId recipe = this.recipeBookPage.getLastClickedRecipe();
-				RecipeCollection recipeCollection = this.recipeBookPage.getLastClickedRecipeCollection();
+				RecipeDisplayId recipe = this.recipeBookPage().getLastClickedRecipe();
+				RecipeCollection recipeCollection = this.recipeBookPage().getLastClickedRecipeCollection();
 				if (recipe != null && recipeCollection != null) {
 					if (!this.tryPlaceRecipe(recipeCollection, recipe, event.hasShiftDown())) {
 						return false;
@@ -531,7 +534,7 @@ public abstract class RecipeBookComponent<T extends RecipeBookMenu> implements G
 		return this.searchBox != null && this.searchBox.isFocused() && this.searchBox.mouseDragged(event, offsetX, offsetY);
 	}
 
-	private boolean tryPlaceRecipe(RecipeCollection recipeCollection, RecipeDisplayId recipe, boolean useMaxItems) {
+	protected boolean tryPlaceRecipe(RecipeCollection recipeCollection, RecipeDisplayId recipe, boolean useMaxItems) {
 		if ((!recipeCollection.isCraftable(recipe) && recipe.equals(this.lastPlacedRecipe))
 			|| this.minecraft.gameMode == null || this.minecraft.player == null
 		) {
@@ -740,7 +743,7 @@ public abstract class RecipeBookComponent<T extends RecipeBookMenu> implements G
 
 	public void updateNarration(NarrationElementOutput output) {
 		List<NarratableEntry> narratableEntries = Lists.newArrayList();
-		this.recipeBookPage.forEachButton((button) -> {
+		this.recipeBookPage().forEachButton((button) -> {
 			if (button.isActive()) {
 				narratableEntries.add(button);
 			}
@@ -770,9 +773,17 @@ public abstract class RecipeBookComponent<T extends RecipeBookMenu> implements G
 		return this.xOffset;
 	}
 
+	protected final Minecraft minecraft() {
+		return this.minecraft;
+	}
+
 	// /////////////////// //
 	// OVERRIDABLE METHODS //
 	// /////////////////// //
+
+	protected BaseRecipeBookPage recipeBookPage() {
+		return this.recipeBookPage;
+	}
 
 	protected int getTabBtnWidth() {
 		return 30;
