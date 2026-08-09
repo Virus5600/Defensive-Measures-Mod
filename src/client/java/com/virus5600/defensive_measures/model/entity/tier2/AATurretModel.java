@@ -34,6 +34,7 @@ import static com.virus5600.defensive_measures.animations.KeyframeScripts.EXPLOD
 public class AATurretModel extends BaseTurretModel<BaseTurretRenderState> {
 	private final static Queue<? extends Keyframe> SHOOT_KEYFRAMES;
 	private final static Queue<? extends Keyframe> DEATH_KEYFRAMES;
+	public final ModelPart MINIMAP_ICON;
 
 	protected final static String[] TEXTURES = new String[]{
 		"aa_turret.png"
@@ -52,6 +53,8 @@ public class AATurretModel extends BaseTurretModel<BaseTurretRenderState> {
 			new AnimationDefinition[] {AATurretAnimation.ANIM_AA_TURRET_TEARDOWN},
 			2f
 		);
+
+		this.MINIMAP_ICON = root.getChild("base").getChild("horizontal_traverse");
 	}
 
 	public static LayerDefinition createBodyLayer() {

@@ -32,7 +32,8 @@ import static com.virus5600.defensive_measures.animations.KeyframeScripts.EXPLOD
 public class FlameTurretModel extends BaseTurretModel<FlameTurretRenderState> {
 	private final static Queue<? extends Keyframe> DEATH_KEYFRAMES;
 
-	private final ModelPart lighterTip;
+	private final ModelPart LIGHTER_TIP;
+	public final ModelPart MINIMAP_ICON;
 
 	protected final static String[] TEXTURES = new String[]{
 		"flame_turret.png"
@@ -51,7 +52,8 @@ public class FlameTurretModel extends BaseTurretModel<FlameTurretRenderState> {
 			2f
 		);
 
-		this.lighterTip = root.getChild("base").getChild("body").getChild("neck").getChild("head").getChild("nozzle").getChild("lighter").getChild("tip");
+		this.LIGHTER_TIP = root.getChild("base").getChild("body").getChild("neck").getChild("head").getChild("nozzle").getChild("lighter").getChild("tip");
+		this.MINIMAP_ICON = root.getChild("base").getChild("body").getChild("neck");
 	}
 
 	public static LayerDefinition createBodyLayer() {
@@ -122,7 +124,7 @@ public class FlameTurretModel extends BaseTurretModel<FlameTurretRenderState> {
 	public void setupAnim(@NonNull FlameTurretRenderState state) {
 		super.setupAnim(state);
 
-		this.lighterTip.xRot = state.lighterPitch;
+		this.LIGHTER_TIP.xRot = state.lighterPitch;
 	}
 
 	// //////////////// //

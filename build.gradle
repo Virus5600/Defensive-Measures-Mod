@@ -61,15 +61,15 @@ dependencies {
 
 processResources {
 	inputs.property "version", project.version
-	inputs.property "minecraft_version", project.minecraft_version
-	inputs.property "loader_version", project.loader_version
+	inputs.property "minecraft_version", minecraft_version
+	inputs.property "loader_version", loader_version
 
 	filteringCharset "UTF-8"
 
 	filesMatching("fabric.mod.json") {
 		expand "version": project.version,
-			"minecraft_version": project.minecraft_version,
-			"loader_version": project.loader_version
+			"minecraft_version": minecraft_version,
+			"loader_version": loader_version
 	}
 }
 
@@ -104,7 +104,7 @@ java {
 
 jar {
 	from("LICENSE") {
-		rename { "${it}_${project.archives_base_name}"}
+		rename { "${it}_${archives_base_name}"}
 	}
 }
 
@@ -112,7 +112,7 @@ jar {
 publishing {
 	publications {
 		create("mavenJava", MavenPublication) {
-			artifactId = project.archives_base_name
+			artifactId = archives_base_name
 			from components.java
 		}
 	}
@@ -134,5 +134,30 @@ test {
 
 /** Prints the built jar name. */
 tasks.register("getJarName") {
-	println("${project.archives_base_name}-${project.version}")
+	println("${archives_base_name}-${project.version}")
+}
+
+def xaeroRPName = "${xaeroRP}-${xaeroRP_version}"
+
+tasks.register("getRPName") {
+	println("Xareo RP: ${archives_base_name}-${project.version}-${xaeroRPName}.zip")
+}
+
+/**
+ * Creates the Xaero's Minimap resource pack zip file. This is used for creating the resource pack
+ * and distributing the icons separately from the mod jar.
+ */
+tasks.register('xaeroResourcePack', Zip) {
+	archiveClassifier = "${xaeroRPName}"
+	from('src/main/resources/resource-support/xaero-pack')
+	destinationDirectory = layout.buildDirectory.dir('libs')
+}
+
+tasks.register("buildAllModRelated") {
+	dependsOn("build", "xaeroResourcePack")
+}
+
+processResources {
+	exclude 'resource-support/**'
+	includeEmptyDirs = false
 }

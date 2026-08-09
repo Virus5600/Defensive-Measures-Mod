@@ -1,0 +1,16 @@
+{
+	"variants": {
+		"default": "model:0"
+	},
+	"modelConfigs": [
+		{
+			"baseScale": 1.25,
+			"rotationX": -15,
+			"rotationY" : 30,
+			"modelMainPartFieldAliases": [
+				"com.virus5600.defensive_measures.model.entity.tier1.BallistaTurretModel;MINIMAP_ICON"
+			],
+			"renderingFullModel": false
+		}
+	]
+}

@@ -1,0 +1,15 @@
+{
+	"variants": {
+		"default": "model:0"
+	},
+	"modelConfigs": [
+		{
+			"baseScale": 0.75,
+			"rotationY" : 30,
+			"modelMainPartFieldAliases": [
+				"com.virus5600.defensive_measures.model.entity.tier2.FlameTurretModel;MINIMAP_ICON"
+			],
+			"renderingFullModel": false
+		}
+	]
+}
