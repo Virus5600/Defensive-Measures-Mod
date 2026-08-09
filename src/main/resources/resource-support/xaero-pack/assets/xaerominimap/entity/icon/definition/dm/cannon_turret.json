@@ -1,0 +1,15 @@
+{
+	"variants": {
+		"default": "model:0"
+	},
+	"modelConfigs": [
+		{
+			"rotationX": -15,
+			"rotationY" : 60,
+			"modelMainPartFieldAliases": [
+				"com.virus5600.defensive_measures.model.entity.tier1.CannonTurretModel;MINIMAP_ICON"
+			],
+			"renderingFullModel": false
+		}
+	]
+}

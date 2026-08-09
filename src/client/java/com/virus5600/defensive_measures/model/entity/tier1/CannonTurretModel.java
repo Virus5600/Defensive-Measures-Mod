@@ -16,6 +16,8 @@ import com.virus5600.defensive_measures.renderer.entity.state.BaseTurretRenderSt
  * @version 2.0
  */
 public class CannonTurretModel extends BaseTurretModel<BaseTurretRenderState> {
+	public final ModelPart MINIMAP_ICON;
+
 	protected final static String[] TEXTURES = new String[] {
 		"cannon_turret.png"
 	};
@@ -33,6 +35,8 @@ public class CannonTurretModel extends BaseTurretModel<BaseTurretRenderState> {
 			new AnimationDefinition[] {CannonTurretAnimation.ANIM_CANNON_TEARDOWN},
 			1f
 		);
+
+		this.MINIMAP_ICON = root.getChild("stand").getChild("head");
 	}
 
 	public static LayerDefinition createBodyLayer() {
@@ -51,7 +55,8 @@ public class CannonTurretModel extends BaseTurretModel<BaseTurretRenderState> {
 			.texOffs(42, 76).addBox(-1.0F, -4.0F, -3.0F, 1.0F, 4.0F, 3.0F, new CubeDeformation(0.0F)), PartPose.offset(6.0F, -1.5F, 1.0F));
 		left_stand.addOrReplaceChild("left_stand_r1", CubeListBuilder.create().texOffs(0, 67).addBox(-0.975F, -2.0F, -9.0F, 1.0F, 3.0F, 12.0F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(0.0F, -5.0F, 0.0F, 0.8727F, 0.0F, 0.0F));
 
-		stand.addOrReplaceChild("head", CubeListBuilder.create().texOffs(54, 18).addBox(-5.0F, -2.5F, -5.5F, 10.0F, 6.0F, 8.0F, new CubeDeformation(0.0F))
+		stand.addOrReplaceChild("head", CubeListBuilder.create()
+			.texOffs(54, 18).addBox(-5.0F, -2.5F, -5.5F, 10.0F, 6.0F, 8.0F, new CubeDeformation(0.0F))
 			.texOffs(0, 45).addBox(-4.0F, -3.5F, -10.5F, 8.0F, 8.0F, 14.0F, new CubeDeformation(0.0F))
 			.texOffs(44, 58).addBox(-3.0F, -4.5F, -5.5F, 6.0F, 10.0F, 8.0F, new CubeDeformation(0.0F))
 			.texOffs(0, 18).addBox(-3.0F, -2.5F, -15.5F, 6.0F, 6.0F, 21.0F, new CubeDeformation(0.0F))

@@ -16,6 +16,7 @@ import com.virus5600.defensive_measures.renderer.entity.state.BaseTurretRenderSt
  * @version 2.0
  */
 public class BallistaTurretModel extends BaseTurretModel<BaseTurretRenderState> {
+	public final ModelPart MINIMAP_ICON;
 
 	protected final static String[] TEXTURES = new String[] {
 		"ballista.png"
@@ -35,6 +36,7 @@ public class BallistaTurretModel extends BaseTurretModel<BaseTurretRenderState> 
 			1f
 		);
 
+		this.MINIMAP_ICON = root.getChild("base").getChild("head");
 	}
 
 	public static LayerDefinition createBodyLayer() {

@@ -19,10 +19,12 @@ import org.jspecify.annotations.NonNull;
  */
 public class PelletTurretModel extends BaseTurretModel<BaseTurretRenderState> {
 	private final ModelPart SUPPORT_STICKS;
+	public final ModelPart MINIMAP_ICON;
 
 	protected final static String[] TEXTURES = new String[] {
 		"pellet_turret.png"
 	};
+
 
 	public PelletTurretModel(ModelPart root) {
 		super(
@@ -41,6 +43,8 @@ public class PelletTurretModel extends BaseTurretModel<BaseTurretRenderState> {
 		this.SUPPORT_STICKS = root.getChild("base")
 			.getChild("pole")
 			.getChild("support");
+
+		this.MINIMAP_ICON = root.getChild("base").getChild("pole").getChild("holder").getChild("barrel");
 	}
 
 	public static LayerDefinition createBodyLayer() {

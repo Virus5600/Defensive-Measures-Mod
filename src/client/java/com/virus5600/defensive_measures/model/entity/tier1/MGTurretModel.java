@@ -16,6 +16,8 @@ import com.virus5600.defensive_measures.renderer.entity.state.BaseTurretRenderSt
  * @version 2.0
  */
 public class MGTurretModel extends BaseTurretModel<BaseTurretRenderState> {
+	public final ModelPart MINIMAP_ICON;
+
 	protected final static String[] TEXTURES = new String[] {
 		"mg_turret.png"
 	};
@@ -33,6 +35,8 @@ public class MGTurretModel extends BaseTurretModel<BaseTurretRenderState> {
 			new AnimationDefinition[] {MGTurretAnimation.ANIM_MG_TEARDOWN},
 			0.625f
 		);
+
+		this.MINIMAP_ICON = root.getChild("turret").getChild("body").getChild("head");
 	}
 
 	@SuppressWarnings("unused")
