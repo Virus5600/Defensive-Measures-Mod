@@ -1,0 +1,15 @@
+{
+	"variants": {
+		"default": "model:0"
+	},
+	"modelConfigs": [
+		{
+			"rotationX": -15,
+			"rotationY" : 45,
+			"modelMainPartFieldAliases": [
+				"com.virus5600.defensive_measures.model.entity.tier0.PelletTurretModel;MINIMAP_ICON"
+			],
+			"renderingFullModel": false
+		}
+	]
+}

@@ -29,6 +29,7 @@ import org.jspecify.annotations.NonNull;
 public class MissileTurretModel extends BaseTurretModel<MissileTurretRenderState> {
 	private final static Queue<? extends Keyframe> SHOOT_KEYFRAMES;
 	private final ModelPart RADAR_DISH;
+	public final ModelPart MINIMAP_ICON;
 
 	protected final static String[] TEXTURES = new String[] {
 		"missile_turret.png"
@@ -54,6 +55,8 @@ public class MissileTurretModel extends BaseTurretModel<MissileTurretRenderState
 			.getChild("head")
 			.getChild("radar")
 			.getChild("upper_radar");
+
+		this.MINIMAP_ICON = root.getChild("base").getChild("stand").getChild("column").getChild("swivel");
 	}
 
 	public static LayerDefinition createBodyLayer() {
