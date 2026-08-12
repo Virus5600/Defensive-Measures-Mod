@@ -1643,7 +1643,7 @@ public abstract class TurretEntity extends Mob implements Itemable, RangedAttack
 	}
 
 	public int getMinHeadXRot() {
-		return -this.getMaxHeadYRot();
+		return -this.getMaxHeadXRot();
 	}
 
 	@Override

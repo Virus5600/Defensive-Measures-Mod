@@ -8,7 +8,7 @@
 			"rotationX": -15,
 			"rotationY" : 45,
 			"modelMainPartFieldAliases": [
-				"com.virus5600.defensive_measures.model.entity.tier0.PelletTurretModel;MINIMAP_ICON"
+				"com.virus5600.defensive_measures.model.entity.tier0.DirtTurretModel;MINIMAP_ICON"
 			],
 			"renderingFullModel": false
 		}

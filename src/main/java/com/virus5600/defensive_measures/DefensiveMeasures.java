@@ -1,9 +1,9 @@
 package com.virus5600.defensive_measures;
 
-import com.virus5600.defensive_measures.behvaior.block.ModDispenserItemBehavior;
 import net.fabricmc.api.ModInitializer;
 
 import com.virus5600.defensive_measures.advancement.criterion.ModCriterion;
+import com.virus5600.defensive_measures.behvaior.block.ModDispenserItemBehavior;
 import com.virus5600.defensive_measures.block.ModBlocks;
 import com.virus5600.defensive_measures.block.state.properties.ModBlockStateProperties;
 import com.virus5600.defensive_measures.command.ModCommands;

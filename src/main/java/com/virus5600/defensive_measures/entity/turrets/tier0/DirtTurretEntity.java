@@ -1,18 +1,14 @@
 package com.virus5600.defensive_measures.entity.turrets.tier0;
 
-import net.minecraft.network.syncher.EntityDataAccessor;
-import net.minecraft.network.syncher.EntityDataSerializers;
-import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
-import net.minecraft.world.entity.ai.attributes.AttributeSupplier.Builder;
+import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -30,51 +26,47 @@ import com.virus5600.defensive_measures.sound.ModSoundEvents;
 import org.jetbrains.annotations.Nullable;
 import org.jspecify.annotations.NonNull;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 /**
- * Represents the Pellet Turret entity.
+ * Represents the Dirt Turret entity
  * <br><br>
- * A Pellet Turret is a basic wooden turret that shoots pellets at enemies. It has a short range
- * and deals a small amount of damage while providing a high fire rate with low damage. It can be
- * used to strategically to bait enemies into a location, letting the turret be a sacrificial
- * pawn to group enemies together.
+ * A joke turret suggested by one of the players who played the mod. While it might be a joke
+ * turret, it is still a turret that can be used to defend against enemies. It has a very low
+ * health and deals very low damage, but it can be used to distract enemies and buy time for other
+ * turrets to deal damage. It can also be used to block enemy projectiles and protect other turrets.
+ * <br><br>
+ * Additionally, while it has low damage, the dirt it "shoots" gives a Blindness effect for a short
+ * while to anyone hit by the dirt. This can be used to blind enemies and make them easier to kill.
+ * However, the Blindness effect is not very long, so it is not very effective against enemies with
+ * high health or armor.
  * <hr/>
  * <b>Attributes:</b>
  * <ul>
- *     <li><b>Health:</b> 20</li>
- *     <li><b>Base Damage:</b> 2.0</li>
+ *     <li><b>Health:</b> 10</li>
+ *     <li><b>Base Damage:</b> 1.0</li>
  *     <li><b>Base Pierce Level:</b> 0</li>
- *     <li><b>Attack Cooldown:</b> 2 seconds</li>
- *     <li><b>Attack Range:</b> 10 blocks</li>
+ *     <li><b>Attack Cooldown:</b> 2.5 seconds</li>
+ *     <li><b>Attack Range:</b> 8 blocks</li>
  *     <li><b>X Firing Arc:</b> ±360°</li>
- *     <li><b>Y Firing Arc:</b> ±30°</li>
- *     <li><b>Armor:</b> 0</li>
- *     <li><b>Armor Toughness:</b> 0</li>
+ *     <li><b>Y Firing Arc:</b> ±7°</li>
+ *     <li><b>Armor:</b> 2</li>
+ *     <li><b>Armor Toughness:</b> 2</li>
  * </ul>
- * <hr/>
- * Additionally, the turret can have various abilities based on its evolution path that can be
- * rescinded or changed when see fit:
- * <a href="https://github.com/Virus5600/Defensive-Measures-Mod/issues/31">Pellet Turret's GitHub
- * issue</a>.
  *
  * @see TurretEntity
  *
  * @since 1.2.0-beta
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
  */
-public class PelletTurretEntity extends TurretEntity {
-	private static final EntityDataAccessor<Integer> ATTACK_COOLDOWN;
-
+public class DirtTurretEntity extends TurretEntity {
 	/**
 	 * Defines how many seconds the ballista should wait before shooting again.
-	 * The time is calculated in ticks and by default, it's 2.0 seconds <b>(20 ticks times 2.0 seconds)</b>.
+	 * The time is calculated in ticks and by default, it's 2.5 seconds <b>(20 ticks times 2.5 seconds)</b>.
 	 */
-	private static final int TOTAL_ATT_COOLDOWN = (int) (20 * 2.0);
-	private static final Map<Offsets, List<Vec3>> OFFSETS;
+	private static final int TOTAL_ATT_COOLDOWN = (int) (20 * 2.5);
+	private static final Map<DirtTurretEntity.Offsets, List<Vec3>> OFFSETS;
 	private static final Map<Item, SoundEvent> HEAL_SOUNDS;
 	private static final double[] DAMAGE;
 	private static final byte[] PIERCE_LEVELS;
@@ -91,13 +83,12 @@ public class PelletTurretEntity extends TurretEntity {
 	// //////////// //
 	// CONSTRUCTORS //
 	// //////////// //
-	public PelletTurretEntity(EntityType<? extends Mob> entityType, Level world) {
-		super(entityType, world, TurretMaterial.WOOD, ModEntities.FLINT_PELLET, ModItems.PELLET_TURRET);
-
+	public DirtTurretEntity(EntityType<? extends Mob> entityType, Level world) {
+		super(entityType, world, TurretMaterial.DIRT, ModEntities.SPECTRAL_ARROW, ModItems.DIRT_TURRET);
 
 		this.addHealables(healables)
 			.addEffectSource(effectSource)
-			.setShootSound(ModSoundEvents.TURRET_PELLET_SHOOT)
+			.setShootSound(ModSoundEvents.TURRET_DIRT_SHOOT)
 		;
 	}
 
@@ -113,18 +104,9 @@ public class PelletTurretEntity extends TurretEntity {
 		super.registerGoals();
 	}
 
-	@Override
-	protected void defineSynchedData(net.minecraft.network.syncher.SynchedEntityData.@NonNull Builder builder) {
-		// Initialize standard data trackers
-		super.defineSynchedData(builder);
-
-		builder.define(ATTACK_COOLDOWN, TOTAL_ATT_COOLDOWN)
-		;
-	}
-
-	public static Builder setAttributes() {
-		TurretEntity.setTurretMaxHealth(20);
-		TurretEntity.setTurretMaxRange(10 + ModEntities.BALLISTA_TURRET.getDimensions().eyeHeight());
+	public static AttributeSupplier.Builder setAttributes() {
+		TurretEntity.setTurretMaxHealth(10);
+		TurretEntity.setTurretMaxRange(8 + ModEntities.BALLISTA_TURRET.getDimensions().eyeHeight());
 
 		return TurretEntity.setAttributes();
 	}
@@ -166,27 +148,27 @@ public class PelletTurretEntity extends TurretEntity {
 
 	@Override
 	public int getMaxHeadXRot() {
-		return 30;
+		return 7;
 	}
 
 	@Override @Nullable
 	protected SoundEvent getHurtSound(@NonNull DamageSource source) {
-		return ModSoundEvents.TURRET_PELLET_HURT;
+		return ModSoundEvents.TURRET_DIRT_HURT;
 	}
 
 	@Override @Nullable
 	protected SoundEvent getDeathSound() {
-		return ModSoundEvents.TURRET_PELLET_DESTROYED;
+		return ModSoundEvents.TURRET_DIRT_DESTROYED;
 	}
 
 	@Override
 	public ItemStack getEntityItem() {
-		return new ItemStack(ModItems.PELLET_TURRET);
+		return new ItemStack(ModItems.DIRT_TURRET);
 	}
 
 	@Override
 	public SoundEvent getEntityRemoveSound() {
-		return ModSoundEvents.TURRET_REMOVED_WOOD;
+		return ModSoundEvents.TURRET_REMOVED_DIRT;
 	}
 
 	// //////////////////////// //
@@ -197,14 +179,14 @@ public class PelletTurretEntity extends TurretEntity {
 
 	/**
 	 * {@inheritDoc}
-	 * @see {@code PelletTurretAnimation#ANIM_PELLET_TURRET_DEATH}
+	 * @see {@code DirtTurretAnimation#ANIM_DIRT_TURRET_DEATH}
 	 */
 	protected int getDeathAnimDuration() {
 		return (int) (1.0F * 20);
 	}
 
 	protected List<Vec3> getTurretProjectileSpawn() {
-		return OFFSETS.get(Offsets.TUBE);
+		return OFFSETS.get(Offsets.BARREL);
 	}
 
 	public TurretProjectileVelocity getProjectileVelocityData(LivingEntity target) {
@@ -226,31 +208,7 @@ public class PelletTurretEntity extends TurretEntity {
 	}
 
 	public int getTotalAttCooldown() {
-		int attCooldown = TOTAL_ATT_COOLDOWN;
-		MobEffectInstance effectInstance = this.getEffect(MobEffects.HASTE);
-
-		if (effectInstance != null) {
-			double level = effectInstance.getAmplifier() + 1;
-			double denominator = level > 2 ? 256 : 10;
-
-			attCooldown = (int) (attCooldown * (1 - (level / denominator)));
-		}
-
-		attCooldown = Math.max(attCooldown, (int) (0.5 * 20));
-
-		// Updates the attack goal's attack interval, allowing the haste effect to properly speed
-		// up the turret's fire rate
-		if (
-			!this.level().isClientSide()
-				&& this.attackGoal != null
-				&& this.attackGoal.getMaxIntervalTicks() != attCooldown
-		) {
-			this.attackGoal.setMaxIntervalTicks(attCooldown);
-			this.attackGoal.setMinIntervalTicks(attCooldown);
-			this.entityData.set(ATTACK_COOLDOWN, attCooldown);
-		}
-
-		return attCooldown;
+		return TOTAL_ATT_COOLDOWN;
 	}
 
 	// //////////// //
@@ -271,7 +229,7 @@ public class PelletTurretEntity extends TurretEntity {
 	// LOCAL CLASSES/ENUMS //
 	// /////////////////// //
 	public enum Offsets {
-		TUBE
+		BARREL
 	}
 
 	// ///////////////// //
@@ -279,11 +237,9 @@ public class PelletTurretEntity extends TurretEntity {
 	// ///////////////// //
 
 	static {
-		ATTACK_COOLDOWN = SynchedEntityData.defineId(PelletTurretEntity.class, EntityDataSerializers.INT);
-
 		DAMAGE = new double[] {
-			2,
-			3.75,
+			1,
+			2.5,
 			5
 		};
 
@@ -294,42 +250,26 @@ public class PelletTurretEntity extends TurretEntity {
 		};
 
 		OFFSETS = Map.of(
-			Offsets.TUBE, List.of(
+			Offsets.BARREL, List.of(
 				new Vec3(0, 0, 0.5)
 			)
 		);
 
 		// HEAL SOUNDS
-		HEAL_SOUNDS = new HashMap<>();
-		HEAL_SOUNDS.put(Items.STICK, ModSoundEvents.TURRET_REPAIR_WOOD);
-		HEAL_SOUNDS.put(Items.LEATHER, ModSoundEvents.TURRET_REPAIR_LEATHER);
+		HEAL_SOUNDS = Map.of(
+			Items.GRASS_BLOCK, ModSoundEvents.TURRET_REPAIR_DIRT,
+			Items.DIRT, ModSoundEvents.TURRET_REPAIR_DIRT
+		);
 
-		final List<Item> WOODS = new ArrayList<>(TurretEntity.PLANKS.stream().toList());
-		WOODS.addAll(TurretEntity.LOGS);
-		WOODS.forEach(item -> HEAL_SOUNDS.put(item, ModSoundEvents.TURRET_REPAIR_WOOD));
+		healables = Map.of(
+			Items.GRASS_BLOCK, 2.5f,
+			Items.DIRT, 5.0f
+		);
 
-		healables = new HashMap<>() {
-			{
-				put(Items.STICK, 1.0f);
-				put(Items.LEATHER, 3.0f);
-
-				TurretEntity.PLANKS.forEach(item -> put(item, 5.0f));
-				TurretEntity.LOGS.forEach(item -> put(item, 25.0f));
-			}
-		};
-
-		effectSource = new HashMap<>() {
-			{
-				put(Items.LEATHER, List.<Object[]>of(
-					new Object[] {MobEffects.HASTE, 30, 2}
-				));
-
-				for (Item item : TurretEntity.LOGS) {
-					put(item, List.<Object[]>of(
-						new Object[] {MobEffects.ABSORPTION, 60, 2}
-					));
-				}
-			}
-		};
+		effectSource = Map.of(
+			Items.DIRT, List.<Object[]>of(
+				new Object[] {MobEffects.ABSORPTION, 30, 2}
+			)
+		);
 	}
 }
