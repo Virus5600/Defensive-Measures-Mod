@@ -70,6 +70,7 @@
 	"item.dm.missile_turret_radar": "Missile Turret Radar",
 
 	"item.dm.pellet_turret": "Place Pellet Turret",
+	"item.dm.dirt_turret": "Place Dirt Turret",
 
 	"itemTooltip.dm.generic.health" : "Health: %.1f / %.1f (%.2f%%)",
 
@@ -101,6 +102,10 @@
 	"itemTooltip.dm.pellet_turret.line2" : "Firing Arc: X: ±360° | Y: ±30°",
 	"itemTooltip.dm.pellet_turret.line3" : "Reload Time: 2 seconds",
 
+	"itemTooltip.dm.dirt_turret.line1" : "Range: 8 blocks",
+	"itemTooltip.dm.dirt_turret.line2" : "Firing Arc: X: ±360° | Y: -7° to +7°",
+	"itemTooltip.dm.dirt_turret.line3" : "Reload Time: 2.5 seconds",
+
 	"entity.dm.anti_tank_hawkins" : "(Thrown) Hawkins Anti-Tank",
 
 	"entity.dm.cannon_turret" : "炮塔",
@@ -123,6 +128,8 @@
 
 	"entity.dm.pellet_turret": "Pellet Turret",
 	"entity.dm.flint_pellet": "Flint Pellet",
+
+	"entity.dm.dirt_turret": "Dirt Turret",
 
 	"death.attack.bolt_head" : "%1$s踩到了箭头陷阱",
 	"death.attack.bolt_head.player" : "%1$s在和与%2$s战斗时踩到了箭头陷阱",
@@ -152,6 +159,7 @@
 	"subtitles.turret.bow.repair" : "Repaired a bow turret",
 	"subtitles.turret.leather.repair" : "Stitched leather patching",
 	"subtitles.turret.wood.repair" : "Repaired a wooden turret",
+	"subtitles.turret.dirt.repair" : "Repaired a dirt turret",
 
 	"subtitles.generic.impact.bullet.default" : "Bullet impacted",
 	"subtitles.generic.impact.bullet.flesh" : "Bullet hit an entity",
@@ -197,6 +205,9 @@
 	"subtitles.turret.pellet_turret.hurt" : "Pellet Turret damaged",
 	"subtitles.turret.pellet_turret.destroyed" : "Pellet Turret destroyed",
 	"subtitles.turret.pellet_turret.shoot" : "Pellet Turret shoots",
+	"subtitles.turret.dirt_turret.hurt" : "Dirt Turret damaged",
+	"subtitles.turret.dirt_turret.destroyed" : "Dirt Turret destroyed",
+	"subtitles.turret.dirt_turret.shoot" : "Dirt Turret shoots",
 
 	"subtitles.projectile.at_hawkins_throw": "Hawkins AT Mine thrown",
 

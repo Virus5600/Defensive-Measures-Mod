@@ -42,6 +42,7 @@ public class ModEntityModels {
 
 	// v1.2.0-beta
 	public static final ModelLayerLocation PELLET_TURRET = registerMain("pellet_turret");
+	public static final ModelLayerLocation DIRT_TURRET = registerMain("dirt_turret");
 
 	// /////////// //
 	// PROJECTILES //
@@ -80,6 +81,7 @@ public class ModEntityModels {
 
 		// v1.2.0-beta
 		ModelLayerRegistry.registerModelLayer(PELLET_TURRET, PelletTurretModel::createBodyLayer);
+		ModelLayerRegistry.registerModelLayer(DIRT_TURRET, DirtTurretModel::createBodyLayer);
 
 		// /////////// //
 		// PROJECTILES //

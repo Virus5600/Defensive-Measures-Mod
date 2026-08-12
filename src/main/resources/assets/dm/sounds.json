@@ -101,6 +101,16 @@
 		],
 		"subtitle": "subtitles.turret.remove.wood"
 	},
+	"turret.remove.dirt": {
+		"sounds": [
+			"dig/grass1",
+			"dig/grass2",
+			"dig/grass3",
+			"dig/grass4"
+		],
+		"pitch": 0.75,
+		"subtitle": "subtitles.turret.remove.dirt"
+	},
 
 	"turret.repair.metal": {
 		"sounds": [
@@ -136,6 +146,17 @@
 			"dm:turrets/repair/wood_repair2"
 		],
 		"subtitle": "subtitles.turret.wood.repair"
+	},
+	"turret.repair.dirt": {
+		"sounds": [
+			"dig/grass1",
+			"dig/grass2",
+			"dig/grass3",
+			"dig/grass4"
+		],
+		"volume": 1.5,
+		"pitch": 0.75,
+		"subtitle": "subtitles.turret.dirt.repair"
 	},
 
 	"turret.hurt.metal": {
@@ -436,5 +457,38 @@
 			"block/lodestone/lock2"
 		],
 		"subtitle": "subtitles.block.landmine.disarmed"
+	},
+
+	"turret.dirt_turret.hurt": {
+		"sounds": [
+			"block/rooted_dirt/break1",
+			"block/rooted_dirt/break2",
+			"block/rooted_dirt/break3",
+			"block/rooted_dirt/break4"
+		],
+		"pitch": 0.75,
+		"subtitle": "subtitles.turret.dirt_turret.hurt"
+	},
+	"turret.dirt_turret.destroyed": {
+		"sounds": [
+			"block/rooted_dirt/break1",
+			"block/rooted_dirt/break2",
+			"block/rooted_dirt/break3",
+			"block/rooted_dirt/break4"
+		],
+		"pitch": 0.75,
+		"subtitle": "subtitles.turret.dirt_turret.destroyed"
+	},
+	"turret.dirt_turret.shoot": {
+		"sounds": [
+			"block/rooted_dirt/step1",
+			"block/rooted_dirt/step2",
+			"block/rooted_dirt/step3",
+			"block/rooted_dirt/step4",
+			"block/rooted_dirt/step5",
+			"block/rooted_dirt/step6"
+		],
+		"pitch": 0.75,
+		"subtitle": "subtitles.turret.dirt_turret.shoot"
 	}
 }

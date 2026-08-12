@@ -25,7 +25,6 @@ public class PelletTurretModel extends BaseTurretModel<BaseTurretRenderState> {
 		"pellet_turret.png"
 	};
 
-
 	public PelletTurretModel(ModelPart root) {
 		super(
 			root, "pellet_turret", TEXTURES,
