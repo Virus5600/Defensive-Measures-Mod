@@ -20,7 +20,7 @@ import com.virus5600.defensive_measures.item.equipments.tier2.*;
 import com.virus5600.defensive_measures.item.interfaces.FuelItem;
 import com.virus5600.defensive_measures.item.misc.tier3.*;
 import com.virus5600.defensive_measures.item.turrets.TurretItem;
-import com.virus5600.defensive_measures.item.turrets.tier_0.pellet_turret.*;
+import com.virus5600.defensive_measures.item.turrets.tier_0.*;
 import com.virus5600.defensive_measures.item.turrets.tier_1.ballista.*;
 import com.virus5600.defensive_measures.item.turrets.tier_1.cannon.*;
 import com.virus5600.defensive_measures.item.turrets.tier_1.mg_turret.*;
@@ -101,8 +101,9 @@ public class ModItems {
 	public final static Item MISSILE_TURRET_BATTERY = registerItem("missile_turret_battery", MissileBatteryItem::new);
 	public final static Item MISSILE_TURRET_RADAR = registerItem("missile_turret_radar", MissileRadarItem::new);
 
-	// PELLET TURRET
+	// TIER 0 TURRET
 	public final static Item PELLET_TURRET = registerItem("pellet_turret", ModEntities.PELLET_TURRET, PelletTurretItem::new);
+	public final static Item DIRT_TURRET = registerItem("dirt_turret", ModEntities.DIRT_TURRET, DirtTurretItem::new);
 
 	// ////////// //
 	// EQUIPMENTS //
@@ -409,6 +410,7 @@ public class ModItems {
 		DM_TURRETS = new Item[] {
 			// TIER 0
 			PELLET_TURRET,
+			DIRT_TURRET,
 
 			// TIER 1
 			CANNON_TURRET,

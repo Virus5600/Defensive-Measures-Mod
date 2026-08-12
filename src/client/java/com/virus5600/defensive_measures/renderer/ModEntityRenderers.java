@@ -4,13 +4,9 @@ import net.minecraft.client.renderer.entity.EntityRenderers;
 
 import com.virus5600.defensive_measures.DefensiveMeasures;
 import com.virus5600.defensive_measures.entity.ModEntities;
-import com.virus5600.defensive_measures.renderer.entity.tier0.PelletTurretRenderer;
-import com.virus5600.defensive_measures.renderer.entity.tier1.BallistaTurretRenderer;
-import com.virus5600.defensive_measures.renderer.entity.tier1.CannonTurretRenderer;
-import com.virus5600.defensive_measures.renderer.entity.tier1.MGTurretRenderer;
-import com.virus5600.defensive_measures.renderer.entity.tier2.AATurretRenderer;
-import com.virus5600.defensive_measures.renderer.entity.tier2.FlameTurretRenderer;
-import com.virus5600.defensive_measures.renderer.entity.tier2.MissileTurretRenderer;
+import com.virus5600.defensive_measures.renderer.entity.tier0.*;
+import com.virus5600.defensive_measures.renderer.entity.tier1.*;
+import com.virus5600.defensive_measures.renderer.entity.tier2.*;
 import com.virus5600.defensive_measures.renderer.projectiles.*;
 
 /**
@@ -43,6 +39,7 @@ public class ModEntityRenderers {
 
 		// v1.2.0-beta
 		EntityRenderers.register(ModEntities.PELLET_TURRET, PelletTurretRenderer::new);
+		EntityRenderers.register(ModEntities.DIRT_TURRET, DirtTurretRenderer::new);
 
 		// /////////// //
 		// PROJECTILES //

@@ -3,6 +3,7 @@ package com.virus5600.defensive_measures.entity;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
 import net.minecraft.world.entity.EntityType.Builder;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.MobCategory;
 
 import com.virus5600.defensive_measures.DefensiveMeasures;
@@ -18,7 +19,7 @@ import com.virus5600.defensive_measures.entity.turrets.tier2.*;
  * @since 1.0.0-beta
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
  */
-public class ModEntities {
+public class ModEntities extends EntityTypes {
 	// TURRETS //
 	// v1.0.0-beta
 	public static final EntityType<CannonTurretEntity> CANNON_TURRET = RegistryHelper.registerEntity(
@@ -84,6 +85,15 @@ public class ModEntities {
 			.sized(0.625F, 1F)
 			.clientTrackingRange(16)
 			.eyeHeight(0.625F)
+	);
+
+	public static final EntityType<DirtTurretEntity> DIRT_TURRET = RegistryHelper.registerEntity(
+		"dirt_turret",
+		Builder.
+			of(DirtTurretEntity::new, MobCategory.MISC)
+			.sized(0.55F, 0.55F)
+			.clientTrackingRange(16)
+			.eyeHeight(0.2925F)
 	);
 
 	// PROJECTILES //
@@ -193,5 +203,6 @@ public class ModEntities {
 
 		// v1.2.0-beta
 		FabricDefaultAttributeRegistry.register(ModEntities.PELLET_TURRET, PelletTurretEntity.setAttributes());
+		FabricDefaultAttributeRegistry.register(ModEntities.DIRT_TURRET, DirtTurretEntity.setAttributes());
 	}
 }

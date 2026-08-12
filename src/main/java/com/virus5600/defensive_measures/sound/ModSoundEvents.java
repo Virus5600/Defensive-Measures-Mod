@@ -5,6 +5,7 @@ import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
 
 import com.virus5600.defensive_measures.DefensiveMeasures;
 
@@ -21,7 +22,7 @@ import org.jetbrains.annotations.NotNull;
  * @since 1.0.0-beta
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
  */
-public class ModSoundEvents {
+public class ModSoundEvents extends SoundEvents {
 
 	// V1.0.0-beta
 	public final static SoundEvent TURRET_REMOVED_METAL = ModSoundEvents.registerSoundEvent("turret.remove.metal");
@@ -79,12 +80,20 @@ public class ModSoundEvents {
 	// v1.2.0-beta
 	public final static SoundEvent TURRET_REPAIR_LEATHER = ModSoundEvents.registerSoundEvent("turret.repair.leather");
 	public final static SoundEvent FLINT_PELLET_DEFAULT = ModSoundEvents.registerSoundEvent("generic.impact.flint_pellet.default");
+	public final static SoundEvent TURRET_REPAIR_DIRT = ModSoundEvents.registerSoundEvent("turret.repair.dirt");
+	public final static SoundEvent TURRET_REMOVED_DIRT = ModSoundEvents.registerSoundEvent("turret.remove.dirt");
 
 	// PELLET TURRET
 	public static final SoundEvent TURRET_PELLET_HURT = ModSoundEvents.registerSoundEvent("turret.pellet_turret.hurt");
 	public static final SoundEvent TURRET_PELLET_DESTROYED = ModSoundEvents.registerSoundEvent("turret.pellet_turret.destroyed");
 	public static final SoundEvent TURRET_PELLET_SHOOT = ModSoundEvents.registerSoundEvent("turret.pellet_turret.shoot");
 
+	// DIRT TURRET
+	public static final SoundEvent TURRET_DIRT_HURT = ModSoundEvents.registerSoundEvent("turret.dirt_turret.hurt");
+	public static final SoundEvent TURRET_DIRT_DESTROYED = ModSoundEvents.registerSoundEvent("turret.dirt_turret.destroyed");
+	public static final SoundEvent TURRET_DIRT_SHOOT = ModSoundEvents.registerSoundEvent("turret.dirt_turret.shoot");
+
+	// ETC
 	public static final SoundEvent BLOCK_LANDMINE_ARMED = ModSoundEvents.registerSoundEvent("block.landmine.armed");
 	public static final SoundEvent BLOCK_LANDMINE_DISARMED = ModSoundEvents.registerSoundEvent("block.landmine.disarmed");
 

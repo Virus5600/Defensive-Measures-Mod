@@ -1,4 +1,4 @@
-package com.virus5600.defensive_measures.item.turrets.tier_0.pellet_turret;
+package com.virus5600.defensive_measures.item.turrets.tier_0;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
@@ -10,8 +10,7 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.component.TooltipDisplay;
 
 import com.virus5600.defensive_measures.entity.turrets.TurretEntity;
-import com.virus5600.defensive_measures.entity.turrets.tier0.PelletTurretEntity;
-import com.virus5600.defensive_measures.item.interfaces.FuelItem;
+import com.virus5600.defensive_measures.entity.turrets.tier0.DirtTurretEntity;
 import com.virus5600.defensive_measures.item.turrets.TurretItem;
 
 import org.jspecify.annotations.NonNull;
@@ -20,13 +19,13 @@ import java.lang.reflect.Type;
 import java.util.function.Consumer;
 
 /**
- * The item that spawns the {@link PelletTurretEntity}
+ * The item that spawns the {@link DirtTurretEntity}
  *
  * @since 1.2.0-beta
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
  */
-public class PelletTurretItem extends TurretItem implements FuelItem {
-	public PelletTurretItem(EntityType<? extends Mob> type, Properties settings) {
+public class DirtTurretItem extends TurretItem {
+	public DirtTurretItem(EntityType<? extends Mob> type, Properties settings) {
 		super(
 			type,
 			settings
@@ -41,7 +40,7 @@ public class PelletTurretItem extends TurretItem implements FuelItem {
 
 		for (int i = 1; i <= 3; i++) {
 			textConsumer.accept(
-				Component.translatable("itemTooltip.dm.pellet_turret.line" + i)
+				Component.translatable("itemTooltip.dm.dirt_turret.line" + i)
 					.withStyle(ChatFormatting.GRAY)
 			);
 		}
@@ -52,14 +51,9 @@ public class PelletTurretItem extends TurretItem implements FuelItem {
 
 		Type superClass = this.type.getClass().getGenericSuperclass();
 		if (superClass instanceof TurretEntity) {
-			maxHealth = ((PelletTurretEntity) superClass).getMaxHealth();
+			maxHealth = ((DirtTurretEntity) superClass).getMaxHealth();
 		}
 
 		return maxHealth;
-	}
-
-	@Override
-	public int getFuelTime() {
-		return 30 * 20;
 	}
 }

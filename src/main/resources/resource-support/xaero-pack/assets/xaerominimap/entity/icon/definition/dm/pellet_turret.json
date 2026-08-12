@@ -4,6 +4,7 @@
 	},
 	"modelConfigs": [
 		{
+			"baseScale": 1.25,
 			"rotationX": -15,
 			"rotationY" : 45,
 			"modelMainPartFieldAliases": [

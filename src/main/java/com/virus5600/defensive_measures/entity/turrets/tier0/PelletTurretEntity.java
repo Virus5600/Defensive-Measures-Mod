@@ -94,10 +94,10 @@ public class PelletTurretEntity extends TurretEntity {
 	public PelletTurretEntity(EntityType<? extends Mob> entityType, Level world) {
 		super(entityType, world, TurretMaterial.WOOD, ModEntities.FLINT_PELLET, ModItems.PELLET_TURRET);
 
-		this.setShootSound(ModSoundEvents.TURRET_PELLET_SHOOT);
 
 		this.addHealables(healables)
 			.addEffectSource(effectSource)
+			.setShootSound(ModSoundEvents.TURRET_PELLET_SHOOT)
 		;
 	}
 
