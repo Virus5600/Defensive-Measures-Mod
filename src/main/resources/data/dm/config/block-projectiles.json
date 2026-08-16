@@ -1,0 +1,25 @@
+{
+	"entities": {
+		"dm:dirt_turret": {
+			"default": {
+				"drag": 0.9,
+				"gravity": 0.05,
+				"damage": 2.0,
+				"piercing": 0.0,
+				"fire": false,
+				"explosive": false
+			},
+			"blocks": [
+				{
+					"block": [ "#dm:dirt" ],
+					"drag": 0.9,
+					"gravity": 0.05,
+					"damage": 2.0,
+					"piercing": 0.0,
+					"fire": false,
+					"explosive": false
+				}
+			]
+		}
+	}
+}
