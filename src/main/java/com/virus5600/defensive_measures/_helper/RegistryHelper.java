@@ -199,16 +199,32 @@ public final class RegistryHelper {
 	}
 
 	// Tag Registry
+	public static TagKey<Block> createBlockTagKey(Identifier id) {
+		return TagKey.create(Registries.BLOCK, id);
+	}
+
 	public static TagKey<Block> createBlockTagKey(String path) {
 		return TagKey.create(Registries.BLOCK, Identifier.fromNamespaceAndPath(DefensiveMeasures.MOD_ID, path));
+	}
+
+	public static TagKey<Block> createBlockTagKey(String namespace, String path) {
+		return TagKey.create(Registries.BLOCK, Identifier.fromNamespaceAndPath(namespace, path));
 	}
 
 	public static TagKey<EntityType<?>> createEntityTypeTagKey(String path) {
 		return TagKey.create(Registries.ENTITY_TYPE, Identifier.fromNamespaceAndPath(DefensiveMeasures.MOD_ID, path));
 	}
 
+	public static TagKey<Item> createItemTagKey(Identifier id) {
+		return TagKey.create(Registries.ITEM, id);
+	}
+
 	public static TagKey<Item> createItemTagKey(String path) {
 		return TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath(DefensiveMeasures.MOD_ID, path));
+	}
+
+	public static TagKey<Item> createItemTagKey(String namespace, String path) {
+		return TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath(namespace, path));
 	}
 
 	// Entity Registry

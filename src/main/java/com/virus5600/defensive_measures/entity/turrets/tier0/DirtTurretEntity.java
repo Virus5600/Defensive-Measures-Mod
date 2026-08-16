@@ -20,6 +20,7 @@ import com.virus5600.defensive_measures.entity.ModEntities;
 import com.virus5600.defensive_measures.entity.TurretMaterial;
 import com.virus5600.defensive_measures.entity.ai.goal.ProjectileAttackGoal;
 import com.virus5600.defensive_measures.entity.turrets.TurretEntity;
+import com.virus5600.defensive_measures.entity.turrets.interfaces.UsesBlockProjectile;
 import com.virus5600.defensive_measures.item.ModItems;
 import com.virus5600.defensive_measures.sound.ModSoundEvents;
 
@@ -60,7 +61,7 @@ import java.util.Map;
  * @since 1.2.0-beta
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
  */
-public class DirtTurretEntity extends TurretEntity {
+public class DirtTurretEntity extends TurretEntity implements UsesBlockProjectile {
 	/**
 	 * Defines how many seconds the ballista should wait before shooting again.
 	 * The time is calculated in ticks and by default, it's 2.5 seconds <b>(20 ticks times 2.5 seconds)</b>.
