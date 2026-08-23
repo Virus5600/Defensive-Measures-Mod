@@ -5,15 +5,17 @@
 			"trigger": "minecraft:tick",
 			"conditions": {
 				"player": {
-					"stats": [
-						{
-							"type": "minecraft:custom",
-							"stat": "dm:interact_with_turret_assembly_station",
-							"value": {
-								"min": 1
+					"minecraft:type_specific/player": {
+						"stats": [
+							{
+								"type": "minecraft:custom",
+								"stat": "dm:interact_with_turret_assembly_station",
+								"value": {
+									"min": 1
+								}
 							}
-						}
-					]
+						]
+					}
 				}
 			}
 		},
