@@ -1,6 +1,6 @@
 {
 	"type": "minecraft:crafting_shaped",
-	"category": "turret",
+	"category": "misc",
 	"pattern": [
 		"ah",
 		" b"
