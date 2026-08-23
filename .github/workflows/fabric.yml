@@ -50,16 +50,16 @@ jobs:
           echo "Runtime Test Version: ${{ matrix.version.loader }}"
           echo "Fabric API Version: ${{ matrix.version.api }}"
 
-      # Current test haven't updated yet for 26.2; disabling for now until the test client is updated to support 26.2
-#      - name: Run MC test client
-#        uses: headlesshq/mc-runtime-test@4.4.0
-#        with:
-#          mc: ${{ matrix.version.minecraft_version }}
-#          modloader: ${{ matrix.version.loader }}
-#          regex: .*${{ matrix.version.loader }}.*
-#          java: ${{ matrix.version.java }}
-#          mc-runtime-test: ${{ matrix.version.loader }}
-#          xvfb: false
-#          fabric-api: ${{ matrix.version.api }}
-#          headlessmc-command: -lwjgl --jvm -Djava.awt.headless=true
+      # ~~Current test haven't updated yet for 26.2; disabling for now until the test client is updated to support 26.2~~
+      - name: Run MC test client
+        uses: headlesshq/mc-runtime-test@4.5.1
+        with:
+          mc: ${{ matrix.version.minecraft_version }}
+          modloader: ${{ matrix.version.loader }}
+          regex: .*${{ matrix.version.loader }}.*
+          java: ${{ matrix.version.java }}
+          mc-runtime-test: ${{ matrix.version.loader }}
+          xvfb: false
+          fabric-api: ${{ matrix.version.api }}
+          headlessmc-command: -lwjgl --jvm -Djava.awt.headless=true
 
