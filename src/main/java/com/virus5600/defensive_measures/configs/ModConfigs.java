@@ -1,7 +1,10 @@
 package com.virus5600.defensive_measures.configs;
 
+import net.fabricmc.fabric.api.event.lifecycle.v1.CommonLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.minecraft.server.MinecraftServer;
+
+import com.virus5600.defensive_measures.DefensiveMeasures;
 
 /**
  * Loads all configuration files for the mod. This class is responsible for initializing and
@@ -17,7 +20,12 @@ import net.minecraft.server.MinecraftServer;
  */
 public class ModConfigs {
 	public static void init() {
-		BlockProjectileConfigManager.init();
+
+		CommonLifecycleEvents.TAGS_LOADED.register((_, _) -> {
+			DefensiveMeasures.LOGGER.info("Tags loaded; loading block projectile configuration...");
+
+			BlockProjectileConfigManager.init();
+		});
 
 		ServerLifecycleEvents.SERVER_STARTED.register(ModConfigs::initOnWorldLoad);
 		ServerLifecycleEvents.SERVER_STOPPED.register(ModConfigs::clearCachedConfig);
