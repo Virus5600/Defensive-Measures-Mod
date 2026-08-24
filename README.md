@@ -14,7 +14,7 @@
 
 <div align="center" style="text-align: center">
 	<img src="https://img.shields.io/modrinth/dt/defensive-measures?logo=modrinth&amp;label=Modrinth%20Downloads" alt="Modrinth Downloads">&nbsp;&nbsp;&nbsp;&nbsp;
-	<img src="https://img.shields.io/curseforge/dt/700629?logo=curseforge&amp;label=CureForge%20Downloads" alt="CurseForge Downloads">&nbsp;&nbsp;&nbsp;&nbsp;
+	<img src="https://img.shields.io/curseforge/dt/700629?logo=curseforge&amp;label=CurseForge%20Downloads" alt="CurseForge Downloads">&nbsp;&nbsp;&nbsp;&nbsp;
 	<img src="https://img.shields.io/github/downloads/Virus5600/Defensive-Measures-Mod/total?logo=github&amp;label=GitHub%20Downloads" alt="GitHub Downloads (all assets, all releases)">&nbsp;&nbsp;&nbsp;&nbsp;
 </div>
 <br>

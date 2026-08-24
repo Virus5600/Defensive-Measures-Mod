@@ -218,6 +218,8 @@
 	"tag.item.dm.turret_removers" : "Turret Removers",
 	"tag.item.dm.turret_remover_repairable" : "Turret Remover Repairable",
 
+	"tag.item.dm.dirt" : "Dirt Items",
+
 	"tag.entity.dm.flying_hostiles" : "Flying Hostiles",
 	"tag.entity.dm.projectiles" : "Defensive Measures Projectiles",
 	"tag.entity.dm.tier_0_turrets" : "Tier 0 Turrets",

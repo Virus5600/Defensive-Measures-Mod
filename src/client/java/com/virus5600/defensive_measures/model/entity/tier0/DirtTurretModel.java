@@ -36,7 +36,7 @@ public class DirtTurretModel extends BaseTurretModel<BaseTurretRenderState> {
 			1f
 		);
 
-		this.MINIMAP_ICON = root;
+		this.MINIMAP_ICON = root.getChild("body");
 	}
 
 	public static LayerDefinition createBodyLayer() {

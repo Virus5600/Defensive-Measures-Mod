@@ -4,9 +4,10 @@
 	},
 	"modelConfigs": [
 		{
-			"baseScale": 1.25,
+			"baseScale": 0.75,
 			"rotationX": -15,
 			"rotationY" : 45,
+			"offsetY": 5,
 			"modelMainPartFieldAliases": [
 				"com.virus5600.defensive_measures.model.entity.tier0.DirtTurretModel;MINIMAP_ICON"
 			],
