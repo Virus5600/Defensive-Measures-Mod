@@ -1,6 +1,7 @@
 package com.virus5600.defensive_measures.configs;
 
-
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderSet;
@@ -8,12 +9,14 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.tags.TagKey;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.storage.LevelResource;
 
 import com.virus5600.defensive_measures.DefensiveMeasures;
 import com.virus5600.defensive_measures._helper.RegistryHelper;
 import com.virus5600.defensive_measures.configs.interfaces.ReloadableConfig;
+import com.virus5600.defensive_measures.entity.turrets.interfaces.UsesBlockProjectile;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -34,12 +37,135 @@ import java.util.function.ToDoubleFunction;
 
 /**
  * Loads, merges, and exposes Block Projectile attribute configuration from three tiers:
- * Built-in (JAR resource) &lt; Global ({@code config/block-projectiles.json}) &lt;
- * Per-World ({@code saves/&lt;world&gt;/config/block-projectiles.json}).
+ * Built-in (JAR resource) < Global ({@code config/block-projectiles.json}) <
+ * Per-World ({@code saves/<world>/config/block-projectiles.json}).
  * <br><br>
  * This is a config file, not a datapack resource — it is NOT wired into vanilla's
  * {@code /reload}. Call {@link #reload(MinecraftServer)} explicitly (e.g. from a custom
  * command) or {@link #loadStatic()} / {@link #loadPerWorld(MinecraftServer)} individually.
+ * <br><br>
+ * The config file is a JSON object that follows this schema:
+ * <ul>
+ * 	<li>{@code entities}: {@code <object>}
+ * 		<ul>
+ * 			<li>{@code <entityId>}: {@code <object>}
+ * 				<ul>
+ * 					<li>{@code default}: {@code <object>}</li>
+ * 					<li>{@code blocks}: {@code <array><object></array>}
+ * 						<ul>
+ * 							<li>{@code block}: {@code <array><string></array>}</li>
+ * 							<li>{@code drag}: {@code 0.0 - 1.0}</li>
+ * 							<li>{@code gravity}: {@code 0.000 - 0.100}</li>
+ * 							<li>{@code damage}: {@code 0 - 1000}</li>
+ * 							<li>{@code piercing}: {@code 0 - 100}</li>
+ * 							<li>{@code fire}: {@code <boolean>}</li>
+ * 							<li>{@code explosive}: {@code <boolean>} | {@code <object>}
+ * 								<ul>
+ * 									<li>{@code damage}: {@code 0 - 1000}</li>
+ * 									<li>{@code radius}: {@code 1.0 - 100.0}</li>
+ * 								</ul>
+ * 							</li>
+ * 						</ul>
+ * 					</li>
+ * 				</ul>
+ * 			</li>
+ * 		</ul>
+ * 	</li>
+ * </ul>
+ *
+ * <hr/>
+ * As for what each field means (key descriptions):
+ *
+ * <table>
+ * 	<thead>
+ * 		<tr>
+ * 			<th width="20%">Key</th>
+ * 			<th width="20%">Type</th>
+ * 			<th width="20%">Default</th>
+ * 			<th width="40%">Description</th>
+ * 		</tr>
+ * 	</thead>
+ * 	<tbody>
+ * 		<tr>
+ * 			<td>{@code entities}</td>
+ * 			<td>JSON object</td>
+ * 			<td><strong>TBD</strong></td>
+ * 			<td>Contains the list of entities that shoots the Block Projectile like the <strong>Catapult Tower</strong> ({@code dm:catapult_tower}). An entity that does not shoot this projectile will be ignored.</td>
+ * 		</tr>
+ * 		<tr>
+ * 			<td>{@code entities.entityId}</td>
+ * 			<td>Entity ID</td>
+ * 			<td><strong>TBD</strong></td>
+ * 			<td>The entity ID that will have its projectile modified (i.e.: {@code dm:catapult_tower}). If a default turret isn't defined in the file yet the {@code replace} key's value is {@code true}, it will use the default configuration.</td>
+ * 		</tr>
+ * 		<tr>
+ * 			<td>{@code entities.entityId.default}</td>
+ * 			<td>JSON object</td>
+ * 			<td><strong>TBD</strong></td>
+ * 			<td>Contains a default fallback for all values in the other attributes. Basically, it hold a fallback value for the {@code drag}, {@code gravity}, {@code damage}, {@code piercing}, {@code fire}, and {@code explosive} attributes.</td>
+ * 		</tr>
+ * 		<tr>
+ * 			<td>{@code entities.entityId.blocks}</td>
+ * 			<td>Array (JSON object)</td>
+ * 			<td><strong>TBD</strong></td>
+ * 			<td>An array containing the attributes for this/these block/s.</td>
+ * 		</tr>
+ * 		<tr>
+ * 			<td>{@code entities.entityId.blocks.block}</td>
+ * 			<td>Array (Item ID OR Item Tag ID)</td>
+ * 			<td><strong>TBD</strong></td>
+ * 			<td>An array of item IDs or item tag IDs that the entity it is attached to will be able to shoot. An example of this would be the Catapult Tower ({@code dm:catapult_tower}) lobbing a Cobblestone, so {@code minecraft:cobblestone} is defined as one of its item ID, or {@code #minecraft:anvil} to include all the anvils.</td>
+ * 		</tr>
+ * 		<tr>
+ * 			<td>{@code entities.entityId.blocks.drag}</td>
+ * 			<td>{@code <float>} ({@code 0.0} to {@code 1.0})</td>
+ * 			<td>{@code 0.99}</td>
+ * 			<td>The velocity multiplier after the drag is applied. Value will clamp between 0 and 1 as negative value will leave the projectile inverting its velocity every tick. Values more than 1 will instead increase its velocity. The default {@code 0.99} value means that it loses 1% of its velocity every tick, simulating drag as it moves.</td>
+ * 		</tr>
+ * 		<tr>
+ * 			<td>{@code entities.entityId.blocks.gravity}</td>
+ * 			<td>{@code <float>} ({@code 0.000} to {@code 0.100})</td>
+ * 			<td>{@code 0.05}</td>
+ * 			<td>The gravity defines how much downward velocity will be applied to the projectile every tick. Clamping it to {@code 0.0} to {@code 0.1} allows the projectile to act more in line with the Minecraft world's fictional gravity.</td>
+ * 		</tr>
+ * 		<tr>
+ * 			<td>{@code entities.entityId.blocks.damage}</td>
+ * 			<td>{@code <int>} ({@code 0} to {@code 1000})</td>
+ * 			<td>{@code 4}</td>
+ * 			<td>Do not confuse this with the {@code entities.entityId.blockId.explosive.damage}. This {@code damage} key defines the damage dealt when the projectile <strong>HITS</strong> or <strong>COLLIDES</strong> with an entity. Capping the damage to 1000 is a design choice to allow said turret to balance out with potentially unhinge modded blocks and mods with inflated monster HP.</td>
+ * 		</tr>
+ * 		<tr>
+ * 			<td>{@code entities.entityId.blocks.piercing}</td>
+ * 			<td>{@code <int>} ({@code 0} to {@code 100})</td>
+ * 			<td>{@code 0}</td>
+ * 			<td>The piercing of the mod works differently than the vanilla piercing. The defined value for the {@code piercing} key will determine how many unarmored entities the projectile can pass through before getting destroyed. Armored entities may reduce the number of entities it could pierce and may even reduce the projectile's speed.</td>
+ * 		</tr>
+ * 		<tr>
+ * 			<td>{@code entities.entityId.blocks.fire}</td>
+ * 			<td>{@code <boolean>}</td>
+ * 			<td>{@code false}</td>
+ * 			<td>Sets the projectile on fire when launched. This allows the projectile to also set the entity it hits on fire, providing additional fire damage to anyone it hits.</td>
+ * 		</tr>
+ * 		<tr>
+ * 			<td>{@code entities.entityId.blocks.explosive}</td>
+ * 			<td>{@code <boolean>} or JSON Object</td>
+ * 			<td>{@code false}</td>
+ * 			<td>Determines whether the block projectile launched/shot by the turret explodes on contact. When this key is set to {@code true} or has a defined custom value inside, it disregards the {@code piercing} key regardless of its value.<br><br>Having its value as {@code true} makes the projectile use the hardcoded default value. However, providing an object will allow the explosion to be a bit customized.</td>
+ * 		</tr>
+ * 		<tr>
+ * 			<td>{@code entities.entityId.explosive.damage}</td>
+ * 			<td>{@code <int>} ({@code 0} to {@code 1000})</td>
+ * 			<td>{@code 5}</td>
+ * 			<td>Do not confuse this with the {@code entities.entityId.blockId.damage}. This {@code damage} key defines the damage dealt by the explosion of this projectile. Capping the damage to 1000 is a design choice to allow the projectile to allow said turret to balance out with potentially unhinge modded blocks and mods with inflated monster HP.</td>
+ * 		</tr>
+ * 		<tr>
+ * 			<td>{@code entities.entityId.explosive.radius}</td>
+ * 			<td>{@code <float>} ({@code 1.0} to {@code 100.0})</td>
+ * 			<td>{@code 2.5}</td>
+ * 			<td>Determines the radius of the explosion, damaging all entities within said radius.</td>
+ * 		</tr>
+ * 	</tbody>
+ * </table>
  *
  * @since 1.2.0-beta
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
@@ -48,7 +174,7 @@ public class BlockProjectileConfigManager implements ReloadableConfig {
 	private static final Gson GSON = new GsonBuilder().setStrictness(Strictness.LENIENT).create();
 	private static final String MOD_ID = DefensiveMeasures.MOD_ID;
 	private static final String CONFIG_FILE_NAME = "block-projectiles.json";
-	private static final String BUILT_IN_RESOURCE_PATH = "/data/" + MOD_ID + "/config/" + CONFIG_FILE_NAME;
+	private static final String BUILT_IN_RESOURCE_PATH = "/data/" + MOD_ID + "/configs/" + CONFIG_FILE_NAME;
 
 	private static RawConfig builtIn = RawConfig.EMPTY;
 	private static RawConfig global = RawConfig.EMPTY;
@@ -64,6 +190,48 @@ public class BlockProjectileConfigManager implements ReloadableConfig {
 		DefensiveMeasures.LOGGER.info("Loading block projectile config...");
 
 		loadStatic();
+	}
+
+	// ////// //
+	// GETTER //
+	// ////// //
+
+	/**
+	 * Returns the final resolved config, after merging all three tiers. This is the only thing
+	 * queried at runtime; the raw tiered configs are not exposed.
+	 * <br/><br/>
+	 * The returned map uses {@link Identifier} as the key and {@link EntityBlockAttributeIndex} as
+	 * the value. It is also important to note that through this configuration, it is possible
+	 * to have an entity that does not implements {@link UsesBlockProjectile} but still has a
+	 * config entry. While this is possible, the config will only take effect if said entity
+	 * implements {@link UsesBlockProjectile} or has a code that explicitly calls this config
+	 * manager and uses a config entry for said entity. Otherwise, the config entry will be ignored
+	 * and have no effect on the entity.
+	 * <br/><br/>
+	 * Furthermore, while the config manager allows for any entity to have a config entry, it is
+	 * important to note that if said entity uses a config entry but does not implement
+	 * {@link UsesBlockProjectile}, it has risks of causing unexpected behavior or crashes. In this
+	 * case, the mod and developer of the entity are to be blamed for not following the proper
+	 * implementation of the config manager and the {@link UsesBlockProjectile} interface.
+	 *
+	 * @return an unmodifiable map of entity IDs to their resolved block attribute indices.
+	 */
+	public static Map<Identifier, EntityBlockAttributeIndex> getResolved() {
+		return Map.copyOf(resolved);
+	}
+
+	public static EntityBlockAttributeIndex getConfigForEntity(Identifier entityId) {
+		return resolved.getOrDefault(
+			entityId,
+			new EntityBlockAttributeIndex(
+				AttributeValues.EMPTY,
+				List.of()
+			)
+		);
+	}
+
+	public static EntityBlockAttributeIndex getConfigForEntity(EntityType<?> entityType) {
+		return getConfigForEntity(RegistryHelper.getIdentifier(entityType));
 	}
 
 	// //////// //
@@ -287,6 +455,8 @@ public class BlockProjectileConfigManager implements ReloadableConfig {
 		}
 
 		resolved = Map.copyOf(out);
+
+		DefensiveMeasures.LOGGER.debug("Turret Ammo Attrs: {}", resolved);
 	}
 
 	/**
@@ -334,9 +504,19 @@ public class BlockProjectileConfigManager implements ReloadableConfig {
 			return AttributeValues.EMPTY;
 		}
 
+		// Ignores tags for those that are as-is (i.e. direct block ID)
 		for (RawBlockGroup group : entity.blockGroups()) {
 			for (String ref : group.blockRefs()) {
-				if (expandRef(ref).contains(concreteBlockRef)) {
+				if (!ref.startsWith("#") && ref.equals(concreteBlockRef)) {
+					return group.attributes();
+				}
+			}
+		}
+
+		// Tag matches only
+		for (RawBlockGroup group : entity.blockGroups()) {
+			for (String ref : group.blockRefs()) {
+				if (ref.startsWith("#") && expandRef(ref).contains(concreteBlockRef)) {
 					return group.attributes();
 				}
 			}
@@ -490,17 +670,26 @@ public class BlockProjectileConfigManager implements ReloadableConfig {
 	 * @param fire      Whether the projectile sets entities on fire. Null = unset at this tier.
 	 * @param explosive The explosive properties of the projectile, if any.
 	 */
-	private record AttributeValues(
-		double drag, double gravity, double damage, double piercing,
+	public record AttributeValues(
+		double drag, double gravity, double damage, byte piercing,
 		Boolean fire, ExplosiveValues explosive
 	) {
-		static final AttributeValues EMPTY = new AttributeValues(-1.0, -1.0, -1.0, -1.0, null, null);
+		public static final Codec<AttributeValues> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+			Codec.DOUBLE.optionalFieldOf("drag", -1.0).forGetter(AttributeValues::drag),
+			Codec.DOUBLE.optionalFieldOf("gravity", -1.0).forGetter(AttributeValues::gravity),
+			Codec.DOUBLE.optionalFieldOf("damage", -1.0).forGetter(AttributeValues::damage),
+			Codec.BYTE.optionalFieldOf("piercing", (byte) -1).forGetter(AttributeValues::piercing),
+			Codec.BOOL.optionalFieldOf("fire", false).forGetter(AttributeValues::fire),
+			ExplosiveValues.CODEC.optionalFieldOf("explosive", ExplosiveValues.DISABLED).forGetter(AttributeValues::explosive)
+		).apply(instance, AttributeValues::new));
+
+		static final AttributeValues EMPTY = new AttributeValues(-1.0, -1.0, -1.0, (byte) -1, null, null);
 
 		static AttributeValues fromJson(JsonObject obj) {
 			double drag = obj.has("drag") ? obj.get("drag").getAsDouble() : -1.0;
 			double gravity = obj.has("gravity") ? obj.get("gravity").getAsDouble() : -1.0;
 			double damage = obj.has("damage") ? obj.get("damage").getAsDouble() : -1.0;
-			double piercing = obj.has("piercing") ? obj.get("piercing").getAsDouble() : -1.0;
+			byte piercing = obj.has("piercing") ? obj.get("piercing").getAsByte() : -1;
 			Boolean fire = obj.has("fire") ? obj.get("fire").getAsBoolean() : null;
 
 			ExplosiveValues explosive = null;
@@ -531,7 +720,7 @@ public class BlockProjectileConfigManager implements ReloadableConfig {
 				pickNumeric(highest, mid, lowest, AttributeValues::drag),
 				pickNumeric(highest, mid, lowest, AttributeValues::gravity),
 				pickNumeric(highest, mid, lowest, AttributeValues::damage),
-				pickNumeric(highest, mid, lowest, AttributeValues::piercing),
+				(byte) pickNumeric(highest, mid, lowest, AttributeValues::piercing),
 				pickBoolean(highest, mid, lowest, AttributeValues::fire),
 				pickExplosive(highest, mid, lowest)
 			);
@@ -581,6 +770,17 @@ public class BlockProjectileConfigManager implements ReloadableConfig {
 			return null;
 		}
 
+		@Override
+		public String toString() {
+			return "AttributeValues{" +
+				"drag=" + drag +
+				", gravity=" + gravity +
+				", damage=" + damage +
+				", piercing=" + piercing +
+				", fire=" + fire +
+				", explosive=" + explosive +
+				'}';
+		}
 	}
 
 	/**
@@ -590,14 +790,51 @@ public class BlockProjectileConfigManager implements ReloadableConfig {
 	 * @param damage the damage dealt by the explosion
 	 * @param radius the radius of the explosion
 	 */
-	private record ExplosiveValues(boolean enabled, double damage, double radius) {
+	public record ExplosiveValues(boolean enabled, double damage, double radius) {
+		public static final Codec<ExplosiveValues> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+			Codec.BOOL.optionalFieldOf("enabled", false).forGetter(ExplosiveValues::enabled),
+			Codec.DOUBLE.optionalFieldOf("damage", -1.0).forGetter(ExplosiveValues::damage),
+			Codec.DOUBLE.optionalFieldOf("radius", -1.0).forGetter(ExplosiveValues::radius)
+		).apply(instance, ExplosiveValues::new));
+
 		static final ExplosiveValues DISABLED = new ExplosiveValues(false, -1.0, -1.0);
 		static final ExplosiveValues ENABLED_DEFAULT = new ExplosiveValues(true, -1.0, -1.0);
 	}
 
-	private record ResolvedBlockGroup(String blockRef, AttributeValues attributes) {}
+	/**
+	 * A resolved block group for a specific entity, after cascading all three config tiers plus
+	 * the entity's {@code default}. Contains the concrete block ref and its resolved attributes.
+	 *
+	 * @param blockRef   The concrete block reference (plain block ID) for this group.
+	 * @param attributes The resolved attributes for this block group, after cascading all three config tiers plus the entity's {@code default}.
+	 */
+	public record ResolvedBlockGroup(String blockRef, AttributeValues attributes) {}
 
-	private record EntityBlockAttributeIndex(AttributeValues entityDefault, List<ResolvedBlockGroup> blockGroups) {}
+	/**
+	 * The final resolved attribute set for a specific entity, after cascading all three
+	 * config tiers plus the entity's {@code default}. Contains the entity's resolved
+	 * {@code default} plus a list of resolved block groups, each with its concrete block ref and
+	 * resolved attributes.
+	 *
+	 * @param entityDefault The resolved default attributes for the entity, after cascading all three config tiers.
+	 * @param blockGroups   The list of resolved block groups for the entity, each containing a concrete block ref and its resolved attributes.
+	 */
+	public record EntityBlockAttributeIndex(
+		AttributeValues entityDefault, List<ResolvedBlockGroup> blockGroups
+	) {
+		@Override
+		public String toString() {
+			String blockGroupsStr = blockGroups.stream()
+				.map(group -> group.blockRef() + "=" + group.attributes())
+				.reduce((a, b) -> a + ", " + b)
+				.orElse("");
+
+			return "EntityBlockAttributeIndex{" +
+				"entityDefault=[" + entityDefault + "]" +
+				", blockGroups=[" + blockGroupsStr +"]" +
+				'}';
+		}
+	}
 
 	/**
 	 * The final attribute set for a specific entity+block pairing, after cascading all three

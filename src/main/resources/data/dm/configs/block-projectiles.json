@@ -4,20 +4,18 @@
 			"default": {
 				"drag": 0.9,
 				"gravity": 0.05,
-				"damage": 2.0,
+				"damage": 1.0,
 				"piercing": 0.0,
 				"fire": false,
 				"explosive": false
 			},
 			"blocks": [
 				{
-					"block": [ "#dm:dirt" ],
-					"drag": 0.9,
-					"gravity": 0.05,
-					"damage": 2.0,
-					"piercing": 0.0,
-					"fire": false,
-					"explosive": false
+					"block": [ "#dm:turret_item_ammo/dirt_turret_ammo" ],
+					"damage": 3.0
+				},
+				{
+					"block": [ "minecraft:gravel" ]
 				}
 			]
 		}

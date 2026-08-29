@@ -1,5 +1,9 @@
 package com.virus5600.defensive_measures.entity.turrets.tier0;
 
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.network.syncher.SynchedEntityData.Builder;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -10,15 +14,26 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.Vec3;
 
+import com.virus5600.defensive_measures._helper.RegistryHelper;
+import com.virus5600.defensive_measures.configs.BlockProjectileConfigManager.AttributeValues;
+import com.virus5600.defensive_measures.configs.BlockProjectileConfigManager.EntityBlockAttributeIndex;
+import com.virus5600.defensive_measures.configs.BlockProjectileConfigManager.ExplosiveValues;
+import com.virus5600.defensive_measures.configs.BlockProjectileConfigManager.ResolvedBlockGroup;
+import com.virus5600.defensive_measures.configs.BlockProjectileConfigManager;
 import com.virus5600.defensive_measures.entity.ModEntities;
 import com.virus5600.defensive_measures.entity.TurretMaterial;
 import com.virus5600.defensive_measures.entity.ai.goal.ProjectileAttackGoal;
+import com.virus5600.defensive_measures.entity.projectiles.ExplosiveProjectileEntity;
+import com.virus5600.defensive_measures.entity.projectiles.TurretProjectileEntity;
 import com.virus5600.defensive_measures.entity.turrets.TurretEntity;
 import com.virus5600.defensive_measures.entity.turrets.interfaces.UsesBlockProjectile;
 import com.virus5600.defensive_measures.item.ModItems;
@@ -55,13 +70,23 @@ import java.util.Map;
  *     <li><b>Armor:</b> 2</li>
  *     <li><b>Armor Toughness:</b> 2</li>
  * </ul>
+ * <hr/>
+ * This entity implements the {@link UsesBlockProjectile} interface, which means it can use blocks
+ * as projectiles. In this case, it uses dirt blocks as projectiles by default through the
+ * config file under {@code data/dm/configs/block-projectiles.json@entities/dm:dirt_turret}. While
+ * that is the default, it can be changed to use any other blocks by following the same format
+ * dictated by the documentation under {@link BlockProjectileConfigManager}.
  *
  * @see TurretEntity
+ * @see UsesBlockProjectile
+ * @see BlockProjectileConfigManager
  *
  * @since 1.2.0-beta
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
  */
 public class DirtTurretEntity extends TurretEntity implements UsesBlockProjectile {
+	private static final EntityDataAccessor<ItemStack> CURRENT_AMMO;
+
 	/**
 	 * Defines how many seconds the ballista should wait before shooting again.
 	 * The time is calculated in ticks and by default, it's 2.5 seconds <b>(20 ticks times 2.5 seconds)</b>.
@@ -71,7 +96,6 @@ public class DirtTurretEntity extends TurretEntity implements UsesBlockProjectil
 	private static final Map<Item, SoundEvent> HEAL_SOUNDS;
 	private static final double[] DAMAGE;
 	private static final byte[] PIERCE_LEVELS;
-
 	/**
 	 * Contains all the items that can heal this entity.
 	 */
@@ -81,21 +105,41 @@ public class DirtTurretEntity extends TurretEntity implements UsesBlockProjectil
 	 */
 	protected static final Map<Item, List<Object[]>> effectSource;
 
+	private Item currentAmmo;
+	private AttributeValues currentAmmoAttr;
+
 	// //////////// //
 	// CONSTRUCTORS //
 	// //////////// //
 	public DirtTurretEntity(EntityType<? extends Mob> entityType, Level world) {
-		super(entityType, world, TurretMaterial.DIRT, ModEntities.SPECTRAL_ARROW, ModItems.DIRT_TURRET);
+		super(entityType, world, TurretMaterial.DIRT, ModEntities.FLINT_PELLET, ModItems.DIRT_TURRET);
 
 		this.addHealables(healables)
 			.addEffectSource(effectSource)
 			.setShootSound(ModSoundEvents.TURRET_DIRT_SHOOT)
 		;
+
+		if (this.currentAmmo == null) {
+			this.currentAmmo = Items.DIRT;
+		}
+
+		this.updateCurrentAmmo(this.currentAmmo);
 	}
 
 	// //////////// //
 	// INITIALIZERS //
 	// //////////// //
+	@Override
+	protected void defineSynchedData(@NonNull Builder builder) {
+		super.defineSynchedData(builder);
+
+		if (this.currentAmmo == null) {
+			this.currentAmmo = Items.DIRT;
+		}
+
+		builder.define(CURRENT_AMMO, this.currentAmmo.getDefaultInstance());
+	}
+
 	@Override
 	protected void registerGoals() {
 		// Goal instances
@@ -117,6 +161,25 @@ public class DirtTurretEntity extends TurretEntity implements UsesBlockProjectil
 	// /////////////// //
 
 	@Override
+	protected <P extends Projectile> void onProjectileCreateCallback(P projectile) {
+		if (projectile instanceof TurretProjectileEntity tpe) {
+			// Set Drag
+			// Set Gravity
+
+			if (this.currentAmmoAttr.fire()) {
+				tpe.setRemainingFireTicks(Integer.MAX_VALUE);
+			}
+
+			ExplosiveValues ev = this.currentAmmoAttr.explosive();
+			if (ev.enabled() && tpe instanceof ExplosiveProjectileEntity epe) {
+
+				epe.setDamage(ev.damage());
+				// Set radius
+			}
+		}
+	}
+
+	@Override
 	public void performRangedAttack(@NonNull LivingEntity target, float pullProgress) {
 		TurretProjectileVelocity velocityData = this.getProjectileVelocityData(target);
 
@@ -125,10 +188,19 @@ public class DirtTurretEntity extends TurretEntity implements UsesBlockProjectil
 
 	@Override
 	public @NonNull InteractionResult mobInteract(Player player, @NonNull InteractionHand hand) {
-		Item usedItem = player.getItemInHand(hand).getItem();
+		ItemStack usedItemStack = player.getItemInHand(hand);
+		Item usedItem = usedItemStack.getItem();
 
 		if (this.isHealableItem(usedItem)) {
 			this.setHealSound(HEAL_SOUNDS.get(usedItem));
+		}
+
+		if (this.isValidAmmo(usedItem)) {
+			if (this.updateCurrentAmmo(usedItem)) {
+				usedItemStack.setCount(usedItemStack.getCount() - 1);
+
+				return InteractionResult.SUCCESS;
+			}
 		}
 
 		return super.mobInteract(player, hand);
@@ -201,11 +273,11 @@ public class DirtTurretEntity extends TurretEntity implements UsesBlockProjectil
 	}
 
 	public double getProjectileDamage() {
-		return DAMAGE[this.getTrackedLevel() - 1];
+		return DAMAGE[this.getTrackedLevel() - 1] + this.currentAmmoAttr.damage();
 	}
 
 	public byte getProjectilePierceLevel() {
-		return PIERCE_LEVELS[this.getTrackedLevel() - 1];
+		return (byte) (PIERCE_LEVELS[this.getTrackedLevel() - 1] + this.currentAmmoAttr.piercing());
 	}
 
 	public int getTotalAttCooldown() {
@@ -226,6 +298,55 @@ public class DirtTurretEntity extends TurretEntity implements UsesBlockProjectil
 		return (int) (1.75F * 20);
 	}
 
+	// ///////////////////////// //
+	// INTERFACE IMPLEMENTATIONS //
+	// ///////////////////////// //
+
+	// UsesBlockProjectile //
+
+	@Override
+	public Item getCurrentAmmo() {
+		return this.currentAmmo;
+	}
+
+	@Override
+	public boolean updateCurrentAmmo(Item item) {
+		if (!this.isValidAmmo(item)) {
+			return false;
+		}
+
+		EntityBlockAttributeIndex attrIndex = BlockProjectileConfigManager.getConfigForEntity(this.getType());
+		this.currentAmmo = item;
+		this.currentAmmoAttr = attrIndex.entityDefault();
+
+		for (ResolvedBlockGroup blockGroup : attrIndex.blockGroups()) {
+			if (blockGroup.blockRef().equals(RegistryHelper.getIdentifier(item).toString())) {
+				this.currentAmmoAttr = blockGroup.attributes();
+				break;
+			}
+		}
+
+		return true;
+	}
+
+	// /////////////////////////////// //
+	// CUSTOM DATA READING AND WRITING //
+	// /////////////////////////////// //
+
+	@Override
+	public void readAdditionalSaveData(@NonNull ValueInput view) {
+		view.read("current_ammo", ItemStack.CODEC)
+			.ifPresent(stack -> this.updateCurrentAmmo(stack.getItem()));
+	}
+
+	@Override
+	public void addAdditionalSaveData(@NonNull ValueOutput view) {
+		ItemStack currentAmmoStack = new ItemStack(this.currentAmmo);
+		currentAmmoStack.setCount(1);
+
+		view.store("current_ammo", ItemStack.CODEC, currentAmmoStack);
+	}
+
 	// /////////////////// //
 	// LOCAL CLASSES/ENUMS //
 	// /////////////////// //
@@ -238,6 +359,8 @@ public class DirtTurretEntity extends TurretEntity implements UsesBlockProjectil
 	// ///////////////// //
 
 	static {
+		CURRENT_AMMO = SynchedEntityData.defineId(DirtTurretEntity.class, EntityDataSerializers.ITEM_STACK);
+
 		DAMAGE = new double[] {
 			1,
 			2.5,

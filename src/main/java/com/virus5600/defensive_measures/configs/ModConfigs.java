@@ -27,6 +27,10 @@ public class ModConfigs {
 			BlockProjectileConfigManager.init();
 		});
 
+		ServerLifecycleEvents.END_DATA_PACK_RELOAD.register((server, _, _) -> {
+			reloadConfigs(server);
+		});
+
 		ServerLifecycleEvents.SERVER_STARTED.register(ModConfigs::initOnWorldLoad);
 		ServerLifecycleEvents.SERVER_STOPPED.register(ModConfigs::clearCachedConfig);
 	}
@@ -37,5 +41,9 @@ public class ModConfigs {
 
 	public static void clearCachedConfig(MinecraftServer server) {
 		BlockProjectileConfigManager.clearPerWorld();
+	}
+
+	public static void reloadConfigs(MinecraftServer server) {
+		BlockProjectileConfigManager.reload(server);
 	}
 }

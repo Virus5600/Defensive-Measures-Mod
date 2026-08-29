@@ -82,8 +82,28 @@ public final class RegistryHelper {
 		return BuiltInRegistries.ENTITY_TYPE.wrapAsHolder(entityType);
 	}
 
+	public static boolean isOf(Item item, TagKey<Item> tag) {
+		return getHolder(item).is(tag);
+	}
+
+	public static boolean isOf(Block block, TagKey<Block> tag) {
+		return getHolder(block).is(tag);
+	}
+
 	public static boolean isOf(EntityType<?> entityType, TagKey<EntityType<?>> tag) {
 		return getHolder(entityType).is(tag);
+	}
+
+	public static Identifier getIdentifier(Item item) {
+		return BuiltInRegistries.ITEM.getKey(item);
+	}
+
+	public static Identifier getIdentifier(Block block) {
+		return BuiltInRegistries.BLOCK.getKey(block);
+	}
+
+	public static Identifier getIdentifier(EntityType<?> entityType) {
+		return BuiltInRegistries.ENTITY_TYPE.getKey(entityType);
 	}
 
 	// Block Registry

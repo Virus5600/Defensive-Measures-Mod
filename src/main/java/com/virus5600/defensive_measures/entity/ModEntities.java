@@ -1,6 +1,9 @@
 package com.virus5600.defensive_measures.entity;
 
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType.Builder;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EntityTypes;
@@ -9,6 +12,7 @@ import net.minecraft.world.entity.MobCategory;
 import com.virus5600.defensive_measures.DefensiveMeasures;
 import com.virus5600.defensive_measures._helper.RegistryHelper;
 import com.virus5600.defensive_measures.entity.projectiles.*;
+import com.virus5600.defensive_measures.entity.turrets.interfaces.UsesBlockProjectile;
 import com.virus5600.defensive_measures.entity.turrets.tier0.*;
 import com.virus5600.defensive_measures.entity.turrets.tier1.*;
 import com.virus5600.defensive_measures.entity.turrets.tier2.*;
@@ -189,6 +193,16 @@ public class ModEntities extends EntityTypes {
 	@SuppressWarnings("ConstantConditions")
 	public static void init() {
 		DefensiveMeasures.LOGGER.info("REGISTERING ENTITY ATTRIBUTES FOR {}...", DefensiveMeasures.MOD_NAME);
+
+		ServerLifecycleEvents.END_DATA_PACK_RELOAD.register((server, _, _) -> {
+			for (ServerLevel level : server.getAllLevels()) {
+				for (Entity entity : level.getAllEntities()) {
+					if (entity instanceof UsesBlockProjectile ubp) {
+						ubp.updateCurrentAmmo(ubp.getCurrentAmmo());
+					}
+				}
+			}
+		});
 
 		// TURRETS //
 		// v1.0.0-beta

@@ -41,9 +41,16 @@ loom {
 		runs {
 			client {
 				programArgs(progArgs)
+
+				vmArg "-Dfabric-tag-conventions-v2.missingTagTranslationWarning=VERBOSE"
+			}
+			server {
+				vmArg "-Dfabric-tag-conventions-v2.missingTagTranslationWarning=VERBOSE"
 			}
 		}
 	}
+
+	log4jConfigs.from(file("log4j-dev.xml"))
 }
 
 dependencies {
