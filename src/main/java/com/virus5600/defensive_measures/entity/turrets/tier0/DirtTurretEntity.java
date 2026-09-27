@@ -174,7 +174,7 @@ public class DirtTurretEntity extends TurretEntity implements UsesBlockProjectil
 			if (ev.enabled() && tpe instanceof ExplosiveProjectileEntity epe) {
 
 				epe.setDamage(ev.damage());
-				// Set radius
+				// Set effectiveRadius
 			}
 		}
 	}
@@ -327,6 +327,11 @@ public class DirtTurretEntity extends TurretEntity implements UsesBlockProjectil
 		}
 
 		return true;
+	}
+
+	@Override
+	public TurretEntity getTurretEntity() {
+		return this;
 	}
 
 	// /////////////////////////////// //

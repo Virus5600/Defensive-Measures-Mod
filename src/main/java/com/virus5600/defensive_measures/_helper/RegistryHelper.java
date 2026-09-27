@@ -322,6 +322,10 @@ public final class RegistryHelper {
 		return Registry.register(BuiltInRegistries.RECIPE_BOOK_CATEGORY, id, new RecipeBookCategory());
 	}
 
+	public static Item getItem(Identifier blockId) {
+		return BuiltInRegistries.ITEM.getValue(blockId);
+	}
+
 	// PRIVATE ENUM
 	private enum LoggerFormat {
 		RESET("\\u001B[0m"),

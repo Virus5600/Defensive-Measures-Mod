@@ -16,18 +16,17 @@ import org.jspecify.annotations.NonNull;
 /**
  * The projectile used by {@link CannonTurretEntity Cannon Turret}.
  *
- * <p>Represents a cannonball projectile entity that explodes on impact.</p>
- * <p>
- *     The cannonball is an {@link ExplosiveProjectileEntity explosive projectile}
- *     that is fired from a {@link CannonTurretEntity cannon turret}.
- * </p>
- * <p>
- *     This projectile is set to explode upon impact, causing 10 hearts of damage to entities
- *     within a 2.5 block radius, which is also known as effective range. Within the radius of 2.5
- *     blocks and 5 blocks, entities will receive a reduced amount of damage based on the distance
- *     from the center of the explosion.
- * </p>
- * <p>The damage dealt every 0.25 blocks after the 2.5 is as follows:</p>
+ * Represents a cannonball projectile entity that explodes on impact.
+ * <br><br>
+ * The cannonball is an {@link ExplosiveProjectileEntity explosive projectile} that is fired from a
+ * {@link CannonTurretEntity cannon turret}.
+ * <br><br>
+ * This projectile is set to explode upon impact, causing 10 hearts of damage to entities within a
+ * 2.5 block effectiveRadius, which is also known as effective range. Within the effectiveRadius of 2.5 blocks and 5
+ * blocks, entities will receive a reduced amount of damage based on the distance from the center
+ * of the explosion.
+ * <br><br>
+ * The damage dealt every 0.25 blocks after the 2.5 is as follows:
  * <ul>
  *     <li><b>2.50 blocks:</b> 10.0 HP</li>
  *     <li><b>2.75 blocks:</b> ~8.88 HP</li>
@@ -42,14 +41,15 @@ import org.jspecify.annotations.NonNull;
  *     <li><b>5.00 blocks:</b> 0.0 HP</li>
  * </ul>
  * <hr>
- * <p>To get the same values as the ones above, the following formula was used:</p>
+ * To get the same values as the ones above, the following formula was used:
+ * <br><br>
  * <pre><code>
  * normalizedRadius = (radius - effectiveRadius) / (maxDmgRadius - effectiveRadius)
  * formula = (e^(-dmgReduction * normalizedRadius) - e^(-dmgReduction)) / (1 - e^(-dmgReduction))
  * dmg = baseDmg * formula
  * </code></pre>
- *
- * <p>And if you want to test it, you can use the Desmos graph created by me:</p>
+ * <br><br>
+ * And if you want to test it, you can use the Desmos graph created by me:<br>
  * <a href="https://www.desmos.com/calculator/pdm27kw9oe">Reduction Damage Graph</a>
  *
  * @see ExplosiveProjectileEntity

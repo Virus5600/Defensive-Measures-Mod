@@ -82,8 +82,8 @@ public abstract class ExplosiveProjectileEntity extends TurretProjectileEntity i
 	// //////////// //
 	// CONSTRUCTORS //
 	// //////////// //
-	protected ExplosiveProjectileEntity(EntityType<? extends TurretProjectileEntity> entityType, Level world) {
-		super(entityType, world);
+	protected ExplosiveProjectileEntity(EntityType<? extends TurretProjectileEntity> entityType, Level level) {
+		super(entityType, level);
 
 		this.setDamage(5);
 		this.setPierceLevel(this.getMaxPierceLevel());

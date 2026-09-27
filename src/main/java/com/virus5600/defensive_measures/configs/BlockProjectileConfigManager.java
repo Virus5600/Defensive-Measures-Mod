@@ -62,7 +62,8 @@ import java.util.function.ToDoubleFunction;
  * 							<li>{@code explosive}: {@code <boolean>} | {@code <object>}
  * 								<ul>
  * 									<li>{@code damage}: {@code 0 - 1000}</li>
- * 									<li>{@code radius}: {@code 1.0 - 100.0}</li>
+ * 									<li>{@code effectiveRadius}: {@code 1.0 - 100.0}</li>
+ * 									<li>{@code maxRadius}: {@code 1.0 - 100.0}</li>
  * 								</ul>
  * 							</li>
  * 						</ul>
@@ -159,10 +160,16 @@ import java.util.function.ToDoubleFunction;
  * 			<td>Do not confuse this with the {@code entities.entityId.blockId.damage}. This {@code damage} key defines the damage dealt by the explosion of this projectile. Capping the damage to 1000 is a design choice to allow the projectile to allow said turret to balance out with potentially unhinge modded blocks and mods with inflated monster HP.</td>
  * 		</tr>
  * 		<tr>
- * 			<td>{@code entities.entityId.explosive.radius}</td>
+ * 			<td>{@code entities.entityId.explosive.effectiveRadius}</td>
  * 			<td>{@code <float>} ({@code 1.0} to {@code 100.0})</td>
  * 			<td>{@code 2.5}</td>
- * 			<td>Determines the radius of the explosion, damaging all entities within said radius.</td>
+ * 			<td>Determines the effective radius of the explosion, damaging all entities within said radius.</td>
+ * 		</tr>
+ * 		<tr>
+ * 			<td>{@code  entities.entityId.explosive.maxRadius}</td>
+ * 			<td>{@code <float>} ({@code 1.0} to {@code 100.0})</td>
+ * 			<td>{@code 5.0}</td>
+ * 			<td>Determines the maximum radius of the explosion, which is the furthest distance an entity can be from the explosion center and still be affected.</td>
  * 		</tr>
  * 	</tbody>
  * </table>
@@ -576,7 +583,7 @@ public class BlockProjectileConfigManager implements ReloadableConfig {
 
 		ResolvedAttributes.Explosive resolvedExplosive = explosive == null
 			? new ResolvedAttributes.Explosive(false, -1.0, -1.0)
-			: new ResolvedAttributes.Explosive(explosive.enabled(), explosive.damage(), explosive.radius());
+			: new ResolvedAttributes.Explosive(explosive.enabled(), explosive.damage(), explosive.effectiveRadius());
 
 		return new ResolvedAttributes(
 			values.drag(), values.gravity(), values.damage(), values.piercing(),
@@ -703,11 +710,15 @@ public class BlockProjectileConfigManager implements ReloadableConfig {
 				}
 				else if (ex.isJsonObject()) {
 					JsonObject exObj = ex.getAsJsonObject();
+
 					double exDamage = exObj.has("damage") ?
 						exObj.get("damage").getAsDouble() : -1.0;
-					double exRadius = exObj.has("radius") ?
-						exObj.get("radius").getAsDouble() : -1.0;
-					explosive = new ExplosiveValues(true, exDamage, exRadius);
+					double exEffectiveRadius = exObj.has("effectiveRadius") ?
+						exObj.get("effectiveRadius").getAsDouble() : -1.0;
+					double exMaxRadius = exObj.has("maxRadius") ?
+						exObj.get("maxRadius").getAsDouble() : -1.0;
+
+					explosive = new ExplosiveValues(true, exDamage, exEffectiveRadius, exMaxRadius);
 				}
 			}
 
@@ -788,17 +799,19 @@ public class BlockProjectileConfigManager implements ReloadableConfig {
 	 *
 	 * @param enabled whether the projectile is explosive
 	 * @param damage the damage dealt by the explosion
-	 * @param radius the radius of the explosion
+	 * @param effectiveRadius the effective radius of the explosion; basically the radius where the damage gets applied fully
+	 * @param maxRadius the maximum radius of the explosion
 	 */
-	public record ExplosiveValues(boolean enabled, double damage, double radius) {
+	public record ExplosiveValues(boolean enabled, double damage, double effectiveRadius, double maxRadius) {
 		public static final Codec<ExplosiveValues> CODEC = RecordCodecBuilder.create(instance -> instance.group(
 			Codec.BOOL.optionalFieldOf("enabled", false).forGetter(ExplosiveValues::enabled),
-			Codec.DOUBLE.optionalFieldOf("damage", -1.0).forGetter(ExplosiveValues::damage),
-			Codec.DOUBLE.optionalFieldOf("radius", -1.0).forGetter(ExplosiveValues::radius)
+			Codec.DOUBLE.optionalFieldOf("damage", 5.0).forGetter(ExplosiveValues::damage),
+			Codec.DOUBLE.optionalFieldOf("effectiveRadius", 3.0).forGetter(ExplosiveValues::effectiveRadius),
+			Codec.DOUBLE.optionalFieldOf("maxRadius", 5.0).forGetter(ExplosiveValues::maxRadius)
 		).apply(instance, ExplosiveValues::new));
 
-		static final ExplosiveValues DISABLED = new ExplosiveValues(false, -1.0, -1.0);
-		static final ExplosiveValues ENABLED_DEFAULT = new ExplosiveValues(true, -1.0, -1.0);
+		static final ExplosiveValues DISABLED = new ExplosiveValues(false, -1.0, -1.0, -1.0);
+		static final ExplosiveValues ENABLED_DEFAULT = new ExplosiveValues(true, 5, 3, 5);
 	}
 
 	/**
@@ -822,6 +835,23 @@ public class BlockProjectileConfigManager implements ReloadableConfig {
 	public record EntityBlockAttributeIndex(
 		AttributeValues entityDefault, List<ResolvedBlockGroup> blockGroups
 	) {
+		/**
+		 * Returns the resolved attributes for a specific block ref
+		 * (or ID; i.e.: {@code minecraft:stone}). However, if the block ref is not found in the
+		 * list, the method will return the entity's resolved {@code default} attributes instead.
+		 *
+		 * @param blockRef The concrete block reference (plain block ID) for which to retrieve the resolved attributes.
+		 *
+		 * @return The resolved attributes for the specified block ref, or the entity's resolved {@code default} if no block group matches.
+		 */
+		public AttributeValues getBlockAttributes(String blockRef) {
+			return blockGroups.stream()
+				.filter(group -> group.blockRef().equals(blockRef))
+				.findFirst()
+				.map(ResolvedBlockGroup::attributes)
+				.orElse(entityDefault);
+		}
+
 		@Override
 		public String toString() {
 			String blockGroupsStr = blockGroups.stream()
