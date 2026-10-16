@@ -8,23 +8,23 @@
 					"type": "minecraft:item",
 					"weight": 20,
 					"name": "dm:mg_head",
-					"functions": [
-						{
-							"function": "minecraft:set_count",
-							"count": 1
+					"modifier": {
+						"type": "minecraft:set_count",
+						"count": {
+							"type": "minecraft:uniform",
+							"min": 5,
+							"max": 9
 						}
-					]
+					}
 				},
 				{
 					"type": "minecraft:item",
 					"weight": 50,
 					"name": "dm:mg_stand",
-					"functions": [
-						{
-							"function": "minecraft:set_count",
-							"count": 1
-						}
-					]
+					"modifier": {
+						"type": "minecraft:set_count",
+						"count": 1
+					}
 				}
 			]
 		}

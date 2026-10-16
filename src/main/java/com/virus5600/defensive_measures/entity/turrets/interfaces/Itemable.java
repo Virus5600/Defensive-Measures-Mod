@@ -4,7 +4,6 @@ import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtOps;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
@@ -19,7 +18,6 @@ import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 
-import com.virus5600.defensive_measures.advancement.criterion.ModCriterion;
 import com.virus5600.defensive_measures.entity.turrets.TurretEntity;
 
 import java.util.Optional;
@@ -175,8 +173,6 @@ public interface Itemable {
 				if (discard) {
 					entity.discard();
 				}
-
-				ModCriterion.TURRET_ITEM_RETRIEVED_CRITERION.trigger((ServerPlayer) player, stack);
 			}
 
 			return Optional.of(InteractionResult.SUCCESS);

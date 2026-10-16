@@ -141,7 +141,8 @@ public interface ExplosiveEntity {
 					.send(
 						new ClientboundExplodePacket(
 							vec3d, power, blocksDestroyed, optional,
-							particleEffect, soundEvent, blockParticles
+							particleEffect, soundEvent, blockParticles,
+							true
 						)
 					);
 			}

@@ -263,7 +263,7 @@ public abstract class TurretItem extends Item {
 			entity.setGlowingTag(nbt.getBooleanOr("Glowing", false));
 		}
 		if (nbt.contains("Invulnerable")) {
-			entity.setInvulnerable(nbt.getBooleanOr("Invulnerable", false));
+			entity.setInvulnerableTime(nbt.getIntOr("Invulnerable", 0));
 		}
 		if (nbt.contains("MaxHealth")) {
 			float maxHp = nbt.getFloatOr("MaxHealth", entity.getMaxHealth());

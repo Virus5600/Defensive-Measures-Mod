@@ -16,6 +16,7 @@ import com.virus5600.defensive_measures.model.projectiles.BaseProjectileModel;
 import com.virus5600.defensive_measures.renderer.projectiles.state.BaseProjectileRenderState;
 
 import org.jetbrains.annotations.Nullable;
+import org.joml.Matrix4fc;
 import org.jspecify.annotations.NonNull;
 
 import java.util.function.Supplier;
@@ -64,19 +65,18 @@ public abstract class BaseProjectileRenderer<
 		stack.pushPose();
 
 		if (this.shouldLookAtDir()) {
-			stack.mulPose(Axis.YN.rotationDegrees(state.yaw + 180F));
-			stack.mulPose(Axis.XN.rotationDegrees(state.pitch));
+			stack.rotateDegrees(Axis.YN, state.yaw + 180F);
+			stack.rotateDegrees(Axis.XN, state.pitch);
 		}
 
 		Identifier textureId = this.getTexture(state);
 		if (textureId != null) {
 			queue.submitModel(
 				this.getModel(), state, stack,
-				RenderTypes.entityCutout(textureId),
+				textureId,
 				state.lightCoords,
 				OverlayTexture.NO_OVERLAY,
-				state.outlineColor,
-				null
+				state.outlineColor
 			);
 		}
 

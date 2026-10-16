@@ -191,7 +191,7 @@ public class LoopingShootSoundInstance extends AbstractTickableSoundInstance {
 	}
 
 	public void updateSound() {
-		WeighedSoundEvents wss = this.resolve(Minecraft.getInstance().getSoundManager());
+		WeighedSoundEvents wss = this.getOrResolve(Minecraft.getInstance().getSoundManager());
 
 		if (wss != null) {
 			this.pitch = this.getPitch();
@@ -301,7 +301,7 @@ public class LoopingShootSoundInstance extends AbstractTickableSoundInstance {
 
 	@Nullable
 	@Override
-	public WeighedSoundEvents resolve(@NonNull SoundManager soundManager) {
+	public WeighedSoundEvents getOrResolve(@NonNull SoundManager soundManager) {
 		if (this.getIdentifier().equals(SoundManager.INTENTIONALLY_EMPTY_SOUND_LOCATION)) {
 			this.sound = SoundManager.INTENTIONALLY_EMPTY_SOUND;
 			return SoundManager.INTENTIONALLY_EMPTY_SOUND_EVENT;

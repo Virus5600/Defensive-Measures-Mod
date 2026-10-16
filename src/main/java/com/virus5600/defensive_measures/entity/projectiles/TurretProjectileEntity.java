@@ -325,7 +325,7 @@ public abstract class TurretProjectileEntity extends Projectile {
 				hitEntity.hurtClient(dmgSrc);
 
 				hitEntity.setRemainingFireTicks(fireTime);
-				this.deflect(ProjectileDeflection.REVERSE, hitEntity, EntityReference.of(hitEntity), false);
+				this.deflect(ProjectileDeflection.REVERSE, hitEntity, EntityReference.of(hitEntity), false, this.getDeltaMovement().reverse());
 				this.setDeltaMovement(this.getDeltaMovement().scale(0.2));
 
 				if (world instanceof ServerLevel serverWorld && this.getDeltaMovement().lengthSqr() < 1.0E-7) {
@@ -858,7 +858,7 @@ public abstract class TurretProjectileEntity extends Projectile {
 	public void setSpawnPos(Vec3 spawnPos) {
 		this.spawnPos = spawnPos;
 		this.setPos(spawnPos);
-		this.moveOrInterpolateTo(spawnPos);
+		this.moveOrInterpolateTo(PositionPath.of(spawnPos));
 	}
 
 	public Vec3 getSpawnPos() {

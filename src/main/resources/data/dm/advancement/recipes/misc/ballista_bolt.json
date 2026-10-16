@@ -17,13 +17,13 @@
 		"has_recipe_bolt_head": {
 			"trigger": "minecraft:recipe_unlocked",
 			"conditions": {
-				"recipe": "dm:ballista/ballista_bolt_head"
+				"recipes": ["dm:ballista/ballista_bolt_head"]
 			}
 		},
 		"has_recipe_tas_bolt_head": {
 			"trigger": "minecraft:recipe_unlocked",
 			"conditions": {
-				"recipe": "dm:_turret_assembly_station/bolt_head/ballista_bolt_head"
+				"recipes": ["dm:_turret_assembly_station/bolt_head/ballista_bolt_head"]
 			}
 		}
 	},

@@ -1,6 +1,5 @@
 package com.virus5600.defensive_measures.block;
 
-import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
@@ -45,8 +44,6 @@ import org.jspecify.annotations.NonNull;
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
  */
 public class TurretAssemblyStationBlock extends BaseFunctionalBlock {
-	public static final MapCodec<TurretAssemblyStationBlock> CODEC = simpleCodec(TurretAssemblyStationBlock::new);
-
 	public static final EnumProperty<Direction> FACING;
 
 	private static final VoxelShape SHAPE;
@@ -84,11 +81,6 @@ public class TurretAssemblyStationBlock extends BaseFunctionalBlock {
 
 	protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
 		builder.add(FACING);
-	}
-
-	@Override
-	public @NonNull MapCodec<TurretAssemblyStationBlock> codec() {
-		return CODEC;
 	}
 
 	@Override

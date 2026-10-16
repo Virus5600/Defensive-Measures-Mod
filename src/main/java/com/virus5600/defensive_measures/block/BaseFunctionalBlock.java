@@ -1,6 +1,5 @@
 package com.virus5600.defensive_measures.block;
 
-import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
@@ -12,8 +11,6 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
-
-import java.util.function.Function;
 
 import org.jspecify.annotations.NonNull;
 
@@ -84,18 +81,6 @@ public abstract class BaseFunctionalBlock extends Block {
 	 * @since 1.1.0
 	 */
 	protected abstract Component getTitle();
-
-	/**
-	 * Returns this block's codec. To create one, just create a static final {@link MapCodec} property
-	 * and set its value with the result of {{@link #simpleCodec(Function)}}.<br><br>
-	 *
-	 * Example:<br>
-	 * - {@code createCodec(CraftingTableBlock::new)}<br>
-	 * - {@link BoltHeadBlock#CODEC createCodec(BoltHeadBlock::new);}<br>
-	 *
-	 * @return {@link MapCodec} A MapCodec that will be used to serialize and deserialize this block.
-	 */
-	public abstract @NonNull MapCodec<? extends BaseFunctionalBlock> codec();
 
 	/**
 	 * A dedicated stat to increment when interacting with this block.<br><br>
