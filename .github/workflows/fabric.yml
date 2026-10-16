@@ -6,7 +6,7 @@ jobs:
     strategy:
       matrix:
         version:
-          - {minecraft_version: "26.2", java: 25, loader: fabric, api: "0.153.0"}
+          - {minecraft_version: "26.3", java: 25, loader: fabric, api: "0.161.0"}
         os:
           - ubuntu-latest
 
@@ -50,9 +50,8 @@ jobs:
           echo "Runtime Test Version: ${{ matrix.version.loader }}"
           echo "Fabric API Version: ${{ matrix.version.api }}"
 
-      # ~~Current test haven't updated yet for 26.2; disabling for now until the test client is updated to support 26.2~~
       - name: Run MC test client
-        uses: headlesshq/mc-runtime-test@4.5.1
+        uses: headlesshq/mc-runtime-test@5.0.0
         with:
           mc: ${{ matrix.version.minecraft_version }}
           modloader: ${{ matrix.version.loader }}
