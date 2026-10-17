@@ -60,5 +60,5 @@ jobs:
           mc-runtime-test: ${{ matrix.version.loader }}
           xvfb: false
           fabric-api: ${{ matrix.version.api }}
-          headlessmc-command: -lwjgl --jvm
+          headlessmc-command: -lwjgl
 
