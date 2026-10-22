@@ -3,7 +3,7 @@ plugins {
 	id 'maven-publish'
 }
 
-version = "${project.mod_version}-${project.minecraft_version}"
+version = "${project.mod_version}+mc-${project.minecraft_version}"
 group = project.maven_group
 
 base {
@@ -144,10 +144,10 @@ tasks.register("getJarName") {
 	println("${archives_base_name}-${project.version}")
 }
 
-def xaeroRPName = "${xaeroRP} v${xaeroRP_version}-${mod_id}${mod_version}"
+def xaeroRPName = "${xaeroRP} v${xaeroRP_version}+${mod_id}-${mod_version}+mc-${minecraft_version}"
 
 tasks.register("getRPName") {
-	println("Xareo RP: ${mod_name} - ${xaeroRPName}.zip")
+	println("Xaero RP: ${mod_name} - ${xaeroRPName}.zip")
 }
 
 /**
