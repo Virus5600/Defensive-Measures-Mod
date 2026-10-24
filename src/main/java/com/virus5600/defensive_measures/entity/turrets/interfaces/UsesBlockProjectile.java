@@ -9,7 +9,7 @@ import net.minecraft.world.level.block.Block;
 
 import com.virus5600.defensive_measures._helper.RegistryHelper;
 import com.virus5600.defensive_measures.configs.BlockProjectileConfigManager;
-import com.virus5600.defensive_measures.entity.projectiles.BlockProjectile;
+import com.virus5600.defensive_measures.entity.projectiles.BlockProjectileEntity;
 import com.virus5600.defensive_measures.entity.turrets.TurretEntity;
 
 import org.jetbrains.annotations.Nullable;
@@ -61,7 +61,7 @@ public interface UsesBlockProjectile {
 	boolean updateCurrentAmmo(Item item);
 
 	/**
-	 * Gets the turret entity that implements this interface. Used by its {@link BlockProjectile}
+	 * Gets the turret entity that implements this interface. Used by its {@link BlockProjectileEntity}
 	 * companion class to let it know which turret entity fired it, allowing the lookup to
 	 * {@link BlockProjectileConfigManager} to get the correct attributes for the block projectile.
 	 *

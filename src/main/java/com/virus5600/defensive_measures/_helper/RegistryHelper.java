@@ -42,6 +42,7 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
 
+import net.minecraft.world.level.block.state.BlockState;
 import org.slf4j.Logger;
 
 /**
@@ -322,8 +323,20 @@ public final class RegistryHelper {
 		return Registry.register(BuiltInRegistries.RECIPE_BOOK_CATEGORY, id, new RecipeBookCategory());
 	}
 
+	// Getters
+
 	public static Item getItem(Identifier blockId) {
 		return BuiltInRegistries.ITEM.getValue(blockId);
+	}
+
+	public static Block getBlock(Identifier blockId) {
+		return BuiltInRegistries.BLOCK.getValue(blockId);
+	}
+
+	public static BlockState getBlockState(Identifier blockId) {
+		Block block = getBlock(blockId);
+
+		return block == null ? null : block.defaultBlockState();
 	}
 
 	// PRIVATE ENUM

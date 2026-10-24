@@ -99,6 +99,8 @@ public abstract class BaseProjectileRenderer<
 			);
 		}
 
+		this.submitExtra(state, stack, queue, camState);
+
 		super.submit(state, stack, queue, camState);
 		stack.popPose();
 	}
@@ -106,6 +108,19 @@ public abstract class BaseProjectileRenderer<
 	// ////////////// //
 	// CUSTOM METHODS //
 	// ////////////// //
+
+	/**
+	 * Submits any extra rendering logic for this projectile. This method is called after the
+	 * main model of the projectile has been submitted. This allows for additional rendering logic
+	 * to be added without having to override the entire {@link #submit} method.
+	 *
+	 * @param state    The current render state of the projectile.
+	 * @param stack    The current pose stack for rendering.
+	 * @param queue    The submit node collector for rendering.
+	 * @param camState The current camera render state.
+	 */
+	protected void submitExtra(@NonNull S state, PoseStack stack, @NonNull SubmitNodeCollector queue, @NonNull CameraRenderState camState) {
+	}
 
 	protected int getModelTint(final S state) {
 		return -1;

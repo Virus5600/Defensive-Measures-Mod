@@ -189,10 +189,10 @@ public class ModEntities extends EntityTypes {
 			.updateInterval(10)
 	);
 
-	public static final EntityType<BlockProjectile> BLOCK_PROJECTILE = RegistryHelper.registerEntity(
+	public static final EntityType<BlockProjectileEntity> BLOCK_PROJECTILE = RegistryHelper.registerEntity(
 		"block_projectile",
 		Builder
-			.<BlockProjectile>of(BlockProjectile::new, MobCategory.MISC)
+			.<BlockProjectileEntity>of(BlockProjectileEntity::new, MobCategory.MISC)
 			.noLootTable()
 			.sized(0.5f, 0.5f)
 			.clientTrackingRange(8)
