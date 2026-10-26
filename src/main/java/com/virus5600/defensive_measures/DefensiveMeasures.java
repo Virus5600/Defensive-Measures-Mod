@@ -2,6 +2,7 @@ package com.virus5600.defensive_measures;
 
 import net.fabricmc.api.ModInitializer;
 
+import com.virus5600.defensive_measures._helper.DelayedTasks;
 import com.virus5600.defensive_measures.advancement.criterion.ModCriterion;
 import com.virus5600.defensive_measures.behvaior.block.ModDispenserItemBehavior;
 import com.virus5600.defensive_measures.block.ModBlocks;
@@ -75,6 +76,8 @@ public class DefensiveMeasures implements ModInitializer {
 		ModRecipeBookCategories.init();
 		ModPackets.init();
 		ModDispenserItemBehavior.init();
+
+		DelayedTasks.init();
 
 		ModCommands.init();
 		ModConfigs.init();

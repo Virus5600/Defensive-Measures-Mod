@@ -1,6 +1,7 @@
 package com.virus5600.defensive_measures.renderer.projectiles;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Axis;
 import com.virus5600.defensive_measures.entity.projectiles.BlockProjectileEntity;
 import com.virus5600.defensive_measures.model.projectiles.BaseProjectileModel;
 import com.virus5600.defensive_measures.renderer.projectiles.state.BaseProjectileRenderState;
@@ -13,6 +14,7 @@ import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.Identifier;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.RenderShape;
 
 import org.jetbrains.annotations.Nullable;
@@ -48,7 +50,7 @@ public class BlockProjectileRenderer extends BaseTurretProjectileRenderer<
 			BlockProjectileRenderState::new
 		);
 
-		this.shouldLookAtDir(false);
+		this.shouldLookAtDir(true);
 		this.shadowRadius = 0.5f;
 	}
 
@@ -85,9 +87,25 @@ public class BlockProjectileRenderer extends BaseTurretProjectileRenderer<
 		}
 
 		stack.pushPose();
+
+		float radius = 0.5f;
+		float height = 0.5f;
+		double yTranslation = -0.5;
+
+		// Make the render larger if its an Iron Bars block - easter egg to make it look like a
+		// Rods from God
+		if (state.movingBlockRenderState.blockState == Blocks.IRON_BARS.defaultBlockState()) {
+			radius = 10f;
+			height = 37.5f;
+			yTranslation = -0.75;
+
+			stack.mulPose(Axis.XN.rotationDegrees(90F));
+		}
+
 		stack.translate(0.0, 0.25, 0.0);
-		stack.scale(0.5f, 0.5f, 0.5f);
-		stack.translate(-0.5, -0.5, -0.5);
+		stack.scale(radius, height, radius);
+		stack.translate(-0.5, yTranslation, -0.5);
+
 		queue.submitMovingBlock(stack, state.movingBlockRenderState, state.outlineColor);
 		stack.popPose();
 	}

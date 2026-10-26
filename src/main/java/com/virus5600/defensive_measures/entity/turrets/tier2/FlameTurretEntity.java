@@ -264,7 +264,10 @@ public class FlameTurretEntity extends TurretEntity implements LoopableShootingS
 	}
 
 	@Override
-	protected <P extends Projectile> void onProjectileCreateCallback(P projectile) {
+	protected <P extends Projectile> void onProjectileCreateCallback(P projectile, boolean postCreation) {
+		// Run only after data is populated already.
+		if (!postCreation) return;
+
 		FlammableAerosolEntity fae = (FlammableAerosolEntity) projectile;
 
 		int fireDuration = (int) (2.5 * 20);

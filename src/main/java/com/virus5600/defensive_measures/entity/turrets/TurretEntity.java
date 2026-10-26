@@ -667,14 +667,15 @@ public abstract class TurretEntity extends Mob implements Itemable, RangedAttack
 	 * This method can be used to modify attributes and various aspects of the assigned projectile
 	 * that this turret shoots.<br>
 	 * <br>
-	 * By default, the base method ({@link TurretEntity#onProjectileCreateCallback(Projectile)})
+	 * By default, the base method ({@link TurretEntity#onProjectileCreateCallback(Projectile, boolean)})
 	 * does nothing.
 	 *
-	 * @param projectile The projectile that is created by this turret.
-	 * @param <P>        The type of the projectile, which must be a subclass of {@link Projectile}.
+	 * @param projectile   The projectile that is created by this turret.
+	 * @param postCreation A boolean value that indicates where this method is called in the projectile creation process. If {@code true}, this method is called after the projectile is populated with data while {@code false} indicates that this method is called before the projectile is populated with data.
+	 * @param <P>          The type of the projectile, which must be a subclass of {@link Projectile}.
 	 */
 	@SuppressWarnings("JavadocDeclaration")
-	protected <P extends Projectile> void onProjectileCreateCallback(P projectile) {
+	protected <P extends Projectile> void onProjectileCreateCallback(P projectile, boolean postCreation) {
 	}
 
 	/**
@@ -2300,6 +2301,9 @@ public abstract class TurretEntity extends Mob implements Itemable, RangedAttack
 				return;
 			}
 
+			// Calls the callback after data population (pre creation).
+			this.onProjectileCreateCallback(projectile, false);
+
 			Vec3 barrelPos = this.getCurrentBarrel(true);
 			Vec3 pos = this.getRelativePos(barrelPos);
 
@@ -2333,8 +2337,8 @@ public abstract class TurretEntity extends Mob implements Itemable, RangedAttack
 
 			projectile.setOwner(this);
 
-			// Calls the callback.
-			this.onProjectileCreateCallback(projectile);
+			// Calls the callback after data population (post creation).
+			this.onProjectileCreateCallback(projectile, true);
 
 			// Plays shooting sound by default (via the this.playShootSound)
 			if (this.playShootSound) {

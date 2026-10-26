@@ -8,6 +8,7 @@ import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
 import net.minecraft.network.syncher.SynchedEntityData.Builder;
+import net.minecraft.references.BlockItemIds;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerEntity;
 import net.minecraft.server.level.ServerLevel;
@@ -31,8 +32,11 @@ import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 
+import com.virus5600.defensive_measures._helper.DelayedTasks;
+import com.virus5600.defensive_measures._helper.ParticleHelper;
 import com.virus5600.defensive_measures._util.MathUtil;
 import com.virus5600.defensive_measures.entity.ExplosiveEntity;
+import com.virus5600.defensive_measures.configs.BlockProjectileConfigManager;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -85,9 +89,20 @@ public abstract class ExplosiveProjectileEntity extends TurretProjectileEntity i
 	protected ExplosiveProjectileEntity(EntityType<? extends TurretProjectileEntity> entityType, Level level) {
 		super(entityType, level);
 
+		if (this instanceof BlockProjectileEntity blockProjectile) {
+			blockProjectile.setAttributes(BlockProjectileConfigManager.AttributeValues.DEFAULT);
+		}
+
 		this.setDamage(5);
 		this.setPierceLevel(this.getMaxPierceLevel());
 		this.setSpeedAffectsDamage(false);
+
+		// If it's not an explosive block projectile, then the speed will affect the damage like how
+		// a kinetic projectile would.
+		if (this instanceof BlockProjectileEntity blockProjectile
+			&& !blockProjectile.attrValues.explosive().enabled()) {
+			this.setSpeedAffectsDamage(true);
+		}
 	}
 
 	// //////////// //
@@ -126,7 +141,10 @@ public abstract class ExplosiveProjectileEntity extends TurretProjectileEntity i
 	protected void onHitEntity(@NonNull EntityHitResult hitResult) {
 		super.onHitEntity(hitResult);
 
-		if (!this.level().isClientSide()) {
+		if (!this.level().isClientSide()
+			&& (!(this instanceof BlockProjectileEntity bpe)
+				|| bpe.attrValues.explosive().enabled())
+		) {
 			this.doDamage();
 		}
 	}
@@ -159,10 +177,45 @@ public abstract class ExplosiveProjectileEntity extends TurretProjectileEntity i
 	 *     <li>{@code formula} is the formula used to calculate the reduced damage.</li>
 	 *     <li>{@code dmg} is the reduced damage dealt to the entity.</li>
 	 * </ul>
+	 *
+	 * @param discardAfter whether to discard the projectile after applying damage.
 	 */
-	public void doDamage() {
+	public void doDamage(boolean discardAfter) {
 		if (this.level().isClientSide()) {
 			return;
+		}
+
+		if (this instanceof BlockProjectileEntity bpe) {
+			Level level = bpe.level();
+
+			// Spawns a ring of explosion particles
+			if (level instanceof ServerLevel serverLevel) {
+				double waveDistance = 8;
+				double maxRadius = bpe.attrValues.explosive().maxRadius();
+				int waves = (int) (maxRadius / waveDistance);
+				int intervalTick = 5;
+
+				serverLevel.sendParticles(
+					maxRadius > waveDistance ? this.getLargeExplosionParticleType() : this.getSmallExplosionParticleType(),
+					bpe.getX(), bpe.getY() + 1, bpe.getZ(),
+					2, 3, 1, 3, 0
+				);
+
+				for (int i = 1; i <= waves; i++) {
+					double radius = waveDistance * i;
+
+					DelayedTasks.schedule(
+						serverLevel.getServer().getTickCount() + (i * intervalTick),
+						() -> {
+							ParticleHelper.spawnRing(
+								serverLevel, maxRadius > waveDistance ? this.getLargeExplosionParticleType() : this.getSmallExplosionParticleType(),
+								bpe.getX(), bpe.getY() + 1, bpe.getZ(),
+								radius, this.getExplosionSoundEvent().value()
+							);
+						}
+					);
+				}
+			}
 		}
 
 		// Create the damage source
@@ -191,7 +244,16 @@ public abstract class ExplosiveProjectileEntity extends TurretProjectileEntity i
 			this.canDestroyBlocks()
 		);
 
-		this.discard();
+		if (discardAfter) {
+			this.discard();
+		}
+	}
+
+	/**
+	 * @see #doDamage(boolean)
+	 */
+	public void doDamage() {
+		this.doDamage(true);
 	}
 
 	@Override

@@ -192,11 +192,20 @@ public class BlockProjectileConfigManager implements ReloadableConfig {
 	 * Populated by merge(); this is the only thing queried at runtime.
 	 */
 	private static Map<Identifier, EntityBlockAttributeIndex> resolved = Map.of();
+	private static int generation = 0;
 
 	public static void init() {
 		DefensiveMeasures.LOGGER.info("Loading block projectile config...");
 
 		loadStatic();
+	}
+
+	// ////////////////// //
+	// GENERATION COUNTER //
+	// ////////////////// //
+
+	public static int generation() {
+		return generation;
 	}
 
 	// ////// //
@@ -231,7 +240,7 @@ public class BlockProjectileConfigManager implements ReloadableConfig {
 		return resolved.getOrDefault(
 			entityId,
 			new EntityBlockAttributeIndex(
-				AttributeValues.EMPTY,
+				AttributeValues.EMPTY.withDefaults(),
 				List.of()
 			)
 		);
@@ -239,6 +248,25 @@ public class BlockProjectileConfigManager implements ReloadableConfig {
 
 	public static EntityBlockAttributeIndex getConfigForEntity(EntityType<?> entityType) {
 		return getConfigForEntity(RegistryHelper.getIdentifier(entityType));
+	}
+
+	public static EntityBlockAttributeIndex createFrom(
+		double drag, double gravity,
+		int damage, byte piercing,
+		boolean fire, ExplosiveValues explosive
+	) {
+		return createFrom(new AttributeValues(
+			drag, gravity,
+			damage, piercing,
+			fire, explosive
+		));
+	}
+
+	public static EntityBlockAttributeIndex createFrom(AttributeValues values) {
+		return new EntityBlockAttributeIndex(
+			values,
+			List.of()
+		);
 	}
 
 	// //////// //
@@ -453,7 +481,8 @@ public class BlockProjectileConfigManager implements ReloadableConfig {
 				AttributeValues biGroup = findGroupValuesForBlock(biEntity, ref);
 
 				AttributeValues resolvedValues = AttributeValues.cascade(pwGroup, glGroup, biGroup)
-					.fillFrom(entityDefault);
+					.fillFrom(entityDefault)
+					.withDefaults();
 
 				resolvedGroups.add(new ResolvedBlockGroup(ref, resolvedValues));
 			}
@@ -462,6 +491,7 @@ public class BlockProjectileConfigManager implements ReloadableConfig {
 		}
 
 		resolved = Map.copyOf(out);
+		generation++;
 
 		DefensiveMeasures.LOGGER.debug("Turret Ammo Attrs: {}", resolved);
 	}
@@ -676,6 +706,9 @@ public class BlockProjectileConfigManager implements ReloadableConfig {
 	 * @param piercing  The piercing level of the projectile (0.0 means no piercing, higher values allow it to pierce more entities). Negative = unset.
 	 * @param fire      Whether the projectile sets entities on fire. Null = unset at this tier.
 	 * @param explosive The explosive properties of the projectile, if any.
+	 *
+	 * @apiNote Use the getter methods to retrieve clamped values for {@link #drag()},
+	 * {@link #gravity()}, {@link #damage()}, {@link #piercing()}, {@link #fire()}, and {@link #explosive()}.
 	 */
 	public record AttributeValues(
 		double drag, double gravity, double damage, byte piercing,
@@ -690,7 +723,107 @@ public class BlockProjectileConfigManager implements ReloadableConfig {
 			ExplosiveValues.CODEC.optionalFieldOf("explosive", ExplosiveValues.DISABLED).forGetter(AttributeValues::explosive)
 		).apply(instance, AttributeValues::new));
 
-		static final AttributeValues EMPTY = new AttributeValues(-1.0, -1.0, -1.0, (byte) -1, null, null);
+		// ////////////// //
+		// DEFAULT VALUES //
+		// ////////////// //
+
+		/**
+		 * Represents an empty set of attribute values, where all numeric fields are negative and
+		 * boolean fields are null. This is used as a sentinel value to indicate that no attributes
+		 * were specified at this tier.
+		 */
+		public static final AttributeValues EMPTY = new AttributeValues(-1.0, -1.0, -1.0, (byte) -1, null, null);
+		/**
+		 * Represents the default attribute values for a block projectile, where in:
+		 * <ul>
+		 *     <li>{@code drag} is {@code 0.99}</li>
+		 *     <li>{@code gravity} is {@code 0.05}</li>
+		 *     <li>{@code damage} is {@code 1}</li>
+		 *     <li>{@code piercing} is {@code -1} (unset)</li>
+		 *     <li>{@code fire} is {@code false}</li>
+		 *     <li>{@code explosive} is {@link ExplosiveValues#DISABLED ExplosiveValues.DISABLED}</li>
+		 * </ul>
+		 * These values are used as the final fallback when no other tiers or entity-specific
+		 * defaults provide a value for a given attribute.
+		 *
+		 * @see ExplosiveValues#DISABLED ExplosiveValues.DISABLED
+		 */
+		public static final AttributeValues DEFAULT = new AttributeValues(0.99, 0.05, 1, (byte) 0, false, ExplosiveValues.DISABLED);
+		/**
+		 * Represents a simulated <a href="https://en.wikipedia.org/wiki/Kinetic_bombardment">"Rods from God"</a> projectile, where in:
+		 * <ul>
+		 *     <li>{@code drag} is {@code 1.0}</li>
+		 *     <li>{@code gravity} is {@code 0.1}</li>
+		 *     <li>{@code damage} is {@code 500}</li>
+		 *     <li>{@code piercing} is {@code 0}</li>
+		 *     <li>{@code fire} is {@code false}</li>
+		 *     <li>{@code explosive} is a new instance of {@link ExplosiveValues} with the following values:
+		 *         <ul>
+		 *             <li>{@code enabled} is {@code true}</li>
+		 *             <li>{@code damage} is {@code 375}</li>
+		 *             <li>{@code effectiveRadius} is {@code 50}</li>
+		 *             <li>{@code maxRadius} is {@code 100}</li>
+		 *         </ul>
+		 *     </li>
+		 * </ul>
+		 *
+		 * <img src="https://i.imgur.com/1yTgjIL.png" alt="Rods from God" width="300"/>
+		 *
+		 * <p>Wanna spawn one?</p>
+		 * <pre>
+		 * {@code /summon dm:block_projectile ~ ~100 ~ {Block: "minecraft:iron_bars", Attr: {drag: 1.0, gravity: 0.5, damage: 500, piercing: 0, fire: false, explosive: {enabled: true, damage: 375, effectiveRadius: 50, maxRadius: 100}}}}
+		 * </pre>
+		 *
+		 * @see ExplosiveValues
+		 */
+		public static final AttributeValues RODS_FROM_GOD = new AttributeValues(
+			1.0, 0.5, 500, (byte) 0,
+			false, new ExplosiveValues(true, 375, 50, 100)
+		);
+		/**
+		 * An inert version of {@link #RODS_FROM_GOD}, where the explosive is disabled. This can be
+		 * used for testing or for scenarios where you want the projectile to have the same physical
+		 * properties but without causing an explosion.
+		 *
+		 * <p>Wanna spawn one?</p>
+		 * <pre>
+		 * {@code /summon dm:block_projectile ~ ~100 ~ {Block: "minecraft:iron_bars", Attr: {drag: 1.0, gravity: 0.5, damage: 500, piercing: 0, fire: false}}}
+		 * </pre>
+		 *
+		 * @see #RODS_FROM_GOD
+		 */
+		public static final AttributeValues RODS_FROM_GOD_INERT = new AttributeValues(
+			1.0, 0.5, 500, (byte) 0,
+			false, ExplosiveValues.DISABLED
+		);
+
+		// /////// //
+		// GETTERS //
+		// /////// //
+
+		public double drag() {
+			return this.drag == -1 ?
+				-1 : Math.clamp(this.drag, 0, 1);
+		}
+
+		public double gravity() {
+			return this.gravity == -1 ?
+				-1 : Math.clamp(this.gravity, 0.0, 0.5);
+		}
+
+		public double damage() {
+			return this.damage == -1 ?
+				-1 : Math.clamp(this.damage, 0, 1000);
+		}
+
+		public byte piercing() {
+			return (byte) (this.piercing == -1 ?
+				-1 : Math.clamp(this.piercing, 0, 100));
+		}
+
+		// ////////////// //
+		// STATIC METHODS //
+		// ////////////// //
 
 		static AttributeValues fromJson(JsonObject obj) {
 			double drag = obj.has("drag") ? obj.get("drag").getAsDouble() : -1.0;
@@ -706,7 +839,7 @@ public class BlockProjectileConfigManager implements ReloadableConfig {
 
 				if (ex.isJsonPrimitive() && ex.getAsJsonPrimitive().isBoolean()) {
 					explosive = ex.getAsBoolean() ?
-						ExplosiveValues.ENABLED_DEFAULT : ExplosiveValues.DISABLED;
+						ExplosiveValues.ENABLED : ExplosiveValues.DISABLED;
 				}
 				else if (ex.isJsonObject()) {
 					JsonObject exObj = ex.getAsJsonObject();
@@ -774,11 +907,24 @@ public class BlockProjectileConfigManager implements ReloadableConfig {
 			return null;
 		}
 
+		private static Boolean pickBoolean(AttributeValues a, AttributeValues b, AttributeValues c, Function<AttributeValues, Boolean> getter, Boolean defaultValue) {
+			Boolean value = pickBoolean(a, b, c, getter);
+			return value == null ? defaultValue : value;
+		}
+
 		private static ExplosiveValues pickExplosive(AttributeValues a, AttributeValues b, AttributeValues c) {
 			if (a != null && a.explosive() != null) return a.explosive();
 			if (b != null && b.explosive() != null) return b.explosive();
 			if (c != null) return c.explosive();
 			return null;
+		}
+
+		AttributeValues withDefaults() {
+			return new AttributeValues(
+				drag, gravity, damage, piercing,
+				fire != null ? fire : Boolean.FALSE,
+				explosive != null ? explosive : ExplosiveValues.DISABLED
+			);
 		}
 
 		@Override
@@ -801,6 +947,9 @@ public class BlockProjectileConfigManager implements ReloadableConfig {
 	 * @param damage the damage dealt by the explosion
 	 * @param effectiveRadius the effective radius of the explosion; basically the radius where the damage gets applied fully
 	 * @param maxRadius the maximum radius of the explosion
+	 *
+	 * @apiNote Use the getter methods to retrieve clamped values for {@link #damage()},
+	 * {@link #effectiveRadius()}, and {@link #maxRadius()}.
 	 */
 	public record ExplosiveValues(boolean enabled, double damage, double effectiveRadius, double maxRadius) {
 		public static final Codec<ExplosiveValues> CODEC = RecordCodecBuilder.create(instance -> instance.group(
@@ -810,8 +959,52 @@ public class BlockProjectileConfigManager implements ReloadableConfig {
 			Codec.DOUBLE.optionalFieldOf("maxRadius", 5.0).forGetter(ExplosiveValues::maxRadius)
 		).apply(instance, ExplosiveValues::new));
 
-		static final ExplosiveValues DISABLED = new ExplosiveValues(false, -1.0, -1.0, -1.0);
-		static final ExplosiveValues ENABLED_DEFAULT = new ExplosiveValues(true, 5, 3, 5);
+		// ////////////// //
+		// DEFAULT VALUES //
+		// ////////////// //
+
+		/**
+		 * Represents an explosive configuration that is disabled, with all numeric fields set to
+		 * -1.0. This is used as a sentinel value to indicate that the explosive feature is not
+		 * enabled for this projectile, and that no specific explosive attributes have been set at
+		 * this tier.
+		 */
+		public static final ExplosiveValues DISABLED = new ExplosiveValues(false, -1.0, -1.0, -1.0);
+		/**
+		 * Represents the default explosive configuration that is enabled, with values all its
+		 * attributes. As defined, the values are:
+		 * <ul>
+		 *     <li>{@code enabled} is {@code true}</li>
+		 *     <li>{@code damage} is {@code 5.0}</li>
+		 *     <li>{@code effectiveRadius} is {@code 3.0}</li>
+		 *     <li>{@code maxRadius} is {@code 5.0}</li>
+		 * </ul>
+		 * These values are used as the final fallback when no other tiers or entity-specific
+		 * defaults provide a value for a given explosive attribute.
+		 */
+		public static final ExplosiveValues ENABLED = new ExplosiveValues(true, 5, 3, 5);
+
+		// /////// //
+		// GETTERS //
+		// /////// //
+
+		public double damage() {
+			return this.damage == -1 ?
+				-1 : Math.clamp(this.damage, 1, 1000);
+		}
+
+		public double effectiveRadius() {
+			return this.effectiveRadius == -1 ?
+				-1 : Math.clamp(this.effectiveRadius, 1.0, this.maxRadius());
+		}
+
+		public double maxRadius() {
+			double minimumRadius = this.effectiveRadius == -1 ?
+				1 : this.effectiveRadius;
+
+			return this.maxRadius == -1 ?
+				-1 : Math.clamp(this.maxRadius, minimumRadius, 100);
+		}
 	}
 
 	/**

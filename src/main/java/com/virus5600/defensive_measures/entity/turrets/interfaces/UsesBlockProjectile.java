@@ -3,9 +3,7 @@ package com.virus5600.defensive_measures.entity.turrets.interfaces;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
-import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.level.block.Block;
 
 import com.virus5600.defensive_measures._helper.RegistryHelper;
 import com.virus5600.defensive_measures.configs.BlockProjectileConfigManager;
@@ -13,8 +11,6 @@ import com.virus5600.defensive_measures.entity.projectiles.BlockProjectileEntity
 import com.virus5600.defensive_measures.entity.turrets.TurretEntity;
 
 import org.jetbrains.annotations.Nullable;
-
-import java.util.Optional;
 
 /**
  * An interface that provides a contract for entities that use block projectiles. This interface can
@@ -114,23 +110,5 @@ public interface UsesBlockProjectile {
 	 */
 	default boolean isValidAmmo(Item item) {
 		return this.getAllowedItems() != null && RegistryHelper.isOf(item, this.getAllowedItems());
-	}
-
-	/**
-	 * Resolves the block that the given ammo item places, so it can be used as the fired
-	 * projectile's visual/identity and looked up in {@code BlockProjectileConfigManager}.
-	 * Only {@link BlockItem}-backed ammo is supported — anything else resolves to an empty
-	 * {@link Optional} rather than throwing, consistent with this system's "skip malformed,
-	 * don't crash" handling elsewhere.
-	 *
-	 * @param ammo The ammo item to resolve a block from.
-	 *
-	 * @return The block this ammo item places, or empty if the item isn't a {@link BlockItem}.
-	 */
-	default Optional<Block> resolveBlock(Item ammo) {
-		if (ammo instanceof BlockItem blockItem) {
-			return Optional.of(blockItem.getBlock());
-		}
-		return Optional.empty();
 	}
 }

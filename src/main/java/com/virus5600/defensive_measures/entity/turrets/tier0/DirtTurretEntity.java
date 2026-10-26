@@ -26,14 +26,12 @@ import net.minecraft.world.phys.Vec3;
 import com.virus5600.defensive_measures._helper.RegistryHelper;
 import com.virus5600.defensive_measures.configs.BlockProjectileConfigManager.AttributeValues;
 import com.virus5600.defensive_measures.configs.BlockProjectileConfigManager.EntityBlockAttributeIndex;
-import com.virus5600.defensive_measures.configs.BlockProjectileConfigManager.ExplosiveValues;
 import com.virus5600.defensive_measures.configs.BlockProjectileConfigManager.ResolvedBlockGroup;
 import com.virus5600.defensive_measures.configs.BlockProjectileConfigManager;
 import com.virus5600.defensive_measures.entity.ModEntities;
 import com.virus5600.defensive_measures.entity.TurretMaterial;
 import com.virus5600.defensive_measures.entity.ai.goal.ProjectileAttackGoal;
-import com.virus5600.defensive_measures.entity.projectiles.ExplosiveProjectileEntity;
-import com.virus5600.defensive_measures.entity.projectiles.TurretProjectileEntity;
+import com.virus5600.defensive_measures.entity.projectiles.BlockProjectileEntity;
 import com.virus5600.defensive_measures.entity.turrets.TurretEntity;
 import com.virus5600.defensive_measures.entity.turrets.interfaces.UsesBlockProjectile;
 import com.virus5600.defensive_measures.item.ModItems;
@@ -88,7 +86,7 @@ public class DirtTurretEntity extends TurretEntity implements UsesBlockProjectil
 	private static final EntityDataAccessor<ItemStack> CURRENT_AMMO;
 
 	/**
-	 * Defines how many seconds the ballista should wait before shooting again.
+	 * Defines how many seconds the dirt turret should wait before shooting again.
 	 * The time is calculated in ticks and by default, it's 2.5 seconds <b>(20 ticks times 2.5 seconds)</b>.
 	 */
 	private static final int TOTAL_ATT_COOLDOWN = (int) (20 * 2.5);
@@ -105,23 +103,19 @@ public class DirtTurretEntity extends TurretEntity implements UsesBlockProjectil
 	 */
 	protected static final Map<Item, List<Object[]>> effectSource;
 
-	private Item currentAmmo;
-	private AttributeValues currentAmmoAttr;
+	private Item currentAmmo = Items.DIRT;
+	private AttributeValues currentAmmoAttr = AttributeValues.DEFAULT;
 
 	// //////////// //
 	// CONSTRUCTORS //
 	// //////////// //
 	public DirtTurretEntity(EntityType<? extends Mob> entityType, Level world) {
-		super(entityType, world, TurretMaterial.DIRT, ModEntities.FLINT_PELLET, ModItems.DIRT_TURRET);
+		super(entityType, world, TurretMaterial.DIRT, ModEntities.BLOCK_PROJECTILE, ModItems.DIRT_TURRET);
 
 		this.addHealables(healables)
 			.addEffectSource(effectSource)
 			.setShootSound(ModSoundEvents.TURRET_DIRT_SHOOT)
 		;
-
-		if (this.currentAmmo == null) {
-			this.currentAmmo = Items.DIRT;
-		}
 
 		this.updateCurrentAmmo(this.currentAmmo);
 	}
@@ -151,7 +145,7 @@ public class DirtTurretEntity extends TurretEntity implements UsesBlockProjectil
 
 	public static AttributeSupplier.Builder setAttributes() {
 		TurretEntity.setTurretMaxHealth(10);
-		TurretEntity.setTurretMaxRange(8 + ModEntities.BALLISTA_TURRET.getDimensions().eyeHeight());
+		TurretEntity.setTurretMaxRange(8 + ModEntities.DIRT_TURRET.getDimensions().eyeHeight());
 
 		return TurretEntity.setAttributes();
 	}
@@ -161,22 +155,17 @@ public class DirtTurretEntity extends TurretEntity implements UsesBlockProjectil
 	// /////////////// //
 
 	@Override
-	protected <P extends Projectile> void onProjectileCreateCallback(P projectile) {
-		if (projectile instanceof TurretProjectileEntity tpe) {
-			// Set Drag
-			// Set Gravity
-
-			if (this.currentAmmoAttr.fire()) {
-				tpe.setRemainingFireTicks(Integer.MAX_VALUE);
-			}
-
-			ExplosiveValues ev = this.currentAmmoAttr.explosive();
-			if (ev.enabled() && tpe instanceof ExplosiveProjectileEntity epe) {
-
-				epe.setDamage(ev.damage());
-				// Set effectiveRadius
-			}
+	protected <P extends Projectile> void onProjectileCreateCallback(P projectile, boolean postCreation) {
+		if (projectile instanceof BlockProjectileEntity bpe) {
+			bpe.setBlockId(this.currentAmmo)
+				.setAttributes(this.currentAmmoAttr);
 		}
+	}
+
+	@Override
+	protected void shoot(TurretProjectileVelocity velocityData) {
+		this.ammoAttr();
+		super.shoot(velocityData);
 	}
 
 	@Override
@@ -195,12 +184,14 @@ public class DirtTurretEntity extends TurretEntity implements UsesBlockProjectil
 			this.setHealSound(HEAL_SOUNDS.get(usedItem));
 		}
 
-		if (this.isValidAmmo(usedItem)) {
-			if (this.updateCurrentAmmo(usedItem)) {
-				usedItemStack.setCount(usedItemStack.getCount() - 1);
-
-				return InteractionResult.SUCCESS;
+		if (this.isValidAmmo(usedItem) && player.isCrouching()) {
+			if (usedItem != this.getCurrentAmmo() && this.updateCurrentAmmo(usedItem)) {
+				if (!player.isCreative()) {
+					usedItemStack.setCount(usedItemStack.getCount() - 1);
+				}
 			}
+
+			return InteractionResult.SUCCESS;
 		}
 
 		return super.mobInteract(player, hand);
@@ -319,6 +310,8 @@ public class DirtTurretEntity extends TurretEntity implements UsesBlockProjectil
 		this.currentAmmo = item;
 		this.currentAmmoAttr = attrIndex.entityDefault();
 
+		this.entityData.set(CURRENT_AMMO, this.currentAmmo.getDefaultInstance());
+
 		for (ResolvedBlockGroup blockGroup : attrIndex.blockGroups()) {
 			if (blockGroup.blockRef().equals(RegistryHelper.getIdentifier(item).toString())) {
 				this.currentAmmoAttr = blockGroup.attributes();
@@ -340,12 +333,16 @@ public class DirtTurretEntity extends TurretEntity implements UsesBlockProjectil
 
 	@Override
 	public void readAdditionalSaveData(@NonNull ValueInput view) {
+		super.readAdditionalSaveData(view);
+
 		view.read("current_ammo", ItemStack.CODEC)
 			.ifPresent(stack -> this.updateCurrentAmmo(stack.getItem()));
 	}
 
 	@Override
 	public void addAdditionalSaveData(@NonNull ValueOutput view) {
+		super.addAdditionalSaveData(view);
+
 		ItemStack currentAmmoStack = new ItemStack(this.currentAmmo);
 		currentAmmoStack.setCount(1);
 
@@ -357,6 +354,30 @@ public class DirtTurretEntity extends TurretEntity implements UsesBlockProjectil
 	// /////////////////// //
 	public enum Offsets {
 		BARREL
+	}
+
+	// //////////////////////////////////// //
+	// TEMPORARY ATTRVAL GENERATION COUNTER //
+	// //////////////////////////////////// //
+
+	private int attrGen = -1;
+
+	private AttributeValues ammoAttr() {
+		if (this.attrGen != BlockProjectileConfigManager.generation()) {
+			EntityBlockAttributeIndex attrIndex = BlockProjectileConfigManager.getConfigForEntity(this.getType());
+			this.currentAmmoAttr = attrIndex.entityDefault();
+
+			for (ResolvedBlockGroup blockGroup : attrIndex.blockGroups()) {
+				if (blockGroup.blockRef().equals(RegistryHelper.getIdentifier(this.currentAmmo).toString())) {
+					this.currentAmmoAttr = blockGroup.attributes();
+					break;
+				}
+			}
+
+			this.attrGen = BlockProjectileConfigManager.generation();
+		}
+
+		return this.currentAmmoAttr;
 	}
 
 	// ///////////////// //
