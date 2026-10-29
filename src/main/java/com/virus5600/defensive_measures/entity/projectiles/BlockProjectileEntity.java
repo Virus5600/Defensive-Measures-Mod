@@ -17,19 +17,19 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
-
-import com.virus5600.defensive_measures.DefensiveMeasures;
-import com.virus5600.defensive_measures._helper.RegistryHelper;
-import com.virus5600.defensive_measures._util.MathUtil;
-import com.virus5600.defensive_measures.configs.BlockProjectileConfigManager.AttributeValues;
-import com.virus5600.defensive_measures.configs.BlockProjectileConfigManager.ExplosiveValues;
-import com.virus5600.defensive_measures.configs.BlockProjectileConfigManager;
-import com.virus5600.defensive_measures.entity.turrets.interfaces.UsesBlockProjectile;
-
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.VoxelShape;
+
+import com.virus5600.defensive_measures.DefensiveMeasures;
+import com.virus5600.defensive_measures._helper.RegistryHelper;
+import com.virus5600.defensive_measures._util.MathUtil;
+import com.virus5600.defensive_measures.configs.BlockProjectileConfigManager;
+import com.virus5600.defensive_measures.configs.records.block.AttributeValues;
+import com.virus5600.defensive_measures.configs.records.block.ExplosiveValues;
+import com.virus5600.defensive_measures.entity.turrets.interfaces.UsesBlockProjectile;
+
 import org.jspecify.annotations.NonNull;
 
 /**

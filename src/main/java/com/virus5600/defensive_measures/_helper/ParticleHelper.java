@@ -44,8 +44,8 @@ public final class ParticleHelper {
 	) {
 		int points = (int) Math.clamp(radius * 1.25, 16, 500);
 
-		for (int p = 0; p < points; p++) {
-			double a = 2 * Math.PI * p / points;
+		for (int i = 0; i < points; i++) {
+			double a = 2 * Math.PI * i / points;
 			double xPos = x + Math.cos(a) * radius;
 			double yPos = y + Mth.nextDouble(level.getRandom(), -1, 5);
 			double zPos = z + Math.sin(a) * radius;

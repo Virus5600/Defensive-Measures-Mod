@@ -1,6 +1,7 @@
 package com.virus5600.defensive_measures.renderer.projectiles.state;
 
 import net.minecraft.client.renderer.block.MovingBlockRenderState;
+import net.minecraft.client.renderer.item.ItemStackRenderState;
 
 import com.virus5600.defensive_measures.renderer.projectiles.BlockProjectileRenderer;
 
@@ -13,4 +14,5 @@ import com.virus5600.defensive_measures.renderer.projectiles.BlockProjectileRend
  */
 public class BlockProjectileRenderState extends BaseProjectileRenderState {
 	public final MovingBlockRenderState movingBlockRenderState = new MovingBlockRenderState();
+	public final ItemStackRenderState itemRenderState = new ItemStackRenderState();
 }

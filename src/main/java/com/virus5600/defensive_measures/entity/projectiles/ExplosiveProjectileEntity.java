@@ -8,7 +8,6 @@ import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
 import net.minecraft.network.syncher.SynchedEntityData.Builder;
-import net.minecraft.references.BlockItemIds;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerEntity;
 import net.minecraft.server.level.ServerLevel;
@@ -35,8 +34,8 @@ import net.minecraft.world.phys.Vec3;
 import com.virus5600.defensive_measures._helper.DelayedTasks;
 import com.virus5600.defensive_measures._helper.ParticleHelper;
 import com.virus5600.defensive_measures._util.MathUtil;
+import com.virus5600.defensive_measures.configs.records.block.AttributeValues;
 import com.virus5600.defensive_measures.entity.ExplosiveEntity;
-import com.virus5600.defensive_measures.configs.BlockProjectileConfigManager;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -90,7 +89,7 @@ public abstract class ExplosiveProjectileEntity extends TurretProjectileEntity i
 		super(entityType, level);
 
 		if (this instanceof BlockProjectileEntity blockProjectile) {
-			blockProjectile.setAttributes(BlockProjectileConfigManager.AttributeValues.DEFAULT);
+			blockProjectile.setAttributes(AttributeValues.DEFAULT);
 		}
 
 		this.setDamage(5);

@@ -2,8 +2,8 @@ package com.virus5600.defensive_measures.entity.turrets.tier0;
 
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
-import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.network.syncher.SynchedEntityData.Builder;
+import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -24,10 +24,9 @@ import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.Vec3;
 
 import com.virus5600.defensive_measures._helper.RegistryHelper;
-import com.virus5600.defensive_measures.configs.BlockProjectileConfigManager.AttributeValues;
-import com.virus5600.defensive_measures.configs.BlockProjectileConfigManager.EntityBlockAttributeIndex;
-import com.virus5600.defensive_measures.configs.BlockProjectileConfigManager.ResolvedBlockGroup;
 import com.virus5600.defensive_measures.configs.BlockProjectileConfigManager;
+import com.virus5600.defensive_measures.configs.records.block.AttributeValues;
+import com.virus5600.defensive_measures.configs.records.block.EntityBlockAttributeIndex;
 import com.virus5600.defensive_measures.entity.ModEntities;
 import com.virus5600.defensive_measures.entity.TurretMaterial;
 import com.virus5600.defensive_measures.entity.ai.goal.ProjectileAttackGoal;
@@ -163,12 +162,6 @@ public class DirtTurretEntity extends TurretEntity implements UsesBlockProjectil
 	}
 
 	@Override
-	protected void shoot(TurretProjectileVelocity velocityData) {
-		this.ammoAttr();
-		super.shoot(velocityData);
-	}
-
-	@Override
 	public void performRangedAttack(@NonNull LivingEntity target, float pullProgress) {
 		TurretProjectileVelocity velocityData = this.getProjectileVelocityData(target);
 
@@ -264,10 +257,14 @@ public class DirtTurretEntity extends TurretEntity implements UsesBlockProjectil
 	}
 
 	public double getProjectileDamage() {
+		this.updateCurrentAmmo(this.currentAmmo);
+
 		return DAMAGE[this.getTrackedLevel() - 1] + this.currentAmmoAttr.damage();
 	}
 
 	public byte getProjectilePierceLevel() {
+		this.updateCurrentAmmo(this.currentAmmo);
+
 		return (byte) (PIERCE_LEVELS[this.getTrackedLevel() - 1] + this.currentAmmoAttr.piercing());
 	}
 
@@ -312,14 +309,14 @@ public class DirtTurretEntity extends TurretEntity implements UsesBlockProjectil
 
 		this.entityData.set(CURRENT_AMMO, this.currentAmmo.getDefaultInstance());
 
-		for (ResolvedBlockGroup blockGroup : attrIndex.blockGroups()) {
-			if (blockGroup.blockRef().equals(RegistryHelper.getIdentifier(item).toString())) {
-				this.currentAmmoAttr = blockGroup.attributes();
-				break;
-			}
+		AttributeValues ammoAttr = attrIndex.getBlockAttributes(RegistryHelper.getIdentifier(this.currentAmmo).toString());
+		if (this.currentAmmoAttr != ammoAttr) {
+			this.currentAmmoAttr = ammoAttr;
+
+			return true;
 		}
 
-		return true;
+		return false;
 	}
 
 	@Override
@@ -354,30 +351,6 @@ public class DirtTurretEntity extends TurretEntity implements UsesBlockProjectil
 	// /////////////////// //
 	public enum Offsets {
 		BARREL
-	}
-
-	// //////////////////////////////////// //
-	// TEMPORARY ATTRVAL GENERATION COUNTER //
-	// //////////////////////////////////// //
-
-	private int attrGen = -1;
-
-	private AttributeValues ammoAttr() {
-		if (this.attrGen != BlockProjectileConfigManager.generation()) {
-			EntityBlockAttributeIndex attrIndex = BlockProjectileConfigManager.getConfigForEntity(this.getType());
-			this.currentAmmoAttr = attrIndex.entityDefault();
-
-			for (ResolvedBlockGroup blockGroup : attrIndex.blockGroups()) {
-				if (blockGroup.blockRef().equals(RegistryHelper.getIdentifier(this.currentAmmo).toString())) {
-					this.currentAmmoAttr = blockGroup.attributes();
-					break;
-				}
-			}
-
-			this.attrGen = BlockProjectileConfigManager.generation();
-		}
-
-		return this.currentAmmoAttr;
 	}
 
 	// ///////////////// //

@@ -2,20 +2,26 @@ package com.virus5600.defensive_measures.renderer.projectiles;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
-import com.virus5600.defensive_measures.entity.projectiles.BlockProjectileEntity;
-import com.virus5600.defensive_measures.model.projectiles.BaseProjectileModel;
-import com.virus5600.defensive_measures.renderer.projectiles.state.BaseProjectileRenderState;
-import com.virus5600.defensive_measures.renderer.projectiles.state.BlockProjectileRenderState;
 
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.block.MovingBlockRenderState;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
+import net.minecraft.client.renderer.item.ItemModelResolver;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
+import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.Identifier;
+import net.minecraft.world.item.ItemDisplayContext;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.RenderShape;
+import net.minecraft.world.level.block.state.BlockState;
+
+import com.virus5600.defensive_measures.entity.projectiles.BlockProjectileEntity;
+import com.virus5600.defensive_measures.model.projectiles.BaseProjectileModel;
+import com.virus5600.defensive_measures.renderer.projectiles.state.BaseProjectileRenderState;
+import com.virus5600.defensive_measures.renderer.projectiles.state.BlockProjectileRenderState;
 
 import org.jetbrains.annotations.Nullable;
 import org.jspecify.annotations.NonNull;
@@ -42,6 +48,8 @@ public class BlockProjectileRenderer extends BaseTurretProjectileRenderer<
 	BaseProjectileModel<BlockProjectileRenderState>
 	> {
 
+	private final ItemModelResolver itemModelResolver;
+
 	public BlockProjectileRenderer(EntityRendererProvider.Context ctx) {
 		super(
 			ctx,
@@ -50,6 +58,7 @@ public class BlockProjectileRenderer extends BaseTurretProjectileRenderer<
 			BlockProjectileRenderState::new
 		);
 
+		this.itemModelResolver = ctx.getItemModelResolver();
 		this.shouldLookAtDir(true);
 		this.shadowRadius = 0.5f;
 	}
@@ -74,6 +83,20 @@ public class BlockProjectileRenderer extends BaseTurretProjectileRenderer<
 			mbs.cardinalLighting = level.cardinalLighting();
 			mbs.lightEngine = level.getLightEngine();
 		}
+
+		boolean isInvisible = mbs.blockState.getRenderShape() != RenderShape.MODEL;
+		boolean isBlockEntity = mbs.blockState.hasBlockEntity();
+
+		if (isInvisible || isBlockEntity) {
+			ItemStack itemStack = new ItemStack(mbs.blockState.getBlock());
+
+			this.itemModelResolver.updateForNonLiving(
+				state.itemRenderState,
+				itemStack,
+				ItemDisplayContext.NONE,
+				entity
+			);
+		}
 	}
 
 	// ////////////// //
@@ -82,15 +105,34 @@ public class BlockProjectileRenderer extends BaseTurretProjectileRenderer<
 
 	@Override
 	protected void submitExtra(@NonNull BlockProjectileRenderState state, PoseStack stack, @NonNull SubmitNodeCollector queue, @NonNull CameraRenderState camState) {
-		if (state.movingBlockRenderState.blockState.getRenderShape() != RenderShape.MODEL) {
+		float radius = 0.5f;
+		float height = 0.5f;
+		double yTranslation = -0.5;
+
+		BlockState blockState = state.movingBlockRenderState.blockState;
+		boolean isInvisible = blockState.getRenderShape() != RenderShape.MODEL;
+		boolean isBlockEntity = blockState.hasBlockEntity();
+
+		// If it's a block entity...
+		if (isInvisible || isBlockEntity) {
+			stack.pushPose();
+
+			stack.translate(0.0, 0.25, 0.0);
+			stack.scale(radius, height, radius);
+
+			state.itemRenderState.submit(
+				stack,
+				queue,
+				state.lightCoords,
+				OverlayTexture.NO_OVERLAY,
+				state.outlineColor
+			);
+
+			stack.popPose();
 			return;
 		}
 
 		stack.pushPose();
-
-		float radius = 0.5f;
-		float height = 0.5f;
-		double yTranslation = -0.5;
 
 		// Make the render larger if its an Iron Bars block - easter egg to make it look like a
 		// Rods from God

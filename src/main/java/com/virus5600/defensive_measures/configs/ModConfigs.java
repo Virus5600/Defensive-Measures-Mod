@@ -21,9 +21,10 @@ import com.virus5600.defensive_measures.DefensiveMeasures;
 public class ModConfigs {
 	public static void init() {
 
-		CommonLifecycleEvents.TAGS_LOADED.register((_, _) -> {
-			DefensiveMeasures.LOGGER.info("Tags loaded; loading block projectile configuration...");
+		CommonLifecycleEvents.TAGS_LOADED.register((_, isClient) -> {
+			if (isClient) return;
 
+			DefensiveMeasures.LOGGER.info("Tags loaded; loading block projectile configuration...");
 			BlockProjectileConfigManager.init();
 		});
 
