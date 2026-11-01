@@ -1,7 +1,6 @@
 package com.virus5600.defensive_measures.block.misc.tier2;
 
 import com.mojang.serialization.Codec;
-import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
@@ -54,7 +53,6 @@ import java.util.Map;
 public class WorkshopBlock extends BaseHorizontalFunctionalBlock implements TwoBlockWide<WorkshopPart> {
 	private static final Map<Direction, VoxelShape> SHAPES;
 	public static final EnumProperty<WorkshopPart> PART;
-	public static final MapCodec<WorkshopBlock> CODEC;
 
 	public WorkshopBlock(Properties settings) {
 		super(
@@ -94,11 +92,6 @@ public class WorkshopBlock extends BaseHorizontalFunctionalBlock implements TwoB
 			case WorkshopPart.LEFT -> SHAPES.get(facing);
 			case WorkshopPart.RIGHT -> SHAPES.get(facing.getOpposite());
 		};
-	}
-
-	@Override
-	public MapCodec<WorkshopBlock> codec() {
-		return CODEC;
 	}
 
 	// /////////////////// //
@@ -202,7 +195,6 @@ public class WorkshopBlock extends BaseHorizontalFunctionalBlock implements TwoB
 
 	static {
 		PART = ModBlockStateProperties.WORKSHOP_PART;
-		CODEC = simpleCodec(WorkshopBlock::new);
 
 		// Facing default: North
 		SHAPES = Shapes.rotateHorizontal(Shapes.or(

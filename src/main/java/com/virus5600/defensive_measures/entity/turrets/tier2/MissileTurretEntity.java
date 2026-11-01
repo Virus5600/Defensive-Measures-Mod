@@ -216,7 +216,8 @@ public class MissileTurretEntity extends TurretEntity implements UsesMissile {
 
 		return TurretProjectileVelocity
 			.init(this)
-			.setLaunchAngle(0.1f)
+			.setLaunchAngle(0f)
+			.overrideGravity(true)
 			.setVelocity(vel.x(), vel.y(), vel.z());
 	}
 

@@ -397,6 +397,11 @@ public class MicroMissileEntity extends ExplosiveProjectileEntity implements Loo
 		return ref.getEntity(this.level(), LivingEntity.class);
 	}
 
+	@Override
+	public boolean isNoGravity() {
+		return super.isNoGravity() || this.getDefaultGravity() == 0;
+	}
+
 	// //////////////// //
 	// ABSTRACT METHODS //
 	// //////////////// //

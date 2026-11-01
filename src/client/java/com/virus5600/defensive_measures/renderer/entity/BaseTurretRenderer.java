@@ -134,7 +134,7 @@ public abstract class BaseTurretRenderer<
 		// Keeps the flipping easter-egg or feature.
 		if (turretState.isUpsideDown) {
 			matrices.translate(0.0F, (turretState.boundingBoxHeight + 0.1F) / baseHeight, 0.0F);
-			matrices.mulPose(Axis.ZP.rotationDegrees(180.0F));
+			matrices.rotateDegrees(Axis.ZP, 180.0F);
 		}
 	}
 

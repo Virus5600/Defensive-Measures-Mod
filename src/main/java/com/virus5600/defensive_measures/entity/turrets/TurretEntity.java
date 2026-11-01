@@ -581,7 +581,7 @@ public abstract class TurretEntity extends Mob implements Itemable, RangedAttack
 		this.setOldPosAndRot();
 
 		this.invulnerableOnSpawn = this.isInvulnerable();
-		this.setInvulnerable(true);
+		this.setPermanentlyInvulnerable(true);
 		this.startSetupAnim();
 
 		if (spawnReason == EntitySpawnReason.SPAWN_ITEM_USE) {
@@ -1005,7 +1005,7 @@ public abstract class TurretEntity extends Mob implements Itemable, RangedAttack
 				this.level().gameEvent(this, GameEvent.TELEPORT, newPos);
 
 				if (this.isInvulnerable() != this.invulnerableOnSpawn) {
-					this.setInvulnerable(this.invulnerableOnSpawn);
+					this.setPermanentlyInvulnerable(this.invulnerableOnSpawn);
 				}
 
 				if (this.getDeltaMovement() == Vec3.ZERO && this.level().isClientSide() && !this.isPassenger()) {
@@ -2312,7 +2312,7 @@ public abstract class TurretEntity extends Mob implements Itemable, RangedAttack
 			}
 			else {
 				projectile.setPos(pos);
-				projectile.moveOrInterpolateTo(pos);
+				projectile.moveOrInterpolateTo(PositionPath.of(pos));
 			}
 
 			this.setProjectileVelocity(projectile, velocityData);
@@ -2415,9 +2415,11 @@ public abstract class TurretEntity extends Mob implements Itemable, RangedAttack
 	}
 
 	public Optional<Float> getShootingPitch() {
-		if (this.velocityData == null) {
+		if (this.velocityData == null || this.velocityData.hasNoGravity) {
 			return Optional.empty();
 		}
+
+		this.velocityData.recalculateVelocity();
 
 		Vec3 dir = this.velocityData.getDeltaMovement().normalize();
 		float shootingPitch = MathUtil.radToDeg(
@@ -2517,6 +2519,10 @@ public abstract class TurretEntity extends Mob implements Itemable, RangedAttack
 		private boolean isParabolic;
 		/** Determines after calculation whether the projectile has gravity or not. */
 		private boolean hasNoGravity;
+		/**
+		 * Determines if the {@link #hasNoGravity} has been overridden.
+		 */
+		private boolean gravityOverriden;
 
 		/**
 		 * Initializes the velocity data of the turret's projectile. This can only be initialized
@@ -2531,6 +2537,7 @@ public abstract class TurretEntity extends Mob implements Itemable, RangedAttack
 			this.speed = 1f;
 			this.velocity = Vec3.ZERO;
 			this.hasNoGravity = false;
+			this.gravityOverriden = false;
 		}
 
 		/**
@@ -2789,6 +2796,19 @@ public abstract class TurretEntity extends Mob implements Itemable, RangedAttack
 		}
 
 		/**
+		 * Overrides the projectile's gravity.
+		 *
+		 * @param hasNoGravity {@code true} if the projectile has no gravity, otherwise {@code false}
+		 *
+		 * @return {@code TurretProjectileVelocity} The instance of the {@link TurretProjectileVelocity} class
+		 */
+		public TurretProjectileVelocity overrideGravity(boolean hasNoGravity) {
+			this.hasNoGravity = hasNoGravity;
+			this.gravityOverriden = true;
+			return this;
+		}
+
+		/**
 		 * Sets the projectile's trajectory to be parabolic. This will make the projectile shoot in
 		 * an arc-like trajectory, allowing for the creation of mortar-like projectiles.
 		 *
@@ -2869,12 +2889,14 @@ public abstract class TurretEntity extends Mob implements Itemable, RangedAttack
 		private void calculateVelocity(Vec3 v3d, Vec3 barrel, double angle) {
 			Entity projectile = turret.projectile
 				.create(this.turret.level(), EntitySpawnReason.TRIGGERED);
-			double g = 0;
+			double grav = 0;
 			double drag = 0.95;
 
 			if (projectile != null) {
-				g = projectile.getGravity();
-				this.hasNoGravity = projectile.isNoGravity() || g == 0;
+				if (!this.gravityOverriden) {
+					grav = projectile.getGravity();
+					this.hasNoGravity = projectile.isNoGravity() || grav == 0;
+				}
 
 				if (projectile instanceof TurretProjectileEntity tpe) {
 					drag = tpe.getFinalDrag();
@@ -2931,7 +2953,7 @@ public abstract class TurretEntity extends Mob implements Itemable, RangedAttack
 				double simVH = vH;
 
 				for (int t = 0; t < maxTicks; t++) {
-					simVY -= g;
+					simVY -= grav;
 					simVY *= drag;
 					simVH *= drag;
 					simY += simVY;
@@ -2962,6 +2984,21 @@ public abstract class TurretEntity extends Mob implements Itemable, RangedAttack
 				vyApplied,
 				dirZ * vH
 			);
+		}
+
+		@Override
+		public String toString() {
+			return "TurretProjectileVelocity{" +
+				"lastTargetPos=" + this.lastTargetPos +
+				", turret=" + this.turret +
+				", uncertainty=" + this.uncertainty +
+				", launchAngle=" + this.launchAngle +
+				", speed=" + this.speed +
+				", velocity=" + this.velocity +
+				", isParabolic=" + this.isParabolic +
+				", hasNoGravity=" + this.hasNoGravity +
+				", gravityOverriden=" + this.gravityOverriden +
+				'}';
 		}
 	}
 

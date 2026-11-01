@@ -79,8 +79,8 @@ public abstract class BaseProjectileRenderer<
 		stack.pushPose();
 
 		if (this.shouldLookAtDir()) {
-			stack.mulPose(Axis.YN.rotationDegrees(state.yaw + 180F));
-			stack.mulPose(Axis.XN.rotationDegrees(state.pitch));
+			stack.rotateDegrees(Axis.YN, state.yaw + 180F);
+			stack.rotateDegrees(Axis.XN, state.pitch);
 		}
 
 		Identifier textureId = this.getTexture(state);
@@ -94,8 +94,7 @@ public abstract class BaseProjectileRenderer<
 				RenderTypes.entityCutout(textureId),
 				state.lightCoords,
 				OverlayTexture.NO_OVERLAY,
-				tintedColor, null, state.outlineColor,
-				null
+				tintedColor, null, state.outlineColor
 			);
 		}
 

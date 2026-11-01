@@ -1,6 +1,5 @@
 package com.virus5600.defensive_measures.block.defenses.tier2;
 
-import com.mojang.serialization.MapCodec;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.InsideBlockEffectApplier;
 import net.minecraft.world.entity.LivingEntity;
@@ -54,8 +53,6 @@ import org.jspecify.annotations.Nullable;
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
  */
 public class ElectricFenceBlock extends CrossCollisionBlock {
-	public static final MapCodec<ElectricFenceBlock> CODEC = simpleCodec(ElectricFenceBlock::new);
-
 	private final Function<BlockState, VoxelShape> cullingShapeFunction;
 
 	public ElectricFenceBlock(Properties settings) {
@@ -195,11 +192,6 @@ public class ElectricFenceBlock extends CrossCollisionBlock {
 		boolean isFenceGate = block instanceof FenceGateBlock && FenceGateBlock.connectsToDirection(state, dir);
 
 		return !isExceptionForConnection(state) && neighborIsFullSquare || canConnectToFence || isFenceGate;
-	}
-
-	@Override
-	public @NonNull MapCodec<ElectricFenceBlock> codec() {
-		return CODEC;
 	}
 
 	// ///////////////// //

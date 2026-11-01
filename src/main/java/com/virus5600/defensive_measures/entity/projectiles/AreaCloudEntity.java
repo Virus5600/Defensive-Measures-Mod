@@ -481,7 +481,7 @@ public abstract class AreaCloudEntity extends TurretProjectileEntity {
 
 	@Override
 	public @NonNull PushReaction getPistonPushReaction() {
-		return PushReaction.IGNORE;
+		return PushReaction.IGNORE_ENTITY;
 	}
 
 	@Override
