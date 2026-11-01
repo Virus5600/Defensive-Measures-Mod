@@ -374,7 +374,7 @@ public class DirtTurretEntity extends TurretEntity implements UsesBlockProjectil
 
 		OFFSETS = Map.of(
 			Offsets.BARREL, List.of(
-				new Vec3(0, 0, 0.5)
+				new Vec3(0, -0.25, 0.5)
 			)
 		);
 

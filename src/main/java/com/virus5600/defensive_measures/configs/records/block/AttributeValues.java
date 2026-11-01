@@ -13,7 +13,7 @@ import com.google.gson.JsonObject;
  * Resolved by cascading — see {@link #cascade} — and finalized with {@link #withDefaults()}.
  *
  * @param drag      The drag coefficient ({@code 0.0}-{@code 1.0}), where {@code 1.0} is no drag and {@code 0.0} is instant stop. Negative = unset.
- * @param gravity   The gravity factor ({@code 0.0}-{@code 0.5}), where {@code 0.0} is no gravity and {@code 1.0} is normal gravity. Negative = unset.
+ * @param gravity   The gravity factor ({@code 0.0}-{@code 0.5}), where {@code 0.0} is no gravity and {@code 0.5} is normal gravity. Negative = unset.
  * @param damage    The base damage ({@code 0}-{@code 1000}) of the projectile. Negative = unset. Do note that the turret may add its own base damage to this value, so the final damage may be higher than this value.
  * @param piercing  The piercing level of the projectile ({@code 0} means no piercing, higher values which caps at {@code 100} allow it to pierce more entities). Negative = unset.
  * @param fire      Whether the projectile sets entities on fire. {@code null} = unset at this tier.

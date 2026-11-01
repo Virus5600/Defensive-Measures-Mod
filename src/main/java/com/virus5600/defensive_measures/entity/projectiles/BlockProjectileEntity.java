@@ -8,6 +8,7 @@ import net.minecraft.network.syncher.SynchedEntityData.Builder;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.references.BlockItemIds;
 import net.minecraft.resources.Identifier;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.BlockItem;
@@ -245,6 +246,14 @@ public class BlockProjectileEntity extends ExplosiveProjectileEntity {
 	@Override
 	protected double getDefaultGravity() {
 		return (double) this.entityData.get(DATA_GRAVITY);
+	}
+
+	@Override
+	public SoundEvent getHitSound() {
+		return this.entityData
+			.get(DATA_BLOCK_STATE)
+			.getSoundType()
+			.getBreakSound();
 	}
 
 	public boolean isExplosive() {
