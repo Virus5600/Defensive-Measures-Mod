@@ -2,10 +2,9 @@
 
 ## CURRENT TASK
 
-- Implement Fabrication Matrix (FabMat)
-- Create FabMat model
+- Update Code to 26.3 for Defensive Measures v1.2.0-beta (#75)
 
--------------
+---
 
 ## `TurretItemRetrievedCriterion` - Class
 
@@ -16,6 +15,6 @@ its first turret.
 
 Fully implement this class after implementing a UI for the turrets.
 
-## Dirt Turret (#15)
+## Update Code to 26.3 for Defensive Measures v1.2.0-beta (#75)
 
-A joke turret that shoots dirt
+Once #15, #55, #70, and #74 are merged with the main branch, the codebase must be updated to Minecraft 26.3 API. This version will now release for Minecraft 26.3 and above.

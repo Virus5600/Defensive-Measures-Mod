@@ -4,21 +4,21 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import com.virus5600.defensive_measures.network.clientbound.entity.PlayAnimationPacket;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
-import net.minecraft.commands.Commands;
 import net.minecraft.commands.Commands.CommandSelection;
+import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 
-import com.virus5600.defensive_measures.command.suggestions.AnimationSuggestionProvider;
 import com.virus5600.defensive_measures.command.suggestions.AnimationSuggestionProvider.DMAnimation;
+import com.virus5600.defensive_measures.command.suggestions.AnimationSuggestionProvider;
 import com.virus5600.defensive_measures.entity.turrets.TurretEntity;
+import com.virus5600.defensive_measures.network.clientbound.entity.PlayAnimationPacket;
 
 import java.util.Arrays;
 import java.util.Collection;

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN">
+	<Appenders>
+		<Console name="ModConsole" target="SYSTEM_OUT">
+			<PatternLayout pattern="%style{[%d{HH:mm:ss}]}{blue} %highlight{[%t/%level]} %style{(%logger{1})}{cyan} %msg%n" />
+		</Console>
+	</Appenders>
+
+	<Loggers>
+		<Logger name="DefensiveMeasures" level="DEBUG" additivity="false">
+			<AppenderRef ref="ModConsole" />
+		</Logger>
+	</Loggers>
+</Configuration>

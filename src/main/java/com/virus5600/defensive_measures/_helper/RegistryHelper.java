@@ -33,6 +33,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.block.state.BlockState;
 
 import com.virus5600.defensive_measures.DefensiveMeasures;
 
@@ -82,8 +83,28 @@ public final class RegistryHelper {
 		return BuiltInRegistries.ENTITY_TYPE.wrapAsHolder(entityType);
 	}
 
+	public static boolean isOf(Item item, TagKey<Item> tag) {
+		return getHolder(item).is(tag);
+	}
+
+	public static boolean isOf(Block block, TagKey<Block> tag) {
+		return getHolder(block).is(tag);
+	}
+
 	public static boolean isOf(EntityType<?> entityType, TagKey<EntityType<?>> tag) {
 		return getHolder(entityType).is(tag);
+	}
+
+	public static Identifier getIdentifier(Item item) {
+		return BuiltInRegistries.ITEM.getKey(item);
+	}
+
+	public static Identifier getIdentifier(Block block) {
+		return BuiltInRegistries.BLOCK.getKey(block);
+	}
+
+	public static Identifier getIdentifier(EntityType<?> entityType) {
+		return BuiltInRegistries.ENTITY_TYPE.getKey(entityType);
 	}
 
 	// Block Registry
@@ -199,16 +220,32 @@ public final class RegistryHelper {
 	}
 
 	// Tag Registry
+	public static TagKey<Block> createBlockTagKey(Identifier id) {
+		return TagKey.create(Registries.BLOCK, id);
+	}
+
 	public static TagKey<Block> createBlockTagKey(String path) {
 		return TagKey.create(Registries.BLOCK, Identifier.fromNamespaceAndPath(DefensiveMeasures.MOD_ID, path));
+	}
+
+	public static TagKey<Block> createBlockTagKey(String namespace, String path) {
+		return TagKey.create(Registries.BLOCK, Identifier.fromNamespaceAndPath(namespace, path));
 	}
 
 	public static TagKey<EntityType<?>> createEntityTypeTagKey(String path) {
 		return TagKey.create(Registries.ENTITY_TYPE, Identifier.fromNamespaceAndPath(DefensiveMeasures.MOD_ID, path));
 	}
 
+	public static TagKey<Item> createItemTagKey(Identifier id) {
+		return TagKey.create(Registries.ITEM, id);
+	}
+
 	public static TagKey<Item> createItemTagKey(String path) {
 		return TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath(DefensiveMeasures.MOD_ID, path));
+	}
+
+	public static TagKey<Item> createItemTagKey(String namespace, String path) {
+		return TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath(namespace, path));
 	}
 
 	// Entity Registry
@@ -284,6 +321,22 @@ public final class RegistryHelper {
 
 	public static RecipeBookCategory registerRecipeBookCat(String id) {
 		return Registry.register(BuiltInRegistries.RECIPE_BOOK_CATEGORY, id, new RecipeBookCategory());
+	}
+
+	// Getters
+
+	public static Item getItem(Identifier blockId) {
+		return BuiltInRegistries.ITEM.getValue(blockId);
+	}
+
+	public static Block getBlock(Identifier blockId) {
+		return BuiltInRegistries.BLOCK.getValue(blockId);
+	}
+
+	public static BlockState getBlockState(Identifier blockId) {
+		Block block = getBlock(blockId);
+
+		return block == null ? null : block.defaultBlockState();
 	}
 
 	// PRIVATE ENUM

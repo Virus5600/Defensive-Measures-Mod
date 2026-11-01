@@ -72,7 +72,6 @@ public abstract class TurretProjectileEntity extends Projectile {
 	/** Defines the item stack this projectile is. Used when picking up the projectile to turn into items. */
 	@Nullable
 	private ItemStack stack;
-	private int life;
 
 	/** Holds the blockstate information of the block in this projectile's position. */
 	@Nullable
@@ -87,6 +86,7 @@ public abstract class TurretProjectileEntity extends Projectile {
 	 * traveled by this projectile.
 	 */
 	protected Vec3 spawnPos = Vec3.ZERO;
+	protected int life;
 	/** Defines how long the shaking animation will play (in ticks). */
 	protected int shake;
 	/** Determines how long this projectile have been stuck "**in**" the ground. */
@@ -208,6 +208,32 @@ public abstract class TurretProjectileEntity extends Projectile {
 		);
 	}
 
+	@Override
+	protected void onHitBlock(BlockHitResult blockHitResult) {
+
+		Level world = this.level();
+		this.lastState = world.getBlockState(blockHitResult.getBlockPos());
+		super.onHitBlock(blockHitResult);
+
+		Vec3 velocity = this.getDeltaMovement();
+		Vec3 dirVector = new Vec3(
+			Math.signum(velocity.x),
+			Math.signum(velocity.y),
+			Math.signum(velocity.z)
+		);
+		Vec3 embeddingAdjustment = dirVector.scale(0.05);
+
+		this.shake = 7;
+		this.setPos(blockHitResult.getLocation().subtract(embeddingAdjustment));
+		this.setDeltaMovement(Vec3.ZERO);
+		this.playSound(this.getSound(), 1f, 1.2f / (this.random.nextFloat() * 0.2f + 0.9f));
+		this.setInGround(true);
+		this.setCritical(false);
+		this.setPierceLevel((byte) 0);
+		this.setSound(this.getHitSound());
+		this.clearPiercingStatus();
+	}
+
 	/**
 	 * This method is called when the projectile hits an entity, handling the logic
 	 * for hitting, damaging, and if applicable, piercing the entity.
@@ -302,7 +328,7 @@ public abstract class TurretProjectileEntity extends Projectile {
 		}
 
 		// Handles the application of damage to the target (if it's not an explosive)
-		if (!(this instanceof ExplosiveEntity)) {
+		if (!(this instanceof ExplosiveEntity) || (this instanceof BlockProjectileEntity)) {
 			if (world instanceof ServerLevel serverWorld) {
 				hitEntity.hurtServer(serverWorld, dmgSrc, (float) damageToDeal);
 
@@ -383,31 +409,6 @@ public abstract class TurretProjectileEntity extends Projectile {
 				this.setDamage(this.getDamage() * (1 - reduction));
 			}
 		}
-	}
-
-	@Override
-	protected void onHitBlock(BlockHitResult blockHitResult) {
-		Level world = this.level();
-		this.lastState = world.getBlockState(blockHitResult.getBlockPos());
-		super.onHitBlock(blockHitResult);
-
-		Vec3 velocity = this.getDeltaMovement();
-		Vec3 dirVector = new Vec3(
-			Math.signum(velocity.x),
-			Math.signum(velocity.y),
-			Math.signum(velocity.z)
-		);
-		Vec3 embeddingAdjustment = dirVector.scale(0.05);
-
-		this.shake = 7;
-		this.setPos(this.position().subtract(embeddingAdjustment));
-		this.setDeltaMovement(Vec3.ZERO);
-		this.playSound(this.getSound(), 1f, 1.2f / (this.random.nextFloat() * 0.2f + 0.9f));
-		this.setInGround(true);
-		this.setCritical(false);
-		this.setPierceLevel((byte) 0);
-		this.setSound(this.getHitSound());
-		this.clearPiercingStatus();
 	}
 
 	protected void onHit(LivingEntity target) {

@@ -2,11 +2,13 @@ package com.virus5600.defensive_measures;
 
 import net.fabricmc.api.ModInitializer;
 
+import com.virus5600.defensive_measures._helper.DelayedTasks;
 import com.virus5600.defensive_measures.advancement.criterion.ModCriterion;
 import com.virus5600.defensive_measures.behvaior.block.ModDispenserItemBehavior;
 import com.virus5600.defensive_measures.block.ModBlocks;
 import com.virus5600.defensive_measures.block.state.properties.ModBlockStateProperties;
 import com.virus5600.defensive_measures.command.ModCommands;
+import com.virus5600.defensive_measures.configs.ModConfigs;
 import com.virus5600.defensive_measures.entity.ModEntities;
 import com.virus5600.defensive_measures.entity.damage.ModDamageTypes;
 import com.virus5600.defensive_measures.item.ModItemGroups;
@@ -72,9 +74,13 @@ public class DefensiveMeasures implements ModInitializer {
 		ModRecipeSerializers.init();
 		ModRecipeTypes.init();
 		ModRecipeBookCategories.init();
-		ModCommands.init();
 		ModPackets.init();
 		ModDispenserItemBehavior.init();
+
+		DelayedTasks.init();
+
+		ModCommands.init();
+		ModConfigs.init();
 
 		LOGGER.info("{} MAIN ENTRY POINT INITIALIZED.", MOD_NAME);
 	}

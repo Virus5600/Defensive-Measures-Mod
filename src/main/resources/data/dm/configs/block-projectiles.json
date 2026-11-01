@@ -1,0 +1,21 @@
+{
+	"entities": {
+		"dm:dirt_turret": {
+			"default": {
+				"drag": 0.9,
+				"gravity": 0.05,
+				"damage": 1.0,
+				"explosive": false
+			},
+			"blocks": [
+				{
+					"block": [ "#dm:turret_item_ammo/dirt_turret_ammo" ],
+					"damage": 3.0
+				},
+				{
+					"block": [ "minecraft:gravel" ]
+				}
+			]
+		}
+	}
+}

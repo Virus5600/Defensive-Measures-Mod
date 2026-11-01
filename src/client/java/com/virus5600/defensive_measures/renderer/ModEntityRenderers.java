@@ -58,5 +58,6 @@ public class ModEntityRenderers {
 		// v1.2.0
 		EntityRenderers.register(ModEntities.FLINT_PELLET, FlintPelletRenderer::new);
 		EntityRenderers.register(ModEntities.ANTI_TANK_HAWKINS, AntiTankHawkinsRenderer::new);
+		EntityRenderers.register(ModEntities.BLOCK_PROJECTILE, BlockProjectileRenderer::new);
 	}
 }

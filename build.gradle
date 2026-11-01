@@ -3,7 +3,7 @@ plugins {
 	id 'maven-publish'
 }
 
-version = "${project.mod_version}-${project.minecraft_version}"
+version = "${project.mod_version}+mc-${project.minecraft_version}"
 group = project.maven_group
 
 base {
@@ -41,9 +41,16 @@ loom {
 		runs {
 			client {
 				programArgs(progArgs)
+
+				vmArg "-Dfabric-tag-conventions-v2.missingTagTranslationWarning=VERBOSE"
+			}
+			server {
+				vmArg "-Dfabric-tag-conventions-v2.missingTagTranslationWarning=VERBOSE"
 			}
 		}
 	}
+
+	log4jConfigs.from(file("log4j-dev.xml"))
 }
 
 dependencies {
@@ -137,10 +144,10 @@ tasks.register("getJarName") {
 	println("${archives_base_name}-${project.version}")
 }
 
-def xaeroRPName = "${xaeroRP}-${xaeroRP_version}"
+def xaeroRPName = "${xaeroRP} v${xaeroRP_version}+${mod_id}-${mod_version}+mc-${minecraft_version}"
 
 tasks.register("getRPName") {
-	println("Xareo RP: ${archives_base_name}-${project.version}-${xaeroRPName}.zip")
+	println("Xaero RP: ${mod_name} - ${xaeroRPName}.zip")
 }
 
 /**
@@ -148,7 +155,7 @@ tasks.register("getRPName") {
  * and distributing the icons separately from the mod jar.
  */
 tasks.register('xaeroResourcePack', Zip) {
-	archiveClassifier = "${xaeroRPName}"
+	archiveFileName = "${mod_name} - ${xaeroRPName}.zip"
 	from('src/main/resources/resource-support/xaero-pack')
 	destinationDirectory = layout.buildDirectory.dir('libs')
 }

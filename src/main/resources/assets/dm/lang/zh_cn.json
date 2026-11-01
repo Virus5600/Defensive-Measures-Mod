@@ -154,6 +154,7 @@
 
 	"subtitles.turret.remove.metal" : "防御塔：拆除",
 	"subtitles.turret.remove.wood" : "防御塔：拆除",
+	"subtitles.turret.remove.dirt" : "Dirt Turret Removed",
 
 	"subtitles.turret.iron.repair" : "Repaired an iron turret",
 	"subtitles.turret.bow.repair" : "Repaired a bow turret",
@@ -217,6 +218,12 @@
 	"tag.item.dm.turrets" : "Turrets",
 	"tag.item.dm.turret_removers" : "Turret Removers",
 	"tag.item.dm.turret_remover_repairable" : "Turret Remover Repairable",
+	"tag.item.dm.iron_metal_detector_repairable" : "Turret Remover Repairable",
+	"tag.item.dm.netherite_metal_detector_repairable" : "Turret Remover Repairable",
+
+	"tag.item.dm.dirt" : "Dirt Items",
+
+	"tag.item.dm.turret_item_ammo.dirt_turret_ammo": "Dirt Turret Ammo",
 
 	"tag.entity.dm.flying_hostiles" : "Flying Hostiles",
 	"tag.entity.dm.projectiles" : "Defensive Measures Projectiles",

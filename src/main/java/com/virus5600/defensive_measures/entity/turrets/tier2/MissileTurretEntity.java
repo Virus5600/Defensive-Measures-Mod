@@ -142,7 +142,10 @@ public class MissileTurretEntity extends TurretEntity implements UsesMissile {
 	// PROCESS METHODS //
 	// /////////////// //
 	@Override
-	protected <P extends Projectile> void onProjectileCreateCallback(P projectile) {
+	protected <P extends Projectile> void onProjectileCreateCallback(P projectile, boolean postCreation) {
+		// Run only after data is populated already.
+		if (!postCreation) return;
+
 		MicroMissileEntity missile = (MicroMissileEntity) projectile;
 
 		missile.setRemainingFuel(this.getMissileFuel());
