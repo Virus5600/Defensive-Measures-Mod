@@ -21,17 +21,16 @@
 			"entries": [
 				{
 					"type": "minecraft:tag",
-					"name": "minecraft:wooden_slabs",
+					"items": "#minecraft:wooden_slabs",
 					"expand": true,
-					"functions": [
-						{
-							"function": "minecraft:set_count",
-							"count": {
-								"min": 0,
-								"max": 3
-							}
+					"modifier": {
+						"type": "minecraft:set_count",
+						"count": {
+							"type": "minecraft:uniform",
+							"min": 0,
+							"max": 3
 						}
-					]
+					}
 				}
 			]
 		}
