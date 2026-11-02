@@ -18,6 +18,7 @@ import java.util.function.UnaryOperator;
  */
 public class ModDataComponents extends DataComponents {
 	public static final DataComponentType<Integer> DETECTION_RANGE = register("detection_range", b -> b.persistent(ExtraCodecs.POSITIVE_INT).networkSynchronized(ByteBufCodecs.VAR_INT));
+	public static final DataComponentType<Long> LAST_USE_TICK = register("last_use_tick", b -> b.persistent(ExtraCodecs.NON_NEGATIVE_LONG).networkSynchronized(ByteBufCodecs.VAR_LONG));
 
 	public static void init() {
 		DefensiveMeasures.LOGGER.info("REGISTERING ITEM COMPONENTS...");

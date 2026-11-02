@@ -23,15 +23,14 @@ import net.minecraft.world.phys.Vec3;
 import com.virus5600.defensive_measures._util.WorldUtil;
 import com.virus5600.defensive_measures.item.ModToolMaterials;
 import com.virus5600.defensive_measures.item.component.ModDataComponents;
-import com.virus5600.defensive_measures.network.clientbound.item.BlockHighlightPacket;
+import com.virus5600.defensive_measures.network.clientbound.item.BlockHighlightListPacket;
 import com.virus5600.defensive_measures.registry.tag.ModBlockTags;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
-import com.google.common.collect.Maps;
-import java.util.Map;
-import java.util.UUID;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * An item that allows the player to detect metalic traps.
@@ -51,14 +50,15 @@ import java.util.UUID;
  */
 public class MetalDetectorItem extends Item {
 	/**
-	 * A map that tracks the tick count for each metal detector item in the world. This is used to
-	 * determine when to apply durability damage to the item.
-	 */
-	private static final Map<UUID, Integer> TICK_COUNT_MAP = Maps.newHashMap();
-	/**
 	 * Delay (in ticks) between each durability damage of the metal detector item.
 	 */
 	protected static final int DEGRADATION_DELAY = 20;
+
+	/**
+	 * A variable that tracks the tick count for this metal detector item in the world. This is
+	 * used to determine when to apply durability damage to the item.
+	 */
+	protected int tickCount = 0;
 
 	public MetalDetectorItem(ToolMaterial material, float attackDamage, float attackSpeed, Properties settings) {
 		super(
@@ -94,38 +94,48 @@ public class MetalDetectorItem extends Item {
 	public void inventoryTick(final ItemStack stack, final ServerLevel level, final Entity owner, final @Nullable EquipmentSlot slot) {
 		super.inventoryTick(stack, level, owner, slot);
 
-		if (slot != null && owner instanceof LivingEntity le) {
-			int tickCount = this.getTickCount(le.getUUID());
+		boolean isNotOnHand = slot != EquipmentSlot.MAINHAND && slot != EquipmentSlot.OFFHAND;
+		boolean isUndamageable = !stack.isDamageableItem();
 
-			switch (slot) {
-				case MAINHAND, OFFHAND -> {
-					if (++tickCount >= DEGRADATION_DELAY) {
-						int range = stack.getOrDefault(ModDataComponents.DETECTION_RANGE, 4);
-						tickCount = 0;
+		if (isNotOnHand || isUndamageable) {
+			return;
+		}
 
-						if (stack.isDamageableItem()) {
-							if ((stack.getDamageValue() + 1) < stack.getMaxDamage()) {
-								this.detectMetals(level, le, range);
+		if (owner instanceof LivingEntity livingEntity) {
+			long now = level.getGameTime();
+			long elapsed = now - stack.getOrDefault(ModDataComponents.LAST_USE_TICK, 0L);
 
-								if (le instanceof Player player) {
-									stack.hurtWithoutBreaking(1, player);
-								}
-							}
-							else {
-								stack.setDamageValue(stack.getDamageValue() + 1);
-							}
-						}
-					}
-				}
-
-				default -> {
-					if (tickCount > 0) {
-						--tickCount;
-					}
-				}
+			if (elapsed >= 0 && elapsed < DEGRADATION_DELAY) {
+				return;
 			}
 
-			this.setTickCountEntry(le.getUUID(), tickCount);
+			if ((stack.getDamageValue() + 1) < stack.getMaxDamage()) {
+				stack.set(ModDataComponents.LAST_USE_TICK, now);
+
+				int range = Math.clamp(
+					stack.getOrDefault(ModDataComponents.DETECTION_RANGE, 4),
+					1, 50
+				);
+
+				this.detectMetals(level, livingEntity, range);
+
+				if (livingEntity instanceof Player player) {
+					if (!player.isCreative()) {
+						stack.hurtWithoutBreaking(1, player);
+					}
+				}
+				else {
+					stack.setDamageValue(
+						Math.min(
+							stack.getDamageValue() + 1,
+							stack.getMaxDamage()
+						)
+					);
+				}
+			}
+			else if (stack.getDamageValue() < stack.getMaxDamage()) {
+				stack.setDamageValue(stack.getDamageValue() + 1);
+			}
 		}
 	}
 
@@ -146,14 +156,6 @@ public class MetalDetectorItem extends Item {
 	// CUSTOM METHODS //
 	// ////////////// //
 
-	protected void setTickCountEntry(UUID uuid, int tickCount) {
-		TICK_COUNT_MAP.put(uuid, tickCount);
-	}
-
-	protected int getTickCount(UUID uuid) {
-		return TICK_COUNT_MAP.getOrDefault(uuid, 0);
-	}
-
 	/**
 	 * Detects metalic traps around the given owner entity within the specified range.
 	 *
@@ -162,6 +164,10 @@ public class MetalDetectorItem extends Item {
 	 * @param range The range within which to detect metals
 	 */
 	public void detectMetals(Level level, LivingEntity owner, int range) {
+		if (!(level instanceof ServerLevel serverLevel)) {
+			return;
+		}
+
 		Vec3 pos = owner.position();
 		AABB area = new AABB(
 			pos.x - range, pos.y - range, pos.z - range,
@@ -172,26 +178,40 @@ public class MetalDetectorItem extends Item {
 		int maxChunkX = SectionPos.blockToSectionCoord(area.maxX);
 		int minChunkZ = SectionPos.blockToSectionCoord(area.minZ);
 		int maxChunkZ = SectionPos.blockToSectionCoord(area.maxZ);
+		int sizeCap = 4096;
+		List<ServerPlayer> players = List.copyOf(PlayerLookup.around(serverLevel, pos, 8));
+		List<BlockPos> metalBlocks = new ArrayList<>();
 
 		for (int cx = minChunkX; cx <= maxChunkX; cx++) {
+			if (metalBlocks.size() >= sizeCap) {
+				break;
+			}
+
 			for (int cz = minChunkZ; cz <= maxChunkZ; cz++) {
+				if (metalBlocks.size() >= sizeCap) {
+					break;
+				}
+
 				WorldUtil.scanChunk(
 					level, area, cx, cz,
-					blockPos -> {
-						for (ServerPlayer player : PlayerLookup.around((ServerLevel) level, pos, 8)) {
-							ServerPlayNetworking.send(
-								player,
-								new BlockHighlightPacket(
-									blockPos,
-									0xFF0000,	// Red color in ARGB format
-									1 * 20			// Duration in ticks (1 second)
-								)
-							);
-						}
-					},
+					blockPos -> metalBlocks.add(blockPos.immutable()),
 					ModBlockTags.METAL_DETECTABLE
 				);
 			}
+		}
+
+		if (metalBlocks.isEmpty()) {
+			return;
+		}
+
+		BlockHighlightListPacket packet = new BlockHighlightListPacket(
+			metalBlocks,
+			0xFF0000,		// Red color in ARGB format
+			1 * 20				// Duration in ticks (1 second)
+		);
+
+		for (ServerPlayer player : players) {
+			ServerPlayNetworking.send(player, packet);
 		}
 	}
 }
