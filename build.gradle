@@ -68,15 +68,19 @@ dependencies {
 
 processResources {
 	inputs.property "version", project.version
-	inputs.property "minecraft_version", minecraft_version
+	inputs.property "mod_name", mod_name
 	inputs.property "loader_version", loader_version
+	inputs.property "minecraft_version", minecraft_version
+	inputs.property "fabric_api_version", fabric_api_version
 
-	filteringCharset "UTF-8"
+	filteringCharset = "UTF-8"
 
 	filesMatching("fabric.mod.json") {
 		expand "version": project.version,
+			"mod_name": mod_name,
+			"loader_version": loader_version,
 			"minecraft_version": minecraft_version,
-			"loader_version": loader_version
+			"fabric_api_version": fabric_api_version
 	}
 }
 

@@ -1,7 +1,6 @@
 package com.virus5600.defensive_measures.block.misc.tier3;
 
 import com.mojang.serialization.Codec;
-import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
@@ -62,7 +61,6 @@ public class FabricationMatrixBlock extends BaseHorizontalFunctionalBlock implem
 	private static final Map<FabricationMatrixPart, Map<Direction, VoxelShape>> SHAPES;
 	public static final EnumProperty<FabricationMatrixPart> PART;
 	public static final BooleanProperty ACTIVE;
-	public static final MapCodec<FabricationMatrixBlock> CODEC;
 
 	public FabricationMatrixBlock(Properties settings) {
 		super(
@@ -101,11 +99,6 @@ public class FabricationMatrixBlock extends BaseHorizontalFunctionalBlock implem
 		FabricationMatrixPart part = state.getValue(PART);
 
 		return SHAPES.get(part).get(facing);
-	}
-
-	@Override
-	public MapCodec<FabricationMatrixBlock> codec() {
-		return CODEC;
 	}
 
 	@Override
@@ -247,7 +240,6 @@ public class FabricationMatrixBlock extends BaseHorizontalFunctionalBlock implem
 	static {
 		PART = ModBlockStateProperties.FABRICATION_MATRIX_PART;
 		ACTIVE = BooleanProperty.create("active");
-		CODEC = simpleCodec(FabricationMatrixBlock::new);
 
 		// Facing default: North
 		SHAPES = Map.of(

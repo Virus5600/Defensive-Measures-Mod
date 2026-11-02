@@ -1,16 +1,16 @@
 package com.virus5600.defensive_measures.renderer;
 
-
-import com.mojang.blaze3d.PrimitiveTopology;
-import com.mojang.blaze3d.buffers.GpuBufferSlice;
-import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.pipeline.RenderTarget;
-import com.mojang.blaze3d.systems.RenderPass;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.textures.GpuTextureView;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import com.mojang.blaze3d.vertex.VertexFormat;
+import com.mojang.renderpearl.api.buffers.GpuBufferSlice;
+import com.mojang.renderpearl.api.commands.RenderPass;
+import com.mojang.renderpearl.api.pipeline.CompiledRenderPipeline;
+import com.mojang.renderpearl.api.pipeline.PrimitiveTopology;
+import com.mojang.renderpearl.api.pipeline.RenderPipeline;
+import com.mojang.renderpearl.api.textures.GpuTextureView;
+import com.mojang.renderpearl.api.vertex.VertexFormat;
 import net.fabricmc.fabric.api.client.rendering.v1.level.LevelExtractionContext;
 import net.fabricmc.fabric.api.client.rendering.v1.level.LevelExtractionEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderContext;
@@ -82,7 +82,7 @@ public class BlockHighlightRenderer {
 		);
 
 		LevelExtractionEvents.END_EXTRACTION.register(BlockHighlightRenderer::extractHighlights);
-		LevelRenderEvents.AFTER_TRANSLUCENT_TERRAIN.register(BlockHighlightRenderer::renderAndDrawHighlights);
+		LevelRenderEvents.END_MAIN.register(BlockHighlightRenderer::renderAndDrawHighlights);
 	}
 
 	// /////// //
@@ -98,7 +98,7 @@ public class BlockHighlightRenderer {
 	 */
 	public static void highlight(BlockPos pos, int argb, int durationTicks) {
 		highlights.put(pos, new HighlightEntry(argb, currentTick(), durationTicks));
-		previousBlockstates.put(pos, null); // Initialize to null
+		previousBlockstates.put(pos, null);
 	}
 
 	public static void clear(BlockPos pos) {
@@ -294,6 +294,12 @@ public class BlockHighlightRenderer {
 	}
 
 	private static void draw(Minecraft client, StagedVertexBuffer.ExecuteInfo info, RenderPipeline pipeline) {
+		CompiledRenderPipeline compiled = RenderSystem.getCompiledPipelineNullable(pipeline);
+
+		if (compiled == null || compiled.isClosed()) {
+			return;
+		}
+
 		GpuBufferSlice dynamicTransforms = RenderSystem.getDynamicUniforms()
 			.writeTransform(
 				RenderSystem.getModelViewMatrixCopy(),
@@ -310,7 +316,7 @@ public class BlockHighlightRenderer {
 				() -> DefensiveMeasures.MOD_ID + " block highlight rendering",
 				colorTexture, Optional.empty(), mainTarget.getDepthTextureView(), OptionalDouble.empty()
 			)) {
-			renderPass.setPipeline(pipeline);
+			renderPass.setPipeline(compiled);
 
 			RenderSystem.bindDefaultUniforms(renderPass);
 			renderPass.setUniform("DynamicTransforms", dynamicTransforms);

@@ -230,7 +230,8 @@ public interface ModExplosives extends TraceableEntity {
 					.send(
 						new ClientboundExplodePacket(
 							pos, radius, blocksDestroyed, optional,
-							particleEffect, soundEvent, blockParticles
+							particleEffect, soundEvent, blockParticles,
+							true
 						)
 					);
 			}

@@ -4,6 +4,7 @@ import net.minecraft.network.protocol.game.ClientboundContainerSetSlotPacket;
 import net.minecraft.recipebook.ServerPlaceRecipe;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.Prediction;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -413,7 +414,7 @@ public abstract class BaseCraftingScreenHandler<
 
 			// If the clicked slot was the output slot, drop the item if it couldn't be moved into the inventory or hotbar.
 			if (slotIndex == outputSlotIndex) {
-				player.drop(stack, false);
+				player.drop(stack, false, Prediction.PREDICTED);
 			}
 		}
 

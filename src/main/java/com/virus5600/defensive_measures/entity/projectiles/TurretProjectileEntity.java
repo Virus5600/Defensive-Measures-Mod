@@ -41,9 +41,9 @@ import com.virus5600.defensive_measures.entity.turrets.TurretEntity;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
 
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
-import org.jspecify.annotations.NonNull;
 
 import java.util.Objects;
 
@@ -357,7 +357,7 @@ public abstract class TurretProjectileEntity extends Projectile {
 				hitEntity.hurtClient(dmgSrc);
 
 				hitEntity.setRemainingFireTicks(fireTime);
-				this.deflect(ProjectileDeflection.REVERSE, hitEntity, EntityReference.of(hitEntity), false);
+				this.deflect(ProjectileDeflection.REVERSE, hitEntity, EntityReference.of(hitEntity), false, this.getDeltaMovement().reverse());
 				this.setDeltaMovement(this.getDeltaMovement().scale(0.2));
 			}
 		}
@@ -857,7 +857,7 @@ public abstract class TurretProjectileEntity extends Projectile {
 	public void setSpawnPos(Vec3 spawnPos) {
 		this.spawnPos = spawnPos;
 		this.setPos(spawnPos);
-		this.moveOrInterpolateTo(spawnPos);
+		this.moveOrInterpolateTo(PositionPath.of(spawnPos));
 	}
 
 	public Vec3 getSpawnPos() {

@@ -1,45 +1,53 @@
-﻿{
-	"parent": "minecraft:recipes/root",
-	"criteria": {
-		"tas_interacted": {
-			"trigger": "minecraft:tick",
-			"conditions": {
-				"player": {
-					"minecraft:type_specific/player": {
-						"stats": [
-							{
-								"type": "minecraft:custom",
-								"stat": "dm:interact_with_turret_assembly_station",
-								"value": {
-									"min": 1
-								}
-							}
-						]
-					}
-				}
-			}
-		},
-		"has_ingredients": {
-			"trigger": "minecraft:inventory_changed",
-			"conditions": {
-				"items": [
-					{
-						"items": [
-							"minecraft:heavy_weighted_pressure_plate",
-							"minecraft:nether_brick"
-						]
-					}
-				]
-			}
-		}
-	},
-	"requirements": [
-		["tas_interacted"],
-		["has_ingredients"]
-	],
-	"rewards": {
-		"recipes": [
-			"dm:_turret_assembly_station/parts/tier1/mg_turret/tas_mg_base"
-		]
-	}
+{
+    "parent": "minecraft:recipes/root",
+    "criteria": {
+        "tas_interacted": {
+            "trigger": "minecraft:tick",
+            "conditions": {
+                "player": {
+                    "type": "minecraft:entity_properties",
+                    "entity": "this",
+                    "predicate": {
+                        "minecraft:type_specific/player": {
+                            "stats": [
+                                {
+                                    "type": "minecraft:custom",
+                                    "stat": "dm:interact_with_turret_assembly_station",
+                                    "value": {
+                                        "min": 1
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "has_ingredients": {
+            "trigger": "minecraft:inventory_changed",
+            "conditions": {
+                "items": [
+                    {
+                        "items": [
+                            "minecraft:heavy_weighted_pressure_plate",
+                            "minecraft:nether_brick"
+                        ]
+                    }
+                ]
+            }
+        }
+    },
+    "requirements": [
+        [
+            "tas_interacted"
+        ],
+        [
+            "has_ingredients"
+        ]
+    ],
+    "rewards": {
+        "recipes": [
+            "dm:_turret_assembly_station/parts/tier1/mg_turret/tas_mg_base"
+        ]
+    }
 }

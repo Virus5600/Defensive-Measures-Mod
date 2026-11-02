@@ -1,6 +1,5 @@
 package com.virus5600.defensive_measures.block.traps.tier3;
 
-import com.mojang.serialization.MapCodec;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ExplosionParticleInfo;
@@ -42,7 +41,6 @@ import org.jspecify.annotations.Nullable;
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
  */
 public class AntiPersonnelMineM14Block extends BaseLandmineBlock {
-	public static final MapCodec<AntiPersonnelMineM14Block> CODEC = simpleCodec(AntiPersonnelMineM14Block::new);
 	private static final VoxelShape SHAPE;
 
 	public AntiPersonnelMineM14Block(Properties settings) {
@@ -111,11 +109,6 @@ public class AntiPersonnelMineM14Block extends BaseLandmineBlock {
 	@Override @NonNull
 	protected VoxelShape getShape(BlockState state, @NonNull BlockGetter world, @NonNull BlockPos pos, @NonNull CollisionContext context) {
 		return SHAPE;
-	}
-
-	@Override @NonNull
-	public MapCodec<AntiPersonnelMineM14Block> codec() {
-		return CODEC;
 	}
 
 	// //////////////// //

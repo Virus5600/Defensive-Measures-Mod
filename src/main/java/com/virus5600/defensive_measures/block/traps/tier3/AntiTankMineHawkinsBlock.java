@@ -1,6 +1,5 @@
 package com.virus5600.defensive_measures.block.traps.tier3;
 
-import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ExplosionParticleInfo;
 import net.minecraft.core.particles.ParticleTypes;
@@ -54,7 +53,6 @@ import org.jspecify.annotations.Nullable;
 public class AntiTankMineHawkinsBlock extends BaseLandmineBlock {
 	private static final VoxelShape SHAPE_PLACED;
 	private static final VoxelShape SHAPE_THROWN;
-	public static final MapCodec<AntiTankMineHawkinsBlock> CODEC = simpleCodec(AntiTankMineHawkinsBlock::new);
 	public static final BooleanProperty THROWN = ModProperties.THROWN;
 
 	public AntiTankMineHawkinsBlock(Properties settings) {
@@ -159,11 +157,6 @@ public class AntiTankMineHawkinsBlock extends BaseLandmineBlock {
 				);
 			}
 		}
-	}
-
-	@Override @NonNull
-	public MapCodec<AntiTankMineHawkinsBlock> codec() {
-		return CODEC;
 	}
 
 	@Override

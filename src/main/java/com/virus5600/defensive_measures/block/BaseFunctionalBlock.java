@@ -93,18 +93,6 @@ public abstract class BaseFunctionalBlock extends Block {
 	protected abstract Component getTitle();
 
 	/**
-	 * Returns this block's codec. To create one, just create a static final {@link MapCodec} property
-	 * and set its value with the result of {{@link #simpleCodec(Function)}}.<br><br>
-	 *
-	 * Example:<br>
-	 * - {@code createCodec(CraftingTableBlock::new)}<br>
-	 * - {@link BoltHeadBlock#CODEC createCodec(BoltHeadBlock::new);}<br>
-	 *
-	 * @return {@link MapCodec} A MapCodec that will be used to serialize and deserialize this block.
-	 */
-	protected abstract @NonNull MapCodec<? extends BaseFunctionalBlock> codec();
-
-	/**
 	 * A dedicated stat to increment when interacting with this block.<br><br>
 	 *
 	 * Example:<br>

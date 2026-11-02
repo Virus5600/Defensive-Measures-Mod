@@ -38,6 +38,7 @@ public class ModClientPackets {
 		// v1.2.0-beta
 		ClientPlayNetworking.registerGlobalReceiver(PlayAnimationPacket.PAYLOAD_ID, PlayAnimationPacketReceiver::handle);
 		ClientPlayNetworking.registerGlobalReceiver(BlockHighlightPacket.PAYLOAD_ID, BlockHighlightPacketReceiver::handle);
+		ClientPlayNetworking.registerGlobalReceiver(BlockHighlightListPacket.PAYLOAD_ID, BlockHighlightPacketReceiver::handle);
 
 	}
 }

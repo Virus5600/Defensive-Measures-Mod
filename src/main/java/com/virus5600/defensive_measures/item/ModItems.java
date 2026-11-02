@@ -1,7 +1,6 @@
 package com.virus5600.defensive_measures.item;
 
 import net.fabricmc.fabric.api.creativetab.v1.CreativeModeTabEvents;
-import net.fabricmc.fabric.api.registry.FuelValueEvents;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.item.CreativeModeTabs;
@@ -17,7 +16,6 @@ import com.virus5600.defensive_measures.entity.ModEntities;
 import com.virus5600.defensive_measures.item.component.ModDataComponents;
 import com.virus5600.defensive_measures.item.equipments.tier1.*;
 import com.virus5600.defensive_measures.item.equipments.tier2.*;
-import com.virus5600.defensive_measures.item.interfaces.FuelItem;
 import com.virus5600.defensive_measures.item.misc.tier3.*;
 import com.virus5600.defensive_measures.item.turrets.TurretItem;
 import com.virus5600.defensive_measures.item.turrets.tier_0.*;
@@ -53,7 +51,6 @@ public class ModItems {
 	public final static Item[] DM_EQUIPMENTS;
 	public final static Item[] DM_TRAPS;
 	public final static Item[] DM_TURRETS;
-	public final static Item[] FUEL_ITEMS;
 
 	// /////// //
 	// TURRETS //
@@ -169,10 +166,24 @@ public class ModItems {
 	 * @return The registered item.
 	 */
 	private static Item registerItem(String name, EntityType<? extends Mob> entityType, TurretItemFactory<? extends TurretItem> factory) {
+		return registerItem(name, entityType, factory, new Properties());
+	}
+
+	/**
+	 * Registers a turret item which spawns a turret entity.
+	 *
+	 * @param name       The name of the item. (e.g. "cannon_turret")
+	 * @param entityType The entity type of the turret. (e.g. {@code ModEntities.CANNON_TURRET})
+	 * @param factory    The factory method to create the turret item. Usually a lambda expression like {@code CannonTurretItem::new}.
+	 * @param settings   The properties to apply to the item.
+	 *
+	 * @return The registered item.
+	 */
+	private static Item registerItem(String name, EntityType<? extends Mob> entityType, TurretItemFactory<? extends TurretItem> factory, Properties settings) {
 		return RegistryHelper.registerItem(
 			name,
-			(settings) -> factory.create(entityType, settings),
-			new Properties()
+			(properties) -> factory.create(entityType, properties),
+			settings
 		);
 	}
 
@@ -193,31 +204,28 @@ public class ModItems {
 
 	/**
 	 * Registers a normal item such as ingredients, etc.
-	 * @param name The name of the item. (e.g. {@code "cannon_base"})
+	 * @param name The name of the item. (e.g. "cannon_base")
 	 * @param factory The factory method to create the item. Usually a lambda expression like {@code CannonBaseItem::new}.
 	 * @return The registered item.
 	 */
 	private static Item registerItem(String name, ItemFactory<? extends Item> factory) {
-		return RegistryHelper.registerItem(
-			name,
-			factory::create,
-			new Properties()
-		);
+		return registerItem(name, factory, new Properties());
 	}
 
 	/**
 	 * Registers a normal item such as ingredients, etc.
 	 *
-	 * @param name  The name of the item. (e.g. {@code "cannon_base"})
-	 * @param props The properties of the item. (e.g. {@code new Item.Properties().rarity(Rarity.UNCOMMON)})
+	 * @param name The name of the item. (e.g. "cannon_base")
+	 * @param factory The factory method to create the item. Usually a lambda expression like {@code CannonBaseItem::new}.
+	 * @param settings The properties to apply to the item.
 	 *
 	 * @return The registered item.
 	 */
-	private static Item registerItem(String name, Properties props) {
+	private static Item registerItem(String name, ItemFactory<? extends Item> factory, Properties settings) {
 		return RegistryHelper.registerItem(
 			name,
-			Item::new,
-			props
+			factory::create,
+			settings
 		);
 	}
 
@@ -229,7 +237,7 @@ public class ModItems {
 	 * @return The registered item.
 	 */
 	private static Item registerItem(String name) {
-		return registerItem(name, new Properties());
+		return registerItem(name, Item::new, new Properties());
 	}
 
 	/**
@@ -313,16 +321,6 @@ public class ModItems {
 				(output) -> output.accept(item)
 			)
 		);
-
-		Arrays.stream(FUEL_ITEMS).iterator().forEachRemaining((item) -> FuelValueEvents.BUILD.register((builder, _) -> {
-			// Verifies whether the item is a valid fuel item. Ignores the item if it is not.
-			if (item instanceof FuelItem) {
-				builder.add(item, ((FuelItem) item).getFuelTime());
-			}
-			else {
-				DefensiveMeasures.LOGGER.warn("Item {} is not a valid fuel item.", item.getName(item.getDefaultInstance()).getString());
-			}
-		}));
 	}
 
 	private interface TurretItemFactory<T extends TurretItem> {
@@ -421,22 +419,6 @@ public class ModItems {
 			AA_TURRET,
 			FLAME_TURRET,
 			MISSILE_TURRET,
-		};
-
-		FUEL_ITEMS = new Item[] {
-			// PELLET TURRET
-			PELLET_TURRET,
-
-			// CANNON TURRET
-			CANNON_STAND,
-			CANNON_BASE,
-
-			// BALLISTA
-			BALLISTA_TURRET,
-			BALLISTA_BOLT,
-			BALLISTA_BASE,
-			BALLISTA_BASE_WITH_STAND,
-			BALLISTA_BOW,
 		};
 	}
 }

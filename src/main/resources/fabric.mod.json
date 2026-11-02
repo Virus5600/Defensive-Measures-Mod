@@ -3,7 +3,7 @@
 	"id": "dm",
 	"version": "${version}",
 
-	"name": "Defensive Measures",
+	"name": "${mod_name}",
 	"description": "Allows you to craft defensive turrets that will shoot any hostile mobs it detects, and defend villages that are within proximity.",
 	"authors": [
 		"Virus5600"
@@ -48,10 +48,10 @@
 		]
 	},
 	"depends": {
-		"fabricloader": ">=0.19.3",
-		"minecraft": "~26.2",
+		"fabricloader": ">=${loader_version}",
+		"minecraft": "~${minecraft_version}",
 		"java": ">=25",
-		"fabric-api": ">=0.153.0+26.2"
+		"fabric-api": ">=${fabric_api_version}"
 	},
 	"custom": {
 		"loom:classtweaker": "dm.classtweaker",

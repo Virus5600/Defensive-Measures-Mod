@@ -141,7 +141,7 @@ public class BlockProjectileRenderer extends BaseTurretProjectileRenderer<
 			height = 37.5f;
 			yTranslation = -0.75;
 
-			stack.mulPose(Axis.XN.rotationDegrees(90F));
+			stack.rotateDegrees(Axis.XN, 90F);
 		}
 
 		stack.translate(0.0, 0.25, 0.0);
