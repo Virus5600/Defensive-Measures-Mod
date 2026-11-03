@@ -2,7 +2,7 @@
 
 ## CURRENT TASK
 
-- [Implement Catapult Tower (#45)](#implement-catapult-tower-45)
+- [Implement Trebuchet Platform (#79)](#implement-trebuchet-platform-79)
 - [Reduce Projectile Persistence After Block Hit (#76)](#reduce-projectile-persistence-after-block-hit-76)
 
 ---
@@ -18,23 +18,17 @@ Fully implement this class after implementing a UI for the turrets.
 
 ## Update Code to 26.3 for Defensive Measures v1.2.0-beta (#75)
 
-## Implement Catapult Tower (#45)
+## Implement Trebuchet Platform (#79)
 
-### Catapult Tower
+# Trebuchet Platform
 
-In the medieval times, catapults are not only used as siege weapons but also defensive weapons as part of their defensive fortifications.
+Trebuchet is a form of catapult that uses counterweight instead of torsion/tension to power its shots.
 
-<img alt="Image" src="https://github.com/user-attachments/assets/80d48bd6-07e1-49ec-9d84-3756b482ff8a" />
+<img alt="Image" src="https://github.com/user-attachments/assets/df8be0b4-58d4-480f-bf23-548be21de0d3" />
 
-[By Thomas Ralph Spence](www.artfinding.com/Biography/Spence-Thomas-Ralph) [Public Domain](https://commons.wikimedia.org/w/index.php?curid=30470075)
+[From HowStuffWorks](https://history.howstuffworks.com/european-history/trebuchet.htm)
 
 The defensive emplacement is considered as a Tier-3 turret and thus, can only be crafted in the Workshop.
-
-As for the catapult's model, it will use the Mangonel:
-
-<img alt="Image" src="https://github.com/user-attachments/assets/43abe1ca-c267-4599-936f-23d38943c97f" />
-
-This allows the implementation to have an easier time lobbing projectiles than a sling-launched projectile from an Onager.
 
 As for its projectile, it will lob blocks as a custom block entity under the Defensive Measures namespace, allowing for a broader customization. Said projectile will be under the Explosive Projectile base class and for now, will use Cobblestone. The reasoning behind the use of Explosive Projectile as base class is for a future implementation that will allow Block Projectiles to be explosive, depending on a configuration.
 
