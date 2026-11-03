@@ -12,6 +12,10 @@ import com.virus5600.defensive_measures.entity.turrets.TurretEntity;
 
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Map;
+
+import com.google.common.collect.Maps;
+
 /**
  * An interface that provides a contract for entities that use block projectiles. This interface can
  * be implemented by any turret entity that shoots blocks as projectiles, allowing for consistent
@@ -35,6 +39,12 @@ import org.jetbrains.annotations.Nullable;
  * @implNote This interface is only implementable on {@link TurretEntity Turret Entities}.
  */
 public interface UsesBlockProjectile {
+	/**
+	 * A cache that maps turret entity identifiers to their corresponding allowed item tags. This
+	 * cache is used to avoid recomputing the same values multiple times during gameplay.
+	 */
+	Map<Identifier, TagKey<Item>> ALLOWED_ITEMS_CACHE = Maps.newHashMap();
+
 	// ///////////////// //
 	// INTERFACE METHODS //
 	// ///////////////// //
@@ -53,6 +63,9 @@ public interface UsesBlockProjectile {
 	 * @param item The item to update the current ammo with.
 	 *
 	 * @return {@code true} if the current ammo was successfully updated, {@code false} otherwise.
+	 *
+	 * @implNote This method should be called on the server side to ensure that the current ammo is
+	 * properly synchronized with the client. Return {@code false} if called in the client.
 	 */
 	boolean updateCurrentAmmo(Item item);
 
@@ -71,17 +84,19 @@ public interface UsesBlockProjectile {
 
 	/**
 	 * Gets the item tag representing the allowed (ammo) items that this turret can use to fire
-	 * a block projectile.
+	 * a block projectile. This method caches the allowed items for each turret entity type to
+	 * avoid recomputing the same values multiple times during gameplay.
 	 * <br><br>
-	 * While this method is an instance method and does not use a lot of resources, it is still
-	 * recommended to override this method and add a static field that hold the first instance of
-	 * the returened value to minimize resource usage.
+	 * The tag key for the allowed items is generated based on the turret entity's identifier,
+	 * following the format: {@code turret_item_ammo/<turret_id>_ammo}. For example, if the turret entity's
+	 * identifier is {@code defensive_measures:ballista_turret}, the tag key will be
+	 * {@code turret_item_ammo/ballista_turret_ammo}.
 	 *
 	 * @return The item tag representing the allowed (ammo) items for this turret.
 	 *
-	 * @implNote It is recommended to override this method and add a static field that holds the
-	 * first instance of the returned value to minimize resource usage, as this method is called
-	 * frequently during gameplay.
+	 * @implNote When overriding this method, it is recommended to retain the caching behavior to
+	 * ensure optimal performance. If the allowed items are dynamic and can change during gameplay,
+	 * consider implementing a mechanism to invalidate the cache when necessary.
 	 */
 	@Nullable
 	default TagKey<Item> getAllowedItems() {
@@ -89,12 +104,20 @@ public interface UsesBlockProjectile {
 			Identifier turretId = BuiltInRegistries.ENTITY_TYPE
 				.getKey(turret.getType());
 
-			String tagKey = "turret_item_ammo/" + turretId.getPath() + "_ammo";
+			if (ALLOWED_ITEMS_CACHE.containsKey(turretId)) {
+				return ALLOWED_ITEMS_CACHE.get(turretId);
+			}
 
-			return RegistryHelper.createItemTagKey(
-				turretId.getNamespace(),
-				tagKey
+			String tagKey = "turret_item_ammo/" + turretId.getPath() + "_ammo";
+			ALLOWED_ITEMS_CACHE.putIfAbsent(
+				turretId,
+				RegistryHelper.createItemTagKey(
+					turretId.getNamespace(),
+					tagKey
+				)
 			);
+
+			return ALLOWED_ITEMS_CACHE.get(turretId);
 		}
 
 		return null;
@@ -109,6 +132,7 @@ public interface UsesBlockProjectile {
 	 * @return True if the item is a valid ammo item for this turret entity, false otherwise.
 	 */
 	default boolean isValidAmmo(Item item) {
-		return this.getAllowedItems() != null && RegistryHelper.isOf(item, this.getAllowedItems());
+		TagKey<Item> allowedItems = this.getAllowedItems();
+		return allowedItems != null && RegistryHelper.isOf(item, allowedItems);
 	}
 }

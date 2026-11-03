@@ -206,7 +206,7 @@ public class MetalDetectorItem extends Item {
 
 		BlockHighlightListPacket packet = new BlockHighlightListPacket(
 			metalBlocks,
-			0xFF0000,		// Red color in ARGB format
+			0xFF0000,		// Red color in ARGB format; Alpha is ignored by the code though as it is used by the code to fade it out over time
 			1 * 20				// Duration in ticks (1 second)
 		);
 

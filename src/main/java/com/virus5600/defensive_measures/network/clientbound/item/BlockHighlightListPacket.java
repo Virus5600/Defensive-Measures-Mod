@@ -17,11 +17,13 @@ import java.util.List;
  * the attention of the player to the target block.
  *
  * @param posList       The list of positions of the blocks to highlight.
- * @param argb          The ARGB color of the highlight.
+ * @param argb          The ARGB color of the highlight. Though, the alpha channel is not used, it is still required to be set to 255 (fully opaque) for the color to be visible.
  * @param durationTicks The duration of the highlight in ticks.
  *
  * @since 1.2.0-beta
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
+ *
+ * @see BlockHighlightPacket
  */
 public record BlockHighlightListPacket(
 	List<BlockPos> posList, int argb, int durationTicks

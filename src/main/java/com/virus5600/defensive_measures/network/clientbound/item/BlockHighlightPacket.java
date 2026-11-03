@@ -15,11 +15,13 @@ import com.virus5600.defensive_measures.DefensiveMeasures;
  * of the player to the target block.
  *
  * @param pos           The position of the block to highlight.
- * @param argb          The ARGB color of the highlight.
+ * @param argb          The ARGB color of the highlight. Though, the alpha channel is not used, it is still required to be set to 255 (fully opaque) for the color to be visible.
  * @param durationTicks The duration of the highlight in ticks.
  *
  * @since 1.2.0-beta
  * @author <a href="https://github.com/Virus5600">Virus5600</a>
+ *
+ * @see BlockHighlightListPacket
  */
 public record BlockHighlightPacket(
 	BlockPos pos, int argb, int durationTicks

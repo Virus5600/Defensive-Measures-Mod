@@ -124,7 +124,7 @@ public class PelletTurretEntity extends TurretEntity {
 
 	public static Builder setAttributes() {
 		TurretEntity.setTurretMaxHealth(20);
-		TurretEntity.setTurretMaxRange(10 + ModEntities.BALLISTA_TURRET.getDimensions().eyeHeight());
+		TurretEntity.setTurretMaxRange(10 + ModEntities.PELLET_TURRET.getDimensions().eyeHeight());
 
 		return TurretEntity.setAttributes();
 	}

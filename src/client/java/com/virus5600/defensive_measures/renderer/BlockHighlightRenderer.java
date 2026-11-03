@@ -93,7 +93,7 @@ public class BlockHighlightRenderer {
 	 * Adds a block to be highlighted for a fixed duration.
 	 *
 	 * @param pos           The position of the block to highlight.
-	 * @param argb          The color of the highlight in ARGB format.
+	 * @param argb          The color of the highlight in ARGB format. Though, the alpha channel is not used, it is still required to be set to 255 (fully opaque) for the color to be visible.
 	 * @param durationTicks The duration of the highlight in ticks.
 	 */
 	public static void highlight(BlockPos pos, int argb, int durationTicks) {
@@ -108,6 +108,7 @@ public class BlockHighlightRenderer {
 
 	public static void clearAll() {
 		highlights.clear();
+		previousBlockstates.clear();
 	}
 
 	// //////////////// //
@@ -135,6 +136,7 @@ public class BlockHighlightRenderer {
 			long age = now - data.addedAtTick();
 			if (age > data.durationTicks()) {
 				it.remove();
+				clear(entry.getKey());
 				continue;
 			}
 
@@ -161,7 +163,7 @@ public class BlockHighlightRenderer {
 
 			double size = bounds.getSize();
 			if (size < 0.25 && size != 0) {
-				bounds = bounds.inflate(size / (size / 0.25));
+				bounds = bounds.inflate(0.25);
 			}
 
 			states.add(new HighlightRenderState(pos, bounds, data.color(), alpha));

@@ -87,10 +87,12 @@ public class FlintPelletEntity extends KineticProjectileEntity {
 	public void tick() {
 		super.tick();
 
+		// If the projectile is nearly stationary and has not been idle for a while, set the idle age to the current tick count.
 		if (this.getDeltaMovement().length() < 0.01 && this.idleAge == 0) {
 			this.idleAge = this.tickCount;
 		}
 
+		// If the projectile has been idle for more than 100 ticks (5 seconds), discard it.
 		if (this.idleAge + 100 <= this.tickCount) {
 			this.discard();
 		}

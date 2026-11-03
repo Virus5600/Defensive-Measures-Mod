@@ -299,24 +299,22 @@ public class DirtTurretEntity extends TurretEntity implements UsesBlockProjectil
 
 	@Override
 	public boolean updateCurrentAmmo(Item item) {
-		if (!this.isValidAmmo(item)) {
+		if (this.level().isClientSide() && !this.isValidAmmo(item)) {
 			return false;
 		}
 
 		EntityBlockAttributeIndex attrIndex = BlockProjectileConfigManager.getConfigForEntity(this.getType());
-		this.currentAmmo = item;
-		this.currentAmmoAttr = attrIndex.entityDefault();
-
-		this.entityData.set(CURRENT_AMMO, this.currentAmmo.getDefaultInstance());
-
 		AttributeValues ammoAttr = attrIndex.getBlockAttributes(RegistryHelper.getIdentifier(this.currentAmmo).toString());
-		if (this.currentAmmoAttr != ammoAttr) {
-			this.currentAmmoAttr = ammoAttr;
 
-			return true;
+		if (this.currentAmmoAttr.equals(ammoAttr)) {
+			return false;
 		}
 
-		return false;
+		this.currentAmmo = item;
+		this.entityData.set(CURRENT_AMMO, this.currentAmmo.getDefaultInstance());
+		this.currentAmmoAttr = ammoAttr;
+
+		return true;
 	}
 
 	@Override
